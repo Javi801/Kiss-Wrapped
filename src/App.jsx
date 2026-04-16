@@ -15,7 +15,7 @@ import {
 
 import LanguageSwitcher from "@/components/app/LanguageSwitcher";
 import PeopleScreen from "@/components/people/PeopleScreen";
-import MainScreen from "./components/app/MainScreen";
+import HomeScreen from "./components/app/HomeScreen";
 import AddPersonScreen from "./components/app/AddPersonScreen";
 import IntroScreen from "./components/app/IntroScreen";
 import StatsScreen from "@/components/stats/StatsScreen";
@@ -278,7 +278,7 @@ export default function KissRecorderApp() {
 
           {/* Main dashboard */}
           {screen === "main" ? (
-            <MainScreen
+            <HomeScreen
               onNavigate={setScreen}
               onClearData={clearAllAppData}
               people={people}

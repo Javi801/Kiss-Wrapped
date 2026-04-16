@@ -10,7 +10,7 @@ import StatTile from "@/components/shared/StatTile";
  * Renders the main dashboard screen.
  * It shows summary metrics and the primary navigation actions.
  */
-export default function MainScreen({ onNavigate, onClearData, people, t }) {
+export default function HomeScreen({ onNavigate, onClearData, people, t }) {
   // Count all events across every saved person.
   const totalEvents = people.reduce(
     (sum, person) => sum + (person.events?.length || 0),
