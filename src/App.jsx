@@ -282,6 +282,8 @@ export default function KissRecorderApp() {
               onClearData={clearAllAppData}
               people={people}
               t={t}
+              language={language}
+              setLanguage={setLanguage}
             />
           ) : null}
 

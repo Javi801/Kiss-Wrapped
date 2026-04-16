@@ -5,12 +5,20 @@ import { Button } from "@/components/ui/button";
 
 import { PALETTE } from "@/lib/constants";
 import StatTile from "@/components/shared/StatTile";
+import LanguageSelector from "@/components/app/LanguageSelector";
 
 /**
  * Renders the main dashboard screen.
- * It shows summary metrics and the primary navigation actions.
+ * It shows summary metrics, primary actions, and app-level settings.
  */
-export default function HomeScreen({ onNavigate, onClearData, people, t }) {
+export default function MainScreen({
+  onNavigate,
+  onClearData,
+  people,
+  t,
+  language,
+  setLanguage,
+}) {
   // Count all events across every saved person.
   const totalEvents = people.reduce(
     (sum, person) => sum + (person.events?.length || 0),
@@ -104,6 +112,23 @@ export default function HomeScreen({ onNavigate, onClearData, people, t }) {
           {t.clearLocalData}
         </Button>
       </div>
+
+      {/* App settings */}
+      <Card
+        className="rounded-3xl shadow-sm backdrop-blur"
+        style={{
+          borderColor: "#f1dde7",
+          backgroundColor: "rgba(255,255,255,0.84)",
+        }}
+      >
+        <CardContent className="p-5">
+          <LanguageSelector
+            language={language}
+            setLanguage={setLanguage}
+            t={t}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }
