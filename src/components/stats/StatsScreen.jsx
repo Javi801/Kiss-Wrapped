@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { BarChart3, Clock3, UserRound, BadgePercent, Download, CheckCircle2 } from "lucide-react";
+import { BarChart3, Clock3, UserRound, BadgePercent, Download, CheckCircle2, TriangleAlert } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +11,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { PALETTE } from "@/lib/constants";
-import { exportStatsPdf } from "@/lib/pdf-export";
+import { exportStatsPdf, saveErrorLog } from "@/lib/pdf-export";
 
 import StatsOverviewTab from "@/components/stats/StatsOverviewTab";
 import StatsTimeTab from "@/components/stats/StatsTimeTab";
@@ -183,6 +183,36 @@ export default function StatsScreen({ people, t }) {
           </DialogHeader>
           <DialogFooter>
             <Button onClick={() => setPdfStatus(null)}>{t.close}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Error dialog */}
+      <Dialog
+        open={pdfStatus instanceof Error}
+        onOpenChange={(open) => { if (!open) setPdfStatus(null); }}
+      >
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <div className="flex items-center gap-2 text-red-600">
+              <TriangleAlert className="h-5 w-5 shrink-0" />
+              <DialogTitle className="text-red-600">{t.pdfErrorTitle}</DialogTitle>
+            </div>
+            <DialogDescription>{t.pdfErrorDesc}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPdfStatus(null)}>
+              {t.close}
+            </Button>
+            <Button
+              className="bg-red-600 text-white hover:bg-red-700"
+              onClick={() => {
+                saveErrorLog(pdfStatus).catch(console.error);
+                setPdfStatus(null);
+              }}
+            >
+              {t.savePdfErrorLog}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
