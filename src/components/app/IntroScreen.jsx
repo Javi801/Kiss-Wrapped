@@ -10,11 +10,8 @@ import HeroVisualPlaceholder from "@/components/visuals/HeroVisualPlaceholder";
  */
 export default function IntroScreen({ onOpenMain, t }) {
   return (
-    <button
-      type="button"
-      onClick={onOpenMain}
-      aria-label={t.hiddenAccess}
-      className="relative flex min-h-[calc(100vh-2.5rem)] w-full items-center justify-center overflow-hidden rounded-[32px] text-left"
+    <div
+      className="relative flex min-h-[calc(100vh-2.5rem)] w-full items-center justify-center overflow-hidden rounded-[32px]"
       style={{
         background: `linear-gradient(135deg, ${PALETTE.blush}, ${PALETTE.lilac}, ${PALETTE.sky})`,
       }}
@@ -25,6 +22,16 @@ export default function IntroScreen({ onOpenMain, t }) {
       {/* Top radial overlay */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.95),_transparent_45%)]" />
 
+      {/* Hidden entry — top-left heart */}
+      <button
+        type="button"
+        onClick={onOpenMain}
+        aria-label={t.hiddenAccess}
+        className="absolute left-4 top-4 z-10 p-1 text-rose-300 opacity-40 transition hover:opacity-70"
+      >
+        ♡
+      </button>
+
       {/* Center visual */}
       <motion.div
         initial={{ scale: 0.96, opacity: 0 }}
@@ -34,6 +41,6 @@ export default function IntroScreen({ onOpenMain, t }) {
       >
         <HeroVisualPlaceholder t={t} />
       </motion.div>
-    </button>
+    </div>
   );
 }
