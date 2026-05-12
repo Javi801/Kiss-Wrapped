@@ -10,14 +10,13 @@ export default function IntroScreen({ onOpenMain, t }) {
   return (
     <div
       style={{
-        position: "relative",
+        position: "fixed",
+        inset: 0,
         display: "flex",
-        minHeight: "calc(100vh - 2.5rem)",
-        width: "100%",
         alignItems: "center",
         justifyContent: "center",
         overflow: "hidden",
-        borderRadius: "32px",
+        zIndex: 10,
         background: `linear-gradient(135deg, ${PALETTE.blush}, ${PALETTE.lilac}, ${PALETTE.sky})`,
       }}
     >
