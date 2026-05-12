@@ -9,8 +9,15 @@ import HeroVisualPlaceholder from "@/components/visuals/HeroVisualPlaceholder";
 export default function IntroScreen({ onOpenMain, t }) {
   return (
     <div
-      className="relative flex min-h-[calc(100vh-2.5rem)] w-full items-center justify-center overflow-hidden rounded-[32px]"
       style={{
+        position: "relative",
+        display: "flex",
+        minHeight: "calc(100vh - 2.5rem)",
+        width: "100%",
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden",
+        borderRadius: "32px",
         background: `linear-gradient(135deg, ${PALETTE.blush}, ${PALETTE.lilac}, ${PALETTE.sky})`,
       }}
     >
@@ -18,20 +25,49 @@ export default function IntroScreen({ onOpenMain, t }) {
       <BubbleStarsBackground />
 
       {/* Top radial overlay */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.95),_transparent_45%)]" />
+      <div
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          background: "radial-gradient(circle at top, rgba(255,255,255,0.95), transparent 45%)",
+        }}
+      />
 
       {/* Hidden entry — top-left heart */}
       <button
         type="button"
         onClick={onOpenMain}
         aria-label={t.hiddenAccess}
-        className="absolute left-4 top-4 z-10 p-1 text-rose-300 opacity-40 transition hover:opacity-70"
+        style={{
+          position: "absolute",
+          top: "1rem",
+          left: "1rem",
+          zIndex: 10,
+          padding: "0.25rem",
+          color: "#fda4af",
+          opacity: 0.4,
+          transition: "opacity 150ms",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+        }}
       >
         ♡
       </button>
 
       {/* Center visual */}
-      <div className="relative flex flex-col items-center">
+      <div
+        style={{
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
         <HeroVisualPlaceholder t={t} />
       </div>
     </div>
