@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { PALETTE, MAIN_VISUAL_ASSET } from "@/lib/constants";
+import { PALETTE } from "@/lib/constants";
+import mainBackground from "@/assets/main-background.png";
 
 /**
  * Displays the main circular hero visual.
@@ -12,13 +13,27 @@ export default function HeroVisualPlaceholder() {
 
   return (
     <div
-      className="relative flex h-72 w-72 items-center justify-center rounded-full backdrop-blur-sm"
-      style={{ backgroundColor: "rgba(255,255,255,0.55)" }}
+      style={{
+        position: "relative",
+        display: "flex",
+        height: "18rem",
+        width: "18rem",
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: "9999px",
+        backdropFilter: "blur(4px)",
+        backgroundColor: "rgba(255,255,255,0.55)",
+      }}
     >
       {/* Background gradient layer */}
       <div
-        className="absolute inset-6 rounded-full"
         style={{
+          position: "absolute",
+          top: "1.5rem",
+          right: "1.5rem",
+          bottom: "1.5rem",
+          left: "1.5rem",
+          borderRadius: "9999px",
           background: `linear-gradient(135deg, ${PALETTE.blush}, #fff7fb, ${PALETTE.sky})`,
         }}
       />
@@ -27,18 +42,29 @@ export default function HeroVisualPlaceholder() {
       <motion.div
         animate={{ y: [0, -8, 0] }}
         transition={{ repeat: Infinity, duration: 4.2, ease: "easeInOut" }}
-        className="relative z-10 flex h-48 w-48 items-center justify-center overflow-hidden rounded-[32px] border border-white/45 bg-white/25 text-center shadow-sm"
+        style={{
+          position: "relative",
+          zIndex: 10,
+          display: "flex",
+          height: "12rem",
+          width: "12rem",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden",
+          borderRadius: "32px",
+          textAlign: "center",
+        }}
       >
         {hasImage ? (
           <img
-            src={MAIN_VISUAL_ASSET}
+            src={mainBackground}
             alt="KissRecorder visual"
-            className="h-full w-full object-contain"
+            style={{ height: "100%", width: "100%", objectFit: "contain" }}
             onError={() => setHasImage(false)}
           />
         ) : (
           // Fallback when image is missing.
-          <div className="px-5" />
+          <div style={{ paddingLeft: "1.25rem", paddingRight: "1.25rem" }} />
         )}
       </motion.div>
     </div>

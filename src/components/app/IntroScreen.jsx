@@ -1,8 +1,7 @@
-import { motion } from "framer-motion";
-
 import { PALETTE } from "@/lib/constants";
 import BubbleStarsBackground from "@/components/visuals/BubbleStarsBackground";
 import HeroVisualPlaceholder from "@/components/visuals/HeroVisualPlaceholder";
+import InteractiveBubbles from "@/components/visuals/InteractiveBubbles";
 
 /**
  * Initial splash-like screen with hidden entry.
@@ -10,30 +9,70 @@ import HeroVisualPlaceholder from "@/components/visuals/HeroVisualPlaceholder";
  */
 export default function IntroScreen({ onOpenMain, t }) {
   return (
-    <button
-      type="button"
-      onClick={onOpenMain}
-      aria-label={t.hiddenAccess}
-      className="relative flex min-h-[calc(100vh-2.5rem)] w-full items-center justify-center overflow-hidden rounded-[32px] text-left"
+    <div
       style={{
+        position: "fixed",
+        inset: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden",
+        zIndex: 10,
         background: `linear-gradient(135deg, ${PALETTE.blush}, ${PALETTE.lilac}, ${PALETTE.sky})`,
       }}
     >
       {/* Floating animated background elements */}
       <BubbleStarsBackground />
 
+      {/* Interactive poppable bubbles */}
+      <InteractiveBubbles />
+
       {/* Top radial overlay */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.95),_transparent_45%)]" />
+      <div
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          background: "radial-gradient(circle at top, rgba(255,255,255,0.95), transparent 45%)",
+        }}
+      />
+
+      {/* Hidden entry — top-left heart */}
+      <button
+        type="button"
+        onClick={onOpenMain}
+        aria-label={t.hiddenAccess}
+        style={{
+          position: "absolute",
+          top: "1rem",
+          left: "1rem",
+          zIndex: 10,
+          padding: "0.25rem",
+          color: "#fda4af",
+          opacity: 0.4,
+          transition: "opacity 150ms",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+        }}
+      >
+        ♡
+      </button>
 
       {/* Center visual */}
-      <motion.div
-        initial={{ scale: 0.96, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.35 }}
-        className="relative flex flex-col items-center"
+      <div
+        style={{
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
       >
         <HeroVisualPlaceholder t={t} />
-      </motion.div>
-    </button>
+      </div>
+    </div>
   );
 }

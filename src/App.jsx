@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { Search, Users, BarChart3, UserPlus } from "lucide-react";
 
 import { LANGUAGE_KEY, PALETTE, COPY } from "@/lib/constants";
