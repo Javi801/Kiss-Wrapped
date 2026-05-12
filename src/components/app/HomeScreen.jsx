@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 
 import { PALETTE } from "@/lib/constants";
 import StatTile from "@/components/shared/StatTile";
+import SettingsTile from "@/components/shared/SettingsTile";
 import LanguageSelector from "@/components/app/LanguageSelector";
 
 /**
@@ -54,6 +55,18 @@ export default function MainScreen({
               accent={true}
             />
           </div>
+
+          {/* App settings */}
+          <div className="mt-5">
+            <SettingsTile accent={true}>
+              <LanguageSelector
+                language={language}
+                setLanguage={setLanguage}
+                t={t}
+              />
+            </SettingsTile>
+          </div>
+
         </CardContent>
       </Card>
 
@@ -112,23 +125,6 @@ export default function MainScreen({
           {t.clearLocalData}
         </Button>
       </div>
-
-      {/* App settings */}
-      <Card
-        className="rounded-3xl shadow-sm backdrop-blur"
-        style={{
-          borderColor: "#f1dde7",
-          backgroundColor: "rgba(255,255,255,0.84)",
-        }}
-      >
-        <CardContent className="p-5">
-          <LanguageSelector
-            language={language}
-            setLanguage={setLanguage}
-            t={t}
-          />
-        </CardContent>
-      </Card>
     </div>
   );
 }
