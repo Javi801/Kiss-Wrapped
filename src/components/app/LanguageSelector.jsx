@@ -24,8 +24,8 @@ export default function LanguageSelector({ language, setLanguage, t }) {
   return (
     <div className="space-y-2">
       <p
-        className="text-sm font-medium"
-        style={{ color: PALETTE.text }}
+        className="text-sm font-semibold uppercase"
+        style={{ color: "rgba(255,255,255,0.88)" }}
       >
         {t.language}
       </p>
