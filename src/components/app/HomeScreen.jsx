@@ -1,7 +1,16 @@
-import { UserPlus, Users, BarChart3, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { UserPlus, Users, BarChart3, Trash2, TriangleAlert } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 import { PALETTE } from "@/lib/constants";
 import StatTile from "@/components/shared/StatTile";
@@ -20,6 +29,8 @@ export default function MainScreen({
   language,
   setLanguage,
 }) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   // Count all events across every saved person.
   const totalEvents = people.reduce(
     (sum, person) => sum + (person.events?.length || 0),
@@ -119,12 +130,40 @@ export default function MainScreen({
             borderColor: "#ecd6e0",
             backgroundColor: "rgba(255,255,255,0.86)",
           }}
-          onClick={onClearData}
+          onClick={() => setConfirmOpen(true)}
         >
           <Trash2 className="mr-3 h-5 w-5" />
           {t.clearLocalData}
         </Button>
       </div>
+
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <div className="flex items-center gap-2 text-red-600">
+              <TriangleAlert className="h-5 w-5 shrink-0" />
+              <DialogTitle className="text-red-600">
+                {t.clearDataConfirmTitle}
+              </DialogTitle>
+            </div>
+            <DialogDescription>{t.clearDataConfirmDesc}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmOpen(false)}>
+              {t.cancel}
+            </Button>
+            <Button
+              className="bg-red-600 text-white hover:bg-red-700"
+              onClick={() => {
+                setConfirmOpen(false);
+                onClearData();
+              }}
+            >
+              {t.clearDataConfirmAction}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
