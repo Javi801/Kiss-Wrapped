@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import { Filesystem, Directory } from "@capacitor/filesystem";
+import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import { CHART_COLORS, PALETTE } from "@/lib/constants";
 import { isNativePlatform } from "@/lib/device-storage";
 import { hexToRgb } from "@/lib/helpers";
@@ -489,8 +489,9 @@ export async function exportStatsPdf(people, t) {
 
     await Filesystem.writeFile({
       path: fileName,
-      directory: Directory.Documents,
+      directory: Directory.External,
       data: base64,
+      recursive: true,
     });
     return;
   }
