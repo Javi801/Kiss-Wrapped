@@ -135,26 +135,25 @@ export default function PeopleManagerScreen({
   }, [filteredPeople, groupBy, t]);
 
   return (
-    <div className="space-y-4">
+    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <div>
         <h2
-          className="text-2xl font-bold tracking-tight"
-          style={{ color: PALETTE.text }}
+          style={{ fontSize: "1.5rem", lineHeight: "2rem", fontWeight: "700", letterSpacing: "-0.025em", color: PALETTE.text }}
         >
           {t.personListTitle}
         </h2>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
         {/* Search input */}
-        <div className="relative flex-1">
+        <div style={{ position: "relative", flex: "1 1 0%" }}>
           <Search
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
-            style={{ color: PALETTE.rose }}
+            style={{ pointerEvents: "none", position: "absolute", left: "0.75rem", top: "50%", height: "1rem", width: "1rem", transform: "translateY(-50%)", color: PALETTE.rose }}
           />
           <Input
-            className="rounded-2xl pl-9"
+            className="rounded-2xl"
             style={{
+              paddingLeft: "2.25rem",
               borderColor: "#ecd6e0",
               backgroundColor: "rgba(255,255,255,0.86)",
             }}
@@ -175,15 +174,17 @@ export default function PeopleManagerScreen({
                 backgroundColor: "rgba(255,255,255,0.86)",
               }}
             >
-              <Filter className="mr-2 h-4 w-4" />
+              <Filter style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
               {t.filters}
             </Button>
           </SheetTrigger>
 
           <SheetContent
             side="right"
-            className="w-[92%] max-w-sm overflow-y-auto"
             style={{
+              width: "92%",
+              maxWidth: "24rem",
+              overflowY: "auto",
               borderLeftColor: "#f1dde7",
               backgroundColor: "rgba(255,255,255,0.97)",
             }}
@@ -192,7 +193,7 @@ export default function PeopleManagerScreen({
               <SheetTitle>{t.refineList}</SheetTitle>
             </SheetHeader>
 
-            <div className="mt-6">
+            <div style={{ marginTop: "1.5rem" }}>
               <FiltersPanel
                 filters={filters}
                 setFilters={setFilters}
@@ -210,17 +211,16 @@ export default function PeopleManagerScreen({
       </div>
 
       {filteredPeople.length ? (
-        <div className="space-y-5">
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
           {grouped.map(([group, members]) => (
-            <div key={group} className="space-y-3">
+            <div key={group} style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
               {/* Group header */}
               <div
-                className="sticky top-0 z-10 rounded-2xl px-3 py-2 backdrop-blur"
-                style={{ backgroundColor: "rgba(255,255,255,0.78)" }}
+                className="rounded-2xl"
+                style={{ position: "sticky", top: 0, zIndex: 10, paddingLeft: "0.75rem", paddingRight: "0.75rem", paddingTop: "0.5rem", paddingBottom: "0.5rem", backdropFilter: "blur(8px)", backgroundColor: "rgba(255,255,255,0.78)" }}
               >
                 <p
-                  className="text-xs font-semibold uppercase tracking-[0.16em]"
-                  style={{ color: PALETTE.rose }}
+                  style={{ fontSize: "0.75rem", lineHeight: "1rem", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.16em", color: PALETTE.rose }}
                 >
                   {groupBy === "lastEventDate" && group !== t.noEvents
                     ? formatDisplayDate(group)
@@ -229,7 +229,7 @@ export default function PeopleManagerScreen({
               </div>
 
               {/* Group members */}
-              <div className="space-y-3">
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                 {members.map((person) => (
                   <PersonCard
                     key={person.id}
