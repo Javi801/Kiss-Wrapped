@@ -324,20 +324,20 @@ export default function KissRecorderApp() {
 
   return (
     <div
-      className="h-screen text-slate-900"
       style={{
+        height: "100vh",
+        color: "#0f172a",
         background: `linear-gradient(180deg, ${PALETTE.bgGradientFrom}, ${PALETTE.bgSoft}, ${PALETTE.sky})`,
       }}
     >
-      <div className="mx-auto flex h-full w-full max-w-md flex-col px-4">
+      <div style={{ margin: "0 auto", display: "flex", height: "100%", width: "100%", maxWidth: "28rem", flexDirection: "column", paddingLeft: "1rem", paddingRight: "1rem" }}>
         {/* Main animated content area */}
         <motion.div
           ref={scrollRef}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
-          className="flex-1 overflow-y-scroll pt-5 pb-20"
-          style={{ WebkitOverflowScrolling: "touch" }}
+          style={{ flex: "1 1 0%", overflowY: "scroll", paddingTop: "1.25rem", paddingBottom: "5rem", WebkitOverflowScrolling: "touch" }}
         >
           {/* Entry screen */}
           {screen === "intro" ? (
@@ -390,13 +390,17 @@ export default function KissRecorderApp() {
         {/* Bottom navigation */}
         {!hideBottomBar ? (
           <div
-            className="fixed bottom-0 left-0 right-0 backdrop-blur"
             style={{
+              position: "fixed",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              backdropFilter: "blur(8px)",
               borderTop: "1px solid #ecd6e0",
               backgroundColor: "rgba(255,255,255,0.8)",
             }}
           >
-            <div className="mx-auto grid max-w-md grid-cols-4 gap-1 px-3 py-3">
+            <div style={{ margin: "0 auto", display: "grid", maxWidth: "28rem", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "0.25rem", paddingLeft: "0.75rem", paddingRight: "0.75rem", paddingTop: "0.75rem", paddingBottom: "0.75rem" }}>
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const active = screen === item.key;
@@ -405,15 +409,28 @@ export default function KissRecorderApp() {
                   <button
                     key={item.key}
                     onClick={() => navigateTo(item.key)}
-                    className="flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium transition"
                     style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "0.25rem",
+                      borderRadius: "1rem",
+                      paddingLeft: "0.5rem",
+                      paddingRight: "0.5rem",
+                      paddingTop: "0.5rem",
+                      paddingBottom: "0.5rem",
+                      fontSize: "0.75rem",
+                      lineHeight: "1rem",
+                      fontWeight: "500",
+                      transition: "all 150ms cubic-bezier(0.4, 0, 0.2, 1)",
                       background: active
                         ? `linear-gradient(90deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`
                         : "transparent",
                       color: active ? "#ffffff" : PALETTE.textSoft,
                     }}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon style={{ height: "1rem", width: "1rem" }} />
                     {item.label}
                   </button>
                 );
