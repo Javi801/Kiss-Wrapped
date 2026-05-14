@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { GENDERS, ZODIAC_OPTIONS, PALETTE } from "@/lib/constants";
+import { GENDERS, ZODIAC_OPTIONS, PALETTE, TEXT } from "@/lib/constants";
 import { translateGender } from "@/lib/format";
 
 /**
@@ -94,8 +94,8 @@ export default function PersonForm({
 
   // Shared input styling.
   const inputStyle = {
-    borderColor: "#ecd6e0",
-    backgroundColor: "rgba(255,255,255,0.88)",
+    borderColor: PALETTE.inputBorder,
+    backgroundColor: PALETTE.inputBg,
   };
 
   return (
@@ -111,7 +111,7 @@ export default function PersonForm({
             style={{ ...inputStyle }}
           />
           {errors.name && (
-            <p style={{ fontSize: "0.75rem", lineHeight: "1rem", color: "#ef4444" }}>{errors.name}</p>
+            <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.name}</p>
           )}
         </div>
 
@@ -127,7 +127,7 @@ export default function PersonForm({
             style={{ ...inputStyle }}
             />
             {errors.age && (
-              <p style={{ fontSize: "0.75rem", lineHeight: "1rem", color: "#ef4444" }}>{errors.age}</p>
+              <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.age}</p>
             )}
           </div>
 
@@ -151,7 +151,7 @@ export default function PersonForm({
             </Select>
 
             {errors.gender && (
-              <p style={{ fontSize: "0.75rem", lineHeight: "1rem", color: "#ef4444" }}>{errors.gender}</p>
+              <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.gender}</p>
             )}
           </div>
         </div>
@@ -167,7 +167,7 @@ export default function PersonForm({
             style={{ ...inputStyle }}
             />
             {errors.howWeMet && (
-              <p style={{ fontSize: "0.75rem", lineHeight: "1rem", color: "#ef4444" }}>{errors.howWeMet}</p>
+              <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.howWeMet}</p>
             )}
           </div>
         )}
@@ -193,7 +193,7 @@ export default function PersonForm({
           </Select>
 
           {errors.zodiacSign && (
-            <p style={{ fontSize: "0.75rem", lineHeight: "1rem", color: "#ef4444" }}>{errors.zodiacSign}</p>
+            <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.zodiacSign}</p>
           )}
         </div>
 
@@ -219,7 +219,7 @@ export default function PersonForm({
           </Select>
 
           {errors.activity && (
-            <p style={{ fontSize: "0.75rem", lineHeight: "1rem", color: "#ef4444" }}>{errors.activity}</p>
+            <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.activity}</p>
           )}
         </div>
 
