@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { PALETTE } from "@/lib/constants";
+import { PALETTE, TEXT } from "@/lib/constants";
 
 /**
  * Renders a reusable empty state block with icon, text, and optional action.
@@ -13,8 +13,8 @@ export default function EmptyState({
 }) {
   // Keep card styles grouped so the component stays easy to scan.
   const cardStyle = {
-    borderColor: "#f1dde7",
-    backgroundColor: "rgba(255,255,255,0.78)",
+    borderColor: PALETTE.cardBorder,
+    backgroundColor: PALETTE.surfaceBg,
   };
 
   // Reuse palette colors for the icon badge.
@@ -31,12 +31,12 @@ export default function EmptyState({
 
         <div>
           <h3
-            style={{ fontSize: "1rem", lineHeight: "1.5rem", fontWeight: "600", color: PALETTE.text }}
+            style={{ ...TEXT.title, color: PALETTE.text }}
           >
             {title}
           </h3>
 
-          <p style={{ marginTop: "0.25rem", fontSize: "0.875rem", lineHeight: "1.25rem", color: PALETTE.textSoft }}>
+          <p style={{ marginTop: "0.25rem", ...TEXT.body, color: PALETTE.textSoft }}>
             {description}
           </p>
         </div>
