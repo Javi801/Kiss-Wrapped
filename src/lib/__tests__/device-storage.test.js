@@ -70,3 +70,21 @@ describe("savePeopleToDevice (web path)", () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// clearPeopleFromDevice
+// ---------------------------------------------------------------------------
+describe("clearPeopleFromDevice (web path)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("removes the people entry from localStorage", async () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([{ name: "Ana" }]));
+    await clearPeopleFromDevice();
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+  });
+
+  it("does not throw when the entry does not exist", async () => {
+    await expect(clearPeopleFromDevice()).resolves.not.toThrow();
+  });
+});
