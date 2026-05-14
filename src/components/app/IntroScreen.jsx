@@ -40,7 +40,7 @@ export default function IntroScreen({ onOpenMain, t }) {
         }}
       />
 
-      {/* Hidden entry — top-left heart */}
+      {/* Hidden entry in the top-left heart. */}
       <button
         type="button"
         onClick={onOpenMain}
