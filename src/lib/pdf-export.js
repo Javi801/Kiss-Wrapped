@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import { Filesystem, Directory } from "@capacitor/filesystem";
+import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import { CHART_COLORS, PALETTE } from "@/lib/constants";
 import { isNativePlatform } from "@/lib/device-storage";
 import { hexToRgb } from "@/lib/helpers";
@@ -489,12 +489,42 @@ export async function exportStatsPdf(people, t) {
 
     await Filesystem.writeFile({
       path: fileName,
-      directory: Directory.Documents,
+      directory: Directory.External,
       data: base64,
+      recursive: true,
     });
     return;
   }
 
   // Fall back to the browser download flow on web.
   doc.save(fileName);
+}
+
+/**
+ * Saves an error log to Documents (native) or triggers a text file download (web).
+ * No feedback is shown after saving — the caller is responsible for any UI.
+ */
+export async function saveErrorLog(error) {
+  const timestamp = new Date().toISOString();
+  const content = `KissRecorder PDF Export Error\n${timestamp}\n\n${error?.stack || error?.message || String(error)}`;
+  const fileName = `kiss-recorder-error-${timestamp.slice(0, 10)}.txt`;
+
+  if (isNativePlatform()) {
+    await Filesystem.writeFile({
+      path: fileName,
+      directory: Directory.External,
+      data: content,
+      encoding: Encoding.UTF8,
+      recursive: true,
+    });
+    return;
+  }
+
+  const blob = new Blob([content], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  URL.revokeObjectURL(url);
 }

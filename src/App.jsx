@@ -1,15 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { Search, Users, BarChart3, UserPlus } from "lucide-react";
+import { App as CapacitorApp } from "@capacitor/app";
 
-import { LANGUAGE_KEY, PALETTE, COPY } from "@/lib/constants";
+import { PALETTE, COPY } from "@/lib/constants";
+import { setAppIconColor } from "@/plugins/appicon";
 import { todayString } from "@/lib/date";
 import { uid, normalizePeople } from "@/lib/helpers";
 import { hasScore } from "@/lib/format";
 import {
-  getSafeStorage,
   loadPeopleFromDevice,
   savePeopleToDevice,
   clearPeopleFromDevice,
+  loadSettings,
+  saveSettings,
 } from "@/lib/device-storage";
 
 import PeopleManagerScreen from "@/components/people/PeopleManagerScreen";
@@ -29,11 +33,64 @@ export default function KissRecorderApp() {
   // Current visible screen.
   const [screen, setScreen] = useState("intro");
 
+  // Navigation history stack for hardware back button support.
+  const screenHistoryRef = useRef([]);
+  // Ref keeps the latest screen value accessible inside the Capacitor listener.
+  const screenRef = useRef("intro");
+
   // Current UI language.
   const [language, setLanguage] = useState("en");
 
+  // Icon color palette selected by the user.
+  const [iconColor, setIconColor] = useState("yellow");
+
   // Prevents saving before the initial load completes.
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // Keep screenRef in sync so the Capacitor listener always sees the latest value.
+  useEffect(() => {
+    screenRef.current = screen;
+  }, [screen]);
+
+  /**
+   * Navigates forward to a new screen and pushes the current one onto the history stack.
+   */
+  function navigateTo(newScreen) {
+    screenHistoryRef.current = [...screenHistoryRef.current, screenRef.current];
+    setScreen(newScreen);
+  }
+
+  /**
+   * Handles the hardware back button.
+   * From the "add" screen always returns to "intro" (privacy rule).
+   * From "intro" exits the app.
+   * From any other screen pops the history stack.
+   */
+  useEffect(() => {
+    const listenerPromise = CapacitorApp.addListener("backButton", () => {
+      const current = screenRef.current;
+
+      if (current === "add") {
+        screenHistoryRef.current = [];
+        setScreen("intro");
+      } else if (current === "intro") {
+        CapacitorApp.exitApp();
+      } else {
+        const history = screenHistoryRef.current;
+        if (history.length > 0) {
+          const prev = history[history.length - 1];
+          screenHistoryRef.current = history.slice(0, -1);
+          setScreen(prev);
+        } else {
+          setScreen("intro");
+        }
+      }
+    });
+
+    return () => {
+      listenerPromise.then((h) => h.remove());
+    };
+  }, []);
 
   /**
    * Bootstraps persisted app data on first render.
@@ -51,11 +108,11 @@ export default function KissRecorderApp() {
         // Normalize loaded data before storing it in state.
         setPeople(normalizePeople(rawPeople));
 
-        // Restore the saved language when it is valid.
-        const storage = getSafeStorage();
-        const savedLanguage = storage?.getItem(LANGUAGE_KEY);
-        if (savedLanguage === "en" || savedLanguage === "es") {
-          setLanguage(savedLanguage);
+        // Restore saved settings (language + icon color).
+        const settings = await loadSettings();
+        if (isMounted) {
+          if (settings.language === "en" || settings.language === "es") setLanguage(settings.language);
+          if (["yellow", "blue", "pink", "purple"].includes(settings.iconColor)) setIconColor(settings.iconColor);
         }
       } catch (error) {
         console.error("Failed to load app data", error);
@@ -88,15 +145,20 @@ export default function KissRecorderApp() {
     );
   }, [people, isLoaded]);
 
-  /**
-   * Persists the selected language in browser storage.
-   */
+  // Persists settings whenever language or iconColor change (after boot).
   useEffect(() => {
-    const storage = getSafeStorage();
-    if (!storage) return;
+    if (!isLoaded) return;
+    saveSettings({ iconColor, language }).catch(console.error);
+  }, [iconColor, language, isLoaded]);
 
-    storage.setItem(LANGUAGE_KEY, language);
-  }, [language]);
+  // Switches the icon AND persists the color. Only call from user interaction,
+  // never during boot — disabling the active alias kills the running process.
+  // saveSettings is awaited so the file is written before Android kills the process.
+  async function changeIconColor(newColor) {
+    setIconColor(newColor);
+    await saveSettings({ iconColor: newColor, language });
+    setAppIconColor(newColor);
+  }
 
   // Active translation dictionary.
   const t = COPY[language];
@@ -109,9 +171,8 @@ export default function KissRecorderApp() {
       // Remove persisted people data.
       await clearPeopleFromDevice();
 
-      // Remove persisted language preference.
-      const storage = getSafeStorage();
-      storage?.removeItem(LANGUAGE_KEY);
+      // Reset settings to defaults.
+      await saveSettings({ iconColor: "yellow", language: "en" });
     } catch (error) {
       console.error("Failed to clear app data", error);
     }
@@ -119,6 +180,7 @@ export default function KissRecorderApp() {
     // Reset in-memory state.
     setPeople([]);
     setLanguage("en");
+    screenHistoryRef.current = [];
     setScreen("intro");
   }
 
@@ -143,6 +205,7 @@ export default function KissRecorderApp() {
     setPeople((prev) => [newPerson, ...prev]);
 
     // Return to the entry screen after saving.
+    screenHistoryRef.current = [];
     setScreen("intro");
   }
 
@@ -271,18 +334,20 @@ export default function KissRecorderApp() {
         >
           {/* Entry screen */}
           {screen === "intro" ? (
-            <IntroScreen onOpenMain={() => setScreen("main")} t={t} />
+            <IntroScreen onOpenMain={() => navigateTo("main")} t={t} />
           ) : null}
 
           {/* Main dashboard */}
           {screen === "main" ? (
             <HomeScreen
-              onNavigate={setScreen}
+              onNavigate={navigateTo}
               onClearData={clearAllAppData}
               people={people}
               t={t}
               language={language}
               setLanguage={setLanguage}
+              iconColor={iconColor}
+              setIconColor={changeIconColor}
             />
           ) : null}
 
@@ -332,7 +397,7 @@ export default function KissRecorderApp() {
                 return (
                   <button
                     key={item.key}
-                    onClick={() => setScreen(item.key)}
+                    onClick={() => navigateTo(item.key)}
                     className="flex flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-xs font-medium transition"
                     style={{
                       background: active
