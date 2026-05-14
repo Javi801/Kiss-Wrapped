@@ -223,17 +223,27 @@ export default function PersonForm({
           )}
         </div>
 
-        {/* Detail */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-          <Label>{t.detail}</Label>
-          <Textarea
-            value={form.detail}
-            onChange={(e) => update("detail", e.target.value)}
-            placeholder={mode === "add" ? "" : t.optionalActivityDetails}
-            className="rounded-2xl"
-            style={{ ...inputStyle }}
-          />
-        </div>
+        {/* Specific — only visible after an activity is chosen */}
+        {form.activity && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+            <Label>{t.detail}</Label>
+            <Textarea
+              value={form.detail}
+              onChange={(e) => update("detail", e.target.value)}
+              placeholder={
+                form.activity === "studies"
+                  ? t.specificStudies
+                  : form.activity === "works"
+                    ? t.specificWorks
+                    : form.activity === "studies and works"
+                      ? t.specificStudiesWorks
+                      : ""
+              }
+              className="rounded-2xl"
+              style={{ ...inputStyle, fontSize: "0.8rem" }}
+            />
+          </div>
+        )}
       </div>
 
       {/* Actions */}
