@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { PALETTE } from "@/lib/constants";
+import { PALETTE, TEXT } from "@/lib/constants";
 import AgeRangeBox from "@/components/stats/AgeRangeBox";
 import { getYearKey } from "@/lib/date";
 
@@ -54,14 +54,14 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
       style={{
         boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
         backdropFilter: "blur(8px)",
-        borderColor: "#f1dde7",
-        backgroundColor: "rgba(255,255,255,0.82)",
+        borderColor: PALETTE.cardBorder,
+        backgroundColor: PALETTE.cardBg,
       }}
     >
       <CardHeader style={{ paddingBottom: "0.5rem" }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "0.75rem" }}>
           <div>
-            <CardTitle style={{ fontSize: "1rem", lineHeight: "1.5rem" }}>{title}</CardTitle>
+            <CardTitle style={TEXT.title}>{title}</CardTitle>
             <CardDescription>
               {splitByYear ? t.divideByYear : t.allYears}
             </CardDescription>
@@ -72,7 +72,7 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
             type="button"
             variant="outline"
             className="rounded-2xl"
-            style={{ backgroundColor: "rgba(255,255,255,0.7)", borderColor: "#ecd6e0" }}
+            style={{ backgroundColor: "rgba(255,255,255,0.7)", borderColor: PALETTE.inputBorder }}
             onClick={() => setSplitByYear((prev) => !prev)}
           >
             {splitByYear ? t.showAllTogether : t.divideByYear}
@@ -108,7 +108,7 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
           // Empty fallback.
           <div
             className="rounded-2xl"
-            style={{ border: "1px dashed #ecd6e0", padding: "2rem", textAlign: "center", fontSize: "0.875rem", lineHeight: "1.25rem", color: PALETTE.textSoft }}
+            style={{ border: `1px dashed ${PALETTE.inputBorder}`, padding: "2rem", textAlign: "center", ...TEXT.body, color: PALETTE.textSoft }}
           >
             {emptyText}
           </div>
