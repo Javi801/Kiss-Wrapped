@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   BarChart3,
   Check,
+  Download,
   Eye,
   EyeOff,
   Languages,
@@ -24,6 +25,7 @@ import {
 } from "@/components/ui/dialog";
 
 import { PALETTE, TEXT } from "@/lib/constants";
+import { exportPeopleJson } from "@/lib/device-storage";
 import StatTile from "@/components/shared/StatTile";
 import ColorSelector from "@/components/app/ColorSelector";
 
@@ -354,6 +356,18 @@ export default function MainScreen({
             style={{ marginRight: "0.75rem", height: "1.25rem", width: "1.25rem", color: PALETTE.sky2 }}
           />
           {t.viewStatistics}
+        </Button>
+
+        <Button
+          variant="outline"
+          className="rounded-3xl"
+          style={outlineActionStyle}
+          onClick={() => exportPeopleJson(people)}
+        >
+          <Download
+            style={{ marginRight: "0.75rem", height: "1.25rem", width: "1.25rem", color: PALETTE.sky2 }}
+          />
+          {t.exportJson}
         </Button>
 
         <Button
