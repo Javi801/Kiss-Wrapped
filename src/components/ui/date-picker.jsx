@@ -92,18 +92,39 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
     else setViewMonth((m) => m + 1);
   }
 
+  function isFutureDay(day) {
+    if (viewYear > todayY || (viewYear === todayY && viewMonth > todayM)) return true;
+    return viewYear === todayY && viewMonth === todayM && day > todayD;
+  }
+
+  function isFutureMonth(m) {
+    return viewYear > todayY || (viewYear === todayY && m > todayM);
+  }
+
+  function isFutureYear(yr) {
+    return yr > todayY;
+  }
+
+  const isNextDisabled =
+    (calView === "days" && viewYear === todayY && viewMonth === todayM) ||
+    (calView === "months" && viewYear >= todayY) ||
+    (calView === "years" && yearPageStart + YEAR_PAGE_SIZE - 1 >= todayY);
+
   function selectDay(day) {
+    if (isFutureDay(day)) return;
     onChange(toCalendarDate(viewYear, viewMonth, day));
     setOpen(false);
     setCalView("days");
   }
 
   function selectMonth(month) {
+    if (isFutureMonth(month)) return;
     setViewMonth(month);
     setCalView("days");
   }
 
   function selectYear(year) {
+    if (isFutureYear(year)) return;
     setViewYear(year);
     setCalView("months");
   }
@@ -115,6 +136,7 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
   }
 
   function handleNext() {
+    if (isNextDisabled) return;
     if (calView === "days") nextMonth();
     else if (calView === "months") setViewYear((y) => y + 1);
     else setYearPageStart((s) => s + YEAR_PAGE_SIZE);
@@ -122,18 +144,18 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
 
   const cells = buildDayGrid(viewYear, viewMonth);
 
-  function gridItemStyle({ isSelected, isToday, isActive }) {
+  function gridItemStyle({ isSelected, isToday, isActive, isDisabled }) {
     return {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       borderRadius: "0.5rem",
       border: "none",
-      cursor: "pointer",
+      cursor: isDisabled ? "default" : "pointer",
       fontSize: "0.8125rem",
       fontWeight: isSelected || isToday ? 600 : 400,
-      color: isSelected ? "white" : isActive ? PALETTE.rose : PALETTE.text,
-      backgroundColor: isSelected ? PALETTE.rose : isActive ? PALETTE.blush : "transparent",
+      color: isDisabled ? PALETTE.line : isSelected ? "white" : isActive ? PALETTE.rose : PALETTE.text,
+      backgroundColor: isSelected && !isDisabled ? PALETTE.rose : isActive && !isDisabled ? PALETTE.blush : "transparent",
       transition: "background-color 0.1s",
     };
   }
@@ -227,9 +249,14 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
             <button
               type="button"
               onClick={handleNext}
-              style={navBtn}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = PALETTE.blush)}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+              disabled={isNextDisabled}
+              style={{
+                ...navBtn,
+                cursor: isNextDisabled ? "default" : "pointer",
+                color: isNextDisabled ? PALETTE.line : PALETTE.textSoft,
+              }}
+              onMouseEnter={(e) => { if (!isNextDisabled) e.currentTarget.style.backgroundColor = PALETTE.blush; }}
+              onMouseLeave={(e) => { if (!isNextDisabled) e.currentTarget.style.backgroundColor = "transparent"; }}
             >
               <ChevronRight size={14} />
             </button>
@@ -252,22 +279,24 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
 
                   const isToday = day === todayD && viewMonth === todayM && viewYear === todayY;
                   const isSelected = parsed && day === parsed.day && viewMonth === parsed.month && viewYear === parsed.year;
+                  const isDisabled = isFutureDay(day);
 
                   return (
                     <button
                       key={day}
                       type="button"
                       onClick={() => selectDay(day)}
+                      disabled={isDisabled}
                       style={{
-                        ...gridItemStyle({ isSelected, isToday, isActive: isToday }),
+                        ...gridItemStyle({ isSelected, isToday, isActive: isToday, isDisabled }),
                         aspectRatio: "1",
                         borderRadius: "50%",
                       }}
                       onMouseEnter={(e) => {
-                        if (!isSelected) e.currentTarget.style.backgroundColor = PALETTE.blush;
+                        if (!isSelected && !isDisabled) e.currentTarget.style.backgroundColor = PALETTE.blush;
                       }}
                       onMouseLeave={(e) => {
-                        if (!isSelected) e.currentTarget.style.backgroundColor = isToday ? PALETTE.blush : "transparent";
+                        if (!isSelected && !isDisabled) e.currentTarget.style.backgroundColor = isToday ? PALETTE.blush : "transparent";
                       }}
                     >
                       {day}
@@ -284,22 +313,24 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
               {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => {
                 const isSelected = parsed && m === parsed.month && viewYear === parsed.year;
                 const isToday = m === todayM && viewYear === todayY;
+                const isDisabled = isFutureMonth(m);
 
                 return (
                   <button
                     key={m}
                     type="button"
                     onClick={() => selectMonth(m)}
+                    disabled={isDisabled}
                     style={{
-                      ...gridItemStyle({ isSelected, isToday, isActive: isToday }),
+                      ...gridItemStyle({ isSelected, isToday, isActive: isToday, isDisabled }),
                       padding: "0.4rem 0",
                       textTransform: "capitalize",
                     }}
                     onMouseEnter={(e) => {
-                      if (!isSelected) e.currentTarget.style.backgroundColor = PALETTE.blush;
+                      if (!isSelected && !isDisabled) e.currentTarget.style.backgroundColor = PALETTE.blush;
                     }}
                     onMouseLeave={(e) => {
-                      if (!isSelected) e.currentTarget.style.backgroundColor = isToday ? PALETTE.blush : "transparent";
+                      if (!isSelected && !isDisabled) e.currentTarget.style.backgroundColor = isToday ? PALETTE.blush : "transparent";
                     }}
                   >
                     {getShortMonth(m)}
@@ -315,21 +346,23 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
               {Array.from({ length: YEAR_PAGE_SIZE }, (_, i) => yearPageStart + i).map((yr) => {
                 const isSelected = parsed && yr === parsed.year;
                 const isToday = yr === todayY;
+                const isDisabled = isFutureYear(yr);
 
                 return (
                   <button
                     key={yr}
                     type="button"
                     onClick={() => selectYear(yr)}
+                    disabled={isDisabled}
                     style={{
-                      ...gridItemStyle({ isSelected, isToday, isActive: isToday }),
+                      ...gridItemStyle({ isSelected, isToday, isActive: isToday, isDisabled }),
                       padding: "0.4rem 0",
                     }}
                     onMouseEnter={(e) => {
-                      if (!isSelected) e.currentTarget.style.backgroundColor = PALETTE.blush;
+                      if (!isSelected && !isDisabled) e.currentTarget.style.backgroundColor = PALETTE.blush;
                     }}
                     onMouseLeave={(e) => {
-                      if (!isSelected) e.currentTarget.style.backgroundColor = isToday ? PALETTE.blush : "transparent";
+                      if (!isSelected && !isDisabled) e.currentTarget.style.backgroundColor = isToday ? PALETTE.blush : "transparent";
                     }}
                   >
                     {yr}
