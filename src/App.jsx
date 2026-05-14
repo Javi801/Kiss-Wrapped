@@ -157,9 +157,7 @@ export default function KissRecorderApp() {
     saveSettings({ iconColor, language }).catch(console.error);
   }, [iconColor, language, isLoaded]);
 
-  // Switches the icon AND persists the color. Only call from user interaction,
-  // never during boot — disabling the active alias kills the running process.
-  // saveSettings is awaited so the file is written before Android kills the process.
+  // Switches the icon from user actions only, because Android may kill the app while changing aliases.
   async function changeIconColor(newColor) {
     setIconColor(newColor);
     await saveSettings({ iconColor: newColor, language });
@@ -169,9 +167,7 @@ export default function KissRecorderApp() {
   // Active translation dictionary.
   const t = COPY[language];
 
-  /**
-   * Clears all app data and resets the app to its initial state.
-   */
+  // Clears all app data and resets the app to its initial state.
   async function clearAllAppData() {
     try {
       // Remove persisted people data.
@@ -190,9 +186,7 @@ export default function KissRecorderApp() {
     setScreen("intro");
   }
 
-  /**
-   * Creates a new person and inserts an initial empty event.
-   */
+  // Creates a new person and inserts an initial empty event.
   function addPerson(values) {
     const newPerson = {
       id: uid(),
@@ -215,9 +209,7 @@ export default function KissRecorderApp() {
     setScreen("intro");
   }
 
-  /**
-   * Updates a person's main profile fields.
-   */
+  // Updates a person's main profile fields.
   function updatePerson(personId, values) {
     setPeople((prev) =>
       prev.map((person) =>
@@ -226,17 +218,12 @@ export default function KissRecorderApp() {
     );
   }
 
-  /**
-   * Deletes a person completely from the dataset.
-   */
+  // Deletes a person completely from the dataset.
   function deletePerson(personId) {
     setPeople((prev) => prev.filter((person) => person.id !== personId));
   }
 
-  /**
-   * Adds a new event to a person.
-   * Invalid scores are normalized to null.
-   */
+  // Adds a new event to a person. Invalid scores are normalized to null.
   function addEvent(personId, values) {
     setPeople((prev) =>
       prev.map((person) =>
@@ -257,10 +244,7 @@ export default function KissRecorderApp() {
     );
   }
 
-  /**
-   * Updates a specific event for a person.
-   * Invalid scores are normalized to null.
-   */
+  // Updates a specific event for a person. Invalid scores are normalized to null.
   function updateEvent(personId, eventId, values) {
     setPeople((prev) =>
       prev.map((person) =>
@@ -282,9 +266,7 @@ export default function KissRecorderApp() {
     );
   }
 
-  /**
-   * Deletes one event from a person.
-   */
+  // Deletes one event from a person.
   function deleteEvent(personId, eventId) {
     setPeople((prev) =>
       prev.map((person) =>
@@ -300,9 +282,7 @@ export default function KissRecorderApp() {
     );
   }
 
-  /**
-   * Deletes all events for a person while preserving the person record.
-   */
+  // Deletes all events for a person while preserving the person record.
   function deleteAllEvents(personId) {
     setPeople((prev) =>
       prev.map((person) =>
