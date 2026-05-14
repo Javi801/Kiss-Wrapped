@@ -7,15 +7,9 @@ import BarChartCard from "@/components/charts/BarChartCard";
 import { PALETTE } from "@/lib/constants";
 import { getMonthKey, getYearKey } from "@/lib/date";
 
-/**
- * Renders the time-based statistics tab.
- * It shows monthly, yearly, and multi-year event patterns.
- */
+// Renders the time-based statistics tab. It shows monthly, yearly, and multi-year event patterns.
 export default function StatsTimeTab({ people, allEvents, t }) {
-  /**
-   * Groups all events by month.
-   * Keys are generated in yyyy-MM format.
-   */
+  // Groups all events by month. Keys are generated in yyyy-MM format.
   const eventsPerMonth = useMemo(() => {
     const map = new Map();
 
@@ -30,10 +24,7 @@ export default function StatsTimeTab({ people, allEvents, t }) {
       .map(([label, value]) => ({ label, value }));
   }, [allEvents]);
 
-  /**
-   * Groups all events by year.
-   * Keys are generated in yyyy format.
-   */
+  // Groups all events by year. Keys are generated in yyyy format.
   const eventsPerYear = useMemo(() => {
     const map = new Map();
 
