@@ -72,7 +72,7 @@ export default function StatsTimeTab({ people, allEvents, t }) {
   );
 
   return (
-    <div className="space-y-4">
+    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <BarChartCard
         title={t.eventsPerMonth}
         subtitle={t.monthlyActivity}
@@ -101,44 +101,44 @@ export default function StatsTimeTab({ people, allEvents, t }) {
 
       {personsWithEventsInMultipleYears.length ? (
         <Card
-          className="rounded-3xl shadow-sm backdrop-blur"
+          className="rounded-3xl"
           style={{
+            boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+            backdropFilter: "blur(8px)",
             borderColor: "#f1dde7",
             backgroundColor: "rgba(255,255,255,0.82)",
           }}
         >
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">{t.multiYearSubtitle}</CardTitle>
+          <CardHeader style={{ paddingBottom: "0.5rem" }}>
+            <CardTitle style={{ fontSize: "1rem", lineHeight: "1.5rem" }}>{t.multiYearSubtitle}</CardTitle>
             <CardDescription>{t.yearOverlap}</CardDescription>
           </CardHeader>
 
           <CardContent>
-            <div className="space-y-2">
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
               {personsWithEventsInMultipleYears.map((item) => (
                 <div
                   key={item.label}
-                  className="rounded-2xl p-3"
-                  style={{ backgroundColor: "#fff7fb" }}
+                  className="rounded-2xl"
+                  style={{ padding: "0.75rem", backgroundColor: "#fff7fb" }}
                 >
-                  <div className="flex items-center justify-between gap-3">
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.75rem" }}>
                     <span
-                      className="font-medium"
-                      style={{ color: PALETTE.text }}
+                      style={{ fontWeight: "500", color: PALETTE.text }}
                     >
                       {item.label}
                     </span>
 
                     <Badge
-                      className="rounded-full border-0 text-white"
-                      style={{ backgroundColor: PALETTE.rose }}
+                      className="rounded-full"
+                      style={{ border: "none", color: "white", backgroundColor: PALETTE.rose }}
                     >
                       {item.value}
                     </Badge>
                   </div>
 
                   <p
-                    className="mt-1 text-sm"
-                    style={{ color: PALETTE.textSoft }}
+                    style={{ marginTop: "0.25rem", fontSize: "0.875rem", lineHeight: "1.25rem", color: PALETTE.textSoft }}
                   >
                     {item.years.join(", ")}
                   </p>
