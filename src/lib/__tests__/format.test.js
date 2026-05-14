@@ -62,3 +62,19 @@ describe("renderKisses", () => {
     expect(renderKisses(99, t)).toBe(t.noScore);
   });
 });
+
+describe("translateActivity", () => {
+  it('translates "studies"', () => {
+    expect(translateActivity("studies", t)).toBe(t.studies);
+  });
+  it('translates "works"', () => {
+    expect(translateActivity("works", t)).toBe(t.works);
+  });
+  it('translates "studies and works"', () => {
+    expect(translateActivity("studies and works", t)).toBe(t.studiesWorks);
+  });
+  it("falls back to other for unknown values", () => {
+    expect(translateActivity("retired", t)).toBe(t.other);
+  });
+});
+
