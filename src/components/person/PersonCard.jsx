@@ -204,9 +204,26 @@ export default function PersonCard({
                               )}
                             </div>
 
+                            {(event.place || event.situation) && (
+                              <div style={{ marginTop: "0.5rem", display: "flex", flexWrap: "wrap", gap: "0.25rem 0.75rem", ...TEXT.caption, color: PALETTE.textSoft }}>
+                                {event.place && (
+                                  <span><strong>{t.eventPlace}:</strong> {event.place}</span>
+                                )}
+                                {event.situation && (
+                                  <span><strong>{t.eventSituation}:</strong> {event.situation}</span>
+                                )}
+                              </div>
+                            )}
+
                             <p style={{ marginTop: "0.5rem", ...TEXT.body, color: "#64748b" }}>
                               {event.details || t.noDetailsAdded}
                             </p>
+
+                            {event.observations && (
+                              <p style={{ marginTop: "0.25rem", ...TEXT.caption, color: PALETTE.textSoft }}>
+                                {event.observations}
+                              </p>
+                            )}
                           </button>
                         ))}
                       </div>
