@@ -48,6 +48,17 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
       }));
   }, [people]);
 
+  // Unique persons across all years — same deduplication logic as per-year view.
+  const combinedPeople = useMemo(
+    () =>
+      Array.from(
+        new Map(
+          yearsData.flatMap(({ people: yp }) => yp).map((p) => [p.id, p]),
+        ).values(),
+      ),
+    [yearsData],
+  );
+
   return (
     <Card
       className="rounded-3xl"
@@ -86,7 +97,7 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
           <AgeRangeBox
             title={title}
             subtitle={t.allYears}
-            people={people}
+            people={combinedPeople}
             emptyText={emptyText}
           />
         ) : yearsData.length ? (
