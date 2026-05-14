@@ -7,21 +7,19 @@ export default function StatTile({ label, value, helper, accent = false }) {
   return (
     <TileCard accent={accent}>
       <p
-        className="text-xs font-semibold uppercase tracking-[0.12em]"
-        style={{ color: colors.label }}
+        style={{ fontSize: "0.75rem", lineHeight: "1rem", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.12em", color: colors.label }}
       >
         {label}
       </p>
 
       <p
-        className="mt-2 text-3xl font-bold tracking-tight"
-        style={{ color: colors.value }}
+        style={{ marginTop: "0.5rem", fontSize: "1.875rem", lineHeight: "2.25rem", fontWeight: "700", letterSpacing: "-0.025em", color: colors.value }}
       >
         {value}
       </p>
 
       {helper ? (
-        <p className="mt-1 text-sm" style={{ color: colors.helper }}>
+        <p style={{ marginTop: "0.25rem", fontSize: "0.875rem", lineHeight: "1.25rem", color: colors.helper }}>
           {helper}
         </p>
       ) : null}
