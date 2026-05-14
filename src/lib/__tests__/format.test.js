@@ -113,3 +113,25 @@ describe("personHasIncompleteEvent", () => {
   });
 });
 
+describe("getShortZodiacLabel", () => {
+  it("strips the emoji and parenthetical from an English zodiac string", () => {
+    expect(
+      getShortZodiacLabel("♒ Aquarius (January 20 - February 19)")
+    ).toBe("Aquarius");
+  });
+  it("handles a Spanish zodiac string with an accented character", () => {
+    expect(getShortZodiacLabel("♊ Géminis (21 mayo - 20 junio)")).toBe(
+      "Géminis"
+    );
+  });
+  it("returns empty string for null", () => {
+    expect(getShortZodiacLabel(null)).toBe("");
+  });
+  it("returns empty string for undefined", () => {
+    expect(getShortZodiacLabel(undefined)).toBe("");
+  });
+  it("returns empty string for an empty string", () => {
+    expect(getShortZodiacLabel("")).toBe("");
+  });
+});
+
