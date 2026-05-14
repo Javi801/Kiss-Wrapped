@@ -11,7 +11,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-import { PALETTE } from "@/lib/constants";
+import { PALETTE, TEXT } from "@/lib/constants";
 import { formatDisplayDate } from "@/lib/date";
 import { getFirstEventDate, getLastEventDate } from "@/lib/stats";
 
@@ -138,7 +138,7 @@ export default function PeopleManagerScreen({
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <div>
         <h2
-          style={{ fontSize: "1.5rem", lineHeight: "2rem", fontWeight: "700", letterSpacing: "-0.025em", color: PALETTE.text }}
+          style={{ ...TEXT.heading, letterSpacing: "-0.025em", color: PALETTE.text }}
         >
           {t.personListTitle}
         </h2>
@@ -154,8 +154,8 @@ export default function PeopleManagerScreen({
             className="rounded-2xl"
             style={{
               paddingLeft: "2.25rem",
-              borderColor: "#ecd6e0",
-              backgroundColor: "rgba(255,255,255,0.86)",
+              borderColor: PALETTE.inputBorder,
+              backgroundColor: PALETTE.controlBg,
             }}
             placeholder={t.searchPlaceholder}
             value={query}
@@ -170,8 +170,8 @@ export default function PeopleManagerScreen({
               variant="outline"
               className="rounded-2xl"
               style={{
-                borderColor: "#ecd6e0",
-                backgroundColor: "rgba(255,255,255,0.86)",
+                borderColor: PALETTE.inputBorder,
+                backgroundColor: PALETTE.controlBg,
               }}
             >
               <Filter style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
@@ -185,7 +185,7 @@ export default function PeopleManagerScreen({
               width: "92%",
               maxWidth: "24rem",
               overflowY: "auto",
-              borderLeftColor: "#f1dde7",
+              borderLeftColor: PALETTE.cardBorder,
               backgroundColor: "rgba(255,255,255,0.97)",
             }}
           >
@@ -217,10 +217,10 @@ export default function PeopleManagerScreen({
               {/* Group header */}
               <div
                 className="rounded-2xl"
-                style={{ position: "sticky", top: 0, zIndex: 10, paddingLeft: "0.75rem", paddingRight: "0.75rem", paddingTop: "0.5rem", paddingBottom: "0.5rem", backdropFilter: "blur(8px)", backgroundColor: "rgba(255,255,255,0.78)" }}
+                style={{ position: "sticky", top: 0, zIndex: 10, paddingLeft: "0.75rem", paddingRight: "0.75rem", paddingTop: "0.5rem", paddingBottom: "0.5rem", backdropFilter: "blur(8px)", backgroundColor: PALETTE.surfaceBg }}
               >
                 <p
-                  style={{ fontSize: "0.75rem", lineHeight: "1rem", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.16em", color: PALETTE.rose }}
+                  style={{ ...TEXT.label, textTransform: "uppercase", letterSpacing: "0.16em", color: PALETTE.rose }}
                 >
                   {groupBy === "lastEventDate" && group !== t.noEvents
                     ? formatDisplayDate(group)
@@ -257,7 +257,7 @@ export default function PeopleManagerScreen({
             <Button
               variant="outline"
               className="rounded-2xl"
-              style={{ borderColor: "#ecd6e0", backgroundColor: "white" }}
+              style={{ borderColor: PALETTE.inputBorder, backgroundColor: "white" }}
               onClick={() => {
                 setQuery("");
                 setFilters({
