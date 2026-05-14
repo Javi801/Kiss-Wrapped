@@ -54,6 +54,7 @@ export const PALETTE = {
 export const TEXT = {
   caption:    { fontSize: "0.75rem",  lineHeight: "1rem"    },
   label:      { fontSize: "0.75rem",  lineHeight: "1rem",    fontWeight: "600" },
+  input:      { fontSize: "0.8rem"                          },
   body:       { fontSize: "0.875rem", lineHeight: "1.25rem" },
   bodyStrong: { fontSize: "0.875rem", lineHeight: "1.25rem", fontWeight: "600" },
   base:       { fontSize: "1rem",     lineHeight: "1.5rem"  },
