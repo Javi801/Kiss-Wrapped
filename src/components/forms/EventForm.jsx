@@ -104,6 +104,7 @@ export default function EventForm({ initialValues, onSave, onCancel, t }) {
           value={place}
           onChange={(e) => setPlace(e.target.value)}
           placeholder={t.eventPlacePlaceholder}
+          maxLength={200}
           className="rounded-2xl"
           style={{ ...inputStyle, ...TEXT.input }}
         />
@@ -119,6 +120,7 @@ export default function EventForm({ initialValues, onSave, onCancel, t }) {
           value={situation}
           onChange={(e) => setSituation(e.target.value)}
           placeholder={t.eventSituationPlaceholder}
+          maxLength={200}
           className="rounded-2xl"
           style={{ ...inputStyle, ...TEXT.input }}
         />
@@ -134,6 +136,7 @@ export default function EventForm({ initialValues, onSave, onCancel, t }) {
           value={details}
           onChange={(e) => setDetails(e.target.value)}
           placeholder={t.eventDetailsPlaceholder}
+          maxLength={1000}
           className="rounded-2xl"
           style={{ ...inputStyle, ...TEXT.input }}
         />
@@ -146,6 +149,7 @@ export default function EventForm({ initialValues, onSave, onCancel, t }) {
           value={observations}
           onChange={(e) => setObservations(e.target.value)}
           placeholder={t.eventObservationsPlaceholder}
+          maxLength={1000}
           className="rounded-2xl"
           style={{ ...inputStyle, ...TEXT.input }}
         />
