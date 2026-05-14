@@ -1,4 +1,4 @@
-// Pixel-art style sparkle star group icon.
+// Pixel-art sparkle star group icon — rendered as a grid of colored rects.
 // Each palette matches one of the four color variants in the design reference.
 
 export { SPARKLE_PALETTES, PALETTE_SWATCHES } from './SparkleIcon.constants'
@@ -10,17 +10,96 @@ const PALETTES = {
   purple: { O: '#8950FF', M: '#B58DFF', I: '#D3C0F8', H: '#F8F2F3' },
 }
 
-// 4-pointed sparkle star path using quadratic beziers.
-// rx/ry = horizontal/vertical outer radius; inner = concavity depth.
-function starPath(cx, cy, rx, ry, inner) {
-  return [
-    `M ${cx} ${cy - ry}`,
-    `Q ${cx + inner} ${cy - inner} ${cx + rx} ${cy}`,
-    `Q ${cx + inner} ${cy + inner} ${cx} ${cy + ry}`,
-    `Q ${cx - inner} ${cy + inner} ${cx - rx} ${cy}`,
-    `Q ${cx - inner} ${cy - inner} ${cx} ${cy - ry}`,
-    'Z',
-  ].join(' ')
+const _ = null
+
+// 23x27 main sparkle star — cell 7px, origin (0, 9)
+const MAIN = [
+  [_,_,_,_,_,_,_,_,_,_,_,'O',_,_,_,_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,_,_,_,'O',_,_,_,_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,_,_,'O','H','O',_,_,_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,_,_,'O','H','O',_,_,_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,_,_,'O','H','O',_,_,_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,_,'O','H','H','I','O',_,_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,_,'O','H','H','I','O',_,_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,_,'O','H','I','I','O',_,_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,'O','H','H','I','I','I','O',_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,'O','H','H','I','I','I','O',_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,'O','H','H','I','I','I','I','I','O',_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,'O','H','H','I','I','I','I','I','O',_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,'O','H','H','I','I','I','I','I','I','I','O',_,_,_,_,_,_,],
+  [_,_,_,_,'O','O','H','H','I','I','I','I','I','I','I','I','I','O','O',_,_,_,_,],
+  [_,_,'O','O','H','H','I','I','I','I','I','I','I','I','I','I','M','M','M','O','O',_,_,],
+  ['O','O','I','I','I','I','I','I','I','I','I','I','I','I','I','M','M','M','M','M','M','O','O',],
+  [_,_,'O','O','I','I','I','I','I','I','I','I','I','I','M','M','M','M','M','O','O',_,_,],
+  [_,_,_,_,'O','O','I','I','I','I','I','I','I','M','M','M','M','O','O',_,_,_,_,],
+  [_,_,_,_,_,_,'O','I','I','I','I','I','I','M','M','M','O',_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,'O','I','I','I','I','M','M','M','O',_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,'O','I','I','I','M','M','O',_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,'O','I','I','M','M','M','O',_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,_,'O','I','M','M','O',_,_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,_,'O','M','M','M','O',_,_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,_,'O','M','M','M','O',_,_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,_,_,'O','M','O',_,_,_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,_,_,'O','M','O',_,_,_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,_,_,'O','M','O',_,_,_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,_,_,_,'O',_,_,_,_,_,_,_,_,_,_,_,],
+  [_,_,_,_,_,_,_,_,_,_,_,'O',_,_,_,_,_,_,_,_,_,_,_,],
+]
+
+// 9×9 companion star
+const MEDIUM = [
+  [_,_,_,_,'O',_,_,_,_],
+  [_,_,_,_,'O',_,_,_,_],
+  [_,_,_,'O','I','O',_,_,_],
+  [_,_,'O','I','I','I','O',_,_],
+  ['O','O','I','I','I','I','I','O','O'],
+  [_,_,'O','I','I','I','O',_,_],
+  [_,_,_,'O','I','O',_,_,_],
+  [_,_,_,_,'O',_,_,_,_],
+  [_,_,_,_,'O',_,_,_,_],
+]
+
+// 7×9 small star
+const SMALL = [
+  [_,_,_,'O',_,_,_],
+  ['O',_,_,'O',_,_,'O'],
+  [_,'O',_,'O',_,'O',_],
+  [_,_,_,_,_,_,_],
+  ['O','O',_,_,_,'O','O'],
+  [_,_,_,_,_,_,_],
+  [_,'O',_,'O',_,'O',_],
+  ['O',_,_,'O',_,_,'O'],
+  [_,_,_,'O',_,_,_],
+]
+
+// 3×3 tiny cross-sparkle
+const TINY = [
+  [_,'I',_],
+  [_,'I',_],
+  ['I','H','I'],
+  [_,'I',_],
+  [_,'I',_],
+]
+
+function PixelGrid({ grid, cell, ox, oy, palette }) {
+  const rects = []
+  grid.forEach((row, r) => {
+    row.forEach((key, c) => {
+      if (key) {
+        rects.push(
+          <rect
+            key={`${r}-${c}`}
+            x={ox + c * cell}
+            y={oy + r * cell}
+            width={cell}
+            height={cell}
+            fill={palette[key]}
+          />,
+        )
+      }
+    })
+  })
+  return <>{rects}</>
 }
 
 export function SparkleIcon({ palette = 'yellow', size = 200 }) {
@@ -28,43 +107,26 @@ export function SparkleIcon({ palette = 'yellow', size = 200 }) {
 
   return (
     <svg
-      viewBox="0 0 100 100"
+      viewBox="0 0 80 80"
       width={size}
       height={size}
       xmlns="http://www.w3.org/2000/svg"
+      style={{ imageRendering: 'pixelated' }}
     >
-      <defs>
-        {/* Main star: offset center toward upper-left for the gem highlight */}
-        <radialGradient id={gMain} cx="38%" cy="36%" r="62%">
-          <stop offset="0%"   stopColor={p.highlight} />
-          <stop offset="30%"  stopColor={p.inner} />
-          <stop offset="65%"  stopColor={p.mid} />
-          <stop offset="100%" stopColor={p.outer} />
-        </radialGradient>
-        <radialGradient id={gSmall} cx="38%" cy="36%" r="62%">
-          <stop offset="0%"   stopColor={p.highlight} />
-          <stop offset="40%"  stopColor={p.inner} />
-          <stop offset="100%" stopColor={p.mid} />
-        </radialGradient>
-      </defs>
+      {/* MAIN — centrado (cell=2 → 46×60 en viewBox 100×100) */}
+      <PixelGrid grid={MAIN} cell={2} ox={16} oy={10} palette={p} />
 
-      {/* Main large star */}
-      <path
-        d={starPath(44, 56, 30, 38, 12)}
-        fill={`url(#${gMain})`}
-      />
+      {/* MEDIUM — esquina superior izquierda (cell=2 → 18×18) */}
+      <PixelGrid grid={MEDIUM} cell={2} ox={2} oy={2} palette={p} />
 
-      {/* Companion star — upper right */}
-      <path
-        d={starPath(74, 27, 12, 15, 4.5)}
-        fill={`url(#${gSmall})`}
-      />
+      {/* SMALL — esquina inferior derecha (cell=2 → 14×18) */}
+      <PixelGrid grid={SMALL} cell={2} ox={60} oy={60} palette={p} />
 
-      {/* Tiny sparkles */}
-      <path d={starPath(19, 21,  5,  6.5, 2)}   fill={p.mid} />
-      <path d={starPath(87, 47,  4,  5,   1.5)}  fill={p.inner} />
-      <path d={starPath(16, 81,  4,  5,   1.5)}  fill={p.mid} />
-      <path d={starPath(82, 79,  3,  3.5, 1)}    fill={p.inner} />
+      {/* TINY — esquina superior derecha (cell=4 → 12×12) */}
+      <PixelGrid grid={TINY} cell={4} ox={63} oy={2} palette={p} />
+
+      {/* TINY — esquina inferior izquierda (cell=4 → 12×12) */}
+      <PixelGrid grid={TINY} cell={4} ox={10} oy={55} palette={p} />
     </svg>
   )
 }
