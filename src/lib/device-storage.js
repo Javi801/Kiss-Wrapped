@@ -9,7 +9,7 @@ export function getSafeStorage() {
       return window.localStorage;
     }
   } catch (error) {
-    console.error("Storage unavailable", error);
+    if (import.meta.env.DEV) console.error("Storage unavailable", error);
   }
 
   return null;
@@ -43,8 +43,12 @@ export async function loadPeopleFromDevice() {
   const raw = storage.getItem(STORAGE_KEY);
   if (!raw) return [];
 
-  const parsed = JSON.parse(raw);
-  return Array.isArray(parsed) ? parsed : [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
 }
 
 // Saves people data to native file system or localStorage
@@ -127,7 +131,7 @@ export async function clearPeopleFromDevice() {
         directory: Directory.Data,
       });
     } catch (error) {
-      console.warn("People file did not exist", error);
+      if (import.meta.env.DEV) console.warn("People file did not exist", error);
     }
     return;
   }

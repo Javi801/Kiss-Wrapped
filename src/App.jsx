@@ -121,7 +121,7 @@ export default function KissRecorderApp() {
           if (["yellow", "blue", "pink", "purple"].includes(settings.iconColor)) setIconColor(settings.iconColor);
         }
       } catch (error) {
-        console.error("Failed to load app data", error);
+        if (import.meta.env.DEV) console.error("Failed to load app data", error);
 
         // Fallback to an empty dataset if loading fails.
         if (isMounted) setPeople([]);
@@ -146,15 +146,17 @@ export default function KissRecorderApp() {
   useEffect(() => {
     if (!isLoaded) return;
 
-    savePeopleToDevice(people).catch((error) =>
-      console.error("Failed to save people file", error),
-    );
+    savePeopleToDevice(people).catch((error) => {
+      if (import.meta.env.DEV) console.error("Failed to save people file", error);
+    });
   }, [people, isLoaded]);
 
   // Persists settings whenever language or iconColor change (after boot).
   useEffect(() => {
     if (!isLoaded) return;
-    saveSettings({ iconColor, language }).catch(console.error);
+    saveSettings({ iconColor, language }).catch((error) => {
+      if (import.meta.env.DEV) console.error("Failed to save settings", error);
+    });
   }, [iconColor, language, isLoaded]);
 
   // Switches the icon from user actions only, because Android may kill the app while changing aliases.
@@ -176,7 +178,7 @@ export default function KissRecorderApp() {
       // Reset settings to defaults.
       await saveSettings({ iconColor: "yellow", language: "en" });
     } catch (error) {
-      console.error("Failed to clear app data", error);
+      if (import.meta.env.DEV) console.error("Failed to clear app data", error);
     }
 
     // Reset in-memory state.

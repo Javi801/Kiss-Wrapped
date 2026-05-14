@@ -506,7 +506,7 @@ export async function exportStatsPdf(people, t) {
  */
 export async function saveErrorLog(error) {
   const timestamp = new Date().toISOString();
-  const content = `KissRecorder PDF Export Error\n${timestamp}\n\n${error?.stack || error?.message || String(error)}`;
+  const content = `KissRecorder PDF Export Error\n${timestamp}\n\n${error?.message || String(error)}`;
   const fileName = `kiss-recorder-error-${timestamp.slice(0, 10)}.txt`;
 
   if (isNativePlatform()) {

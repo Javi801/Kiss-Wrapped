@@ -106,9 +106,13 @@ export default function PersonForm({
           <Input
             value={form.name}
             onChange={(e) => update("name", e.target.value)}
+            maxLength={100}
             className="rounded-2xl"
             style={{ ...inputStyle }}
           />
+          <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: "right" }}>
+            {form.name.length}/100
+          </p>
           {errors.name && (
             <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.name}</p>
           )}
@@ -122,6 +126,8 @@ export default function PersonForm({
               type="number"
               value={form.age}
               onChange={(e) => update("age", e.target.value)}
+              min={1}
+              max={120}
               className="rounded-2xl"
             style={{ ...inputStyle }}
             />
@@ -162,9 +168,13 @@ export default function PersonForm({
             <Input
               value={form.howWeMet}
               onChange={(e) => update("howWeMet", e.target.value)}
+              maxLength={200}
               className="rounded-2xl"
             style={{ ...inputStyle }}
             />
+            <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: "right" }}>
+              {form.howWeMet.length}/200
+            </p>
             {errors.howWeMet && (
               <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.howWeMet}</p>
             )}
@@ -238,9 +248,13 @@ export default function PersonForm({
                       ? t.specificStudiesWorks
                       : ""
               }
+              maxLength={500}
               className="rounded-2xl"
               style={{ ...inputStyle, ...TEXT.input }}
             />
+            <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: "right" }}>
+              {form.detail.length}/500
+            </p>
           </div>
         )}
       </div>
