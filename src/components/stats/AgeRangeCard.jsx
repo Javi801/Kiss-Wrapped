@@ -147,6 +147,7 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
             subtitle={t.allYears}
             people={combinedPeople}
             emptyText={emptyText}
+            bare
           />
         ) : multiYear && multiYear.rows.length ? (
           // Multi-year chart: shared X-axis, one boxplot row per year.
