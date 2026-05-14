@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Search, Users, BarChart3, UserPlus } from "lucide-react";
 import { App as CapacitorApp } from "@capacitor/app";
 
-import { PALETTE, COPY } from "@/lib/constants";
+import { PALETTE, TEXT, COPY } from "@/lib/constants";
 import { setAppIconColor } from "@/plugins/appicon";
 import { todayString } from "@/lib/date";
 import { uid, normalizePeople } from "@/lib/helpers";
@@ -376,7 +376,7 @@ export default function KissRecorderApp() {
               left: 0,
               right: 0,
               backdropFilter: "blur(8px)",
-              borderTop: "1px solid #ecd6e0",
+              borderTop: `1px solid ${PALETTE.inputBorder}`,
               backgroundColor: "rgba(255,255,255,0.8)",
             }}
           >
@@ -400,8 +400,7 @@ export default function KissRecorderApp() {
                       paddingRight: "0.5rem",
                       paddingTop: "0.5rem",
                       paddingBottom: "0.5rem",
-                      fontSize: "0.75rem",
-                      lineHeight: "1rem",
+                      ...TEXT.caption,
                       fontWeight: "500",
                       transition: "all 150ms cubic-bezier(0.4, 0, 0.2, 1)",
                       background: active
