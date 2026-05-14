@@ -12,29 +12,31 @@ import PersonForm from "@/components/forms/PersonForm";
  */
 export default function AddPersonScreen({ onSave, onBack, t, language }) {
   return (
-    <div className="space-y-4 pt-2">
+    <div style={{ display: "flex", flexDirection: "column", gap: "1rem", paddingTop: "0.5rem" }}>
       {/* Back action */}
-      <div className="flex items-center justify-start">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-start" }}>
         <Button
           variant="ghost"
-          className="rounded-2xl hover:bg-rose-50"
+          className="hover:bg-rose-50 rounded-2xl"
           style={{ color: PALETTE.deep }}
           onClick={onBack}
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
           {t.back}
         </Button>
       </div>
 
       {/* Form container */}
       <Card
-        className="rounded-3xl shadow-sm backdrop-blur"
+        className="rounded-3xl"
         style={{
+          boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+          backdropFilter: "blur(8px)",
           borderColor: "#f1dde7",
           backgroundColor: "rgba(255,255,255,0.84)",
         }}
       >
-        <CardContent className="p-5">
+        <CardContent style={{ padding: "1.25rem" }}>
           <PersonForm
             onSave={onSave}
             onCancel={onBack}
