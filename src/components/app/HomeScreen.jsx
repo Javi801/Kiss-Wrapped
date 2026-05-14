@@ -158,7 +158,7 @@ export default function MainScreen({
             />
           </div>
 
-          {/* App settings — frosted icon buttons floating on the gradient */}
+          {/* App settings shown as frosted icon buttons on the gradient. */}
           <div
             style={{
               marginTop: "1.25rem",
