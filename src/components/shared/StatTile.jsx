@@ -1,5 +1,6 @@
 import TileCard from "./TileCard";
 import { tileColors } from "./tileColors";
+import { TEXT } from "@/lib/constants";
 
 export default function StatTile({ label, value, helper, accent = false }) {
   const colors = tileColors(accent);
@@ -7,7 +8,7 @@ export default function StatTile({ label, value, helper, accent = false }) {
   return (
     <TileCard accent={accent}>
       <p
-        style={{ fontSize: "0.75rem", lineHeight: "1rem", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.12em", color: colors.label }}
+        style={{ ...TEXT.label, textTransform: "uppercase", letterSpacing: "0.12em", color: colors.label }}
       >
         {label}
       </p>
@@ -19,7 +20,7 @@ export default function StatTile({ label, value, helper, accent = false }) {
       </p>
 
       {helper ? (
-        <p style={{ marginTop: "0.25rem", fontSize: "0.875rem", lineHeight: "1.25rem", color: colors.helper }}>
+        <p style={{ marginTop: "0.25rem", ...TEXT.body, color: colors.helper }}>
           {helper}
         </p>
       ) : null}
