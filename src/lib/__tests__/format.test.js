@@ -135,3 +135,26 @@ describe("getShortZodiacLabel", () => {
   });
 });
 
+describe("getColorForCategory", () => {
+  it('returns male color for "male"', () => {
+    expect(getColorForCategory("male")).toBe(GENDER_COLORS.male);
+  });
+  it('returns female color for "female"', () => {
+    expect(getColorForCategory("female")).toBe(GENDER_COLORS.female);
+  });
+  it('returns other color for "other"', () => {
+    expect(getColorForCategory("other")).toBe(GENDER_COLORS.other);
+  });
+  it('returns male color for "masculino" (Spanish)', () => {
+    expect(getColorForCategory("masculino")).toBe(GENDER_COLORS.male);
+  });
+  it('returns female color for "femenino" (Spanish)', () => {
+    expect(getColorForCategory("femenino")).toBe(GENDER_COLORS.female);
+  });
+  it('returns other color for "otro" (Spanish)', () => {
+    expect(getColorForCategory("otro")).toBe(GENDER_COLORS.other);
+  });
+  it("returns null for an unrecognized label", () => {
+    expect(getColorForCategory("zodiac")).toBeNull();
+  });
+});
