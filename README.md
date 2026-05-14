@@ -9,7 +9,6 @@ A lightweight personal tracking web app to log interactions ("events") with peop
 ## Table of Contents
 
 - [Features](#features)
-- [Demo](#demo)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
@@ -21,10 +20,8 @@ A lightweight personal tracking web app to log interactions ("events") with peop
   - [iOS notes and permissions](#ios-notes-and-permissions)
   - [Android notes](#android-notes)
 - [Data Model](#data-model)
-- [Contributing](#contributing)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
-- [Acknowledgements](#acknowledgements)
 
 ## Features
 
@@ -34,10 +31,6 @@ A lightweight personal tracking web app to log interactions ("events") with peop
 - Export stats as PDF
 - Localization: English and Spanish
 - Local persistence (browser/device storage)
-
-## Demo
-
-No hosted demo is available for this repository. You can run the app locally (see Getting Started).
 
 ## Tech Stack
 
@@ -164,17 +157,6 @@ Event {
 }
 ```
 
-## Contributing
-
-Contributions are welcome. Suggested workflow:
-
-1. Fork the repo
-2. Create a feature branch (`git checkout -b feat/your-feature`)
-3. Make changes and add tests when applicable
-4. Open a PR with a clear description of changes
-
-Please keep changes focused and follow existing code style patterns (React + functional components, utilities in `lib/`).
-
 ## Troubleshooting
 
 - If the native build can't find web assets, confirm you ran `npm run build` and then `npx cap sync <platform>`.
@@ -184,68 +166,3 @@ Please keep changes focused and follow existing code style patterns (React + fun
 ## License
 
 MIT
-
-## Acknowledgements
-
-- Built with Vite, React and Capacitor.
-- Icons and UI libraries credited in `package.json`.
-
----
-
-If you'd like, I can:
-
-- add a small CONTRIBUTING.md
-- add a quick `make ios` script for macOS to automate `build` + `cap sync` steps
-- or also add example screenshots to this README
-
-Tell me which one you'd like next.
-
----
-
-## iOS (Capacitor) Setup
-
-This project is a web app packaged with Capacitor. You can run it on iOS, but building and running the native iOS app requires a macOS machine with Xcode.
-
-Prerequisites (on macOS):
-- Install Xcode from the App Store
-- Install Node.js and npm
-- Install CocoaPods (if needed for native dependencies): `sudo gem install cocoapods`
-
-Steps to prepare and run on iOS:
-
-1. Install dependencies and build the web app:
-
-```bash
-npm install
-npm run build
-```
-
-2. Add and sync the iOS platform (run these on macOS):
-
-```bash
-npx cap add ios
-npx cap sync ios
-npx cap open ios
-```
-
-3. In Xcode:
-- Select a Team for signing (Project > Signing & Capabilities).
-- Add required permissions to `Info.plist` (see below).
-- Build and run on a simulator or a connected device.
-
-Important permissions
-
-If your app records audio, add `NSMicrophoneUsageDescription` to the app Info.plist with a user-facing reason. Example plist entry (XML view):
-
-```xml
-<key>NSMicrophoneUsageDescription</key>
-<string>This app needs access to the microphone to record audio for events.</string>
-</code>
-```
-
-Notes
-- The Capacitor `webDir` is set to `dist` in `capacitor.config.json`, which matches Vite's default output.
-- You can prepare the web build on Linux and then run the iOS platform steps on a mac — but the final native build requires Xcode.
-- After making web changes, run `npx cap sync ios` again to update the native project.
-
-If you want, I can add a short section with the exact `NSMicrophoneUsageDescription` wording you'd like, or prepare a small developer checklist in this README.
