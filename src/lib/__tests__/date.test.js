@@ -54,3 +54,22 @@ describe("isValidDateString", () => {
     expect(isValidDateString("2024.03")).toBe(false);
   });
 });
+
+describe("todayString", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("returns today formatted as yyyy.MM.dd", () => {
+    vi.setSystemTime(new Date("2024-06-15T12:00:00"));
+    expect(todayString()).toBe("2024.06.15");
+  });
+  it("pads single-digit month and day with zeros", () => {
+    vi.setSystemTime(new Date("2024-01-05T12:00:00"));
+    expect(todayString()).toBe("2024.01.05");
+  });
+});
+
