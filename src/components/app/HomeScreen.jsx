@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   BarChart3,
   Check,
@@ -10,6 +10,7 @@ import {
   Settings,
   Trash2,
   TriangleAlert,
+  Upload,
   UserPlus,
   Users,
 } from "lucide-react";
@@ -38,6 +39,7 @@ import ColorSelector from "@/components/app/ColorSelector";
 export default function MainScreen({
   onNavigate,
   onClearData,
+  onImportData,
   people,
   t,
   language,
@@ -49,8 +51,11 @@ export default function MainScreen({
   const [languageOpen, setLanguageOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [statsVisible, setStatsVisible] = useState(true);
-  // null = idle | { fileName, isNative } = success | Error = failed
+  // null = idle | { fileName, isNative, hadMissingFields } = success | Error = failed
   const [jsonExportStatus, setJsonExportStatus] = useState(null);
+  // null = idle | { type: "confirm", count, data } | { type: "success", count } | { type: "error_type" | "error_format" }
+  const [importStatus, setImportStatus] = useState(null);
+  const fileInputRef = useRef(null);
 
   async function handleExportJson() {
     try {
@@ -58,6 +63,43 @@ export default function MainScreen({
       setJsonExportStatus(result);
     } catch (err) {
       setJsonExportStatus(err instanceof Error ? err : new Error(String(err)));
+    }
+  }
+
+  async function handleFileChange(e) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith(".json")) {
+      setImportStatus({ type: "error_type" });
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+
+      if (
+        !Array.isArray(parsed) ||
+        !parsed.every((item) => item && typeof item === "object" && !Array.isArray(item))
+      ) {
+        setImportStatus({ type: "error_format" });
+        return;
+      }
+
+      const existingIds = new Set(people.map((p) => p.id));
+      const newPeople = parsed.filter((p) => !existingIds.has(p.id));
+      const skippedCount = parsed.length - newPeople.length;
+
+      if (newPeople.length === 0) {
+        setImportStatus({ type: "empty", totalInFile: parsed.length });
+        return;
+      }
+
+      setImportStatus({ type: "confirm", totalInFile: parsed.length, newCount: newPeople.length, skippedCount, data: newPeople });
+    } catch {
+      setImportStatus({ type: "error_format" });
     }
   }
 
@@ -102,6 +144,13 @@ export default function MainScreen({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json"
+        style={{ display: "none" }}
+        onChange={handleFileChange}
+      />
       {/* Hero summary card */}
       <Card
         style={{
@@ -386,6 +435,18 @@ export default function MainScreen({
         <Button
           variant="outline"
           className="rounded-3xl"
+          style={outlineActionStyle}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <Upload
+            style={{ marginRight: "0.75rem", height: "1.25rem", width: "1.25rem", color: PALETTE.sky2 }}
+          />
+          {t.importJson}
+        </Button>
+
+        <Button
+          variant="outline"
+          className="rounded-3xl"
           style={{ ...outlineActionStyle, color: "#dc2626" }}
           onClick={() => setConfirmOpen(true)}
         >
@@ -496,6 +557,126 @@ export default function MainScreen({
               }}
             >
               {t.saveJsonErrorLog}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Import confirm dialog */}
+      <Dialog
+        open={importStatus?.type === "confirm"}
+        onOpenChange={(open) => { if (!open) setImportStatus(null); }}
+      >
+        <DialogContent showCloseButton={false} className="rounded-2xl" style={{ background: PALETTE.bgSoft, borderColor: PALETTE.line }}>
+          <DialogHeader>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: PALETTE.deep2 }}>
+              <Upload style={{ height: "1.25rem", width: "1.25rem", flexShrink: 0 }} />
+              <DialogTitle style={{ color: PALETTE.deep2 }}>{t.importJsonConfirmTitle}</DialogTitle>
+            </div>
+            <DialogDescription asChild>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem", color: PALETTE.textSoft }}>
+                <span>
+                  <strong style={{ color: PALETTE.text }}>{importStatus?.totalInFile}</strong>{" "}
+                  {t.importJsonConfirmPeople}
+                </span>
+                <span>
+                  <strong style={{ color: PALETTE.text }}>{importStatus?.newCount}</strong>{" "}
+                  {t.importJsonConfirmNew}
+                </span>
+                {importStatus?.skippedCount > 0 && (
+                  <span>
+                    <strong style={{ color: PALETTE.text }}>{importStatus?.skippedCount}</strong>{" "}
+                    {t.importJsonConfirmSkipped}
+                  </span>
+                )}
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" className="rounded-xl" style={{ borderColor: PALETTE.line, color: PALETTE.text }} onClick={() => setImportStatus(null)}>
+              {t.cancel}
+            </Button>
+            <Button
+              className="rounded-xl"
+              style={{ background: `linear-gradient(90deg, ${PALETTE.deep2}, ${PALETTE.lavender})`, color: "white", border: "none" }}
+              onClick={() => {
+                onImportData(importStatus.data);
+                setImportStatus({ type: "success", newCount: importStatus.newCount });
+              }}
+            >
+              {t.importJsonConfirmAction}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Import success dialog */}
+      <Dialog
+        open={importStatus?.type === "success"}
+        onOpenChange={(open) => { if (!open) setImportStatus(null); }}
+      >
+        <DialogContent showCloseButton={false} className="rounded-2xl" style={{ background: PALETTE.bgSoft, borderColor: PALETTE.line }}>
+          <DialogHeader>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: PALETTE.rose }}>
+              <CheckCircle2 style={{ height: "1.25rem", width: "1.25rem", flexShrink: 0 }} />
+              <DialogTitle style={{ color: PALETTE.rose }}>{t.importJsonSuccessTitle}</DialogTitle>
+            </div>
+            <DialogDescription asChild>
+              <div style={{ color: PALETTE.textSoft }}>
+                <strong style={{ color: PALETTE.text }}>{importStatus?.newCount}</strong>{" "}
+                {t.importJsonSuccessDesc}
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button className="rounded-xl" style={{ background: `linear-gradient(90deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`, color: "white", border: "none" }} onClick={() => setImportStatus(null)}>
+              {t.close}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Import empty dialog (all people already exist) */}
+      <Dialog
+        open={importStatus?.type === "empty"}
+        onOpenChange={(open) => { if (!open) setImportStatus(null); }}
+      >
+        <DialogContent showCloseButton={false} className="rounded-2xl" style={{ background: PALETTE.bgSoft, borderColor: PALETTE.line }}>
+          <DialogHeader>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: PALETTE.textSoft }}>
+              <Upload style={{ height: "1.25rem", width: "1.25rem", flexShrink: 0 }} />
+              <DialogTitle style={{ color: PALETTE.text }}>{t.importJsonEmptyTitle}</DialogTitle>
+            </div>
+            <DialogDescription style={{ color: PALETTE.textSoft }}>{t.importJsonEmptyDesc}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button className="rounded-xl" style={{ background: `linear-gradient(90deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`, color: "white", border: "none" }} onClick={() => setImportStatus(null)}>
+              {t.close}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Import error dialog (invalid type or invalid format) */}
+      <Dialog
+        open={importStatus?.type === "error_type" || importStatus?.type === "error_format"}
+        onOpenChange={(open) => { if (!open) setImportStatus(null); }}
+      >
+        <DialogContent showCloseButton={false} className="rounded-2xl" style={{ background: PALETTE.bgSoft, borderColor: PALETTE.line }}>
+          <DialogHeader>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: PALETTE.deep }}>
+              <TriangleAlert style={{ height: "1.25rem", width: "1.25rem", flexShrink: 0 }} />
+              <DialogTitle style={{ color: PALETTE.deep }}>
+                {importStatus?.type === "error_type" ? t.importJsonErrorTypeTitle : t.importJsonErrorFormatTitle}
+              </DialogTitle>
+            </div>
+            <DialogDescription style={{ color: PALETTE.textSoft }}>
+              {importStatus?.type === "error_type" ? t.importJsonErrorTypeDesc : t.importJsonErrorFormatDesc}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button className="rounded-xl" style={{ background: PALETTE.deep, color: "white", border: "none" }} onClick={() => setImportStatus(null)}>
+              {t.close}
             </Button>
           </DialogFooter>
         </DialogContent>
