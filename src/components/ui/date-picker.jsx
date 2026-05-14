@@ -21,7 +21,14 @@ function getMonthLabel(year, month) {
     .format(new Date(year, month - 1, 1));
 }
 
+function getShortMonth(month) {
+  return new Intl.DateTimeFormat(navigator.language, { month: "short" })
+    .format(new Date(2000, month - 1, 1));
+}
+
 const DAY_HEADERS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+
+const YEAR_PAGE_SIZE = 12;
 
 const navBtn = {
   display: "flex",
@@ -55,6 +62,11 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
   const [viewYear, setViewYear] = useState(parsed?.year ?? todayY);
   const [viewMonth, setViewMonth] = useState(parsed?.month ?? todayM);
 
+  // "days" | "months" | "years"
+  const [calView, setCalView] = useState("days");
+  // First year shown in the year-picker page.
+  const [yearPageStart, setYearPageStart] = useState(() => viewYear - 5);
+
   // Close when clicking outside.
   useEffect(() => {
     if (!open) return;
@@ -77,6 +89,24 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
     }
   }
 
+  function toggleOpen() {
+    if (!open) setCalView("days");
+    setOpen((o) => !o);
+  }
+
+  // Title click cycles: days → months → years → days.
+  function handleTitleClick() {
+    if (calView === "days") {
+      setCalView("months");
+    } else if (calView === "months") {
+      setYearPageStart(viewYear - 5);
+      setCalView("years");
+    } else {
+      setCalView("days");
+    }
+  }
+
+  // ── Day view navigation ──────────────────────────────────────────────────
   function prevMonth() {
     if (viewMonth === 1) { setViewYear((y) => y - 1); setViewMonth(12); }
     else setViewMonth((m) => m - 1);
@@ -90,17 +120,70 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
   function selectDay(day) {
     onChange(toAppDate(viewYear, viewMonth, day));
     setOpen(false);
+    setCalView("days");
   }
 
-  // Build a Mon-first grid of day numbers (null = empty cell).
+  // ── Month view navigation ────────────────────────────────────────────────
+  function selectMonth(month) {
+    setViewMonth(month);
+    setCalView("days");
+  }
+
+  // ── Year view navigation ─────────────────────────────────────────────────
+  function selectYear(year) {
+    setViewYear(year);
+    setCalView("months");
+  }
+
+  // ── Day grid ─────────────────────────────────────────────────────────────
   const totalDays = new Date(viewYear, viewMonth, 0).getDate();
-  const rawFirst = new Date(viewYear, viewMonth - 1, 1).getDay(); // 0=Sun
-  const startOffset = (rawFirst + 6) % 7; // convert to Mon=0
+  const rawFirst = new Date(viewYear, viewMonth - 1, 1).getDay();
+  const startOffset = (rawFirst + 6) % 7;
   const cells = [
     ...Array(startOffset).fill(null),
     ...Array.from({ length: totalDays }, (_, i) => i + 1),
   ];
   while (cells.length % 7 !== 0) cells.push(null);
+
+  // ── Shared styles ─────────────────────────────────────────────────────────
+  function gridItemStyle({ isSelected, isToday, isActive }) {
+    return {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: "0.5rem",
+      border: "none",
+      cursor: "pointer",
+      fontSize: "0.8125rem",
+      fontWeight: isSelected || isToday ? 600 : 400,
+      color: isSelected ? "white" : isActive ? PALETTE.rose : PALETTE.text,
+      backgroundColor: isSelected ? PALETTE.rose : isActive ? PALETTE.blush : "transparent",
+      transition: "background-color 0.1s",
+    };
+  }
+
+  // ── Title label ───────────────────────────────────────────────────────────
+  let titleLabel;
+  if (calView === "days") {
+    titleLabel = getMonthLabel(viewYear, viewMonth);
+  } else if (calView === "months") {
+    titleLabel = String(viewYear);
+  } else {
+    titleLabel = `${yearPageStart} – ${yearPageStart + YEAR_PAGE_SIZE - 1}`;
+  }
+
+  // ── Prev / next handlers per view ─────────────────────────────────────────
+  function handlePrev() {
+    if (calView === "days") prevMonth();
+    else if (calView === "months") setViewYear((y) => y - 1);
+    else setYearPageStart((s) => s - YEAR_PAGE_SIZE);
+  }
+
+  function handleNext() {
+    if (calView === "days") nextMonth();
+    else if (calView === "months") setViewYear((y) => y + 1);
+    else setYearPageStart((s) => s + YEAR_PAGE_SIZE);
+  }
 
   return (
     <div ref={containerRef} style={{ position: "relative" }}>
@@ -116,7 +199,7 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
         <button
           type="button"
           aria-label="Open calendar"
-          onClick={() => setOpen((o) => !o)}
+          onClick={toggleOpen}
           style={{
             display: "flex",
             alignItems: "center",
@@ -153,11 +236,11 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
             userSelect: "none",
           }}
         >
-          {/* Month navigation */}
+          {/* Header: prev / title / next */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
             <button
               type="button"
-              onClick={prevMonth}
+              onClick={handlePrev}
               style={navBtn}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = PALETTE.blush)}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
@@ -165,13 +248,29 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
               <ChevronLeft size={14} />
             </button>
 
-            <span style={{ ...TEXT.bodyStrong, color: PALETTE.text, textTransform: "capitalize" }}>
-              {getMonthLabel(viewYear, viewMonth)}
-            </span>
+            <button
+              type="button"
+              onClick={handleTitleClick}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: "0.125rem 0.5rem",
+                borderRadius: "0.5rem",
+                ...TEXT.bodyStrong,
+                color: PALETTE.text,
+                textTransform: "capitalize",
+                transition: "background-color 0.1s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = PALETTE.blush)}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+            >
+              {titleLabel}
+            </button>
 
             <button
               type="button"
-              onClick={nextMonth}
+              onClick={handleNext}
               style={navBtn}
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = PALETTE.blush)}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
@@ -180,59 +279,109 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
             </button>
           </div>
 
-          {/* Weekday headers */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px", marginBottom: "4px" }}>
-            {DAY_HEADERS.map((d) => (
-              <div
-                key={d}
-                style={{ textAlign: "center", ...TEXT.caption, color: PALETTE.textSoft, fontWeight: 600 }}
-              >
-                {d}
+          {/* ── DAY VIEW ── */}
+          {calView === "days" && (
+            <>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px", marginBottom: "4px" }}>
+                {DAY_HEADERS.map((d) => (
+                  <div key={d} style={{ textAlign: "center", ...TEXT.caption, color: PALETTE.textSoft, fontWeight: 600 }}>
+                    {d}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          {/* Day cells */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px" }}>
-            {cells.map((day, i) => {
-              if (day === null) return <div key={`empty-${i}`} />;
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px" }}>
+                {cells.map((day, i) => {
+                  if (day === null) return <div key={`empty-${i}`} />;
 
-              const isToday = day === todayD && viewMonth === todayM && viewYear === todayY;
-              const isSelected = parsed && day === parsed.day && viewMonth === parsed.month && viewYear === parsed.year;
+                  const isToday = day === todayD && viewMonth === todayM && viewYear === todayY;
+                  const isSelected = parsed && day === parsed.day && viewMonth === parsed.month && viewYear === parsed.year;
 
-              return (
-                <button
-                  key={day}
-                  type="button"
-                  onClick={() => selectDay(day)}
-                  style={{
-                    width: "100%",
-                    aspectRatio: "1",
-                    borderRadius: "50%",
-                    border: "none",
-                    cursor: "pointer",
-                    fontSize: "0.8125rem",
-                    fontWeight: isSelected || isToday ? 600 : 400,
-                    color: isSelected ? "white" : isToday ? PALETTE.rose : PALETTE.text,
-                    backgroundColor: isSelected
-                      ? PALETTE.rose
-                      : isToday
-                      ? PALETTE.blush
-                      : "transparent",
-                    transition: "background-color 0.1s",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isSelected) e.currentTarget.style.backgroundColor = PALETTE.blush;
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isSelected) e.currentTarget.style.backgroundColor = isToday ? PALETTE.blush : "transparent";
-                  }}
-                >
-                  {day}
-                </button>
-              );
-            })}
-          </div>
+                  return (
+                    <button
+                      key={day}
+                      type="button"
+                      onClick={() => selectDay(day)}
+                      style={{
+                        ...gridItemStyle({ isSelected, isToday, isActive: isToday }),
+                        aspectRatio: "1",
+                        borderRadius: "50%",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isSelected) e.currentTarget.style.backgroundColor = PALETTE.blush;
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isSelected) e.currentTarget.style.backgroundColor = isToday ? PALETTE.blush : "transparent";
+                      }}
+                    >
+                      {day}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {/* ── MONTH VIEW ── */}
+          {calView === "months" && (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "6px" }}>
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => {
+                const isSelected = parsed && m === parsed.month && viewYear === parsed.year;
+                const isToday = m === todayM && viewYear === todayY;
+
+                return (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => selectMonth(m)}
+                    style={{
+                      ...gridItemStyle({ isSelected, isToday, isActive: isToday }),
+                      padding: "0.4rem 0",
+                      textTransform: "capitalize",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSelected) e.currentTarget.style.backgroundColor = PALETTE.blush;
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSelected) e.currentTarget.style.backgroundColor = isToday ? PALETTE.blush : "transparent";
+                    }}
+                  >
+                    {getShortMonth(m)}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* ── YEAR VIEW ── */}
+          {calView === "years" && (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "6px" }}>
+              {Array.from({ length: YEAR_PAGE_SIZE }, (_, i) => yearPageStart + i).map((yr) => {
+                const isSelected = parsed && yr === parsed.year;
+                const isToday = yr === todayY;
+
+                return (
+                  <button
+                    key={yr}
+                    type="button"
+                    onClick={() => selectYear(yr)}
+                    style={{
+                      ...gridItemStyle({ isSelected, isToday, isActive: isToday }),
+                      padding: "0.4rem 0",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSelected) e.currentTarget.style.backgroundColor = PALETTE.blush;
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSelected) e.currentTarget.style.backgroundColor = isToday ? PALETTE.blush : "transparent";
+                    }}
+                  >
+                    {yr}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
     </div>
