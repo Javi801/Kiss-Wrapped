@@ -1,0 +1,345 @@
+import { useState, useRef, useEffect } from "react";
+import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { PALETTE, TEXT } from "@/lib/constants";
+import { parseCalendarDate, toCalendarDate, buildDayGrid, nextCalView } from "@/lib/calendar";
+
+function getMonthLabel(year, month) {
+  return new Intl.DateTimeFormat(navigator.language, { month: "long", year: "numeric" })
+    .format(new Date(year, month - 1, 1));
+}
+
+function getShortMonth(month) {
+  return new Intl.DateTimeFormat(navigator.language, { month: "short" })
+    .format(new Date(2000, month - 1, 1));
+}
+
+const DAY_HEADERS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+
+const YEAR_PAGE_SIZE = 12;
+
+const navBtn = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "1.75rem",
+  height: "1.75rem",
+  borderRadius: "50%",
+  border: "none",
+  backgroundColor: "transparent",
+  color: PALETTE.textSoft,
+  cursor: "pointer",
+  transition: "background-color 0.1s",
+};
+
+// Text input paired with a calendar dropdown; value format is yyyy.MM.dd.
+export function DatePicker({ value, onChange, placeholder, className, style }) {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef(null);
+
+  const today = new Date();
+  const todayY = today.getFullYear();
+  const todayM = today.getMonth() + 1;
+  const todayD = today.getDate();
+
+  const parsed = parseCalendarDate(value);
+
+  const [viewYear, setViewYear] = useState(parsed?.year ?? todayY);
+  const [viewMonth, setViewMonth] = useState(parsed?.month ?? todayM);
+  const [calView, setCalView] = useState("days"); // "days" | "months" | "years"
+  const [yearPageStart, setYearPageStart] = useState(() => viewYear - 5); // first year in the page
+
+  // Close when clicking outside.
+  useEffect(() => {
+    if (!open) return;
+    const handle = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
+  }, [open]);
+
+  function handleTextChange(e) {
+    const newVal = e.target.value;
+    onChange(newVal);
+    const p = parseCalendarDate(newVal);
+    if (p) {
+      setViewYear(p.year);
+      setViewMonth(p.month);
+    }
+  }
+
+  function toggleOpen() {
+    if (!open) setCalView("days");
+    setOpen((o) => !o);
+  }
+
+  // Title click cycles: days → months → years → days.
+  function handleTitleClick() {
+    if (calView === "months") setYearPageStart(viewYear - 5);
+    setCalView(nextCalView(calView));
+  }
+
+  function prevMonth() {
+    if (viewMonth === 1) { setViewYear((y) => y - 1); setViewMonth(12); }
+    else setViewMonth((m) => m - 1);
+  }
+
+  function nextMonth() {
+    if (viewMonth === 12) { setViewYear((y) => y + 1); setViewMonth(1); }
+    else setViewMonth((m) => m + 1);
+  }
+
+  function selectDay(day) {
+    onChange(toCalendarDate(viewYear, viewMonth, day));
+    setOpen(false);
+    setCalView("days");
+  }
+
+  function selectMonth(month) {
+    setViewMonth(month);
+    setCalView("days");
+  }
+
+  function selectYear(year) {
+    setViewYear(year);
+    setCalView("months");
+  }
+
+  function handlePrev() {
+    if (calView === "days") prevMonth();
+    else if (calView === "months") setViewYear((y) => y - 1);
+    else setYearPageStart((s) => s - YEAR_PAGE_SIZE);
+  }
+
+  function handleNext() {
+    if (calView === "days") nextMonth();
+    else if (calView === "months") setViewYear((y) => y + 1);
+    else setYearPageStart((s) => s + YEAR_PAGE_SIZE);
+  }
+
+  const cells = buildDayGrid(viewYear, viewMonth);
+
+  function gridItemStyle({ isSelected, isToday, isActive }) {
+    return {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: "0.5rem",
+      border: "none",
+      cursor: "pointer",
+      fontSize: "0.8125rem",
+      fontWeight: isSelected || isToday ? 600 : 400,
+      color: isSelected ? "white" : isActive ? PALETTE.rose : PALETTE.text,
+      backgroundColor: isSelected ? PALETTE.rose : isActive ? PALETTE.blush : "transparent",
+      transition: "background-color 0.1s",
+    };
+  }
+
+  let titleLabel;
+  if (calView === "days") titleLabel = getMonthLabel(viewYear, viewMonth);
+  else if (calView === "months") titleLabel = String(viewYear);
+  else titleLabel = `${yearPageStart} – ${yearPageStart + YEAR_PAGE_SIZE - 1}`;
+
+  return (
+    <div ref={containerRef} style={{ position: "relative" }}>
+      <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+        <Input
+          value={value}
+          onChange={handleTextChange}
+          placeholder={placeholder}
+          className={className}
+          style={{ ...style, flex: 1 }}
+        />
+        <button
+          type="button"
+          aria-label="Open calendar"
+          onClick={toggleOpen}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "2.25rem",
+            height: "2.25rem",
+            flexShrink: 0,
+            borderRadius: "0.75rem",
+            border: `1px solid ${PALETTE.inputBorder}`,
+            backgroundColor: open ? PALETTE.blush : PALETTE.inputBg,
+            color: PALETTE.rose,
+            cursor: "pointer",
+            transition: "background-color 0.15s",
+          }}
+        >
+          <CalendarIcon size={16} />
+        </button>
+      </div>
+
+      {/* calendar dropdown */}
+      {open && (
+        <div
+          style={{
+            position: "absolute",
+            top: "calc(100% + 6px)",
+            left: 0,
+            zIndex: 200,
+            backgroundColor: PALETTE.card,
+            border: `1px solid ${PALETTE.cardBorder}`,
+            borderRadius: "1rem",
+            padding: "1rem",
+            boxShadow: "0 8px 32px rgba(226,115,150,0.18)",
+            minWidth: "268px",
+            userSelect: "none",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
+            <button
+              type="button"
+              onClick={handlePrev}
+              style={navBtn}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = PALETTE.blush)}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+            >
+              <ChevronLeft size={14} />
+            </button>
+
+            <button
+              type="button"
+              onClick={handleTitleClick}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: "0.125rem 0.5rem",
+                borderRadius: "0.5rem",
+                ...TEXT.bodyStrong,
+                color: PALETTE.text,
+                textTransform: "capitalize",
+                transition: "background-color 0.1s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = PALETTE.blush)}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+            >
+              {titleLabel}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleNext}
+              style={navBtn}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = PALETTE.blush)}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+            >
+              <ChevronRight size={14} />
+            </button>
+          </div>
+
+          {/* day view */}
+          {calView === "days" && (
+            <>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px", marginBottom: "4px" }}>
+                {DAY_HEADERS.map((d) => (
+                  <div key={d} style={{ textAlign: "center", ...TEXT.caption, color: PALETTE.textSoft, fontWeight: 600 }}>
+                    {d}
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px" }}>
+                {cells.map((day, i) => {
+                  if (day === null) return <div key={`empty-${i}`} />;
+
+                  const isToday = day === todayD && viewMonth === todayM && viewYear === todayY;
+                  const isSelected = parsed && day === parsed.day && viewMonth === parsed.month && viewYear === parsed.year;
+
+                  return (
+                    <button
+                      key={day}
+                      type="button"
+                      onClick={() => selectDay(day)}
+                      style={{
+                        ...gridItemStyle({ isSelected, isToday, isActive: isToday }),
+                        aspectRatio: "1",
+                        borderRadius: "50%",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isSelected) e.currentTarget.style.backgroundColor = PALETTE.blush;
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isSelected) e.currentTarget.style.backgroundColor = isToday ? PALETTE.blush : "transparent";
+                      }}
+                    >
+                      {day}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {/* month view */}
+          {calView === "months" && (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "6px" }}>
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => {
+                const isSelected = parsed && m === parsed.month && viewYear === parsed.year;
+                const isToday = m === todayM && viewYear === todayY;
+
+                return (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => selectMonth(m)}
+                    style={{
+                      ...gridItemStyle({ isSelected, isToday, isActive: isToday }),
+                      padding: "0.4rem 0",
+                      textTransform: "capitalize",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSelected) e.currentTarget.style.backgroundColor = PALETTE.blush;
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSelected) e.currentTarget.style.backgroundColor = isToday ? PALETTE.blush : "transparent";
+                    }}
+                  >
+                    {getShortMonth(m)}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* year view */}
+          {calView === "years" && (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "6px" }}>
+              {Array.from({ length: YEAR_PAGE_SIZE }, (_, i) => yearPageStart + i).map((yr) => {
+                const isSelected = parsed && yr === parsed.year;
+                const isToday = yr === todayY;
+
+                return (
+                  <button
+                    key={yr}
+                    type="button"
+                    onClick={() => selectYear(yr)}
+                    style={{
+                      ...gridItemStyle({ isSelected, isToday, isActive: isToday }),
+                      padding: "0.4rem 0",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSelected) e.currentTarget.style.backgroundColor = PALETTE.blush;
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSelected) e.currentTarget.style.backgroundColor = isToday ? PALETTE.blush : "transparent";
+                    }}
+                  >
+                    {yr}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
