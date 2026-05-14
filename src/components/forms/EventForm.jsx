@@ -37,9 +37,7 @@ export default function EventForm({ initialValues, onSave, onCancel, t }) {
   // Validation error state.
   const [error, setError] = useState("");
 
-  /**
-   * Validate and submit event data.
-   */
+  // Validate and submit event data.
   function submit(e) {
     e.preventDefault();
 
