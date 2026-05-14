@@ -124,7 +124,7 @@ export default function StatsPeopleTab({ people, t }) {
   }, [personsByGender, eventsByGender]);
 
   return (
-    <div className="space-y-4">
+    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <BarChartCard
         title={t.eventsByZodiac}
         subtitle={t.groupedBySign}
