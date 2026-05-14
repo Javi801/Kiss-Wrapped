@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -68,9 +68,9 @@ export default function EventForm({ initialValues, onSave, onCancel, t }) {
       {/* Date */}
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <Label>{t.eventDate} *</Label>
-        <Input
+        <DatePicker
           value={date}
-          onChange={(e) => setDate(e.target.value)}
+          onChange={setDate}
           placeholder="2026.03.08"
           className="rounded-2xl"
           style={{ ...inputStyle }}
