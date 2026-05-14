@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   BarChart3,
   Check,
+  CheckCircle2,
   Download,
   Eye,
   EyeOff,
@@ -26,6 +27,7 @@ import {
 
 import { PALETTE, TEXT } from "@/lib/constants";
 import { exportPeopleJson } from "@/lib/device-storage";
+import { saveErrorLog } from "@/lib/pdf-export";
 import StatTile from "@/components/shared/StatTile";
 import ColorSelector from "@/components/app/ColorSelector";
 
@@ -47,6 +49,17 @@ export default function MainScreen({
   const [languageOpen, setLanguageOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [statsVisible, setStatsVisible] = useState(true);
+  // null = idle | { fileName, isNative } = success | Error = failed
+  const [jsonExportStatus, setJsonExportStatus] = useState(null);
+
+  async function handleExportJson() {
+    try {
+      const result = await exportPeopleJson(people);
+      setJsonExportStatus(result);
+    } catch (err) {
+      setJsonExportStatus(err instanceof Error ? err : new Error(String(err)));
+    }
+  }
 
   // Count all events across every saved person.
   const totalEvents = people.reduce(
@@ -362,7 +375,7 @@ export default function MainScreen({
           variant="outline"
           className="rounded-3xl"
           style={outlineActionStyle}
-          onClick={() => exportPeopleJson(people)}
+          onClick={handleExportJson}
         >
           <Download
             style={{ marginRight: "0.75rem", height: "1.25rem", width: "1.25rem", color: PALETTE.sky2 }}
@@ -380,6 +393,93 @@ export default function MainScreen({
           {t.clearLocalData}
         </Button>
       </div>
+
+      {/* JSON export success dialog */}
+      <Dialog
+        open={jsonExportStatus !== null && !(jsonExportStatus instanceof Error)}
+        onOpenChange={(open) => { if (!open) setJsonExportStatus(null); }}
+      >
+        <DialogContent
+          showCloseButton={false}
+          className="rounded-2xl"
+          style={{ background: PALETTE.bgSoft, borderColor: PALETTE.line }}
+        >
+          <DialogHeader>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: PALETTE.rose }}>
+              <CheckCircle2 style={{ height: "1.25rem", width: "1.25rem", flexShrink: 0 }} />
+              <DialogTitle style={{ color: PALETTE.rose }}>{t.exportJsonSuccessTitle}</DialogTitle>
+            </div>
+            <DialogDescription asChild>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem", color: PALETTE.textSoft }}>
+                <span>
+                  {t.exportJsonSavedAs}:{" "}
+                  <strong style={{ color: PALETTE.text, fontFamily: "monospace" }}>
+                    {jsonExportStatus?.fileName}
+                  </strong>
+                </span>
+                <span>
+                  {jsonExportStatus?.isNative
+                    ? t.exportJsonLocationNative
+                    : t.exportJsonLocationWeb}
+                </span>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              className="rounded-xl"
+              style={{ background: `linear-gradient(90deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`, color: "white", border: "none" }}
+              onClick={() => setJsonExportStatus(null)}
+            >
+              {t.close}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* JSON export error dialog */}
+      <Dialog
+        open={jsonExportStatus instanceof Error}
+        onOpenChange={(open) => { if (!open) setJsonExportStatus(null); }}
+      >
+        <DialogContent
+          showCloseButton={false}
+          className="rounded-2xl"
+          style={{ background: PALETTE.bgSoft, borderColor: PALETTE.line }}
+        >
+          <DialogHeader>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: PALETTE.deep }}>
+              <TriangleAlert style={{ height: "1.25rem", width: "1.25rem", flexShrink: 0 }} />
+              <DialogTitle style={{ color: PALETTE.deep }}>{t.exportJsonErrorTitle}</DialogTitle>
+            </div>
+            <DialogDescription asChild>
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem", color: PALETTE.textSoft }}>
+                <span>{jsonExportStatus?.message || t.exportJsonErrorDesc}</span>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              className="rounded-xl"
+              style={{ borderColor: PALETTE.line, color: PALETTE.text }}
+              onClick={() => setJsonExportStatus(null)}
+            >
+              {t.close}
+            </Button>
+            <Button
+              className="rounded-xl"
+              style={{ background: PALETTE.deep, color: "white", border: "none" }}
+              onClick={() => {
+                saveErrorLog(jsonExportStatus).catch(console.error);
+                setJsonExportStatus(null);
+              }}
+            >
+              {t.saveJsonErrorLog}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent showCloseButton={false}>
