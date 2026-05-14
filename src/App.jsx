@@ -52,6 +52,12 @@ export default function KissRecorderApp() {
     screenRef.current = screen;
   }, [screen]);
 
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo(0, 0);
+  }, [screen]);
+
   /**
    * Navigates forward to a new screen and pushes the current one onto the history stack.
    */
@@ -318,14 +324,15 @@ export default function KissRecorderApp() {
 
   return (
     <div
-      className="min-h-screen text-slate-900"
+      className="h-screen text-slate-900"
       style={{
         background: `linear-gradient(180deg, ${PALETTE.bgGradientFrom}, ${PALETTE.bgSoft}, ${PALETTE.sky})`,
       }}
     >
-      <div className="mx-auto flex min-h-screen w-full max-w-md flex-col px-4 pb-24 pt-5">
+      <div className="mx-auto flex h-full w-full max-w-md flex-col px-4 pb-24 pt-5">
         {/* Main animated content area */}
         <motion.div
+          ref={scrollRef}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
