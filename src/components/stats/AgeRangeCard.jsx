@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { PALETTE } from "@/lib/constants";
+import { PALETTE, TEXT } from "@/lib/constants";
 import AgeRangeBox from "@/components/stats/AgeRangeBox";
 import { getYearKey } from "@/lib/date";
 
@@ -50,16 +50,18 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
 
   return (
     <Card
-      className="rounded-3xl shadow-sm backdrop-blur"
+      className="rounded-3xl"
       style={{
-        borderColor: "#f1dde7",
-        backgroundColor: "rgba(255,255,255,0.82)",
+        boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        backdropFilter: "blur(8px)",
+        borderColor: PALETTE.cardBorder,
+        backgroundColor: PALETTE.cardBg,
       }}
     >
-      <CardHeader className="pb-2">
-        <div className="flex items-start justify-between gap-3">
+      <CardHeader style={{ paddingBottom: "0.5rem" }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "0.75rem" }}>
           <div>
-            <CardTitle className="text-base">{title}</CardTitle>
+            <CardTitle style={TEXT.title}>{title}</CardTitle>
             <CardDescription>
               {splitByYear ? t.divideByYear : t.allYears}
             </CardDescription>
@@ -69,8 +71,8 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
           <Button
             type="button"
             variant="outline"
-            className="rounded-2xl bg-white/70"
-            style={{ borderColor: "#ecd6e0" }}
+            className="rounded-2xl"
+            style={{ backgroundColor: "rgba(255,255,255,0.7)", borderColor: PALETTE.inputBorder }}
             onClick={() => setSplitByYear((prev) => !prev)}
           >
             {splitByYear ? t.showAllTogether : t.divideByYear}
@@ -89,7 +91,7 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
           />
         ) : yearsData.length ? (
           // Per-year breakdown.
-          <div className="space-y-4">
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             {yearsData.map((item) => (
               <AgeRangeBox
                 key={item.year}
@@ -105,8 +107,8 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
         ) : (
           // Empty fallback.
           <div
-            className="rounded-2xl border border-dashed p-8 text-center text-sm"
-            style={{ borderColor: "#ecd6e0", color: PALETTE.textSoft }}
+            className="rounded-2xl"
+            style={{ border: `1px dashed ${PALETTE.inputBorder}`, padding: "2rem", textAlign: "center", ...TEXT.body, color: PALETTE.textSoft }}
           >
             {emptyText}
           </div>

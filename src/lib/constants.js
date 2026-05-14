@@ -40,6 +40,26 @@ export const PALETTE = {
   line: "#ead7e2",
   text: "#43384a",
   textSoft: "#6b6270",
+  // Structural surfaces and borders
+  inputBorder: "#ecd6e0",
+  cardBorder: "#f1dde7",
+  innerCardBorder: "#efdee6",
+  inputBg: "rgba(255,255,255,0.88)",
+  controlBg: "rgba(255,255,255,0.86)",
+  cardBg: "rgba(255,255,255,0.82)",
+  surfaceBg: "rgba(255,255,255,0.78)",
+};
+
+// Semantic text scale. Spread into style objects or use directly as style prop.
+export const TEXT = {
+  caption:    { fontSize: "0.75rem",  lineHeight: "1rem"    },
+  label:      { fontSize: "0.75rem",  lineHeight: "1rem",    fontWeight: "600" },
+  body:       { fontSize: "0.875rem", lineHeight: "1.25rem" },
+  bodyStrong: { fontSize: "0.875rem", lineHeight: "1.25rem", fontWeight: "600" },
+  base:       { fontSize: "1rem",     lineHeight: "1.5rem"  },
+  title:      { fontSize: "1rem",     lineHeight: "1.5rem",  fontWeight: "600" },
+  subheading: { fontSize: "1.125rem", lineHeight: "1.75rem", fontWeight: "700" },
+  heading:    { fontSize: "1.5rem",   lineHeight: "2rem",    fontWeight: "700" },
 };
 
 // Generic colors for graphics.

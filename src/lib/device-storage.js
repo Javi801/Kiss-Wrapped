@@ -81,7 +81,7 @@ export async function loadSettings() {
       })
       return { ...SETTINGS_DEFAULTS, ...JSON.parse(result.data || '{}') }
     } catch {
-      // File doesn't exist — migrate from localStorage if available
+      // Missing native settings are migrated from localStorage when possible.
       const storage = getSafeStorage()
       const migrated = {
         iconColor: storage?.getItem(ICON_COLOR_KEY) || SETTINGS_DEFAULTS.iconColor,

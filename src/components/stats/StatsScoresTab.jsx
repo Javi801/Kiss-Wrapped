@@ -12,9 +12,7 @@ import AreaChartCard from "@/components/charts/AreaChartCard";
  * It shows score distribution and event-count distribution.
  */
 export default function StatsScoresTab({ people, allEvents, t }) {
-  /**
-   * Keep only events with a valid score.
-   */
+  // Keep only events with a valid score.
   const scoredEvents = useMemo(
     () => allEvents.filter((event) => hasScore(event.score)),
     [allEvents],
@@ -39,9 +37,7 @@ export default function StatsScoresTab({ people, allEvents, t }) {
     return [...map.entries()].map(([label, value]) => ({ label, value }));
   }, [scoredEvents, t]);
 
-  /**
-   * Groups people by how many events they have.
-   */
+  // Groups people by how many events they have.
   const numberOfEventsByNumberOfPersons = useMemo(() => {
     const map = new Map();
 
@@ -55,9 +51,7 @@ export default function StatsScoresTab({ people, allEvents, t }) {
       .map(([label, value]) => ({ label, value }));
   }, [people]);
 
-  /**
-   * Compares scored events against unscored events.
-   */
+  // Compares scored events against unscored events.
   const scoredVsUnscored = useMemo(() => {
     const scored = allEvents.filter((event) => hasScore(event.score)).length;
     const unscored = allEvents.length - scored;
@@ -69,7 +63,7 @@ export default function StatsScoresTab({ people, allEvents, t }) {
   }, [allEvents, t]);
 
   return (
-    <div className="space-y-4">
+    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <PieChartCard
         title={t.scoreDistribution}
         subtitle={t.scoreDistributionDesc}

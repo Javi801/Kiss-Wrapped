@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { PALETTE, SCORE_OPTIONS } from "@/lib/constants";
+import { PALETTE, SCORE_OPTIONS, TEXT } from "@/lib/constants";
 import { todayString, isValidDateString } from "@/lib/date";
 import { hasScore, renderKisses } from "@/lib/format";
 
@@ -37,9 +37,7 @@ export default function EventForm({ initialValues, onSave, onCancel, t }) {
   // Validation error state.
   const [error, setError] = useState("");
 
-  /**
-   * Validate and submit event data.
-   */
+  // Validate and submit event data.
   function submit(e) {
     e.preventDefault();
 
@@ -61,39 +59,39 @@ export default function EventForm({ initialValues, onSave, onCancel, t }) {
 
   // Shared input styling.
   const inputStyle = {
-    borderColor: "#ecd6e0",
-    backgroundColor: "rgba(255,255,255,0.88)",
+    borderColor: PALETTE.inputBorder,
+    backgroundColor: PALETTE.inputBg,
   };
 
   return (
-    <form onSubmit={submit} className="space-y-4">
+    <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       {/* Date */}
-      <div className="space-y-2">
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <Label>{t.eventDate} *</Label>
         <Input
           value={date}
           onChange={(e) => setDate(e.target.value)}
           placeholder="2026.03.08"
           className="rounded-2xl"
-          style={inputStyle}
+          style={{ ...inputStyle }}
         />
 
         {/* Helper text */}
-        <p className="text-xs" style={{ color: PALETTE.textSoft }}>
+        <p style={{ ...TEXT.caption, color: PALETTE.textSoft }}>
           {t.dateFormatHelper}
         </p>
 
         {/* Error message */}
         {error && (
-          <p className="text-xs text-red-500">{error}</p>
+          <p style={{ ...TEXT.caption, color: "#ef4444" }}>{error}</p>
         )}
       </div>
 
       {/* Score */}
-      <div className="space-y-2">
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <Label>{t.eventScore}</Label>
         <Select value={score} onValueChange={setScore}>
-          <SelectTrigger className="rounded-2xl" style={inputStyle}>
+          <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
             <SelectValue placeholder={t.none} />
           </SelectTrigger>
 
@@ -110,23 +108,26 @@ export default function EventForm({ initialValues, onSave, onCancel, t }) {
       </div>
 
       {/* Details */}
-      <div className="space-y-2">
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <Label>{t.eventDetails}</Label>
         <Textarea
           value={details}
           onChange={(e) => setDetails(e.target.value)}
           placeholder={t.eventDetailsPlaceholder}
           className="rounded-2xl"
-          style={inputStyle}
+          style={{ ...inputStyle }}
         />
       </div>
 
       {/* Actions */}
-      <div className="flex gap-2">
+      <div style={{ display: "flex", gap: "0.5rem" }}>
         <Button
           type="submit"
-          className="flex-1 rounded-2xl text-white shadow-sm"
+          className="rounded-2xl"
           style={{
+            flex: "1 1 0%",
+            color: "white",
+            boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
             background: `linear-gradient(90deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`,
           }}
         >
@@ -137,7 +138,7 @@ export default function EventForm({ initialValues, onSave, onCancel, t }) {
           type="button"
           variant="outline"
           className="rounded-2xl"
-          style={inputStyle}
+          style={{ ...inputStyle }}
           onClick={onCancel}
         >
           {t.cancel}

@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { GENDERS, ZODIAC_OPTIONS, PALETTE } from "@/lib/constants";
+import { GENDERS, ZODIAC_OPTIONS, PALETTE, TEXT } from "@/lib/constants";
 import { translateGender } from "@/lib/format";
 
 /**
@@ -46,16 +46,12 @@ export default function PersonForm({
   // Validation errors.
   const [errors, setErrors] = useState({});
 
-  /**
-   * Update a specific field in the form state.
-   */
+  // Update a specific field in the form state.
   function update(key, value) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  /**
-   * Validate required fields and data types.
-   */
+  // Validate required fields and data types.
   function validate() {
     const next = {};
 
@@ -79,9 +75,7 @@ export default function PersonForm({
     return Object.keys(next).length === 0;
   }
 
-  /**
-   * Submit handler that normalizes values before sending.
-   */
+  // Submit handler that normalizes values before sending.
   function submit(e) {
     e.preventDefault();
 
@@ -100,50 +94,50 @@ export default function PersonForm({
 
   // Shared input styling.
   const inputStyle = {
-    borderColor: "#ecd6e0",
-    backgroundColor: "rgba(255,255,255,0.88)",
+    borderColor: PALETTE.inputBorder,
+    backgroundColor: PALETTE.inputBg,
   };
 
   return (
-    <form onSubmit={submit} className="space-y-4">
-      <div className="grid gap-4">
+    <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+      <div style={{ display: "grid", gap: "1rem" }}>
         {/* Name */}
-        <div className="space-y-2">
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
           <Label>{t.name} *</Label>
           <Input
             value={form.name}
             onChange={(e) => update("name", e.target.value)}
             className="rounded-2xl"
-            style={inputStyle}
+            style={{ ...inputStyle }}
           />
           {errors.name && (
-            <p className="text-xs text-red-500">{errors.name}</p>
+            <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.name}</p>
           )}
         </div>
 
         {/* Age + Gender */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "1rem" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             <Label>{t.age} *</Label>
             <Input
               type="number"
               value={form.age}
               onChange={(e) => update("age", e.target.value)}
               className="rounded-2xl"
-              style={inputStyle}
+            style={{ ...inputStyle }}
             />
             {errors.age && (
-              <p className="text-xs text-red-500">{errors.age}</p>
+              <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.age}</p>
             )}
           </div>
 
-          <div className="space-y-2">
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             <Label>{t.gender} *</Label>
             <Select
               value={form.gender}
               onValueChange={(value) => update("gender", value)}
             >
-              <SelectTrigger className="rounded-2xl" style={inputStyle}>
+              <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
                 <SelectValue placeholder={t.select} />
               </SelectTrigger>
 
@@ -157,35 +151,35 @@ export default function PersonForm({
             </Select>
 
             {errors.gender && (
-              <p className="text-xs text-red-500">{errors.gender}</p>
+              <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.gender}</p>
             )}
           </div>
         </div>
 
         {/* How we met */}
         {includeHowWeMet && (
-          <div className="space-y-2">
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             <Label>{t.howWeMet} *</Label>
             <Input
               value={form.howWeMet}
               onChange={(e) => update("howWeMet", e.target.value)}
               className="rounded-2xl"
-              style={inputStyle}
+            style={{ ...inputStyle }}
             />
             {errors.howWeMet && (
-              <p className="text-xs text-red-500">{errors.howWeMet}</p>
+              <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.howWeMet}</p>
             )}
           </div>
         )}
 
         {/* Zodiac */}
-        <div className="space-y-2">
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
           <Label>{t.zodiacSign} *</Label>
           <Select
             value={form.zodiacSign}
             onValueChange={(value) => update("zodiacSign", value)}
           >
-            <SelectTrigger className="rounded-2xl" style={inputStyle}>
+            <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
               <SelectValue placeholder={t.select} />
             </SelectTrigger>
 
@@ -199,18 +193,18 @@ export default function PersonForm({
           </Select>
 
           {errors.zodiacSign && (
-            <p className="text-xs text-red-500">{errors.zodiacSign}</p>
+            <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.zodiacSign}</p>
           )}
         </div>
 
         {/* Activity */}
-        <div className="space-y-2">
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
           <Label>{t.activity} *</Label>
           <Select
             value={form.activity}
             onValueChange={(value) => update("activity", value)}
           >
-            <SelectTrigger className="rounded-2xl" style={inputStyle}>
+            <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
               <SelectValue placeholder={t.select} />
             </SelectTrigger>
 
@@ -225,33 +219,36 @@ export default function PersonForm({
           </Select>
 
           {errors.activity && (
-            <p className="text-xs text-red-500">{errors.activity}</p>
+            <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.activity}</p>
           )}
         </div>
 
         {/* Detail */}
-        <div className="space-y-2">
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
           <Label>{t.detail}</Label>
           <Textarea
             value={form.detail}
             onChange={(e) => update("detail", e.target.value)}
             placeholder={mode === "add" ? "" : t.optionalActivityDetails}
             className="rounded-2xl"
-            style={inputStyle}
+            style={{ ...inputStyle }}
           />
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex gap-2 pt-2">
+      <div style={{ display: "flex", gap: "0.5rem", paddingTop: "0.5rem" }}>
         <Button
           type="submit"
-          className="flex-1 rounded-2xl text-white shadow-sm"
+          className="rounded-2xl"
           style={{
+            flex: "1 1 0%",
+            color: "white",
+            boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
             background: `linear-gradient(90deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`,
           }}
         >
-          <Save className="mr-2 h-4 w-4" />
+          <Save style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
           {saveLabel || t.savePerson}
         </Button>
 
@@ -260,7 +257,7 @@ export default function PersonForm({
             type="button"
             variant="outline"
             className="rounded-2xl"
-            style={inputStyle}
+            style={{ ...inputStyle }}
             onClick={onCancel}
           >
             {t.cancel}

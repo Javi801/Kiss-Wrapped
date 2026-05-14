@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { PALETTE } from "@/lib/constants";
+import { PALETTE, TEXT } from "@/lib/constants";
 
 /**
  * Displays a boxplot-like visualization for age distribution.
@@ -16,18 +16,18 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText }) {
   if (!ages.length) {
     return (
       <Card
-        className="rounded-3xl shadow-none"
-        style={{ borderColor: "#efdee6", backgroundColor: "#fff7fb" }}
+        className="rounded-3xl"
+        style={{ boxShadow: "none", borderColor: PALETTE.innerCardBorder, backgroundColor: PALETTE.cardSoft }}
       >
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">{title}</CardTitle>
+        <CardHeader style={{ paddingBottom: "0.5rem" }}>
+          <CardTitle style={TEXT.title}>{title}</CardTitle>
           {subtitle ? <CardDescription>{subtitle}</CardDescription> : null}
         </CardHeader>
 
         <CardContent>
           <div
-            className="rounded-2xl border border-dashed p-6 text-center text-sm"
-            style={{ borderColor: "#ecd6e0", color: PALETTE.textSoft }}
+            className="rounded-2xl"
+            style={{ border: `1px dashed ${PALETTE.inputBorder}`, padding: "1.5rem", textAlign: "center", ...TEXT.body, color: PALETTE.textSoft }}
           >
             {emptyText}
           </div>
@@ -51,23 +51,22 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText }) {
 
   return (
     <Card
-      className="rounded-3xl shadow-none"
-      style={{ borderColor: "#efdee6", backgroundColor: "#fff7fb" }}
+      className="rounded-3xl"
+      style={{ boxShadow: "none", borderColor: PALETTE.innerCardBorder, backgroundColor: PALETTE.cardSoft }}
     >
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base">{title}</CardTitle>
+      <CardHeader style={{ paddingBottom: "0.5rem" }}>
+        <CardTitle style={TEXT.title}>{title}</CardTitle>
         <CardDescription>{subtitle || `${min} - ${max}`}</CardDescription>
       </CardHeader>
 
       <CardContent>
         <div
-          className="rounded-3xl p-5"
-          style={{ backgroundColor: "rgba(255,255,255,0.78)" }}
+          className="rounded-3xl"
+          style={{ padding: "1.25rem", backgroundColor: PALETTE.surfaceBg }}
         >
           {/* Labels row */}
           <div
-            className="mb-4 flex justify-between text-sm font-medium"
-            style={{ color: PALETTE.deep }}
+            style={{ marginBottom: "1rem", display: "flex", justifyContent: "space-between", ...TEXT.body, fontWeight: "500", color: PALETTE.deep }}
           >
             <span>{min}</span>
             <span>{q1}</span>
@@ -77,29 +76,31 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText }) {
           </div>
 
           {/* Boxplot visualization */}
-          <div className="relative h-14">
+          <div style={{ position: "relative", height: "3.5rem" }}>
             {/* Base line */}
             <div
-              className="absolute left-0 right-0 top-1/2 h-0.5 -translate-y-1/2"
-              style={{ backgroundColor: "#e7d5de" }}
+              style={{ position: "absolute", left: 0, right: 0, top: "50%", height: "0.125rem", transform: "translateY(-50%)", backgroundColor: "#e7d5de" }}
             />
 
             {/* Min marker */}
             <div
-              className="absolute top-1/2 h-8 w-0.5 -translate-y-1/2"
-              style={{ left: "0%", backgroundColor: PALETTE.rose }}
+              style={{ position: "absolute", top: "50%", height: "2rem", width: "0.125rem", transform: "translateY(-50%)", left: "0%", backgroundColor: PALETTE.rose }}
             />
 
             {/* Max marker */}
             <div
-              className="absolute top-1/2 h-8 w-0.5 -translate-y-1/2"
-              style={{ left: "100%", backgroundColor: PALETTE.rose }}
+              style={{ position: "absolute", top: "50%", height: "2rem", width: "0.125rem", transform: "translateY(-50%)", left: "100%", backgroundColor: PALETTE.rose }}
             />
 
             {/* IQR box */}
             <div
-              className="absolute top-1/2 h-8 -translate-y-1/2 rounded-sm border-2"
+              className="rounded-sm"
               style={{
+                position: "absolute",
+                top: "50%",
+                height: "2rem",
+                transform: "translateY(-50%)",
+                border: `2px solid ${PALETTE.rose}`,
                 left: `${left}%`,
                 width: `${Math.max(width, 2)}%`,
                 borderColor: PALETTE.rose,
@@ -109,8 +110,7 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText }) {
 
             {/* Median line */}
             <div
-              className="absolute top-1/2 h-10 w-0.5 -translate-y-1/2"
-              style={{ left: `${medianPos}%`, backgroundColor: PALETTE.deep }}
+              style={{ position: "absolute", top: "50%", height: "2.5rem", width: "0.125rem", transform: "translateY(-50%)", left: `${medianPos}%`, backgroundColor: PALETTE.deep }}
             />
           </div>
         </div>

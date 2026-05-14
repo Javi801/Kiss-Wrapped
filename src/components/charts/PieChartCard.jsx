@@ -12,7 +12,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { PALETTE, CHART_COLORS } from "@/lib/constants";
+import { PALETTE, CHART_COLORS, TEXT } from "@/lib/constants";
 import { getColorForCategory } from "@/lib/format";
 
 /**
@@ -34,20 +34,20 @@ export default function PieChartCard({
 
   // Shared card styling.
   const cardStyle = {
-    borderColor: "#f1dde7",
-    backgroundColor: "rgba(255,255,255,0.82)",
+    borderColor: PALETTE.cardBorder,
+    backgroundColor: PALETTE.cardBg,
   };
 
   // Empty state styling.
   const emptyStyle = {
-    borderColor: "#ecd6e0",
+    borderColor: PALETTE.inputBorder,
     color: PALETTE.textSoft,
   };
 
   return (
-    <Card className="rounded-3xl shadow-sm backdrop-blur" style={cardStyle}>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base" style={{ color: PALETTE.text }}>
+    <Card className="rounded-3xl" style={{ boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)", backdropFilter: "blur(8px)", ...cardStyle }}>
+      <CardHeader style={{ paddingBottom: "0.5rem" }}>
+        <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>
           {title}
         </CardTitle>
         <CardDescription>{subtitle}</CardDescription>
@@ -55,9 +55,9 @@ export default function PieChartCard({
 
       <CardContent>
         {data.length ? (
-          <div className="space-y-3 overflow-hidden">
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", overflow: "hidden" }}>
             {/* Chart */}
-            <div className="h-56 w-full">
+            <div style={{ height: "14rem", width: "100%" }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -78,22 +78,19 @@ export default function PieChartCard({
             </div>
 
             {/* Legend */}
-            <div className="flex flex-wrap gap-2 overflow-hidden">
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", overflow: "hidden" }}>
               {data.map((entry, index) => (
                 <div
                   key={entry.label}
-                  className="max-w-full truncate rounded-full px-3 py-1 text-xs"
-                  style={{
-                    backgroundColor: "#f8f4f7",
-                    color: PALETTE.textSoft,
-                  }}
+                  className="rounded-full"
+                  style={{ maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingLeft: "0.75rem", paddingRight: "0.75rem", paddingTop: "0.25rem", paddingBottom: "0.25rem", ...TEXT.caption, backgroundColor: "#f8f4f7", color: PALETTE.textSoft }}
                 >
-                  <span className="inline-flex items-center gap-2">
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
                     <span
-                      className="h-2.5 w-2.5 shrink-0 rounded-full"
-                      style={{ backgroundColor: fills[index] }}
+                      className="rounded-full"
+                      style={{ height: "0.625rem", width: "0.625rem", flexShrink: 0, backgroundColor: fills[index] }}
                     />
-                    <span className="truncate">
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {entry.label}: {entry.value}
                     </span>
                   </span>
@@ -103,8 +100,8 @@ export default function PieChartCard({
           </div>
         ) : (
           <div
-            className="rounded-2xl border border-dashed p-8 text-center text-sm"
-            style={emptyStyle}
+            className="rounded-2xl"
+            style={{ border: "1px dashed", padding: "2rem", textAlign: "center", ...TEXT.body, ...emptyStyle }}
           >
             {emptyText}
           </div>

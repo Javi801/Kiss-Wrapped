@@ -9,7 +9,7 @@ import {
   Cell,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { PALETTE, CHART_COLORS } from "@/lib/constants";
+import { PALETTE, CHART_COLORS, TEXT } from "@/lib/constants";
 
 /**
  * Renders a reusable bar chart card.
@@ -25,20 +25,20 @@ export default function BarChartCard({
 }) {
   // Shared container style for consistency across charts.
   const cardStyle = {
-    borderColor: "#f1dde7",
-    backgroundColor: "rgba(255,255,255,0.82)",
+    borderColor: PALETTE.cardBorder,
+    backgroundColor: PALETTE.cardBg,
   };
 
   // Empty state fallback when no data is available.
   const emptyStyle = {
-    borderColor: "#ecd6e0",
+    borderColor: PALETTE.inputBorder,
     color: PALETTE.textSoft,
   };
 
   return (
-    <Card className="rounded-3xl shadow-sm backdrop-blur" style={cardStyle}>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base" style={{ color: PALETTE.text }}>
+    <Card className="rounded-3xl" style={{ boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)", backdropFilter: "blur(8px)", ...cardStyle }}>
+      <CardHeader style={{ paddingBottom: "0.5rem" }}>
+        <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>
           {title}
         </CardTitle>
         <CardDescription>{subtitle}</CardDescription>
@@ -46,7 +46,7 @@ export default function BarChartCard({
 
       <CardContent>
         {data.length ? (
-          <div className="h-64 w-full">
+          <div style={{ height: "16rem", width: "100%" }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data}>
                 {/* Background grid */}
@@ -92,8 +92,8 @@ export default function BarChartCard({
           </div>
         ) : (
           <div
-            className="rounded-2xl border border-dashed p-8 text-center text-sm"
-            style={emptyStyle}
+            className="rounded-2xl"
+            style={{ border: "1px dashed", padding: "2rem", textAlign: "center", ...TEXT.body, ...emptyStyle }}
           >
             {emptyText}
           </div>

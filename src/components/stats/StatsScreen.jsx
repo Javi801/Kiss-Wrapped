@@ -10,7 +10,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { PALETTE } from "@/lib/constants";
+import { PALETTE, TEXT } from "@/lib/constants";
 import { exportStatsPdf, saveErrorLog } from "@/lib/pdf-export";
 
 import StatsOverviewTab from "@/components/stats/StatsOverviewTab";
@@ -85,16 +85,15 @@ export default function StatsScreen({ people, t }) {
   const activeTab = statTabs.find((item) => item.key === tab);
 
   return (
-    <div className="space-y-4 pb-8">
-      <div className="flex items-start justify-between gap-3">
+    <div style={{ display: "flex", flexDirection: "column", gap: "1rem", paddingBottom: "2rem" }}>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "0.75rem" }}>
         <div>
           <h2
-            className="text-2xl font-bold tracking-tight"
-            style={{ color: PALETTE.text }}
+            style={{ ...TEXT.heading, letterSpacing: "-0.025em", color: PALETTE.text }}
           >
             {t.analyticsTitle}
           </h2>
-          <p className="text-sm" style={{ color: PALETTE.textSoft }}>
+          <p style={{ ...TEXT.body, color: PALETTE.textSoft }}>
             {activeTab?.helper || t.analyticsDesc}
           </p>
         </div>
@@ -103,7 +102,7 @@ export default function StatsScreen({ people, t }) {
         <Button
           variant="outline"
           className="rounded-2xl bg-white/85"
-          style={{ borderColor: "#ecd6e0" }}
+            style={{ borderColor: PALETTE.inputBorder }}
           onClick={handleExport}
         >
           <Download className="mr-2 h-4 w-4" />
@@ -112,7 +111,7 @@ export default function StatsScreen({ people, t }) {
         */}
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "0.5rem" }}>
         {statTabs.map((item) => {
           const Icon = item.icon;
           const active = tab === item.key;
@@ -121,20 +120,29 @@ export default function StatsScreen({ people, t }) {
             <button
               key={item.key}
               onClick={() => setTab(item.key)}
-              className="flex items-center gap-2 rounded-2xl px-4 py-3 text-left transition"
+              className="rounded-2xl"
               style={{
-                border: active ? "none" : "1px solid #ecd6e0",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                paddingLeft: "1rem",
+                paddingRight: "1rem",
+                paddingTop: "0.75rem",
+                paddingBottom: "0.75rem",
+                textAlign: "left",
+                transition: "all 150ms cubic-bezier(0.4, 0, 0.2, 1)",
+                border: active ? "none" : `1px solid ${PALETTE.inputBorder}`,
                 background: active
                   ? `linear-gradient(90deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`
-                  : "rgba(255,255,255,0.86)",
+                  : PALETTE.controlBg,
                 color: active ? "white" : PALETTE.text,
                 boxShadow: active
                   ? "0 6px 16px rgba(226,115,150,0.18)"
                   : "none",
               }}
             >
-              <Icon className="h-4 w-4 shrink-0" />
-              <span className="text-sm font-medium">{item.label}</span>
+              <Icon style={{ height: "1rem", width: "1rem", flexShrink: 0 }} />
+              <span style={{ ...TEXT.body, fontWeight: "500" }}>{item.label}</span>
             </button>
           );
         })}
@@ -191,8 +199,8 @@ export default function StatsScreen({ people, t }) {
           style={{ background: PALETTE.bgSoft, borderColor: PALETTE.line }}
         >
           <DialogHeader>
-            <div className="flex items-center gap-2" style={{ color: PALETTE.rose }}>
-              <CheckCircle2 className="h-5 w-5 shrink-0" />
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: PALETTE.rose }}>
+              <CheckCircle2 style={{ height: "1.25rem", width: "1.25rem", flexShrink: 0 }} />
               <DialogTitle style={{ color: PALETTE.rose }}>{t.pdfSuccessTitle}</DialogTitle>
             </div>
             <DialogDescription style={{ color: PALETTE.textSoft }}>{t.pdfSuccessDesc}</DialogDescription>
@@ -220,8 +228,8 @@ export default function StatsScreen({ people, t }) {
           style={{ background: PALETTE.bgSoft, borderColor: PALETTE.line }}
         >
           <DialogHeader>
-            <div className="flex items-center gap-2" style={{ color: PALETTE.deep }}>
-              <TriangleAlert className="h-5 w-5 shrink-0" />
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: PALETTE.deep }}>
+              <TriangleAlert style={{ height: "1.25rem", width: "1.25rem", flexShrink: 0 }} />
               <DialogTitle style={{ color: PALETTE.deep }}>{t.pdfErrorTitle}</DialogTitle>
             </div>
             <DialogDescription style={{ color: PALETTE.textSoft }}>{t.pdfErrorDesc}</DialogDescription>

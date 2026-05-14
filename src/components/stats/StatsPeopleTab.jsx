@@ -16,10 +16,7 @@ import AgeRangeCard from "@/components/stats/AgeRangeCard";
  * It groups event and person data by zodiac, activity, gender, age, and name initials.
  */
 export default function StatsPeopleTab({ people, t }) {
-  /**
-   * Sums total events by zodiac sign.
-   * The displayed label uses the short zodiac name only.
-   */
+  // Sums total events by zodiac sign. The displayed label uses the short zodiac name only.
   const eventsByZodiac = useMemo(() => {
     const map = new Map();
 
@@ -33,9 +30,7 @@ export default function StatsPeopleTab({ people, t }) {
       .map(([label, value]) => ({ label, value }));
   }, [people]);
 
-  /**
-   * Sums total events by translated activity label.
-   */
+  // Sums total events by translated activity label.
   const eventsByActivity = useMemo(() => {
     const map = new Map();
 
@@ -49,9 +44,7 @@ export default function StatsPeopleTab({ people, t }) {
       .map(([label, value]) => ({ label, value }));
   }, [people, t]);
 
-  /**
-   * Counts how many people belong to each gender.
-   */
+  // Counts how many people belong to each gender.
   const personsByGender = useMemo(() => {
     const map = new Map();
 
@@ -63,9 +56,7 @@ export default function StatsPeopleTab({ people, t }) {
     return [...map.entries()].map(([label, value]) => ({ label, value }));
   }, [people, t]);
 
-  /**
-   * Sums total events by gender.
-   */
+  // Sums total events by gender.
   const eventsByGender = useMemo(() => {
     const map = new Map();
 
@@ -77,9 +68,7 @@ export default function StatsPeopleTab({ people, t }) {
     return [...map.entries()].map(([label, value]) => ({ label, value }));
   }, [people, t]);
 
-  /**
-   * Counts how many people exist for each age.
-   */
+  // Counts how many people exist for each age.
   const personsByAge = useMemo(() => {
     const map = new Map();
 
@@ -92,9 +81,7 @@ export default function StatsPeopleTab({ people, t }) {
       .map(([label, value]) => ({ label, value }));
   }, [people]);
 
-  /**
-   * Counts people grouped by the first letter of their name.
-   */
+  // Counts people grouped by the first letter of their name.
   const personsByFirstLetter = useMemo(() => {
     const map = new Map();
 
@@ -124,7 +111,7 @@ export default function StatsPeopleTab({ people, t }) {
   }, [personsByGender, eventsByGender]);
 
   return (
-    <div className="space-y-4">
+    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <BarChartCard
         title={t.eventsByZodiac}
         subtitle={t.groupedBySign}

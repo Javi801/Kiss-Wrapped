@@ -46,8 +46,8 @@ export default function StatsOverviewTab({ people, allEvents, t }) {
     : "0.0";
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
+    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "0.75rem" }}>
         <StatTile
           label={t.avgEvents}
           value={averageEventsPerPerson}
@@ -60,7 +60,7 @@ export default function StatsOverviewTab({ people, allEvents, t }) {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "0.75rem" }}>
         <StatTile
           label={t.averageScore}
           value={averageScore}

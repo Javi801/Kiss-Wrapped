@@ -1,5 +1,4 @@
-// Pixel-art sparkle star group icon — rendered as a grid of colored rects.
-// Each palette matches one of the four color variants in the design reference.
+// Pixel-art sparkle group rendered as colored grid cells.
 
 export { SPARKLE_PALETTES, PALETTE_SWATCHES } from './SparkleIcon.constants'
 
@@ -12,7 +11,7 @@ const PALETTES = {
 
 const _ = null
 
-// 23x27 main sparkle star — cell 7px, origin (0, 9)
+// Main sparkle grid with 23 columns and 30 rows.
 const MAIN = [
   [_,_,_,_,_,_,_,_,_,_,_,'O',_,_,_,_,_,_,_,_,_,_,_,],
   [_,_,_,_,_,_,_,_,_,_,_,'O',_,_,_,_,_,_,_,_,_,_,_,],
@@ -46,7 +45,7 @@ const MAIN = [
   [_,_,_,_,_,_,_,_,_,_,_,'O',_,_,_,_,_,_,_,_,_,_,_,],
 ]
 
-// 9×9 companion star
+// 9x9 companion sparkle grid.
 const MEDIUM = [
   [_,_,_,_,'O',_,_,_,_],
   [_,_,_,_,'O',_,_,_,_],
@@ -59,7 +58,7 @@ const MEDIUM = [
   [_,_,_,_,'O',_,_,_,_],
 ]
 
-// 7×9 small star
+// 7x9 small sparkle grid.
 const SMALL = [
   [_,_,_,'O',_,_,_],
   ['O',_,_,'O',_,_,'O'],
@@ -72,7 +71,7 @@ const SMALL = [
   [_,_,_,'O',_,_,_],
 ]
 
-// 3×3 tiny cross-sparkle
+// 3x3 tiny cross-sparkle grid.
 const TINY = [
   [_,'I',_],
   [_,'I',_],
@@ -113,19 +112,19 @@ export function SparkleIcon({ palette = 'yellow', size = 200 }) {
       xmlns="http://www.w3.org/2000/svg"
       style={{ imageRendering: 'pixelated' }}
     >
-      {/* MAIN — centrado (cell=2 → 46×60 en viewBox 100×100) */}
+      {/* Main sparkle centered in the viewBox. */}
       <PixelGrid grid={MAIN} cell={2} ox={16} oy={10} palette={p} />
 
-      {/* MEDIUM — esquina superior izquierda (cell=2 → 18×18) */}
+      {/* Medium sparkle in the top-left corner. */}
       <PixelGrid grid={MEDIUM} cell={2} ox={2} oy={2} palette={p} />
 
-      {/* SMALL — esquina inferior derecha (cell=2 → 14×18) */}
+      {/* Small sparkle in the bottom-right corner. */}
       <PixelGrid grid={SMALL} cell={2} ox={60} oy={60} palette={p} />
 
-      {/* TINY — esquina superior derecha (cell=4 → 12×12) */}
+      {/* Tiny sparkle in the top-right corner. */}
       <PixelGrid grid={TINY} cell={4} ox={63} oy={2} palette={p} />
 
-      {/* TINY — esquina inferior izquierda (cell=4 → 12×12) */}
+      {/* Tiny sparkle in the bottom-left corner. */}
       <PixelGrid grid={TINY} cell={4} ox={10} oy={55} palette={p} />
     </svg>
   )
