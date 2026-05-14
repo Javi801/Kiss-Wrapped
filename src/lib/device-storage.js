@@ -122,11 +122,42 @@ export async function saveSettings({ iconColor, language }) {
   if (language !== undefined) storage.setItem(LANGUAGE_KEY, language)
 }
 
+const PERSON_REQUIRED_STRINGS = ["name", "gender", "howWeMet", "zodiacSign", "activity"];
+const EVENT_REQUIRED_STRINGS  = ["date", "place", "situation"];
+
+// Fills missing required fields with empty values before export.
+// Returns { normalized, hadMissingFields } so callers can warn the user.
+function normalizeForExport(people) {
+  let hadMissingFields = false;
+
+  const normalized = people.map((person) => {
+    const p = { ...person };
+
+    for (const field of PERSON_REQUIRED_STRINGS) {
+      if (p[field] == null) { p[field] = ""; hadMissingFields = true; }
+    }
+    if (p.age == null) { p.age = null; hadMissingFields = true; }
+
+    p.events = (person.events || []).map((event) => {
+      const e = { ...event };
+      for (const field of EVENT_REQUIRED_STRINGS) {
+        if (e[field] == null) { e[field] = ""; hadMissingFields = true; }
+      }
+      return e;
+    });
+
+    return p;
+  });
+
+  return { normalized, hadMissingFields };
+}
+
 // Exports people data as a JSON file to external storage (native) or browser download (web).
-// Returns { fileName, isNative } so callers can show the saved location to the user.
+// Returns { fileName, isNative, hadMissingFields } so callers can show the saved location to the user.
 export async function exportPeopleJson(people) {
   const fileName = `kiss-recorder-data-${new Date().toISOString().slice(0, 10)}.json`;
-  const content = JSON.stringify(people, null, 2);
+  const { normalized, hadMissingFields } = normalizeForExport(people);
+  const content = JSON.stringify(normalized, null, 2);
   const native = isNativePlatform();
 
   if (native) {
@@ -137,7 +168,7 @@ export async function exportPeopleJson(people) {
       encoding: Encoding.UTF8,
       recursive: true,
     });
-    return { fileName, isNative: true };
+    return { fileName, isNative: true, hadMissingFields };
   }
 
   const blob = new Blob([content], { type: "application/json" });
@@ -147,7 +178,7 @@ export async function exportPeopleJson(people) {
   a.download = fileName;
   a.click();
   URL.revokeObjectURL(url);
-  return { fileName, isNative: false };
+  return { fileName, isNative: false, hadMissingFields };
 }
 
 // Clears persisted people data from native file system or localStorage
