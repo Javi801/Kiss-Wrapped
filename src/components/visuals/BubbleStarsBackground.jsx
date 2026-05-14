@@ -23,12 +23,11 @@ export default function BubbleStarsBackground() {
   );
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div style={{ pointerEvents: "none", position: "absolute", inset: 0, overflow: "hidden" }}>
       {items.map((item) => (
         <motion.div
           key={item.id}
-          className="absolute"
-          style={{ left: `${item.left}%`, top: `${item.top}%` }}
+          style={{ position: "absolute", left: `${item.left}%`, top: `${item.top}%` }}
           animate={{
             y: [0, -18, 6, -10, 0],
             x: [0, 6, -4, 5, 0],
@@ -49,8 +48,8 @@ export default function BubbleStarsBackground() {
         >
           {item.shape === "bubble" ? (
             <div
-              className="rounded-full border border-white/40 bg-white/20 backdrop-blur-[1px]"
-              style={{ width: item.size, height: item.size }}
+              className="rounded-full"
+              style={{ width: item.size, height: item.size, border: "1px solid rgba(255,255,255,0.4)", backgroundColor: "rgba(255,255,255,0.2)", backdropFilter: "blur(1px)" }}
             />
           ) : (
             <div
