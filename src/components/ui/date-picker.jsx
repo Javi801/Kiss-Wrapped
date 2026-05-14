@@ -32,10 +32,7 @@ const navBtn = {
   transition: "background-color 0.1s",
 };
 
-/**
- * Date input + calendar dropdown.
- * Props mirror a regular Input: value (yyyy.MM.dd), onChange(newValue), placeholder, className, style.
- */
+// Text input paired with a calendar dropdown; value format is yyyy.MM.dd.
 export function DatePicker({ value, onChange, placeholder, className, style }) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
@@ -49,11 +46,8 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
 
   const [viewYear, setViewYear] = useState(parsed?.year ?? todayY);
   const [viewMonth, setViewMonth] = useState(parsed?.month ?? todayM);
-
-  // "days" | "months" | "years"
-  const [calView, setCalView] = useState("days");
-  // First year shown in the year-picker page.
-  const [yearPageStart, setYearPageStart] = useState(() => viewYear - 5);
+  const [calView, setCalView] = useState("days"); // "days" | "months" | "years"
+  const [yearPageStart, setYearPageStart] = useState(() => viewYear - 5); // first year in the page
 
   // Close when clicking outside.
   useEffect(() => {
@@ -88,7 +82,6 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
     setCalView(nextCalView(calView));
   }
 
-  // ── Day view navigation ──────────────────────────────────────────────────
   function prevMonth() {
     if (viewMonth === 1) { setViewYear((y) => y - 1); setViewMonth(12); }
     else setViewMonth((m) => m - 1);
@@ -105,22 +98,30 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
     setCalView("days");
   }
 
-  // ── Month view navigation ────────────────────────────────────────────────
   function selectMonth(month) {
     setViewMonth(month);
     setCalView("days");
   }
 
-  // ── Year view navigation ─────────────────────────────────────────────────
   function selectYear(year) {
     setViewYear(year);
     setCalView("months");
   }
 
-  // ── Day grid ─────────────────────────────────────────────────────────────
+  function handlePrev() {
+    if (calView === "days") prevMonth();
+    else if (calView === "months") setViewYear((y) => y - 1);
+    else setYearPageStart((s) => s - YEAR_PAGE_SIZE);
+  }
+
+  function handleNext() {
+    if (calView === "days") nextMonth();
+    else if (calView === "months") setViewYear((y) => y + 1);
+    else setYearPageStart((s) => s + YEAR_PAGE_SIZE);
+  }
+
   const cells = buildDayGrid(viewYear, viewMonth);
 
-  // ── Shared styles ─────────────────────────────────────────────────────────
   function gridItemStyle({ isSelected, isToday, isActive }) {
     return {
       display: "flex",
@@ -137,32 +138,13 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
     };
   }
 
-  // ── Title label ───────────────────────────────────────────────────────────
   let titleLabel;
-  if (calView === "days") {
-    titleLabel = getMonthLabel(viewYear, viewMonth);
-  } else if (calView === "months") {
-    titleLabel = String(viewYear);
-  } else {
-    titleLabel = `${yearPageStart} – ${yearPageStart + YEAR_PAGE_SIZE - 1}`;
-  }
-
-  // ── Prev / next handlers per view ─────────────────────────────────────────
-  function handlePrev() {
-    if (calView === "days") prevMonth();
-    else if (calView === "months") setViewYear((y) => y - 1);
-    else setYearPageStart((s) => s - YEAR_PAGE_SIZE);
-  }
-
-  function handleNext() {
-    if (calView === "days") nextMonth();
-    else if (calView === "months") setViewYear((y) => y + 1);
-    else setYearPageStart((s) => s + YEAR_PAGE_SIZE);
-  }
+  if (calView === "days") titleLabel = getMonthLabel(viewYear, viewMonth);
+  else if (calView === "months") titleLabel = String(viewYear);
+  else titleLabel = `${yearPageStart} – ${yearPageStart + YEAR_PAGE_SIZE - 1}`;
 
   return (
     <div ref={containerRef} style={{ position: "relative" }}>
-      {/* Input row */}
       <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
         <Input
           value={value}
@@ -194,7 +176,7 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
         </button>
       </div>
 
-      {/* Calendar dropdown */}
+      {/* calendar dropdown */}
       {open && (
         <div
           style={{
@@ -211,7 +193,6 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
             userSelect: "none",
           }}
         >
-          {/* Header: prev / title / next */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
             <button
               type="button"
@@ -254,7 +235,7 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
             </button>
           </div>
 
-          {/* ── DAY VIEW ── */}
+          {/* day view */}
           {calView === "days" && (
             <>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: "2px", marginBottom: "4px" }}>
@@ -297,7 +278,7 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
             </>
           )}
 
-          {/* ── MONTH VIEW ── */}
+          {/* month view */}
           {calView === "months" && (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "6px" }}>
               {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => {
@@ -328,7 +309,7 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
             </div>
           )}
 
-          {/* ── YEAR VIEW ── */}
+          {/* year view */}
           {calView === "years" && (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "6px" }}>
               {Array.from({ length: YEAR_PAGE_SIZE }, (_, i) => yearPageStart + i).map((yr) => {
