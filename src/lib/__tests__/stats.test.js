@@ -49,3 +49,31 @@ describe("getFirstEventDate", () => {
     expect(p.events[0].date).toBe("2024.06.01");
   });
 });
+
+describe("getLastEventDate", () => {
+  it("returns null for a person with no events", () => {
+    expect(getLastEventDate(makePerson("Ana"))).toBeNull();
+  });
+  it("returns null when events is undefined", () => {
+    expect(getLastEventDate({ name: "Ana" })).toBeNull();
+  });
+  it("returns the only event date when there is one", () => {
+    const p = makePerson("Ana", [makeEvent("2024.03.15")]);
+    expect(getLastEventDate(p)).toBe("2024.03.15");
+  });
+  it("returns the latest date among multiple events", () => {
+    const p = makePerson("Ana", [
+      makeEvent("2024.06.01"),
+      makeEvent("2023.01.15"),
+      makeEvent("2025.12.31"),
+    ]);
+    expect(getLastEventDate(p)).toBe("2025.12.31");
+  });
+  it("does not mutate the original events array", () => {
+    const events = [makeEvent("2024.06.01"), makeEvent("2025.12.31")];
+    const p = makePerson("Ana", events);
+    getLastEventDate(p);
+    expect(p.events[0].date).toBe("2024.06.01");
+  });
+});
+
