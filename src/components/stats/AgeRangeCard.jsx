@@ -50,16 +50,18 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
 
   return (
     <Card
-      className="rounded-3xl shadow-sm backdrop-blur"
+      className="rounded-3xl"
       style={{
+        boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        backdropFilter: "blur(8px)",
         borderColor: "#f1dde7",
         backgroundColor: "rgba(255,255,255,0.82)",
       }}
     >
-      <CardHeader className="pb-2">
-        <div className="flex items-start justify-between gap-3">
+      <CardHeader style={{ paddingBottom: "0.5rem" }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "0.75rem" }}>
           <div>
-            <CardTitle className="text-base">{title}</CardTitle>
+            <CardTitle style={{ fontSize: "1rem", lineHeight: "1.5rem" }}>{title}</CardTitle>
             <CardDescription>
               {splitByYear ? t.divideByYear : t.allYears}
             </CardDescription>
@@ -69,8 +71,8 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
           <Button
             type="button"
             variant="outline"
-            className="rounded-2xl bg-white/70"
-            style={{ borderColor: "#ecd6e0" }}
+            className="rounded-2xl"
+            style={{ backgroundColor: "rgba(255,255,255,0.7)", borderColor: "#ecd6e0" }}
             onClick={() => setSplitByYear((prev) => !prev)}
           >
             {splitByYear ? t.showAllTogether : t.divideByYear}
@@ -89,7 +91,7 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
           />
         ) : yearsData.length ? (
           // Per-year breakdown.
-          <div className="space-y-4">
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             {yearsData.map((item) => (
               <AgeRangeBox
                 key={item.year}
@@ -105,8 +107,8 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
         ) : (
           // Empty fallback.
           <div
-            className="rounded-2xl border border-dashed p-8 text-center text-sm"
-            style={{ borderColor: "#ecd6e0", color: PALETTE.textSoft }}
+            className="rounded-2xl"
+            style={{ border: "1px dashed #ecd6e0", padding: "2rem", textAlign: "center", fontSize: "0.875rem", lineHeight: "1.25rem", color: PALETTE.textSoft }}
           >
             {emptyText}
           </div>
