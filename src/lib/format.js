@@ -1,8 +1,6 @@
 import { GENDER_COLORS } from "@/lib/constants";
 
-/**
- * Translate activity key into localized label.
- */
+// Translate activity key into localized label.
 export function translateActivity(value, t) {
   if (value === "studies") return t.studies;
   if (value === "works") return t.works;
@@ -10,51 +8,39 @@ export function translateActivity(value, t) {
   return t.other;
 }
 
-/**
- * Translate gender key into localized label.
- */
+// Translate gender key into localized label.
 export function translateGender(value, t) {
   if (value === "male") return t.male;
   if (value === "female") return t.female;
   return t.other;
 }
 
-/**
- * Check if a person has at least one event missing details.
- */
+// Check if a person has at least one event missing details.
 export function personHasIncompleteEvent(person) {
   return (person.events || []).some(
     (event) => !event.details?.trim(),
   );
 }
 
-/**
- * Validate score is an integer between 0 and 5.
- */
+// Validate score is an integer between 0 and 5.
 export function hasScore(score) {
   return Number.isInteger(score) && score >= 0 && score <= 5;
 }
 
-/**
- * Render kisses emoji representation of score.
- */
+// Render kisses emoji representation of score.
 export function renderKisses(score, t) {
   if (!hasScore(score)) return t.noScore;
   return "💋".repeat(score) || t.noScore;
 }
 
-/**
- * Extract short zodiac label from full string.
- */
+// Extract short zodiac label from full string.
 export function getShortZodiacLabel(value) {
   if (!value) return "";
   const cleaned = value.replace(/^[^\wA-Za-zÁÉÍÓÚÜÑáéíóúüñ]+/, "");
   return cleaned.split(" (")[0].trim();
 }
 
-/**
- * Return color based on category label.
- */
+// Return color based on category label.
 export function getColorForCategory(label) {
   // Normalize the label to simplify matching.
   const normalized = String(label).toLowerCase();
