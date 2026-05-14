@@ -1,5 +1,16 @@
 import { useState } from "react";
-import { UserPlus, Users, BarChart3, Trash2, TriangleAlert } from "lucide-react";
+import {
+  BarChart3,
+  Check,
+  Eye,
+  EyeOff,
+  Languages,
+  Settings,
+  Trash2,
+  TriangleAlert,
+  UserPlus,
+  Users,
+} from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,9 +24,9 @@ import {
 } from "@/components/ui/dialog";
 
 import { PALETTE } from "@/lib/constants";
+import { SparkleIcon } from "@/components/shared/SparkleIcon";
 import StatTile from "@/components/shared/StatTile";
-import SettingsTile from "@/components/shared/SettingsTile";
-import LanguageSelector from "@/components/app/LanguageSelector";
+import ColorSelector from "@/components/app/ColorSelector";
 
 /**
  * Renders the main dashboard screen.
@@ -28,14 +39,39 @@ export default function MainScreen({
   t,
   language,
   setLanguage,
+  iconColor,
+  setIconColor,
 }) {
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [languageOpen, setLanguageOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [statsVisible, setStatsVisible] = useState(true);
 
   // Count all events across every saved person.
   const totalEvents = people.reduce(
     (sum, person) => sum + (person.events?.length || 0),
     0,
   );
+
+  const frostedButtonStyle = {
+    height: "3.5rem",
+    width: "3.5rem",
+    borderRadius: "9999px",
+    padding: "0",
+    backgroundColor: "rgba(255,255,255,0.22)",
+    border: "1.5px solid rgba(255,255,255,0.45)",
+    backdropFilter: "blur(8px)",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)",
+  };
+
+  const buttonLabelStyle = {
+    fontSize: "0.625rem",
+    color: "rgba(255,255,255,0.85)",
+    fontWeight: "600",
+    letterSpacing: "0.05em",
+    textAlign: "center",
+    maxWidth: "5rem",
+  };
 
   const outlineActionStyle = {
     height: "3.5rem",
@@ -47,6 +83,11 @@ export default function MainScreen({
     borderColor: "#ecd6e0",
     backgroundColor: "rgba(255,255,255,0.86)",
   };
+
+  const languageOptions = [
+    { value: "en", label: t.english },
+    { value: "es", label: t.spanish },
+  ];
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
@@ -115,29 +156,171 @@ export default function MainScreen({
           >
             <StatTile
               label={t.peopleSaved}
-              value={people.length}
+              value={statsVisible ? people.length : "-"}
               accent={true}
             />
             <StatTile
               label={t.totalEvents}
-              value={totalEvents}
+              value={statsVisible ? totalEvents : "-"}
               accent={true}
             />
           </div>
 
-          {/* App settings */}
-          <div className="mt-5">
-            <SettingsTile accent={true}>
-              <LanguageSelector
-                language={language}
-                setLanguage={setLanguage}
-                t={t}
-              />
-            </SettingsTile>
+          {/* App settings — frosted icon buttons floating on the gradient */}
+          <div
+            style={{
+              marginTop: "1.25rem",
+              display: "flex",
+              justifyContent: "space-around",
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.375rem" }}>
+              <Button
+                type="button"
+                aria-label={t.language}
+                style={frostedButtonStyle}
+                onClick={() => setLanguageOpen(true)}
+              >
+                <Languages style={{ height: "1.25rem", width: "1.25rem", color: "white" }} />
+              </Button>
+              <span style={buttonLabelStyle}>{t.language}</span>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.375rem" }}>
+              <Button
+                type="button"
+                aria-label={statsVisible ? t.hideStats : t.showStats}
+                aria-pressed={!statsVisible}
+                style={{
+                  ...frostedButtonStyle,
+                  backgroundColor: statsVisible
+                    ? "rgba(255,255,255,0.22)"
+                    : "rgba(255,255,255,0.10)",
+                  border: statsVisible
+                    ? "1.5px solid rgba(255,255,255,0.45)"
+                    : "1.5px solid rgba(255,255,255,0.2)",
+                }}
+                onClick={() => setStatsVisible((visible) => !visible)}
+              >
+                {statsVisible ? (
+                  <Eye style={{ height: "1.25rem", width: "1.25rem", color: "white" }} />
+                ) : (
+                  <EyeOff style={{ height: "1.25rem", width: "1.25rem", color: "rgba(255,255,255,0.55)" }} />
+                )}
+              </Button>
+              <span style={buttonLabelStyle}>{t.stats}</span>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.375rem" }}>
+              <Button
+                type="button"
+                aria-label={t.settings}
+                style={frostedButtonStyle}
+                onClick={() => setSettingsOpen(true)}
+              >
+                <Settings style={{ height: "1.25rem", width: "1.25rem", color: "white" }} />
+              </Button>
+              <span style={buttonLabelStyle}>{t.settings}</span>
+            </div>
           </div>
 
         </CardContent>
       </Card>
+
+      <Dialog open={languageOpen} onOpenChange={setLanguageOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem" }}>
+              <div
+                style={{
+                  width: "3.5rem",
+                  height: "3.5rem",
+                  borderRadius: "9999px",
+                  background: `linear-gradient(135deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: `0 4px 14px rgba(226,115,150,0.35)`,
+                }}
+              >
+                <Languages style={{ height: "1.5rem", width: "1.5rem", color: "white" }} />
+              </div>
+              <DialogTitle style={{ color: PALETTE.deep2, fontSize: "1.125rem", fontWeight: "700" }}>
+                {t.language}
+              </DialogTitle>
+            </div>
+          </DialogHeader>
+          <div style={{ display: "grid", gap: "0.5rem" }}>
+            {languageOptions.map((option) => {
+              const selected = option.value === language;
+
+              return (
+                <Button
+                  key={option.value}
+                  type="button"
+                  variant="outline"
+                  style={{
+                    height: "3.25rem",
+                    justifyContent: "space-between",
+                    borderRadius: "0.875rem",
+                    fontSize: "1rem",
+                    fontWeight: selected ? "600" : "400",
+                    borderColor: selected ? PALETTE.rose : PALETTE.line,
+                    backgroundColor: selected ? "#fff0f5" : "white",
+                    color: selected ? PALETTE.rose : PALETTE.text,
+                    boxShadow: selected
+                      ? "0 2px 8px rgba(226,115,150,0.18)"
+                      : "none",
+                  }}
+                  onClick={() => {
+                    setLanguage(option.value);
+                    setLanguageOpen(false);
+                  }}
+                >
+                  {option.label}
+                  {selected ? (
+                    <Check style={{ height: "1.25rem", width: "1.25rem", color: PALETTE.rose }} />
+                  ) : null}
+                </Button>
+              );
+            })}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem" }}>
+              <div
+                style={{
+                  width: "3.5rem",
+                  height: "3.5rem",
+                  borderRadius: "9999px",
+                  background: `linear-gradient(135deg, ${PALETTE.deep2}, ${PALETTE.lavender})`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: `0 4px 14px rgba(60,9,108,0.25)`,
+                }}
+              >
+                <Settings style={{ height: "1.5rem", width: "1.5rem", color: "white" }} />
+              </div>
+              <DialogTitle style={{ color: PALETTE.deep2, fontSize: "1.125rem", fontWeight: "700" }}>
+                {t.settings}
+              </DialogTitle>
+            </div>
+          </DialogHeader>
+          <section style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+            <ColorSelector
+              iconColor={iconColor}
+              setIconColor={setIconColor}
+              t={t}
+              accent={false}
+            />
+          </section>
+        </DialogContent>
+      </Dialog>
 
       {/* Main action buttons */}
       <div style={{ display: "grid", gap: "0.75rem" }}>
