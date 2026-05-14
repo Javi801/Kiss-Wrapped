@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { PALETTE } from "@/lib/constants";
+import { PALETTE, TEXT } from "@/lib/constants";
 
 /**
  * Displays a boxplot-like visualization for age distribution.
@@ -17,17 +17,17 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText }) {
     return (
       <Card
         className="rounded-3xl"
-        style={{ boxShadow: "none", borderColor: "#efdee6", backgroundColor: "#fff7fb" }}
+        style={{ boxShadow: "none", borderColor: PALETTE.innerCardBorder, backgroundColor: PALETTE.cardSoft }}
       >
         <CardHeader style={{ paddingBottom: "0.5rem" }}>
-          <CardTitle style={{ fontSize: "1rem", lineHeight: "1.5rem" }}>{title}</CardTitle>
+          <CardTitle style={TEXT.title}>{title}</CardTitle>
           {subtitle ? <CardDescription>{subtitle}</CardDescription> : null}
         </CardHeader>
 
         <CardContent>
           <div
             className="rounded-2xl"
-            style={{ border: "1px dashed #ecd6e0", padding: "1.5rem", textAlign: "center", fontSize: "0.875rem", lineHeight: "1.25rem", color: PALETTE.textSoft }}
+            style={{ border: `1px dashed ${PALETTE.inputBorder}`, padding: "1.5rem", textAlign: "center", ...TEXT.body, color: PALETTE.textSoft }}
           >
             {emptyText}
           </div>
@@ -52,21 +52,21 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText }) {
   return (
     <Card
       className="rounded-3xl"
-      style={{ boxShadow: "none", borderColor: "#efdee6", backgroundColor: "#fff7fb" }}
+      style={{ boxShadow: "none", borderColor: PALETTE.innerCardBorder, backgroundColor: PALETTE.cardSoft }}
     >
       <CardHeader style={{ paddingBottom: "0.5rem" }}>
-        <CardTitle style={{ fontSize: "1rem", lineHeight: "1.5rem" }}>{title}</CardTitle>
+        <CardTitle style={TEXT.title}>{title}</CardTitle>
         <CardDescription>{subtitle || `${min} - ${max}`}</CardDescription>
       </CardHeader>
 
       <CardContent>
         <div
           className="rounded-3xl"
-          style={{ padding: "1.25rem", backgroundColor: "rgba(255,255,255,0.78)" }}
+          style={{ padding: "1.25rem", backgroundColor: PALETTE.surfaceBg }}
         >
           {/* Labels row */}
           <div
-            style={{ marginBottom: "1rem", display: "flex", justifyContent: "space-between", fontSize: "0.875rem", lineHeight: "1.25rem", fontWeight: "500", color: PALETTE.deep }}
+            style={{ marginBottom: "1rem", display: "flex", justifyContent: "space-between", ...TEXT.body, fontWeight: "500", color: PALETTE.deep }}
           >
             <span>{min}</span>
             <span>{q1}</span>
