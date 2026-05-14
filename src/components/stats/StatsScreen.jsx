@@ -27,6 +27,7 @@ export default function StatsScreen({ people, t }) {
   // null = idle, "success" = exported OK, Error instance = export failed
   const [pdfStatus, setPdfStatus] = useState(null);
 
+  // eslint-disable-next-line no-unused-vars -- re-enable once PDF export bug is fixed
   async function handleExport() {
     const hasEvents = people.some((p) => p.events?.length > 0);
     if (people.length === 0 || !hasEvents) {
