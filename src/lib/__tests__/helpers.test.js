@@ -69,4 +69,16 @@ describe("normalizePeople", () => {
     expect(result.age).toBe(30);
     expect(result.gender).toBe("female");
   });
+  it("preserves place, situation and observations on events", () => {
+    const people = [
+      {
+        name: "Ana",
+        events: [{ place: "café", situation: "first date", observations: "nice", score: 3 }],
+      },
+    ];
+    const event = normalizePeople(people)[0].events[0];
+    expect(event.place).toBe("café");
+    expect(event.situation).toBe("first date");
+    expect(event.observations).toBe("nice");
+  });
 });

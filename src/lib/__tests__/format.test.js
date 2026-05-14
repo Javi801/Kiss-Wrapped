@@ -52,7 +52,7 @@ describe("renderKisses", () => {
   it("returns five 💋 for max score 5", () => {
     expect(renderKisses(5, t)).toBe("💋💋💋💋💋");
   });
-  it("returns noScore text for score 0 (no kisses)", () => {
+  it("returns noScore text for score 0", () => {
     expect(renderKisses(0, t)).toBe(t.noScore);
   });
   it("returns noScore text for null", () => {

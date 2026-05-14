@@ -239,7 +239,7 @@ export default function PersonForm({
                       : ""
               }
               className="rounded-2xl"
-              style={{ ...inputStyle, fontSize: "0.8rem" }}
+              style={{ ...inputStyle, ...TEXT.input }}
             />
           </div>
         )}
