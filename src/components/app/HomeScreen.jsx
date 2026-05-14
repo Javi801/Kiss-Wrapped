@@ -137,6 +137,23 @@ export default function MainScreen({
     backgroundColor: PALETTE.controlBg,
   };
 
+  const dataButtonStyle = {
+    height: "4rem",
+    flexDirection: "column",
+    gap: "0.25rem",
+    padding: "0.5rem",
+    boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+    borderColor: PALETTE.inputBorder,
+    backgroundColor: PALETTE.controlBg,
+  };
+
+  const dataButtonLabelStyle = {
+    fontSize: "0.625rem",
+    fontWeight: "600",
+    letterSpacing: "0.04em",
+    lineHeight: "1",
+  };
+
   const languageOptions = [
     { value: "en", label: t.english },
     { value: "es", label: t.spanish },
@@ -420,39 +437,44 @@ export default function MainScreen({
           {t.viewStatistics}
         </Button>
 
-        <Button
-          variant="outline"
-          className="rounded-3xl"
-          style={outlineActionStyle}
-          onClick={handleExportJson}
-        >
-          <Download
-            style={{ marginRight: "0.75rem", height: "1.25rem", width: "1.25rem", color: PALETTE.sky2 }}
-          />
-          {t.exportJson}
-        </Button>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.375rem", paddingTop: "0.25rem" }}>
+          <div style={{ height: "1px", backgroundColor: PALETTE.inputBorder }} />
+          <span style={{ ...TEXT.label, color: PALETTE.textSoft, paddingLeft: "0.25rem" }}>
+            {t.dataSection}
+          </span>
+        </div>
 
-        <Button
-          variant="outline"
-          className="rounded-3xl"
-          style={outlineActionStyle}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <Upload
-            style={{ marginRight: "0.75rem", height: "1.25rem", width: "1.25rem", color: PALETTE.sky2 }}
-          />
-          {t.importJson}
-        </Button>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.5rem" }}>
+          <Button
+            variant="outline"
+            className="rounded-2xl"
+            style={dataButtonStyle}
+            onClick={handleExportJson}
+          >
+            <Download style={{ height: "1.25rem", width: "1.25rem", color: PALETTE.sky2 }} />
+            <span style={dataButtonLabelStyle}>{t.exportJsonLabel}</span>
+          </Button>
 
-        <Button
-          variant="outline"
-          className="rounded-3xl"
-          style={{ ...outlineActionStyle, color: "#dc2626" }}
-          onClick={() => setConfirmOpen(true)}
-        >
-          <Trash2 style={{ marginRight: "0.75rem", height: "1.25rem", width: "1.25rem" }} />
-          {t.clearLocalData}
-        </Button>
+          <Button
+            variant="outline"
+            className="rounded-2xl"
+            style={dataButtonStyle}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Upload style={{ height: "1.25rem", width: "1.25rem", color: PALETTE.sky2 }} />
+            <span style={dataButtonLabelStyle}>{t.importJsonLabel}</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            className="rounded-2xl"
+            style={{ ...dataButtonStyle, color: "#dc2626" }}
+            onClick={() => setConfirmOpen(true)}
+          >
+            <Trash2 style={{ height: "1.25rem", width: "1.25rem" }} />
+            <span style={dataButtonLabelStyle}>{t.clearLocalDataLabel}</span>
+          </Button>
+        </div>
       </div>
 
       {/* JSON export success dialog */}
