@@ -5,7 +5,9 @@
  */
 export const STORAGE_KEY = "kiss-recorder-local-v3";
 export const LANGUAGE_KEY = "kiss-recorder-language-local-v3";
+export const ICON_COLOR_KEY = "kiss-recorder-icon-color-v1";
 export const PEOPLE_FILE_NAME = "kiss-recorder-people.json";
+export const SETTINGS_FILE_NAME = "kiss-recorder-settings.json";
 
 // Main decorative asset displayed on the intro screen
 export const MAIN_VISUAL_ASSET = "/assets/kiss-recorder-icon.png";
@@ -209,8 +211,16 @@ export const COPY = {
     boxplotAgeRange: "Age range",
     noDataYet: "No data yet",
     language: "Language",
+    settings: "Settings",
+    hideStats: "Hide stats",
+    showStats: "Show stats",
     english: "English",
     spanish: "Español",
+    iconColor: "Icon color",
+    colorYellow: "Yellow",
+    colorBlue: "Blue",
+    colorPink: "Pink",
+    colorPurple: "Purple",
     noEvents: "No events",
     ungrouped: "Ungrouped",
     optionalActivityDetails:
@@ -244,6 +254,18 @@ export const COPY = {
     statsGroupScores: "Kisses and ratings",
     noScore: "No kisses",
     reportGenerated: "Generated from KissRecorder",
+    clearDataConfirmTitle: "Delete all data?",
+    clearDataConfirmDesc:
+      "This will permanently delete all saved people and events. This action cannot be undone.",
+    clearDataConfirmAction: "Delete everything",
+    pdfSuccessTitle: "PDF exported",
+    pdfSuccessDesc: "Your report has been saved successfully.",
+    pdfErrorTitle: "Export failed",
+    pdfErrorDesc: "Something went wrong while generating the PDF.",
+    pdfEmptyTitle: "No data to export",
+    pdfEmptyDesc: "You need at least one person and one event to export statistics.",
+    savePdfErrorLog: "Save error log",
+    close: "Close",
   },
   es: {
     appTitle: "KissRecorder",
@@ -363,8 +385,16 @@ export const COPY = {
     boxplotAgeRange: "Rango de edades",
     noDataYet: "Todavía no hay datos",
     language: "Idioma",
+    settings: "Configuración",
+    hideStats: "Ocultar estadísticas",
+    showStats: "Mostrar estadísticas",
     english: "English",
     spanish: "Español",
+    iconColor: "Color del ícono",
+    colorYellow: "Amarillo",
+    colorBlue: "Azul",
+    colorPink: "Rosa",
+    colorPurple: "Morado",
     noEvents: "Sin eventos",
     ungrouped: "Sin grupo",
     optionalActivityDetails:
@@ -398,5 +428,17 @@ export const COPY = {
     statsGroupScores: "Besos y calificaciones",
     noScore: "Sin besos",
     reportGenerated: "Generado desde KissRecorder",
+    clearDataConfirmTitle: "¿Eliminar todos los datos?",
+    clearDataConfirmDesc:
+      "Se eliminarán definitivamente todas las personas y eventos guardados. Esta acción no se puede deshacer.",
+    clearDataConfirmAction: "Eliminar todo",
+    pdfSuccessTitle: "PDF exportado",
+    pdfSuccessDesc: "Tu informe se ha guardado correctamente.",
+    pdfErrorTitle: "Error al exportar",
+    pdfErrorDesc: "Ocurrió un error al generar el PDF.",
+    pdfEmptyTitle: "Sin datos para exportar",
+    pdfEmptyDesc: "Necesitas al menos una persona y un evento para exportar estadísticas.",
+    savePdfErrorLog: "Guardar registro de error",
+    close: "Cerrar",
   },
 };

@@ -1,9 +1,17 @@
 import { useMemo, useState } from "react";
-import { BarChart3, Clock3, UserRound, BadgePercent, Download } from "lucide-react";
+import { BarChart3, Clock3, UserRound, BadgePercent, Download, CheckCircle2, TriangleAlert } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { PALETTE } from "@/lib/constants";
-import { exportStatsPdf } from "@/lib/pdf-export";
+import { exportStatsPdf, saveErrorLog } from "@/lib/pdf-export";
 
 import StatsOverviewTab from "@/components/stats/StatsOverviewTab";
 import StatsTimeTab from "@/components/stats/StatsTimeTab";
@@ -15,8 +23,23 @@ import StatsScoresTab from "@/components/stats/StatsScoresTab";
  * It prepares shared data and delegates each section to a dedicated tab component.
  */
 export default function StatsScreen({ people, t }) {
-  // Track the currently selected stats tab.
   const [tab, setTab] = useState("overview");
+  // null = idle, "success" = exported OK, Error instance = export failed
+  const [pdfStatus, setPdfStatus] = useState(null);
+
+  async function handleExport() {
+    const hasEvents = people.some((p) => p.events?.length > 0);
+    if (people.length === 0 || !hasEvents) {
+      setPdfStatus("empty");
+      return;
+    }
+    try {
+      await exportStatsPdf(people, t);
+      setPdfStatus("success");
+    } catch (err) {
+      setPdfStatus(err instanceof Error ? err : new Error(String(err)));
+    }
+  }
 
   /**
    * Flatten all events and preserve their parent person.
@@ -76,15 +99,17 @@ export default function StatsScreen({ people, t }) {
           </p>
         </div>
 
+        {/* TODO: fix PDF export bug before re-enabling
         <Button
           variant="outline"
           className="rounded-2xl bg-white/85"
           style={{ borderColor: "#ecd6e0" }}
-          onClick={() => exportStatsPdf(people, t)}
+          onClick={handleExport}
         >
           <Download className="mr-2 h-4 w-4" />
           {t.exportPdf}
         </Button>
+        */}
       </div>
 
       <div className="grid grid-cols-2 gap-2">
@@ -128,6 +153,101 @@ export default function StatsScreen({ people, t }) {
       {tab === "scores" ? (
         <StatsScoresTab people={people} allEvents={allEvents} t={t} />
       ) : null}
+
+      {/* Empty data dialog */}
+      <Dialog
+        open={pdfStatus === "empty"}
+        onOpenChange={(open) => { if (!open) setPdfStatus(null); }}
+      >
+        <DialogContent
+          showCloseButton={false}
+          className="rounded-2xl"
+          style={{ background: PALETTE.bgSoft, borderColor: PALETTE.line }}
+        >
+          <DialogHeader>
+            <DialogTitle style={{ color: PALETTE.deep2 }}>{t.pdfEmptyTitle}</DialogTitle>
+            <DialogDescription style={{ color: PALETTE.textSoft }}>{t.pdfEmptyDesc}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              className="rounded-xl"
+              style={{ background: `linear-gradient(90deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`, color: "white", border: "none" }}
+              onClick={() => setPdfStatus(null)}
+            >
+              {t.close}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success dialog */}
+      <Dialog
+        open={pdfStatus === "success"}
+        onOpenChange={(open) => { if (!open) setPdfStatus(null); }}
+      >
+        <DialogContent
+          showCloseButton={false}
+          className="rounded-2xl"
+          style={{ background: PALETTE.bgSoft, borderColor: PALETTE.line }}
+        >
+          <DialogHeader>
+            <div className="flex items-center gap-2" style={{ color: PALETTE.rose }}>
+              <CheckCircle2 className="h-5 w-5 shrink-0" />
+              <DialogTitle style={{ color: PALETTE.rose }}>{t.pdfSuccessTitle}</DialogTitle>
+            </div>
+            <DialogDescription style={{ color: PALETTE.textSoft }}>{t.pdfSuccessDesc}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              className="rounded-xl"
+              style={{ background: `linear-gradient(90deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`, color: "white", border: "none" }}
+              onClick={() => setPdfStatus(null)}
+            >
+              {t.close}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Error dialog */}
+      <Dialog
+        open={pdfStatus instanceof Error}
+        onOpenChange={(open) => { if (!open) setPdfStatus(null); }}
+      >
+        <DialogContent
+          showCloseButton={false}
+          className="rounded-2xl"
+          style={{ background: PALETTE.bgSoft, borderColor: PALETTE.line }}
+        >
+          <DialogHeader>
+            <div className="flex items-center gap-2" style={{ color: PALETTE.deep }}>
+              <TriangleAlert className="h-5 w-5 shrink-0" />
+              <DialogTitle style={{ color: PALETTE.deep }}>{t.pdfErrorTitle}</DialogTitle>
+            </div>
+            <DialogDescription style={{ color: PALETTE.textSoft }}>{t.pdfErrorDesc}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              className="rounded-xl"
+              style={{ borderColor: PALETTE.line, color: PALETTE.text }}
+              onClick={() => setPdfStatus(null)}
+            >
+              {t.close}
+            </Button>
+            <Button
+              className="rounded-xl"
+              style={{ background: PALETTE.deep, color: "white", border: "none" }}
+              onClick={() => {
+                saveErrorLog(pdfStatus).catch(console.error);
+                setPdfStatus(null);
+              }}
+            >
+              {t.savePdfErrorLog}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
