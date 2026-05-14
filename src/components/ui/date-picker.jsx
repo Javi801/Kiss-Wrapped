@@ -55,15 +55,6 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
   const [viewYear, setViewYear] = useState(parsed?.year ?? todayY);
   const [viewMonth, setViewMonth] = useState(parsed?.month ?? todayM);
 
-  // Sync calendar view to a newly valid typed date.
-  useEffect(() => {
-    const p = parseAppDate(value);
-    if (p) {
-      setViewYear(p.year);
-      setViewMonth(p.month);
-    }
-  }, [value]);
-
   // Close when clicking outside.
   useEffect(() => {
     if (!open) return;
@@ -75,6 +66,16 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
     document.addEventListener("mousedown", handle);
     return () => document.removeEventListener("mousedown", handle);
   }, [open]);
+
+  function handleTextChange(e) {
+    const newVal = e.target.value;
+    onChange(newVal);
+    const p = parseAppDate(newVal);
+    if (p) {
+      setViewYear(p.year);
+      setViewMonth(p.month);
+    }
+  }
 
   function prevMonth() {
     if (viewMonth === 1) { setViewYear((y) => y - 1); setViewMonth(12); }
@@ -107,7 +108,7 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
       <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
         <Input
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={handleTextChange}
           placeholder={placeholder}
           className={className}
           style={{ ...style, flex: 1 }}
