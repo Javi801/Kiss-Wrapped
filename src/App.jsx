@@ -409,13 +409,13 @@ export default function KissRecorderApp() {
                   <button
                     key={item.key}
                     onClick={() => navigateTo(item.key)}
+                    className="rounded-2xl"
                     style={{
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "center",
                       justifyContent: "center",
                       gap: "0.25rem",
-                      borderRadius: "1rem",
                       paddingLeft: "0.5rem",
                       paddingRight: "0.5rem",
                       paddingTop: "0.5rem",
