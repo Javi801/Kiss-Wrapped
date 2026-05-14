@@ -89,3 +89,27 @@ describe("translateGender", () => {
     expect(translateGender("nonbinary", t)).toBe(t.other);
   });
 });
+
+describe("personHasIncompleteEvent", () => {
+  it("returns false when all events have details", () => {
+    const person = { events: [{ details: "coffee" }, { details: "dinner" }] };
+    expect(personHasIncompleteEvent(person)).toBe(false);
+  });
+  it("returns true when at least one event has empty details", () => {
+    const person = { events: [{ details: "coffee" }, { details: "" }] };
+    expect(personHasIncompleteEvent(person)).toBe(true);
+  });
+  it("returns true when details is only whitespace", () => {
+    const person = { events: [{ details: "   " }] };
+    expect(personHasIncompleteEvent(person)).toBe(true);
+  });
+  it("returns false for an empty events array", () => {
+    const person = { events: [] };
+    expect(personHasIncompleteEvent(person)).toBe(false);
+  });
+  it("returns false when events is undefined", () => {
+    const person = {};
+    expect(personHasIncompleteEvent(person)).toBe(false);
+  });
+});
+
