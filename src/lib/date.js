@@ -1,3 +1,9 @@
+// Returns true if the date string (yyyy.MM.dd) is strictly after today
+export function isFutureDate(value) {
+  if (!isValidDateString(value)) return false;
+  return value > todayString();
+}
+
 // Validates date string format yyyy.MM.dd and checks if it is a real date
 export function isValidDateString(value) {
   if (!/^\d{4}\.\d{2}\.\d{2}$/.test(value)) return false;
