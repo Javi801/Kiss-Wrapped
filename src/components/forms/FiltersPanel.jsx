@@ -35,21 +35,21 @@ export default function FiltersPanel({
   };
 
   return (
-    <div className="space-y-5">
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
       {/* Panel heading */}
       <div>
-        <h3 className="text-lg font-semibold" style={{ color: PALETTE.text }}>
+        <h3 style={{ fontSize: "1.125rem", lineHeight: "1.75rem", fontWeight: "600", color: PALETTE.text }}>
           {t.filtersOrg}
         </h3>
-        <p className="text-sm" style={{ color: PALETTE.textSoft }}>
+        <p style={{ fontSize: "0.875rem", lineHeight: "1.25rem", color: PALETTE.textSoft }}>
           {t.refineResults}
         </p>
       </div>
 
       {/* Age range */}
-      <div className="space-y-2">
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <Label>{t.ageRange}</Label>
-        <div className="grid grid-cols-2 gap-3">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "0.75rem" }}>
           <Input
             type="number"
             placeholder={t.min}
@@ -58,7 +58,7 @@ export default function FiltersPanel({
               setFilters((prev) => ({ ...prev, minAge: e.target.value }))
             }
             className="rounded-2xl"
-            style={inputStyle}
+            style={{ ...inputStyle }}
           />
           <Input
             type="number"
@@ -68,13 +68,13 @@ export default function FiltersPanel({
               setFilters((prev) => ({ ...prev, maxAge: e.target.value }))
             }
             className="rounded-2xl"
-            style={inputStyle}
+            style={{ ...inputStyle }}
           />
         </div>
       </div>
 
       {/* Activity filter */}
-      <div className="space-y-2">
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <Label>{t.activity}</Label>
         <Select
           value={filters.activity}
@@ -85,7 +85,7 @@ export default function FiltersPanel({
             }))
           }
         >
-          <SelectTrigger className="rounded-2xl" style={inputStyle}>
+          <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
             <SelectValue placeholder={t.allActivities} />
           </SelectTrigger>
           <SelectContent>
@@ -99,7 +99,7 @@ export default function FiltersPanel({
       </div>
 
       {/* Zodiac filter */}
-      <div className="space-y-2">
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <Label>{t.zodiacSign}</Label>
         <Select
           value={filters.zodiacSign}
@@ -110,7 +110,7 @@ export default function FiltersPanel({
             }))
           }
         >
-          <SelectTrigger className="rounded-2xl" style={inputStyle}>
+          <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
             <SelectValue placeholder={t.allSigns} />
           </SelectTrigger>
           <SelectContent>
@@ -125,10 +125,10 @@ export default function FiltersPanel({
       </div>
 
       {/* Grouping mode */}
-      <div className="space-y-2">
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <Label>{t.groupBy}</Label>
         <Select value={groupBy} onValueChange={setGroupBy}>
-          <SelectTrigger className="rounded-2xl" style={inputStyle}>
+          <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -139,10 +139,10 @@ export default function FiltersPanel({
       </div>
 
       {/* Sorting mode */}
-      <div className="space-y-2">
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <Label>{t.sortBy}</Label>
         <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="rounded-2xl" style={inputStyle}>
+          <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -156,8 +156,8 @@ export default function FiltersPanel({
       {/* Reset action */}
       <Button
         variant="outline"
-        className="w-full rounded-2xl"
-        style={inputStyle}
+        className="rounded-2xl"
+        style={{ width: "100%", ...inputStyle }}
         onClick={() => {
           setFilters({
             minAge: "",
@@ -169,12 +169,12 @@ export default function FiltersPanel({
           setSortBy("name");
         }}
       >
-        <RotateCcw className="mr-2 h-4 w-4" />
+        <RotateCcw style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
         {t.resetFilters}
       </Button>
 
       {/* Results count */}
-      <p className="text-xs" style={{ color: PALETTE.textSoft }}>
+      <p style={{ fontSize: "0.75rem", lineHeight: "1rem", color: PALETTE.textSoft }}>
         {t.showingResults} {peopleCount}{" "}
         {peopleCount === 1 ? t.result : t.results}.
       </p>
