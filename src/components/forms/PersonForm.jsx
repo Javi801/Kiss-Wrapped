@@ -15,7 +15,7 @@ import {
 
 import { GENDERS, ZODIAC_OPTIONS, PALETTE, TEXT } from "@/lib/constants";
 import { translateGender } from "@/lib/format";
-import { calculateAge, deriveBirthYear } from "@/lib/date";
+import { calculateAge, deriveBirthYear, isWithinZodiacPeriod } from "@/lib/date";
 
 /**
  * Form used for creating or editing a person.
@@ -42,12 +42,14 @@ export default function PersonForm({
     return { ...initialValues, age: displayAge };
   });
 
-  // Validation errors.
   const [errors, setErrors] = useState({});
+  const [birthdayAlreadyHappened, setBirthdayAlreadyHappened] = useState(false);
 
-  // Update a specific field in the form state.
+  const showBirthdayCheckbox = form.zodiacSign ? isWithinZodiacPeriod(form.zodiacSign) : false;
+
   function update(key, value) {
     setForm((prev) => ({ ...prev, [key]: value }));
+    if (key === "zodiacSign") setBirthdayAlreadyHappened(false);
   }
 
   // Validate required fields and data types.
@@ -83,7 +85,7 @@ export default function PersonForm({
     const { age, ...rest } = form;
     onSave({
       ...rest,
-      birthYear: deriveBirthYear(Number(age), form.zodiacSign),
+      birthYear: deriveBirthYear(Number(age), form.zodiacSign, showBirthdayCheckbox && birthdayAlreadyHappened),
       detail: form.detail.trim(),
       howWeMet: includeHowWeMet
         ? form.howWeMet.trim()
@@ -134,6 +136,32 @@ export default function PersonForm({
             />
             {errors.age && (
               <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.age}</p>
+            )}
+            {showBirthdayCheckbox && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
+                <p style={{ ...TEXT.caption, color: PALETTE.textSoft }}>{t.birthdayAlreadyHappened}</p>
+                <div style={{ display: "flex", borderRadius: "0.75rem", overflow: "hidden", border: `1px solid ${PALETTE.inputBorder}`, width: "fit-content" }}>
+                  {[true, false].map((val) => (
+                    <button
+                      key={String(val)}
+                      type="button"
+                      onClick={() => setBirthdayAlreadyHappened(val)}
+                      style={{
+                        padding: "0.2rem 0.85rem",
+                        ...TEXT.caption,
+                        fontWeight: 500,
+                        cursor: "pointer",
+                        border: "none",
+                        backgroundColor: birthdayAlreadyHappened === val ? PALETTE.rose : "transparent",
+                        color: birthdayAlreadyHappened === val ? "#fff" : PALETTE.textSoft,
+                        transition: "background-color 0.15s, color 0.15s",
+                      }}
+                    >
+                      {val ? t.yes : t.no}
+                    </button>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
 
