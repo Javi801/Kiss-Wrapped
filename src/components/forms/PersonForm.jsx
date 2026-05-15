@@ -15,6 +15,7 @@ import {
 
 import { GENDERS, ZODIAC_OPTIONS, PALETTE, TEXT } from "@/lib/constants";
 import { translateGender } from "@/lib/format";
+import { calculateAge, deriveBirthYear } from "@/lib/date";
 
 /**
  * Form used for creating or editing a person.
@@ -31,19 +32,15 @@ export default function PersonForm({
   mode,
 }) {
   // Local form state initialization.
-  const currentYear = new Date().getFullYear();
-
-  const [form, setForm] = useState(
-    initialValues || {
-      name: "",
-      birthYear: "",
-      gender: "",
-      howWeMet: "",
-      zodiacSign: "",
-      activity: "",
-      detail: "",
-    },
-  );
+  const [form, setForm] = useState(() => {
+    if (!initialValues) {
+      return { name: "", age: "", gender: "", howWeMet: "", zodiacSign: "", activity: "", detail: "" };
+    }
+    const displayAge = initialValues.birthYear
+      ? String(calculateAge(initialValues.birthYear, initialValues.zodiacSign) ?? "")
+      : String(initialValues.age ?? "");
+    return { ...initialValues, age: displayAge };
+  });
 
   // Validation errors.
   const [errors, setErrors] = useState({});
@@ -59,10 +56,9 @@ export default function PersonForm({
 
     if (!form.name.trim()) next.name = t.requiredName;
 
-    const year = Number(form.birthYear);
-    if (!String(form.birthYear).trim()) next.birthYear = t.requiredBirthYear;
-    else if (!Number.isInteger(year) || year < currentYear - 120 || year > currentYear)
-      next.birthYear = t.validBirthYear;
+    if (!String(form.age).trim()) next.age = t.requiredAge;
+    else if (!Number.isInteger(Number(form.age)) || Number(form.age) <= 0)
+      next.age = t.validAge;
 
     if (!form.gender) next.gender = t.requiredGender;
 
@@ -84,9 +80,10 @@ export default function PersonForm({
 
     if (!validate()) return;
 
+    const { age, ...rest } = form;
     onSave({
-      ...form,
-      birthYear: Number(form.birthYear),
+      ...rest,
+      birthYear: deriveBirthYear(Number(age), form.zodiacSign),
       detail: form.detail.trim(),
       howWeMet: includeHowWeMet
         ? form.howWeMet.trim()
@@ -122,21 +119,21 @@ export default function PersonForm({
           )}
         </div>
 
-        {/* Birth Year + Gender */}
+        {/* Age + Gender */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "1rem" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            <Label>{t.birthYear} *</Label>
+            <Label>{t.age} *</Label>
             <Input
               type="number"
-              value={form.birthYear}
-              onChange={(e) => update("birthYear", e.target.value)}
-              min={currentYear - 120}
-              max={currentYear}
+              value={form.age}
+              onChange={(e) => update("age", e.target.value)}
+              min={1}
+              max={120}
               className="rounded-2xl"
               style={{ ...inputStyle }}
             />
-            {errors.birthYear && (
-              <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.birthYear}</p>
+            {errors.age && (
+              <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.age}</p>
             )}
           </div>
 
