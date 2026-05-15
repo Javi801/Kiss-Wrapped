@@ -22,8 +22,10 @@ import {
   savePeopleToDevice,
   clearPeopleFromDevice,
   exportPeopleJson,
+  loadSettings,
+  saveSettings,
 } from "@/lib/device-storage";
-import { STORAGE_KEY } from "@/lib/constants";
+import { STORAGE_KEY, ICON_COLOR_KEY, LANGUAGE_KEY } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // loadPeopleFromDevice
@@ -251,5 +253,78 @@ describe("exportPeopleJson — normalizeForExport output content", () => {
     expect(exported[0].name).toBe("Ana");
     expect(exported[0].age).toBe(25);
     expect(exported[0].events[0].place).toBe("café");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// loadSettings (web path)
+// ---------------------------------------------------------------------------
+describe("loadSettings (web path)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("returns defaults when no settings are saved", async () => {
+    expect(await loadSettings()).toEqual({ iconColor: "yellow", language: "en" });
+  });
+
+  it("returns the saved iconColor", async () => {
+    localStorage.setItem(ICON_COLOR_KEY, "pink");
+    expect((await loadSettings()).iconColor).toBe("pink");
+  });
+
+  it("returns the saved language", async () => {
+    localStorage.setItem(LANGUAGE_KEY, "es");
+    expect((await loadSettings()).language).toBe("es");
+  });
+
+  it("falls back to default iconColor when only language is saved", async () => {
+    localStorage.setItem(LANGUAGE_KEY, "es");
+    const settings = await loadSettings();
+    expect(settings.iconColor).toBe("yellow");
+    expect(settings.language).toBe("es");
+  });
+
+  it("falls back to default language when only iconColor is saved", async () => {
+    localStorage.setItem(ICON_COLOR_KEY, "pink");
+    const settings = await loadSettings();
+    expect(settings.iconColor).toBe("pink");
+    expect(settings.language).toBe("en");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// saveSettings (web path)
+// ---------------------------------------------------------------------------
+describe("saveSettings (web path)", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("saves iconColor to localStorage", async () => {
+    await saveSettings({ iconColor: "pink", language: "es" });
+    expect(localStorage.getItem(ICON_COLOR_KEY)).toBe("pink");
+  });
+
+  it("saves language to localStorage", async () => {
+    await saveSettings({ iconColor: "pink", language: "es" });
+    expect(localStorage.getItem(LANGUAGE_KEY)).toBe("es");
+  });
+
+  it("does not overwrite iconColor when it is undefined", async () => {
+    localStorage.setItem(ICON_COLOR_KEY, "yellow");
+    await saveSettings({ language: "es" });
+    expect(localStorage.getItem(ICON_COLOR_KEY)).toBe("yellow");
+  });
+
+  it("does not overwrite language when it is undefined", async () => {
+    localStorage.setItem(LANGUAGE_KEY, "en");
+    await saveSettings({ iconColor: "pink" });
+    expect(localStorage.getItem(LANGUAGE_KEY)).toBe("en");
+  });
+
+  it("round-trips correctly through save and load", async () => {
+    await saveSettings({ iconColor: "blue", language: "es" });
+    expect(await loadSettings()).toEqual({ iconColor: "blue", language: "es" });
   });
 });
