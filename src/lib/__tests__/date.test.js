@@ -1,8 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
+  isFutureDate,
   isValidDateString,
   todayString,
   formatDisplayDate,
+  formatShortDate,
   getMonthKey,
   getYearKey,
 } from "@/lib/date";
@@ -109,5 +111,58 @@ describe("getYearKey", () => {
   });
   it("returns null for an empty string", () => {
     expect(getYearKey("")).toBeNull();
+  });
+});
+
+describe("formatShortDate", () => {
+  it("formats a valid date in English", () => {
+    expect(formatShortDate("2024.01.15")).toMatch(/15\s+Jan\s+2024/i);
+  });
+  it("formats a valid date in Spanish", () => {
+    expect(formatShortDate("2024.01.15", "es")).toMatch(/15\s+ene\s+2024/i);
+  });
+  it("returns em dash for an empty string", () => {
+    expect(formatShortDate("")).toBe("—");
+  });
+  it("returns the raw value for an invalid date string", () => {
+    expect(formatShortDate("bad")).toBe("bad");
+  });
+  it("returns em dash for undefined", () => {
+    expect(formatShortDate(undefined)).toBe("—");
+  });
+});
+
+describe("isFutureDate", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2024-06-15T12:00:00"));
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("returns true for a date strictly after today", () => {
+    expect(isFutureDate("2024.06.16")).toBe(true);
+  });
+  it("returns true for a date in a future month", () => {
+    expect(isFutureDate("2024.07.01")).toBe(true);
+  });
+  it("returns false for today", () => {
+    expect(isFutureDate("2024.06.15")).toBe(false);
+  });
+  it("returns false for a past date", () => {
+    expect(isFutureDate("2024.06.14")).toBe(false);
+  });
+  it("returns false for a date in a past year", () => {
+    expect(isFutureDate("2023.12.31")).toBe(false);
+  });
+  it("returns false for an invalid date string", () => {
+    expect(isFutureDate("not-a-date")).toBe(false);
+  });
+  it("returns false for null", () => {
+    expect(isFutureDate(null)).toBe(false);
+  });
+  it("returns false for undefined", () => {
+    expect(isFutureDate(undefined)).toBe(false);
   });
 });

@@ -3,6 +3,7 @@ import { COPY, GENDER_COLORS } from "@/lib/constants";
 import {
   translateActivity,
   translateGender,
+  eventIsMissingRequired,
   personHasIncompleteEvent,
   hasScore,
   renderKisses,
@@ -90,26 +91,85 @@ describe("translateGender", () => {
   });
 });
 
+const COMPLETE_PERSON = {
+  name: "Ana",
+  age: 25,
+  gender: "female",
+  zodiacSign: "♒ Aquarius",
+  activity: "studies",
+  events: [{ place: "café", situation: "first date" }],
+};
+
+describe("eventIsMissingRequired", () => {
+  it("returns false when both place and situation are present", () => {
+    expect(eventIsMissingRequired({ place: "café", situation: "first date" })).toBe(false);
+  });
+  it("returns true when place is absent", () => {
+    expect(eventIsMissingRequired({ situation: "first date" })).toBe(true);
+  });
+  it("returns true when place is an empty string", () => {
+    expect(eventIsMissingRequired({ place: "", situation: "first date" })).toBe(true);
+  });
+  it("returns true when place is only whitespace", () => {
+    expect(eventIsMissingRequired({ place: "   ", situation: "first date" })).toBe(true);
+  });
+  it("returns true when situation is absent", () => {
+    expect(eventIsMissingRequired({ place: "café" })).toBe(true);
+  });
+  it("returns true when situation is an empty string", () => {
+    expect(eventIsMissingRequired({ place: "café", situation: "" })).toBe(true);
+  });
+  it("returns true when situation is only whitespace", () => {
+    expect(eventIsMissingRequired({ place: "café", situation: "   " })).toBe(true);
+  });
+  it("returns true when both fields are absent", () => {
+    expect(eventIsMissingRequired({})).toBe(true);
+  });
+});
+
 describe("personHasIncompleteEvent", () => {
-  it("returns false when all events have details", () => {
-    const person = { events: [{ details: "coffee" }, { details: "dinner" }] };
-    expect(personHasIncompleteEvent(person)).toBe(false);
+  it("returns false when all person and event fields are complete", () => {
+    expect(personHasIncompleteEvent(COMPLETE_PERSON)).toBe(false);
   });
-  it("returns true when at least one event has empty details", () => {
-    const person = { events: [{ details: "coffee" }, { details: "" }] };
-    expect(personHasIncompleteEvent(person)).toBe(true);
-  });
-  it("returns true when details is only whitespace", () => {
-    const person = { events: [{ details: "   " }] };
-    expect(personHasIncompleteEvent(person)).toBe(true);
-  });
-  it("returns false for an empty events array", () => {
-    const person = { events: [] };
-    expect(personHasIncompleteEvent(person)).toBe(false);
+  it("returns false for a complete person with no events", () => {
+    expect(personHasIncompleteEvent({ ...COMPLETE_PERSON, events: [] })).toBe(false);
   });
   it("returns false when events is undefined", () => {
-    const person = {};
-    expect(personHasIncompleteEvent(person)).toBe(false);
+    const { events: _, ...noEvents } = COMPLETE_PERSON;
+    expect(personHasIncompleteEvent(noEvents)).toBe(false);
+  });
+  it("returns true when name is missing", () => {
+    expect(personHasIncompleteEvent({ ...COMPLETE_PERSON, name: "" })).toBe(true);
+  });
+  it("returns true when age is missing", () => {
+    expect(personHasIncompleteEvent({ ...COMPLETE_PERSON, age: null })).toBe(true);
+  });
+  it("returns true when gender is missing", () => {
+    expect(personHasIncompleteEvent({ ...COMPLETE_PERSON, gender: "" })).toBe(true);
+  });
+  it("returns true when zodiacSign is missing", () => {
+    expect(personHasIncompleteEvent({ ...COMPLETE_PERSON, zodiacSign: "" })).toBe(true);
+  });
+  it("returns true when activity is missing", () => {
+    expect(personHasIncompleteEvent({ ...COMPLETE_PERSON, activity: "" })).toBe(true);
+  });
+  it("returns true when an event is missing place", () => {
+    const person = { ...COMPLETE_PERSON, events: [{ situation: "first date" }] };
+    expect(personHasIncompleteEvent(person)).toBe(true);
+  });
+  it("returns true when an event is missing situation", () => {
+    const person = { ...COMPLETE_PERSON, events: [{ place: "café" }] };
+    expect(personHasIncompleteEvent(person)).toBe(true);
+  });
+  it("returns true when only the second event is incomplete", () => {
+    const person = {
+      ...COMPLETE_PERSON,
+      events: [
+        { place: "café", situation: "first date" },
+        { place: "park" },
+      ],
+    };
+    expect(personHasIncompleteEvent(person)).toBe(true);
   });
 });
 
