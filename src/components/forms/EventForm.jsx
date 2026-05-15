@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 
 import { PALETTE, SCORE_OPTIONS, TEXT } from "@/lib/constants";
-import { todayString, isValidDateString } from "@/lib/date";
+import { todayString, isValidDateString, isFutureDate } from "@/lib/date";
 import { hasScore, renderKisses } from "@/lib/format";
 
 export default function EventForm({ initialValues, onSave, onCancel, t }) {
@@ -34,6 +34,7 @@ export default function EventForm({ initialValues, onSave, onCancel, t }) {
 
     const newErrors = {};
     if (!isValidDateString(date)) newErrors.date = t.validDateMsg;
+    else if (isFutureDate(date)) newErrors.date = t.futureDateMsg;
     if (!place.trim()) newErrors.place = t.requiredPlace;
     if (!situation.trim()) newErrors.situation = t.requiredSituation;
 

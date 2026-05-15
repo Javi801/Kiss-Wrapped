@@ -2,18 +2,28 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { PALETTE, TEXT } from "@/lib/constants";
 
 /**
- * Displays a boxplot-like visualization for age distribution.
- * It shows min, Q1, median, Q3, and max values.
+ * Displays a boxplot visualization for age distribution.
+ * The x-axis uses "nice" rounded bounds so ticks are always evenly spaced.
+ * When bare=true, renders only the chart content without the Card wrapper.
  */
-export default function AgeRangeBox({ title, subtitle, people, emptyText }) {
-  // Extract valid numeric ages and sort them.
+export default function AgeRangeBox({ title, subtitle, people, emptyText, bare = false }) {
   const ages = people
     .map((p) => p.age)
     .filter((age) => Number.isFinite(age))
     .sort((a, b) => a - b);
 
-  // Handle empty state when no valid ages exist.
   if (!ages.length) {
+    const emptyContent = (
+      <div
+        className="rounded-2xl"
+        style={{ border: `1px dashed ${PALETTE.inputBorder}`, padding: "1.5rem", textAlign: "center", ...TEXT.body, color: PALETTE.textSoft }}
+      >
+        {emptyText}
+      </div>
+    );
+
+    if (bare) return emptyContent;
+
     return (
       <Card
         className="rounded-3xl"
@@ -23,31 +33,118 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText }) {
           <CardTitle style={TEXT.title}>{title}</CardTitle>
           {subtitle ? <CardDescription>{subtitle}</CardDescription> : null}
         </CardHeader>
-
-        <CardContent>
-          <div
-            className="rounded-2xl"
-            style={{ border: `1px dashed ${PALETTE.inputBorder}`, padding: "1.5rem", textAlign: "center", ...TEXT.body, color: PALETTE.textSoft }}
-          >
-            {emptyText}
-          </div>
-        </CardContent>
+        <CardContent>{emptyContent}</CardContent>
       </Card>
     );
   }
 
-  // Compute statistical values.
+  // Linear interpolation quantile (R-7 / numpy default).
+  function quantile(p) {
+    if (ages.length === 1) return ages[0];
+    const idx = p * (ages.length - 1);
+    const lo = Math.floor(idx);
+    const hi = Math.ceil(idx);
+    if (lo === hi) return ages[lo];
+    return ages[lo] + (ages[hi] - ages[lo]) * (idx - lo);
+  }
+
   const min = ages[0];
   const max = ages[ages.length - 1];
-  const q1 = ages[Math.floor((ages.length - 1) * 0.25)];
-  const median = ages[Math.floor((ages.length - 1) * 0.5)];
-  const q3 = ages[Math.floor((ages.length - 1) * 0.75)];
+  const q1 = quantile(0.25);
+  const median = quantile(0.5);
+  const q3 = quantile(0.75);
 
-  // Normalize positions for rendering.
-  const scale = max - min || 1;
-  const left = ((q1 - min) / scale) * 100;
-  const width = ((q3 - q1) / scale) * 100;
-  const medianPos = ((median - min) / scale) * 100;
+  // Compute a "nice" axis with evenly-spaced ticks that may extend beyond min/max.
+  const dataRange = max - min;
+  let step;
+  if (dataRange === 0) {
+    step = 1;
+  } else {
+    const rawStep = dataRange / 4;
+    if (rawStep <= 1) step = 1;
+    else if (rawStep <= 2) step = 2;
+    else if (rawStep <= 5) step = 5;
+    else if (rawStep <= 10) step = 10;
+    else step = Math.ceil(rawStep / 5) * 5;
+  }
+
+  const axisMin = Math.floor(min / step) * step;
+  const axisMax =
+    Math.ceil(max / step) * step === axisMin
+      ? axisMin + step
+      : Math.ceil(max / step) * step;
+  const axisRange = axisMax - axisMin;
+
+  const tickValues = [];
+  for (let v = axisMin; v <= axisMax; v += step) tickValues.push(v);
+
+  const toPos = (v) => 3 + ((v - axisMin) / axisRange) * 94;
+
+  const minPos = toPos(min);
+  const maxPos = toPos(max);
+  const boxLeft = toPos(q1);
+  const boxWidth = Math.max(toPos(q3) - boxLeft, 0.5);
+  const medianPos = toPos(median);
+
+  const chartContent = (
+    <div className="rounded-3xl" style={{ padding: "1.25rem", backgroundColor: PALETTE.surfaceBg }}>
+      {/* Boxplot */}
+      <div style={{ position: "relative", height: "3.5rem", marginBottom: "0.75rem" }}>
+        <div
+          style={{ position: "absolute", left: "3%", right: "3%", top: "50%", height: "0.125rem", transform: "translateY(-50%)", backgroundColor: "#e7d5de" }}
+        />
+        <div
+          style={{ position: "absolute", top: "50%", height: "2rem", width: "0.125rem", transform: "translateY(-50%)", left: `${minPos}%`, backgroundColor: PALETTE.rose }}
+        />
+        <div
+          style={{ position: "absolute", top: "50%", height: "2rem", width: "0.125rem", transform: "translateY(-50%)", left: `${maxPos}%`, backgroundColor: PALETTE.rose }}
+        />
+        <div
+          className="rounded-sm"
+          style={{
+            position: "absolute",
+            top: "50%",
+            height: "2rem",
+            transform: "translateY(-50%)",
+            border: `2px solid ${PALETTE.rose}`,
+            left: `${boxLeft}%`,
+            width: `${boxWidth}%`,
+            backgroundColor: PALETTE.roseSoft,
+          }}
+        />
+        <div
+          style={{ position: "absolute", top: "50%", height: "2.5rem", width: "0.125rem", transform: "translateY(-50%)", left: `${medianPos}%`, backgroundColor: PALETTE.deep }}
+        />
+      </div>
+
+      {/* X-axis labels */}
+      <div style={{ position: "relative", height: "1.25rem" }}>
+        {tickValues.map((v, i) => {
+          const pct = toPos(v);
+          const isFirst = i === 0;
+          const isLast = i === tickValues.length - 1;
+          return (
+            <span
+              key={v}
+              style={{
+                position: "absolute",
+                left: `${pct}%`,
+                transform: isFirst ? "none" : isLast ? "translateX(-100%)" : "translateX(-50%)",
+                ...TEXT.body,
+                fontWeight: "500",
+                color: PALETTE.deep,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {v}
+            </span>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  if (bare) return chartContent;
 
   return (
     <Card
@@ -58,63 +155,7 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText }) {
         <CardTitle style={TEXT.title}>{title}</CardTitle>
         <CardDescription>{subtitle || `${min} - ${max}`}</CardDescription>
       </CardHeader>
-
-      <CardContent>
-        <div
-          className="rounded-3xl"
-          style={{ padding: "1.25rem", backgroundColor: PALETTE.surfaceBg }}
-        >
-          {/* Labels row */}
-          <div
-            style={{ marginBottom: "1rem", display: "flex", justifyContent: "space-between", ...TEXT.body, fontWeight: "500", color: PALETTE.deep }}
-          >
-            <span>{min}</span>
-            <span>{q1}</span>
-            <span>{median}</span>
-            <span>{q3}</span>
-            <span>{max}</span>
-          </div>
-
-          {/* Boxplot visualization */}
-          <div style={{ position: "relative", height: "3.5rem" }}>
-            {/* Base line */}
-            <div
-              style={{ position: "absolute", left: 0, right: 0, top: "50%", height: "0.125rem", transform: "translateY(-50%)", backgroundColor: "#e7d5de" }}
-            />
-
-            {/* Min marker */}
-            <div
-              style={{ position: "absolute", top: "50%", height: "2rem", width: "0.125rem", transform: "translateY(-50%)", left: "0%", backgroundColor: PALETTE.rose }}
-            />
-
-            {/* Max marker */}
-            <div
-              style={{ position: "absolute", top: "50%", height: "2rem", width: "0.125rem", transform: "translateY(-50%)", left: "100%", backgroundColor: PALETTE.rose }}
-            />
-
-            {/* IQR box */}
-            <div
-              className="rounded-sm"
-              style={{
-                position: "absolute",
-                top: "50%",
-                height: "2rem",
-                transform: "translateY(-50%)",
-                border: `2px solid ${PALETTE.rose}`,
-                left: `${left}%`,
-                width: `${Math.max(width, 2)}%`,
-                borderColor: PALETTE.rose,
-                backgroundColor: PALETTE.roseSoft,
-              }}
-            />
-
-            {/* Median line */}
-            <div
-              style={{ position: "absolute", top: "50%", height: "2.5rem", width: "0.125rem", transform: "translateY(-50%)", left: `${medianPos}%`, backgroundColor: PALETTE.deep }}
-            />
-          </div>
-        </div>
-      </CardContent>
+      <CardContent>{chartContent}</CardContent>
     </Card>
   );
 }

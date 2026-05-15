@@ -22,6 +22,7 @@ export default function BarChartCard({
   emptyText,
   rotateXLabels = false,
   customColors = null,
+  yAxisLabel = null,
 }) {
   // Shared container style for consistency across charts.
   const cardStyle = {
@@ -48,7 +49,7 @@ export default function BarChartCard({
         {data.length ? (
           <div style={{ height: "16rem", width: "100%" }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data}>
+              <BarChart data={data} margin={{ top: 5, right: 5, left: -15, bottom: 5 }}>
                 {/* Background grid */}
                 <CartesianGrid vertical={false} strokeDasharray="3 3" />
 
@@ -70,6 +71,14 @@ export default function BarChartCard({
                   tickLine={false}
                   axisLine={false}
                   fontSize={12}
+                  width={yAxisLabel ? 50 : 40}
+                  label={yAxisLabel ? {
+                    value: yAxisLabel,
+                    angle: -90,
+                    position: "insideLeft",
+                    dx: 15,
+                    style: { fontSize: 11, fill: PALETTE.textSoft },
+                  } : undefined}
                 />
 
                 <Tooltip />

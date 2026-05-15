@@ -28,6 +28,7 @@ export default function PersonForm({
   language,
   includeHowWeMet = true,
   saveLabel,
+  mode,
 }) {
   // Local form state initialization.
   const [form, setForm] = useState(
@@ -218,10 +219,10 @@ export default function PersonForm({
             </SelectTrigger>
 
             <SelectContent>
-              <SelectItem value="studies">{t.studiesForm}</SelectItem>
-              <SelectItem value="works">{t.worksForm}</SelectItem>
+              <SelectItem value="studies">{mode === "add" ? t.studiesForm : t.studies}</SelectItem>
+              <SelectItem value="works">{mode === "add" ? t.worksForm : t.works}</SelectItem>
               <SelectItem value="studies and works">
-                {t.studiesWorksForm}
+                {mode === "add" ? t.studiesWorksForm : t.studiesWorks}
               </SelectItem>
               <SelectItem value="other">{t.other}</SelectItem>
             </SelectContent>
