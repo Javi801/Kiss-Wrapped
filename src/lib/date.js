@@ -43,6 +43,19 @@ export function calculateAge(birthYear, zodiacSign) {
   return today >= endThisYear ? currentYear - birthYear : currentYear - birthYear - 1;
 }
 
+// Derives birth year from a known current age and zodiac sign.
+// If the zodiac period end has already passed this year, the person already
+// turned `age` this year → birthYear = currentYear - age.
+// Otherwise the birthday is still ahead → birthYear = currentYear - age - 1.
+export function deriveBirthYear(age, zodiacSign) {
+  const endDate = getZodiacEndDate(zodiacSign);
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  if (!endDate) return currentYear - age;
+  const endThisYear = new Date(currentYear, endDate.month - 1, endDate.day);
+  return today >= endThisYear ? currentYear - age : currentYear - age - 1;
+}
+
 // Returns true if the date string (yyyy.MM.dd) is strictly after today
 export function isFutureDate(value) {
   if (!isValidDateString(value)) return false;
