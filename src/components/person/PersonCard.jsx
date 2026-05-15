@@ -24,7 +24,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-import { PALETTE, TEXT } from "@/lib/constants";
+import { PALETTE, TEXT, abbreviateZodiacMonths } from "@/lib/constants";
 import { formatDisplayDate } from "@/lib/date";
 import {
   translateActivity,
@@ -121,7 +121,7 @@ export default function PersonCard({
                   <span>•</span>
                   <span>{translateGender(person.gender, t)}</span>
                   <span>•</span>
-                  <span>{person.zodiacSign}</span>
+                  <span>{abbreviateZodiacMonths(person.zodiacSign)}</span>
                   <span>•</span>
                   <span>{translateActivity(person.activity, t)}</span>
                 </div>

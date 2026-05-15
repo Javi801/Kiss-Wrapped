@@ -31,10 +31,21 @@ export function todayString() {
 // Converts yyyy.MM.dd to dd/MM/yyyy for display
 export function formatDisplayDate(value) {
   if (!isValidDateString(value)) return value || "—";
-  
+
   const [y, m, d] = value.split(".");
-  
+
   return `${d}/${m}/${y}`;
+}
+
+// Converts yyyy.MM.dd to a short human date with abbreviated month, e.g. "15 Jan 2024"
+export function formatShortDate(value, language = "en") {
+  if (!isValidDateString(value)) return value || "—";
+  const [y, mo, d] = value.split(".").map(Number);
+  return new Intl.DateTimeFormat(language === "es" ? "es-ES" : "en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(y, mo - 1, d));
 }
 
 // Extracts month key in format yyyy-MM from valid date
