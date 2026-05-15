@@ -12,12 +12,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 import { PALETTE, SCORE_OPTIONS, TEXT } from "@/lib/constants";
 import { todayString, isValidDateString, isFutureDate } from "@/lib/date";
 import { hasScore, renderKisses } from "@/lib/format";
 
-export default function EventForm({ initialValues, onSave, onCancel, t }) {
+export default function EventForm({ initialValues, onSave, onCancel, onDelete, t }) {
   const [date, setDate] = useState(initialValues?.date || todayString());
   const [details, setDetails] = useState(initialValues?.details || "");
   const [score, setScore] = useState(
@@ -169,28 +180,59 @@ export default function EventForm({ initialValues, onSave, onCancel, t }) {
       </div>
 
       {/* Actions */}
-      <div style={{ display: "flex", gap: "0.5rem" }}>
-        <Button
-          type="submit"
-          className="rounded-2xl"
-          style={{
-            flex: "1 1 0%",
-            color: "white",
-            boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-            background: `linear-gradient(90deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`,
-          }}
-        >
-          {t.saveEvent}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          className="rounded-2xl"
-          style={{ ...inputStyle }}
-          onClick={onCancel}
-        >
-          {t.cancel}
-        </Button>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          <Button
+            type="submit"
+            className="rounded-2xl"
+            style={{
+              flex: "1 1 0%",
+              color: "white",
+              boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+              background: `linear-gradient(90deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`,
+            }}
+          >
+            {t.saveEvent}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="rounded-2xl"
+            style={{ ...inputStyle }}
+            onClick={onCancel}
+          >
+            {t.cancel}
+          </Button>
+        </div>
+        {onDelete && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-2xl w-full"
+                style={{ borderColor: "#ef4444", color: "#ef4444" }}
+              >
+                {t.deleteEvent}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t.deleteEventConfirmTitle}</AlertDialogTitle>
+                <AlertDialogDescription>{t.deleteEventConfirmDesc}</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
+                <AlertDialogAction
+                  style={{ background: "#ef4444", color: "white" }}
+                  onClick={onDelete}
+                >
+                  {t.deleteEventConfirmAction}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
       </div>
     </form>
   );

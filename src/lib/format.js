@@ -15,11 +15,21 @@ export function translateGender(value, t) {
   return t.other;
 }
 
-// Check if a person has at least one event missing details.
+// Check if an event is missing any required field.
+export function eventIsMissingRequired(event) {
+  return !event.place?.trim() || !event.situation?.trim();
+}
+
+// Check if a person or any of their events is missing required fields.
 export function personHasIncompleteEvent(person) {
-  return (person.events || []).some(
-    (event) => !event.details?.trim(),
-  );
+  const personMissing =
+    !person.name?.trim() ||
+    !person.age ||
+    !person.gender ||
+    !person.zodiacSign ||
+    !person.activity;
+
+  return personMissing || (person.events || []).some(eventIsMissingRequired);
 }
 
 // Validate score is an integer between 0 and 5.
