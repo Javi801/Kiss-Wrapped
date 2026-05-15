@@ -36,6 +36,7 @@ export default function PersonCard({
   onDeletePerson,
   onAddEvent,
   onUpdateEvent,
+  onDeleteEvent,
   t,
   language,
 }) {
@@ -293,6 +294,10 @@ export default function PersonCard({
             onCancel={() =>
               setEventModal({ open: false, mode: "add", event: null })
             }
+            onDelete={eventModal.mode === "edit" ? () => {
+              onDeleteEvent(person.id, eventModal.event.id);
+              setEventModal({ open: false, mode: "add", event: null });
+            } : undefined}
             t={t}
           />
         </DialogContent>
