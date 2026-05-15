@@ -253,6 +253,8 @@ export const COPY = {
     topTracked: "Top tracked contacts",
     eventsByZodiac: "Events by zodiac sign",
     groupedBySign: "Total events grouped by sign",
+    personsByZodiac: "People by zodiac sign",
+    zodiacDistribution: "Distribution of people across signs",
     eventsByActivity: "Events by activity",
     groupedByActivity: "Total events grouped by person activity",
     personsByGender: "People by gender",
