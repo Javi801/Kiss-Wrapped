@@ -88,6 +88,7 @@ export default function StatsTimeTab({ people, allEvents, t }) {
         }))}
         emptyText={t.noMultiYearPeopleYet}
         rotateXLabels={true}
+        yAxisLabel={t.years}
       />
 
       {personsWithEventsInMultipleYears.length ? (
