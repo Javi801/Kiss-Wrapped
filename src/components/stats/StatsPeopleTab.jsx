@@ -7,6 +7,7 @@ import {
   getColorForCategory,
 } from "@/lib/format";
 import { ZODIAC_OPTIONS } from "@/lib/constants";
+import { calculateAge } from "@/lib/date";
 
 import BarChartCard from "@/components/charts/BarChartCard";
 import PieChartCard from "@/components/charts/PieChartCard";
@@ -99,7 +100,8 @@ export default function StatsPeopleTab({ people, t }) {
     const map = new Map();
 
     for (const person of people) {
-      map.set(String(person.age), (map.get(String(person.age)) || 0) + 1);
+      const age = calculateAge(person.birthYear, person.zodiacSign) ?? person.age;
+      map.set(String(age), (map.get(String(age)) || 0) + 1);
     }
 
     return [...map.entries()]

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { PALETTE, TEXT } from "@/lib/constants";
 import AgeRangeBox from "@/components/stats/AgeRangeBox";
-import { getYearKey } from "@/lib/date";
+import { getYearKey, calculateAge } from "@/lib/date";
 
 // Linear interpolation quantile (R-7 / numpy default).
 function quantileFromSorted(sorted, p) {
@@ -81,7 +81,7 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
   // Shared axis and per-year boxplot rows for the multi-year view.
   const multiYear = useMemo(() => {
     const allAges = combinedPeople
-      .map((p) => p.age)
+      .map((p) => calculateAge(p.birthYear, p.zodiacSign) ?? p.age)
       .filter(Number.isFinite)
       .sort((a, b) => a - b);
     if (!allAges.length) return null;
@@ -90,7 +90,7 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
 
     const rows = yearsData
       .map(({ year, people: yp }) => {
-        const sorted = yp.map((p) => p.age).filter(Number.isFinite).sort((a, b) => a - b);
+        const sorted = yp.map((p) => calculateAge(p.birthYear, p.zodiacSign) ?? p.age).filter(Number.isFinite).sort((a, b) => a - b);
         if (!sorted.length) return null;
         const q1 = quantileFromSorted(sorted, 0.25);
         const q3 = quantileFromSorted(sorted, 0.75);

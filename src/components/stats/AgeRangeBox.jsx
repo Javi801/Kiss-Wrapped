@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { PALETTE, TEXT } from "@/lib/constants";
+import { calculateAge } from "@/lib/date";
 
 /**
  * Displays a boxplot visualization for age distribution.
@@ -8,7 +9,7 @@ import { PALETTE, TEXT } from "@/lib/constants";
  */
 export default function AgeRangeBox({ title, subtitle, people, emptyText, bare = false }) {
   const ages = people
-    .map((p) => p.age)
+    .map((p) => calculateAge(p.birthYear, p.zodiacSign) ?? p.age)
     .filter((age) => Number.isFinite(age))
     .sort((a, b) => a - b);
 

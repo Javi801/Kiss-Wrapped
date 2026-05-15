@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sheet";
 
 import { PALETTE, TEXT } from "@/lib/constants";
-import { formatDisplayDate } from "@/lib/date";
+import { formatDisplayDate, calculateAge } from "@/lib/date";
 import { getFirstEventDate, getLastEventDate } from "@/lib/stats";
 
 import EmptyState from "@/components/people/EmptyState";
@@ -77,10 +77,11 @@ export default function PeopleManagerScreen({
         .toLowerCase();
 
       const matchesQuery = !q || searchable.includes(q);
+      const age = calculateAge(person.birthYear, person.zodiacSign) ?? person.age;
       const matchesMinAge =
-        !filters.minAge || person.age >= Number(filters.minAge);
+        !filters.minAge || age >= Number(filters.minAge);
       const matchesMaxAge =
-        !filters.maxAge || person.age <= Number(filters.maxAge);
+        !filters.maxAge || age <= Number(filters.maxAge);
       const matchesActivity =
         filters.activity.length === 0 || filters.activity.includes(person.activity);
       const matchesZodiac =
