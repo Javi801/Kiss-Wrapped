@@ -37,6 +37,7 @@ export default function PersonCard({
   onAddEvent,
   onUpdateEvent,
   onDeleteEvent,
+  onDeleteAllEvents,
   t,
   language,
 }) {
@@ -167,6 +168,17 @@ export default function PersonCard({
                         <Plus style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
                         {t.addEvent}
                       </Button>
+
+                      {sortedEvents.length > 0 && (
+                        <Button
+                          variant="outline"
+                          style={{ color: "#dc2626" }}
+                          onClick={() => onDeleteAllEvents(person.id)}
+                        >
+                          <Trash2 style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
+                          {t.deleteAllEvents}
+                        </Button>
+                      )}
 
                       <Button
                         variant="outline"
