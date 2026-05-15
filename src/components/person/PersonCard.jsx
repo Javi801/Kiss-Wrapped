@@ -131,18 +131,7 @@ export default function PersonCard({
                   <span>{person.zodiacSign}</span>
                 </div>
 
-                {/* Extra info */}
-                {person.howWeMet && (
-                  <p style={{ marginTop: "0.5rem", ...TEXT.body, color: PALETTE.text }}>
-                    {t.met}: {person.howWeMet}
-                  </p>
-                )}
 
-                {person.detail && (
-                  <p style={{ marginTop: "0.25rem", ...TEXT.body, color: PALETTE.textSoft }}>
-                    {person.detail}
-                  </p>
-                )}
               </div>
 
               {/* Toggle icon */}
