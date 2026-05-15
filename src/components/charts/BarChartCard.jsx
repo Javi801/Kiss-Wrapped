@@ -22,6 +22,7 @@ export default function BarChartCard({
   emptyText,
   rotateXLabels = false,
   customColors = null,
+  yAxisLabel = null,
 }) {
   // Shared container style for consistency across charts.
   const cardStyle = {
@@ -70,7 +71,14 @@ export default function BarChartCard({
                   tickLine={false}
                   axisLine={false}
                   fontSize={12}
-                  width={40}
+                  width={yAxisLabel ? 50 : 40}
+                  label={yAxisLabel ? {
+                    value: yAxisLabel,
+                    angle: -90,
+                    position: "insideLeft",
+                    dx: 15,
+                    style: { fontSize: 11, fill: PALETTE.textSoft },
+                  } : undefined}
                 />
 
                 <Tooltip />
