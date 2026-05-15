@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+
 import { PALETTE, ZODIAC_OPTIONS, TEXT } from "@/lib/constants";
 
 /**
@@ -76,52 +77,76 @@ export default function FiltersPanel({
       {/* Activity filter */}
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <Label>{t.activity}</Label>
-        <Select
-          value={filters.activity}
-          onValueChange={(value) =>
-            setFilters((prev) => ({
-              ...prev,
-              activity: value === "all" ? "" : value,
-            }))
-          }
-        >
-          <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
-            <SelectValue placeholder={t.allActivities} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t.allActivities}</SelectItem>
-            <SelectItem value="studies">{t.studies}</SelectItem>
-            <SelectItem value="works">{t.works}</SelectItem>
-            <SelectItem value="studies and works">{t.studiesWorks}</SelectItem>
-            <SelectItem value="other">{t.other}</SelectItem>
-          </SelectContent>
-        </Select>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+          {[
+            { value: "studies", label: t.studies },
+            { value: "works", label: t.works },
+            { value: "studies and works", label: t.studiesWorks },
+            { value: "other", label: t.other },
+          ].map(({ value, label }) => {
+            const isSelected = filters.activity.includes(value);
+            return (
+              <button
+                key={value}
+                onClick={() =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    activity: isSelected
+                      ? prev.activity.filter((a) => a !== value)
+                      : [...prev.activity, value],
+                  }))
+                }
+                style={{
+                  padding: "0.25rem 0.75rem",
+                  borderRadius: "9999px",
+                  border: `1px solid ${isSelected ? PALETTE.rose : PALETTE.inputBorder}`,
+                  backgroundColor: isSelected ? PALETTE.rose : "rgba(255,255,255,0.9)",
+                  color: isSelected ? "white" : PALETTE.text,
+                  fontSize: "0.875rem",
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Zodiac filter */}
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <Label>{t.zodiacSign}</Label>
-        <Select
-          value={filters.zodiacSign}
-          onValueChange={(value) =>
-            setFilters((prev) => ({
-              ...prev,
-              zodiacSign: value === "all" ? "" : value,
-            }))
-          }
-        >
-          <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
-            <SelectValue placeholder={t.allSigns} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t.allSigns}</SelectItem>
-            {ZODIAC_OPTIONS[language].map((item) => (
-              <SelectItem key={item} value={item}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+          {ZODIAC_OPTIONS[language].map((item) => {
+            const isSelected = filters.zodiacSign.includes(item);
+            return (
+              <button
+                key={item}
+                onClick={() =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    zodiacSign: isSelected
+                      ? prev.zodiacSign.filter((z) => z !== item)
+                      : [...prev.zodiacSign, item],
+                  }))
+                }
+                style={{
+                  padding: "0.25rem 0.75rem",
+                  borderRadius: "9999px",
+                  border: `1px solid ${isSelected ? PALETTE.rose : PALETTE.inputBorder}`,
+                  backgroundColor: isSelected ? PALETTE.rose : "rgba(255,255,255,0.9)",
+                  color: isSelected ? "white" : PALETTE.text,
+                  fontSize: "0.875rem",
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                }}
+              >
                 {item}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Grouping mode */}
@@ -162,8 +187,8 @@ export default function FiltersPanel({
           setFilters({
             minAge: "",
             maxAge: "",
-            activity: "",
-            zodiacSign: "",
+            activity: [],
+            zodiacSign: [],
           });
           setGroupBy("name");
           setSortBy("name");

@@ -41,8 +41,8 @@ export default function PeopleManagerScreen({
   const [filters, setFilters] = useState({
     minAge: "",
     maxAge: "",
-    activity: "",
-    zodiacSign: "",
+    activity: [],
+    zodiacSign: [],
   });
 
   // Current grouping mode.
@@ -75,9 +75,9 @@ export default function PeopleManagerScreen({
       const matchesMaxAge =
         !filters.maxAge || person.age <= Number(filters.maxAge);
       const matchesActivity =
-        !filters.activity || person.activity === filters.activity;
+        filters.activity.length === 0 || filters.activity.includes(person.activity);
       const matchesZodiac =
-        !filters.zodiacSign || person.zodiacSign === filters.zodiacSign;
+        filters.zodiacSign.length === 0 || filters.zodiacSign.includes(person.zodiacSign);
 
       return (
         matchesQuery &&
@@ -263,8 +263,8 @@ export default function PeopleManagerScreen({
                 setFilters({
                   minAge: "",
                   maxAge: "",
-                  activity: "",
-                  zodiacSign: "",
+                  activity: [],
+                  zodiacSign: [],
                 });
               }}
             >
