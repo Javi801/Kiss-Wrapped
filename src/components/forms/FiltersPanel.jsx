@@ -1,4 +1,4 @@
-import { RotateCcw } from "lucide-react";
+import { Briefcase, Calendar, RotateCcw, SlidersHorizontal, Star } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,13 +12,84 @@ import {
 } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
 
-
 import { PALETTE, ZODIAC_OPTIONS, TEXT } from "@/lib/constants";
 
-/**
- * Renders the filters and organization controls for the people list.
- * It updates external state provided by the parent screen.
- */
+const MONTH_NUM = {
+  january:"01", february:"02", march:"03", april:"04", may:"05", june:"06",
+  july:"07", august:"08", september:"09", october:"10", november:"11", december:"12",
+  enero:"01", febrero:"02", marzo:"03", abril:"04", mayo:"05", junio:"06",
+  julio:"07", agosto:"08", septiembre:"09", octubre:"10", noviembre:"11", diciembre:"12",
+};
+
+function formatZodiacDates(item) {
+  const open = item.indexOf("(");
+  if (open === -1) return item;
+  const prefix = item.slice(0, open).trimEnd();
+  const inner = item.slice(open + 1, item.lastIndexOf(")"));
+  // English: "Month DD - Month DD"
+  const en = inner.match(/^(\w+)\s+(\d+)\s*-\s*(\w+)\s+(\d+)$/);
+  if (en) {
+    const [, m1, d1, m2, d2] = en;
+    return `${prefix} (${d1.padStart(2,"0")}/${MONTH_NUM[m1.toLowerCase()]} - ${d2.padStart(2,"0")}/${MONTH_NUM[m2.toLowerCase()]})`;
+  }
+  // Spanish: "DD Month - DD Month"
+  const es = inner.match(/^(\d+)\s+(\w+)\s*-\s*(\d+)\s+(\w+)$/);
+  if (es) {
+    const [, d1, m1, d2, m2] = es;
+    return `${prefix} (${d1.padStart(2,"0")}/${MONTH_NUM[m1.toLowerCase()]} - ${d2.padStart(2,"0")}/${MONTH_NUM[m2.toLowerCase()]})`;
+  }
+  return item;
+}
+
+const EMPTY_FILTERS = {
+  minAge: "",
+  maxAge: "",
+  activity: [],
+  zodiacSign: [],
+  eventDateFrom: "",
+  eventDateTo: "",
+};
+
+const divider = (
+  <div style={{ height: "1px", background: `linear-gradient(90deg, ${PALETTE.line}, transparent)` }} />
+);
+
+function SectionLabel({ icon: Icon, label }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", marginBottom: "0.625rem" }}>
+      <Icon size={12} style={{ color: PALETTE.rose, flexShrink: 0 }} />
+      <span style={{ ...TEXT.label, textTransform: "uppercase", letterSpacing: "0.09em", color: PALETTE.rose }}>
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function Chip({ label, selected, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        padding: "0.3rem 0.8rem",
+        borderRadius: "9999px",
+        border: selected ? "none" : `1px solid ${PALETTE.inputBorder}`,
+        background: selected
+          ? `linear-gradient(90deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`
+          : "rgba(255,255,255,0.75)",
+        color: selected ? "white" : PALETTE.textSoft,
+        ...TEXT.body,
+        fontWeight: selected ? "600" : "400",
+        cursor: "pointer",
+        transition: "all 0.15s",
+        boxShadow: selected ? "0 1px 4px rgba(226,115,150,0.28)" : "none",
+      }}
+    >
+      {label}
+    </button>
+  );
+}
+
 export default function FiltersPanel({
   filters,
   setFilters,
@@ -30,203 +101,178 @@ export default function FiltersPanel({
   t,
   language,
 }) {
-  // Reuse the same style across all form controls in the panel.
   const inputStyle = {
     borderColor: PALETTE.inputBorder,
-    backgroundColor: "rgba(255,255,255,0.9)",
+    backgroundColor: "rgba(255,255,255,0.75)",
+    ...TEXT.input,
   };
+
+  function toggleActivity(value) {
+    setFilters((prev) => ({
+      ...prev,
+      activity: prev.activity.includes(value)
+        ? prev.activity.filter((a) => a !== value)
+        : [...prev.activity, value],
+    }));
+  }
+
+  function toggleZodiac(value) {
+    setFilters((prev) => ({
+      ...prev,
+      zodiacSign: prev.zodiacSign.includes(value)
+        ? prev.zodiacSign.filter((z) => z !== value)
+        : [...prev.zodiacSign, value],
+    }));
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-      {/* Panel heading */}
-      <div>
-        <h3 style={{ ...TEXT.subheading, fontWeight: "600", color: PALETTE.text }}>
-          {t.filtersOrg}
-        </h3>
-        <p style={{ ...TEXT.body, color: PALETTE.textSoft }}>
-          {t.refineResults}
+
+      {/* Reset + results count */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "-0.875rem 0" }}>
+        <p style={{ ...TEXT.caption, color: PALETTE.textSoft }}>
+          {t.showingResults}{" "}
+          <span style={{ ...TEXT.label, color: PALETTE.rose }}>{peopleCount}</span>{" "}
+          {peopleCount === 1 ? t.result : t.results}
         </p>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="rounded-2xl"
+          style={{
+            color: PALETTE.textSoft,
+            gap: "0.375rem",
+            fontSize: "0.8rem",
+          }}
+          onClick={() => {
+            setFilters(EMPTY_FILTERS);
+            setGroupBy("name");
+            setSortBy("name");
+          }}
+        >
+          <RotateCcw size={13} />
+          {t.resetFilters}
+        </Button>
       </div>
 
+      {divider}
+
+      {/* Group & sort */}
+      <div>
+        <SectionLabel icon={SlidersHorizontal} label={`${t.groupBy} / ${t.sortBy}`} />
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+          <Label style={{ ...TEXT.caption, color: PALETTE.textSoft }}>{t.groupBy}</Label>
+          <Select value={groupBy} onValueChange={setGroupBy}>
+            <SelectTrigger className="rounded-2xl" style={inputStyle}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="name">{t.groupName}</SelectItem>
+              <SelectItem value="lastEventDate">{t.groupLastEvent}</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Label style={{ ...TEXT.caption, color: PALETTE.textSoft, marginTop: "0.25rem" }}>{t.sortBy}</Label>
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="rounded-2xl" style={inputStyle}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="name">{t.sortName}</SelectItem>
+              <SelectItem value="firstEventDate">{t.sortFirst}</SelectItem>
+              <SelectItem value="lastEventDate">{t.sortLast}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {divider}
+
       {/* Age range */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-        <Label>{t.ageRange}</Label>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "0.75rem" }}>
+      <div>
+        <SectionLabel icon={SlidersHorizontal} label={t.ageRange} />
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
           <Input
             type="number"
             placeholder={t.min}
             value={filters.minAge}
-            onChange={(e) =>
-              setFilters((prev) => ({ ...prev, minAge: e.target.value }))
-            }
+            onChange={(e) => setFilters((prev) => ({ ...prev, minAge: e.target.value }))}
             className="rounded-2xl"
-            style={{ ...inputStyle }}
+            style={inputStyle}
           />
           <Input
             type="number"
             placeholder={t.max}
             value={filters.maxAge}
-            onChange={(e) =>
-              setFilters((prev) => ({ ...prev, maxAge: e.target.value }))
-            }
+            onChange={(e) => setFilters((prev) => ({ ...prev, maxAge: e.target.value }))}
             className="rounded-2xl"
-            style={{ ...inputStyle }}
+            style={inputStyle}
           />
         </div>
       </div>
 
-      {/* Activity filter */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-        <Label>{t.activity}</Label>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+      {divider}
+
+      {/* Activity */}
+      <div>
+        <SectionLabel icon={Briefcase} label={t.activity} />
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
           {[
             { value: "studies", label: t.studies },
             { value: "works", label: t.works },
             { value: "studies and works", label: t.studiesWorks },
             { value: "other", label: t.other },
-          ].map(({ value, label }) => {
-            const isSelected = filters.activity.includes(value);
-            return (
-              <button
-                key={value}
-                onClick={() =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    activity: isSelected
-                      ? prev.activity.filter((a) => a !== value)
-                      : [...prev.activity, value],
-                  }))
-                }
-                style={{
-                  padding: "0.25rem 0.75rem",
-                  borderRadius: "9999px",
-                  border: `1px solid ${isSelected ? PALETTE.rose : PALETTE.inputBorder}`,
-                  backgroundColor: isSelected ? PALETTE.rose : "rgba(255,255,255,0.9)",
-                  color: isSelected ? "white" : PALETTE.text,
-                  fontSize: "0.875rem",
-                  cursor: "pointer",
-                  transition: "all 0.15s",
-                }}
-              >
-                {label}
-              </button>
-            );
-          })}
+          ].map(({ value, label }) => (
+            <Chip
+              key={value}
+              label={label}
+              selected={filters.activity.includes(value)}
+              onClick={() => toggleActivity(value)}
+            />
+          ))}
         </div>
       </div>
 
-      {/* Zodiac filter */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-        <Label>{t.zodiacSign}</Label>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-          {ZODIAC_OPTIONS[language].map((item) => {
-            const isSelected = filters.zodiacSign.includes(item);
-            return (
-              <button
-                key={item}
-                onClick={() =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    zodiacSign: isSelected
-                      ? prev.zodiacSign.filter((z) => z !== item)
-                      : [...prev.zodiacSign, item],
-                  }))
-                }
-                style={{
-                  padding: "0.25rem 0.75rem",
-                  borderRadius: "9999px",
-                  border: `1px solid ${isSelected ? PALETTE.rose : PALETTE.inputBorder}`,
-                  backgroundColor: isSelected ? PALETTE.rose : "rgba(255,255,255,0.9)",
-                  color: isSelected ? "white" : PALETTE.text,
-                  fontSize: "0.875rem",
-                  cursor: "pointer",
-                  transition: "all 0.15s",
-                }}
-              >
-                {item}
-              </button>
-            );
-          })}
+      {divider}
+
+      {/* Zodiac */}
+      <div>
+        <SectionLabel icon={Star} label={t.zodiacSign} />
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+          {ZODIAC_OPTIONS[language].map((item) => (
+            <Chip
+              key={item}
+              label={formatZodiacDates(item)}
+              selected={filters.zodiacSign.includes(item)}
+              onClick={() => toggleZodiac(item)}
+            />
+          ))}
         </div>
       </div>
+
+      {divider}
 
       {/* Event date range */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-        <Label>{t.eventDateRange}</Label>
+      <div>
+        <SectionLabel icon={Calendar} label={t.eventDateRange} />
         <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
           <DatePicker
             value={filters.eventDateFrom}
             onChange={(value) => setFilters((prev) => ({ ...prev, eventDateFrom: value }))}
             placeholder={t.dateFrom}
             className="rounded-2xl"
-            style={{ ...inputStyle }}
+            style={inputStyle}
           />
           <DatePicker
             value={filters.eventDateTo}
             onChange={(value) => setFilters((prev) => ({ ...prev, eventDateTo: value }))}
             placeholder={t.dateTo}
             className="rounded-2xl"
-            style={{ ...inputStyle }}
+            style={inputStyle}
           />
         </div>
       </div>
 
-      {/* Grouping mode */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-        <Label>{t.groupBy}</Label>
-        <Select value={groupBy} onValueChange={setGroupBy}>
-          <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="name">{t.groupName}</SelectItem>
-            <SelectItem value="lastEventDate">{t.groupLastEvent}</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Sorting mode */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-        <Label>{t.sortBy}</Label>
-        <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="name">{t.sortName}</SelectItem>
-            <SelectItem value="firstEventDate">{t.sortFirst}</SelectItem>
-            <SelectItem value="lastEventDate">{t.sortLast}</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Reset action */}
-      <Button
-        variant="outline"
-        className="rounded-2xl"
-        style={{ width: "100%", ...inputStyle }}
-        onClick={() => {
-          setFilters({
-            minAge: "",
-            maxAge: "",
-            activity: [],
-            zodiacSign: [],
-            eventDateFrom: "",
-            eventDateTo: "",
-          });
-          setGroupBy("name");
-          setSortBy("name");
-        }}
-      >
-        <RotateCcw style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
-        {t.resetFilters}
-      </Button>
-
-      {/* Results count */}
-      <p style={{ ...TEXT.caption, color: PALETTE.textSoft }}>
-        {t.showingResults} {peopleCount}{" "}
-        {peopleCount === 1 ? t.result : t.results}.
-      </p>
     </div>
   );
 }

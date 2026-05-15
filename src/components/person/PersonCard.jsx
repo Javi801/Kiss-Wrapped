@@ -24,8 +24,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-import { PALETTE, TEXT } from "@/lib/constants";
-import { formatDisplayDate } from "@/lib/date";
+import { PALETTE, TEXT, abbreviateZodiacMonths } from "@/lib/constants";
+import { formatShortDate } from "@/lib/date";
 import {
   translateActivity,
   translateGender,
@@ -106,13 +106,6 @@ export default function PersonCard({
                     {person.name}
                   </h3>
 
-                  <Badge
-                    className="rounded-full"
-                    style={{ border: "none", paddingLeft: "0.75rem", paddingRight: "0.75rem", paddingTop: "0.25rem", paddingBottom: "0.25rem", fontSize: "11px", fontWeight: "600", backgroundColor: "#ffe2ec", color: PALETTE.deep }}
-                  >
-                    {translateActivity(person.activity, t)}
-                  </Badge>
-
                   {hasIncompleteEvent && (
                     <Badge className="rounded-full" style={{ border: "none", backgroundColor: "#fef3c7", color: "#b45309" }}>
                       {t.missingEventDetailsBadge}
@@ -128,21 +121,12 @@ export default function PersonCard({
                   <span>•</span>
                   <span>{translateGender(person.gender, t)}</span>
                   <span>•</span>
-                  <span>{person.zodiacSign}</span>
+                  <span>{translateActivity(person.activity, t)}</span>
+                  <span>•</span>
+                  <span>{abbreviateZodiacMonths(person.zodiacSign)}</span>
                 </div>
 
-                {/* Extra info */}
-                {person.howWeMet && (
-                  <p style={{ marginTop: "0.5rem", ...TEXT.body, color: PALETTE.text }}>
-                    {t.met}: {person.howWeMet}
-                  </p>
-                )}
 
-                {person.detail && (
-                  <p style={{ marginTop: "0.25rem", ...TEXT.body, color: PALETTE.textSoft }}>
-                    {person.detail}
-                  </p>
-                )}
               </div>
 
               {/* Toggle icon */}
@@ -164,7 +148,23 @@ export default function PersonCard({
                   exit={{ height: 0, opacity: 0 }}
                   style={{ overflow: "hidden" }}
                 >
-                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", padding: "1.25rem" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", padding: "0rem 1.25rem 1.25rem" }}>
+                    {/* Extra info */}
+                    {(person.howWeMet || person.detail) && (
+                      <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                        {person.howWeMet && (
+                          <p style={{ ...TEXT.body, color: PALETTE.text }}>
+                            {t.met}: {person.howWeMet}
+                          </p>
+                        )}
+                        {person.detail && (
+                          <p style={{ ...TEXT.body, color: PALETTE.textSoft }}>
+                            {person.detail}
+                          </p>
+                        )}
+                      </div>
+                    )}
+
                     {/* Actions */}
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
                       <Button onClick={() => setEditingPerson(true)}>
@@ -257,7 +257,7 @@ export default function PersonCard({
                             <div style={{ display: "flex", justifyContent: "space-between" }}>
                               <span>
                                 <Calendar style={{ display: "inline", marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
-                                {formatDisplayDate(event.date)}
+                                {formatShortDate(event.date, language)}
                               </span>
 
                               {hasScore(event.score) && (

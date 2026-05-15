@@ -82,6 +82,22 @@ export const GENDER_COLORS = {
   other: "#8fc9b5",
 };
 
+const MONTH_ABBR = {
+  January: "Jan", February: "Feb", March: "Mar", April: "Apr",
+  May: "May", June: "Jun", July: "Jul", August: "Aug",
+  September: "Sep", October: "Oct", November: "Nov", December: "Dec",
+  enero: "ene", febrero: "feb", marzo: "mar", abril: "abr",
+  mayo: "may", junio: "jun", julio: "jul", agosto: "ago",
+  septiembre: "sep", octubre: "oct", noviembre: "nov", diciembre: "dic",
+};
+
+export function abbreviateZodiacMonths(zodiacString) {
+  return zodiacString.replace(
+    /January|February|March|April|May|June|July|August|September|October|November|December|enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre/g,
+    (m) => MONTH_ABBR[m] ?? m,
+  );
+}
+
 // Zodiac sign options by language. Aquarius
 export const ZODIAC_OPTIONS = {
   en: [
@@ -193,7 +209,7 @@ export const COPY = {
     personListTitle: "People",
     searchPlaceholder: "Search by name, detail, or event notes",
     filters: "Filters",
-    refineList: "Refine people list",
+    refineList: "Filter list",
     filtersOrg: "Filters & organization",
     refineResults: "Refine results and reorganize the list.",
     ageRange: "Age range",
@@ -437,7 +453,7 @@ export const COPY = {
     personListTitle: "Personas",
     searchPlaceholder: "Buscar por nombre, detalle o notas de eventos",
     filters: "Filtros",
-    refineList: "Refinar lista",
+    refineList: "Filtrar lista",
     filtersOrg: "Filtros y organización",
     refineResults: "Refina resultados y reorganiza la lista.",
     ageRange: "Rango de edad",

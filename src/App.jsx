@@ -35,6 +35,10 @@ export default function KissRecorderApp() {
 
   // Navigation history stack for hardware back button support.
   const screenHistoryRef = useRef([]);
+
+  // When a modal/sheet is open it registers a close callback here.
+  // The back button handler checks this before doing screen navigation.
+  const modalBackRef = useRef(null);
   // Ref keeps the latest screen value accessible inside the Capacitor listener.
   const screenRef = useRef("intro");
 
@@ -74,6 +78,11 @@ export default function KissRecorderApp() {
    */
   useEffect(() => {
     const listenerPromise = CapacitorApp.addListener("backButton", () => {
+      if (modalBackRef.current) {
+        modalBackRef.current();
+        return;
+      }
+
       const current = screenRef.current;
 
       if (current === "add") {
@@ -362,6 +371,7 @@ export default function KissRecorderApp() {
               onDeleteAllEvents={deleteAllEvents}
               t={t}
               language={language}
+              modalBackRef={modalBackRef}
             />
           ) : null}
 
@@ -377,6 +387,7 @@ export default function KissRecorderApp() {
               bottom: 0,
               left: 0,
               right: 0,
+              zIndex: 50,
               backdropFilter: "blur(8px)",
               borderTop: `1px solid ${PALETTE.inputBorder}`,
               backgroundColor: "rgba(255,255,255,0.8)",
