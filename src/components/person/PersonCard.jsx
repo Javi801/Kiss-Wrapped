@@ -148,7 +148,7 @@ export default function PersonCard({
                   exit={{ height: 0, opacity: 0 }}
                   style={{ overflow: "hidden" }}
                 >
-                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", padding: "1.25rem" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", padding: "0rem 1.25rem 1.25rem" }}>
                     {/* Extra info */}
                     {(person.howWeMet || person.detail) && (
                       <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
