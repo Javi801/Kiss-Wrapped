@@ -216,8 +216,8 @@ export default function PeopleManagerScreen({
           <SheetContent
             side="right"
             style={{
-              width: "92%",
-              maxWidth: "24rem",
+              width: "80%",
+              maxWidth: "20rem",
               overflowY: "auto",
               borderLeftColor: PALETTE.cardBorder,
               background: `linear-gradient(180deg, #f4edfb 0%, #eae5f7 50%, #d6ecfe 100%)`,
