@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Search, Filter, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -19,10 +19,8 @@ import EmptyState from "@/components/people/EmptyState";
 import PersonCard from "@/components/person/PersonCard";
 import FiltersPanel from "@/components/forms/FiltersPanel";
 
-/**
- * Displays the full people list with search, filters, sorting, and grouping.
- * It keeps all list-specific UI state isolated from the app root.
- */
+const ALPHA_INDEX = ["#", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")];
+
 export default function PeopleManagerScreen({
   people,
   onUpdatePerson,
@@ -35,10 +33,8 @@ export default function PeopleManagerScreen({
   language,
   modalBackRef,
 }) {
-  // Search query entered by the user.
   const [query, setQuery] = useState("");
 
-  // Active filter values for the list.
   const [filters, setFilters] = useState({
     minAge: "",
     maxAge: "",
@@ -48,29 +44,21 @@ export default function PeopleManagerScreen({
     eventDateTo: "",
   });
 
-  // Current grouping mode.
   const [groupBy, setGroupBy] = useState("name");
-
-  // Current sorting mode.
   const [sortBy, setSortBy] = useState("name");
-
-  // Controlled open state for the filters Sheet.
   const [filterOpen, setFilterOpen] = useState(false);
+
+  const alphabetRef = useRef(null);
 
   function handleFilterOpenChange(open) {
     setFilterOpen(open);
     modalBackRef.current = open ? () => setFilterOpen(false) : null;
   }
 
-  /**
-   * Filters and sorts the people list.
-   * Search checks name, detail, howWeMet, and event details.
-   */
   const filteredPeople = useMemo(() => {
     const q = query.trim().toLowerCase();
 
     const result = people.filter((person) => {
-      // Build one searchable text block for simple matching.
       const searchable = [
         person.name,
         person.detail || "",
@@ -109,28 +97,21 @@ export default function PeopleManagerScreen({
       );
     });
 
-    // Apply the selected ordering after filtering.
     return [...result].sort((a, b) => {
       if (sortBy === "name") {
         return a.name.localeCompare(b.name);
       }
-
       if (sortBy === "firstEventDate") {
         const aDate = getFirstEventDate(a) || "9999.99.99";
         const bDate = getFirstEventDate(b) || "9999.99.99";
         return aDate.localeCompare(bDate);
       }
-
       const aDate = getLastEventDate(a) || "0000.00.00";
       const bDate = getLastEventDate(b) || "0000.00.00";
       return bDate.localeCompare(aDate);
     });
   }, [people, query, filters, sortBy]);
 
-  /**
-   * Groups already filtered people based on the selected grouping mode.
-   * The output is normalized into sorted [groupName, members] tuples.
-   */
   const grouped = useMemo(() => {
     const groups = {};
 
@@ -138,7 +119,8 @@ export default function PeopleManagerScreen({
       let key = t.ungrouped;
 
       if (groupBy === "name") {
-        key = person.name[0]?.toUpperCase() || "#";
+        const first = person.name[0]?.toUpperCase() || "#";
+        key = /^[A-Z]$/.test(first) ? first : "#";
       }
 
       if (groupBy === "lastEventDate") {
@@ -155,18 +137,36 @@ export default function PeopleManagerScreen({
     return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
   }, [filteredPeople, groupBy, t]);
 
+  // Alphabet sidebar is only meaningful when grouping by name.
+  const showAlphabet = groupBy === "name";
+
+  const activeLetters = useMemo(
+    () => new Set(grouped.map(([g]) => g)),
+    [grouped],
+  );
+
+  function scrollToGroup(letter) {
+    const el = document.getElementById(`group-${letter}`);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function handleAlphabetTouchMove(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+    const letter = target?.dataset?.letter;
+    if (letter && activeLetters.has(letter)) scrollToGroup(letter);
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <div>
-        <h2
-          style={{ ...TEXT.heading, letterSpacing: "-0.025em", color: PALETTE.text }}
-        >
+        <h2 style={{ ...TEXT.heading, letterSpacing: "-0.025em", color: PALETTE.text }}>
           {t.personListTitle}
         </h2>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-        {/* Search input */}
         <div style={{ position: "relative", flex: "1 1 0%" }}>
           <Search
             style={{ pointerEvents: "none", position: "absolute", left: "0.75rem", top: "50%", height: "1rem", width: "1rem", transform: "translateY(-50%)", color: PALETTE.rose }}
@@ -184,7 +184,6 @@ export default function PeopleManagerScreen({
           />
         </div>
 
-        {/* Filters drawer */}
         <Sheet open={filterOpen} onOpenChange={handleFilterOpenChange}>
           <SheetTrigger asChild>
             <Button
@@ -257,42 +256,105 @@ export default function PeopleManagerScreen({
       </div>
 
       {filteredPeople.length ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-          {grouped.map(([group, members]) => (
-            <div key={group} style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-              {/* Group header */}
-              <div
-                className="rounded-2xl"
-                style={{ position: "sticky", top: 0, zIndex: 10, paddingLeft: "0.75rem", paddingRight: "0.75rem", paddingTop: "0.5rem", paddingBottom: "0.5rem", backdropFilter: "blur(8px)", backgroundColor: PALETTE.surfaceBg }}
-              >
-                <p
-                  style={{ ...TEXT.label, textTransform: "uppercase", letterSpacing: "0.16em", color: PALETTE.rose }}
-                >
-                  {groupBy === "lastEventDate" && group !== t.noEvents
-                    ? formatDisplayDate(group)
-                    : group}
-                </p>
-              </div>
-
-              {/* Group members */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                {members.map((person) => (
-                  <PersonCard
-                    key={person.id}
-                    person={person}
-                    onUpdatePerson={onUpdatePerson}
-                    onDeletePerson={onDeletePerson}
-                    onAddEvent={onAddEvent}
-                    onUpdateEvent={onUpdateEvent}
-                    onDeleteEvent={onDeleteEvent}
-                    onDeleteAllEvents={onDeleteAllEvents}
-                    t={t}
-                    language={language}
-                  />
-                ))}
-              </div>
+        <div style={{ display: "flex", gap: "0.75rem" }}>
+          {/* Alphabet index — sticky strip on the left */}
+          {showAlphabet && (
+            <div
+              ref={alphabetRef}
+              onTouchMove={handleAlphabetTouchMove}
+              style={{
+                width: "14px",
+                flexShrink: 0,
+                position: "sticky",
+                top: "1rem",
+                alignSelf: "flex-start",
+                height: "calc(100svh - 9rem)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingTop: "0.125rem",
+                paddingBottom: "0.125rem",
+              }}
+            >
+              {ALPHA_INDEX.map((letter) => {
+                const active = activeLetters.has(letter);
+                return (
+                  <button
+                    key={letter}
+                    data-letter={letter}
+                    onClick={() => active && scrollToGroup(letter)}
+                    style={{
+                      all: "unset",
+                      display: "block",
+                      textAlign: "center",
+                      width: "14px",
+                      fontSize: "0.55rem",
+                      fontWeight: active ? "700" : "400",
+                      lineHeight: 1,
+                      color: active ? PALETTE.rose : PALETTE.textSoft,
+                      opacity: active ? 1 : 0.3,
+                      cursor: active ? "pointer" : "default",
+                      transition: "color 0.15s, opacity 0.15s",
+                      WebkitTapHighlightColor: "transparent",
+                    }}
+                  >
+                    {letter}
+                  </button>
+                );
+              })}
             </div>
-          ))}
+          )}
+
+          {/* Grouped list */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {grouped.map(([group, members]) => (
+              <div key={group}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginBottom: "1.25rem" }}>
+                  {/* Group header */}
+                  <div
+                    id={`group-${group}`}
+                    className="rounded-2xl"
+                    style={{
+                      position: "sticky",
+                      top: 0,
+                      zIndex: 10,
+                      paddingLeft: "0.75rem",
+                      paddingRight: "0.75rem",
+                      paddingTop: "0.5rem",
+                      paddingBottom: "0.5rem",
+                      backdropFilter: "blur(8px)",
+                      backgroundColor: PALETTE.surfaceBg,
+                    }}
+                  >
+                    <p style={{ ...TEXT.label, textTransform: "uppercase", letterSpacing: "0.16em", color: PALETTE.rose }}>
+                      {groupBy === "lastEventDate" && group !== t.noEvents
+                        ? formatDisplayDate(group)
+                        : group}
+                    </p>
+                  </div>
+
+                  {/* Group members */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                    {members.map((person) => (
+                      <PersonCard
+                        key={person.id}
+                        person={person}
+                        onUpdatePerson={onUpdatePerson}
+                        onDeletePerson={onDeletePerson}
+                        onAddEvent={onAddEvent}
+                        onUpdateEvent={onUpdateEvent}
+                        onDeleteEvent={onDeleteEvent}
+                        onDeleteAllEvents={onDeleteAllEvents}
+                        t={t}
+                        language={language}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <EmptyState
