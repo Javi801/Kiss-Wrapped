@@ -77,6 +77,7 @@ export default function FiltersPanel({
   const inputStyle = {
     borderColor: PALETTE.inputBorder,
     backgroundColor: "rgba(255,255,255,0.75)",
+    ...TEXT.input,
   };
 
   function toggleActivity(value) {
