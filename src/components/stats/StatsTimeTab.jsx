@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 
 import BarChartCard from "@/components/charts/BarChartCard";
+import DumbbellChartCard from "@/components/charts/DumbbellChartCard";
+import HeatmapChartCard from "@/components/charts/HeatmapChartCard";
 import { PALETTE, TEXT } from "@/lib/constants";
 import { getMonthKey, getYearKey } from "@/lib/date";
 
@@ -39,9 +41,21 @@ export default function StatsTimeTab({ people, allEvents, t }) {
       .map(([label, value]) => ({ label, value }));
   }, [allEvents]);
 
+  // Full year range with no gaps, derived from all events across all people.
+  const allYears = useMemo(() => {
+    const nums = allEvents
+      .map((e) => getYearKey(e.date))
+      .filter(Boolean)
+      .map(Number);
+    if (!nums.length) return [];
+    const min = Math.min(...nums);
+    const max = Math.max(...nums);
+    return Array.from({ length: max - min + 1 }, (_, i) => String(min + i));
+  }, [allEvents]);
+
   /**
-   * Finds people whose events span two or more distinct years.
-   * Each entry keeps both the count and the list of years.
+   * People whose events span two or more distinct years.
+   * yearCounts maps each year string to the number of events that year.
    */
   const personsWithEventsInMultipleYears = useMemo(
     () =>
@@ -55,7 +69,13 @@ export default function StatsTimeTab({ people, allEvents, t }) {
             ),
           ].sort();
 
-          return { label: person.name, value: years.length, years };
+          const yearCounts = {};
+          for (const event of person.events || []) {
+            const y = getYearKey(event.date);
+            if (y) yearCounts[y] = (yearCounts[y] || 0) + 1;
+          }
+
+          return { label: person.name, value: years.length, years, yearCounts };
         })
         .filter((item) => item.value >= 2)
         .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label)),
@@ -92,6 +112,22 @@ export default function StatsTimeTab({ people, allEvents, t }) {
         rotateXLabels={true}
         yAxisLabel={t.years}
         tooltipUnit={{ one: t.chartYear, many: t.years }}
+      />
+
+      <DumbbellChartCard
+        title={t.dumbbellChart}
+        subtitle={t.dumbbellDesc}
+        data={personsWithEventsInMultipleYears}
+        allYears={allYears}
+        emptyText={t.noMultiYearPeopleYet}
+      />
+
+      <HeatmapChartCard
+        title={t.heatmapChart}
+        subtitle={t.heatmapDesc}
+        data={personsWithEventsInMultipleYears}
+        allYears={allYears}
+        emptyText={t.noMultiYearPeopleYet}
       />
 
       {personsWithEventsInMultipleYears.length ? (
