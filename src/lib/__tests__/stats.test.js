@@ -267,4 +267,43 @@ describe("getStatsData", () => {
       numberOfEventsByNumberOfPersons.find((d) => d.label === "1").value
     ).toBe(1);
   });
+
+  it("sorts personsWithEventsInMultipleYears by count desc, then alphabetically on tie", () => {
+    const people = [
+      makePerson("Zoe", [makeEvent("2023.01.01"), makeEvent("2024.01.01")]),
+      makePerson("Ana", [makeEvent("2023.01.01"), makeEvent("2024.01.01")]),
+      makePerson("Bob", [makeEvent("2022.01.01"), makeEvent("2023.01.01"), makeEvent("2024.01.01")]),
+    ];
+    const result = getStatsData(people, t).personsWithEventsInMultipleYears;
+    expect(result[0].label).toBe("Bob");
+    expect(result[1].label).toBe("Ana");
+    expect(result[2].label).toBe("Zoe");
+  });
+
+  it("sorts eventsByZodiac by event count descending", () => {
+    const people = [
+      makePerson("Ana", [makeEvent("2024.01.01"), makeEvent("2024.02.01")], {
+        zodiacSign: "♒ Aquarius (January 20 - February 19)",
+      }),
+      makePerson("Bob", [makeEvent("2024.01.01")], {
+        zodiacSign: "♓ Pisces (February 20 - March 20)",
+      }),
+    ];
+    const { eventsByZodiac } = getStatsData(people, t);
+    expect(eventsByZodiac[0].label).toBe("Aquarius");
+    expect(eventsByZodiac[1].label).toBe("Pisces");
+  });
+
+  it("sorts eventsByActivity by event count descending", () => {
+    const people = [
+      makePerson("Ana", [makeEvent("2024.01.01"), makeEvent("2024.02.01")], {
+        activity: "works",
+      }),
+      makePerson("Bob", [makeEvent("2024.01.01")], {
+        activity: "studies",
+      }),
+    ];
+    const { eventsByActivity } = getStatsData(people, t);
+    expect(eventsByActivity[0].value).toBeGreaterThan(eventsByActivity[1].value);
+  });
 });
