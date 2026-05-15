@@ -1,6 +1,6 @@
 import { SCORE_OPTIONS } from "@/lib/constants";
 import { hasScore, renderKisses, getShortZodiacLabel, translateActivity, translateGender } from "@/lib/format";
-import { getMonthKey, getYearKey } from "@/lib/date";
+import { getMonthKey, getYearKey, calculateAge } from "@/lib/date";
 
 /**
  * Returns the earliest event date for a person.
@@ -156,7 +156,8 @@ export function getStatsData(people, t) {
   const personsByAge = (() => {
     const map = new Map();
     for (const person of people) {
-      map.set(String(person.age), (map.get(String(person.age)) || 0) + 1);
+      const age = calculateAge(person.birthYear, person.zodiacSign) ?? person.age;
+      map.set(String(age), (map.get(String(age)) || 0) + 1);
     }
     return [...map.entries()]
       .sort((a, b) => Number(a[0]) - Number(b[0]))
