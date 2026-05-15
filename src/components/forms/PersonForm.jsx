@@ -45,7 +45,7 @@ export default function PersonForm({
   const [errors, setErrors] = useState({});
   const [birthdayAlreadyHappened, setBirthdayAlreadyHappened] = useState(false);
 
-  const showBirthdayCheckbox = form.zodiacSign ? isWithinZodiacPeriod(form.zodiacSign) : false;
+  const showBirthdayCheckbox = isWithinZodiacPeriod(form.zodiacSign);
 
   function update(key, value) {
     setForm((prev) => ({ ...prev, [key]: value }));
