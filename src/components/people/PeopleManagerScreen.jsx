@@ -43,6 +43,8 @@ export default function PeopleManagerScreen({
     maxAge: "",
     activity: [],
     zodiacSign: [],
+    eventDateFrom: "",
+    eventDateTo: "",
   });
 
   // Current grouping mode.
@@ -78,13 +80,23 @@ export default function PeopleManagerScreen({
         filters.activity.length === 0 || filters.activity.includes(person.activity);
       const matchesZodiac =
         filters.zodiacSign.length === 0 || filters.zodiacSign.includes(person.zodiacSign);
+      const matchesEventDate = (() => {
+        if (!filters.eventDateFrom && !filters.eventDateTo) return true;
+        return (person.events || []).some((event) => {
+          if (!event.date) return false;
+          if (filters.eventDateFrom && event.date < filters.eventDateFrom) return false;
+          if (filters.eventDateTo && event.date > filters.eventDateTo) return false;
+          return true;
+        });
+      })();
 
       return (
         matchesQuery &&
         matchesMinAge &&
         matchesMaxAge &&
         matchesActivity &&
-        matchesZodiac
+        matchesZodiac &&
+        matchesEventDate
       );
     });
 
@@ -265,6 +277,8 @@ export default function PeopleManagerScreen({
                   maxAge: "",
                   activity: [],
                   zodiacSign: [],
+                  eventDateFrom: "",
+                  eventDateTo: "",
                 });
               }}
             >
