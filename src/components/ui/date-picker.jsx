@@ -62,9 +62,16 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
   }, [open]);
 
   function handleTextChange(e) {
-    const newVal = e.target.value;
-    onChange(newVal);
-    const p = parseCalendarDate(newVal);
+    const raw = e.target.value;
+
+    // Strip everything that isn't a digit, then insert dots at positions 4 and 7.
+    const digits = raw.replace(/\D/g, "").slice(0, 8);
+    let formatted = digits;
+    if (digits.length > 4) formatted = digits.slice(0, 4) + "." + digits.slice(4);
+    if (digits.length > 6) formatted = formatted.slice(0, 7) + "." + digits.slice(6);
+
+    onChange(formatted);
+    const p = parseCalendarDate(formatted);
     if (p) {
       setViewYear(p.year);
       setViewMonth(p.month);
