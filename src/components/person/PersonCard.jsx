@@ -180,6 +180,30 @@ export default function PersonCard({
                         {t.addEvent}
                       </Button>
 
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="outline" style={{ color: "#dc2626" }}>
+                            <Trash2 style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
+                            {t.deletePerson}
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>{t.deletePersonConfirmTitle}</AlertDialogTitle>
+                            <AlertDialogDescription>{t.deletePersonConfirmDesc}</AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
+                            <AlertDialogAction
+                              style={{ background: "#ef4444", color: "white" }}
+                              onClick={() => onDeletePerson(person.id)}
+                            >
+                              {t.deletePersonConfirmAction}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+
                       {sortedEvents.length > 0 && (
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
@@ -205,30 +229,6 @@ export default function PersonCard({
                           </AlertDialogContent>
                         </AlertDialog>
                       )}
-
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="outline" style={{ color: "#dc2626" }}>
-                            <Trash2 style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
-                            {t.delete}
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>{t.deletePersonConfirmTitle}</AlertDialogTitle>
-                            <AlertDialogDescription>{t.deletePersonConfirmDesc}</AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
-                            <AlertDialogAction
-                              style={{ background: "#ef4444", color: "white" }}
-                              onClick={() => onDeletePerson(person.id)}
-                            >
-                              {t.deletePersonConfirmAction}
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
                     </div>
 
                     {/* Event list */}
