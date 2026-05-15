@@ -15,6 +15,18 @@ import { PALETTE, CHART_COLORS, TEXT } from "@/lib/constants";
  * Renders a reusable bar chart card.
  * Supports optional label rotation and custom color mapping.
  */
+function ChartTooltip({ active, payload, label, tooltipUnit }) {
+  if (!active || !payload?.length) return null;
+  const value = payload[0].value;
+  const unit = value === 1 ? tooltipUnit.one : tooltipUnit.many;
+  return (
+    <div style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: "0.5rem", padding: "0.5rem 0.75rem", fontSize: 13 }}>
+      <p style={{ marginBottom: "0.2rem", fontWeight: 500 }}>{label}</p>
+      <p>{`${value} ${unit}`}</p>
+    </div>
+  );
+}
+
 export default function BarChartCard({
   title,
   subtitle,
@@ -23,6 +35,7 @@ export default function BarChartCard({
   rotateXLabels = false,
   customColors = null,
   yAxisLabel = null,
+  tooltipUnit = null,
 }) {
   // Shared container style for consistency across charts.
   const cardStyle = {
@@ -47,7 +60,7 @@ export default function BarChartCard({
 
       <CardContent>
         {data.length ? (
-          <div style={{ height: "16rem", width: "100%" }}>
+          <div style={{ height: "16rem", width: "100%", outline: "none" }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data} margin={{ top: 5, right: 5, left: -15, bottom: 5 }}>
                 {/* Background grid */}
@@ -81,7 +94,11 @@ export default function BarChartCard({
                   } : undefined}
                 />
 
-                <Tooltip />
+                {tooltipUnit ? (
+                  <Tooltip content={<ChartTooltip tooltipUnit={tooltipUnit} />} />
+                ) : (
+                  <Tooltip />
+                )}
 
                 {/* Bars */}
                 <Bar dataKey="value" radius={[8, 8, 0, 0]}>

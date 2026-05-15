@@ -69,6 +69,7 @@ export default function StatsScoresTab({ people, allEvents, t }) {
         subtitle={t.scoreDistributionDesc}
         data={scoredVsUnscored}
         emptyText={t.noDataYet}
+        tooltipUnit={{ one: t.chartEvent, many: t.chartEvents }}
       />
 
       <BarChartCard
@@ -77,6 +78,7 @@ export default function StatsScoresTab({ people, allEvents, t }) {
         data={scoresByKisses.filter((item) => item.value > 0)}
         emptyText={t.noDataYet}
         rotateXLabels={true}
+        tooltipUnit={{ one: t.chartEvent, many: t.chartEvents }}
       />
 
       <AreaChartCard
@@ -84,6 +86,7 @@ export default function StatsScoresTab({ people, allEvents, t }) {
         subtitle={t.eventCountBuckets}
         data={numberOfEventsByNumberOfPersons}
         emptyText={t.noDataYet}
+        tooltipUnit={{ one: t.chartPerson, many: t.chartPersons }}
       />
     </div>
   );

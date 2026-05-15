@@ -6,9 +6,11 @@ import {
   translateGender,
   getColorForCategory,
 } from "@/lib/format";
+import { ZODIAC_OPTIONS } from "@/lib/constants";
 
 import BarChartCard from "@/components/charts/BarChartCard";
 import PieChartCard from "@/components/charts/PieChartCard";
+import RadarChartCard from "@/components/charts/RadarChartCard";
 import AgeRangeCard from "@/components/stats/AgeRangeCard";
 
 /**
@@ -16,6 +18,30 @@ import AgeRangeCard from "@/components/stats/AgeRangeCard";
  * It groups event and person data by zodiac, activity, gender, age, and name initials.
  */
 export default function StatsPeopleTab({ people, t }) {
+  // Counts people per zodiac sign, filling in zeros for all 12 signs.
+  const personsByZodiac = useMemo(() => {
+    const lang = t.studies === "estudia" ? "es" : "en";
+    const allSigns = ZODIAC_OPTIONS[lang].map(getShortZodiacLabel);
+    const map = new Map(allSigns.map((s) => [s, 0]));
+    for (const person of people) {
+      const key = getShortZodiacLabel(person.zodiacSign);
+      if (map.has(key)) map.set(key, map.get(key) + 1);
+    }
+    return allSigns.map((label) => ({ label, value: map.get(label) }));
+  }, [people, t]);
+
+  // Counts people per translated activity label.
+  const personsByActivity = useMemo(() => {
+    const map = new Map();
+    for (const person of people) {
+      const label = translateActivity(person.activity, t);
+      map.set(label, (map.get(label) || 0) + 1);
+    }
+    return [...map.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([label, value]) => ({ label, value }));
+  }, [people, t]);
+
   // Sums total events by zodiac sign. The displayed label uses the short zodiac name only.
   const eventsByZodiac = useMemo(() => {
     const map = new Map();
@@ -118,6 +144,15 @@ export default function StatsPeopleTab({ people, t }) {
         data={eventsByZodiac}
         emptyText={t.noDataYet}
         rotateXLabels={true}
+        tooltipUnit={{ one: t.chartEvent, many: t.chartEvents }}
+      />
+
+      <RadarChartCard
+        title={t.personsByZodiac}
+        subtitle={t.zodiacDistribution}
+        data={personsByZodiac}
+        emptyText={t.noDataYet}
+        tooltipUnit={{ one: t.chartPerson, many: t.chartPersons }}
       />
 
       <BarChartCard
@@ -126,6 +161,15 @@ export default function StatsPeopleTab({ people, t }) {
         data={eventsByActivity}
         emptyText={t.noDataYet}
         rotateXLabels={true}
+        tooltipUnit={{ one: t.chartEvent, many: t.chartEvents }}
+      />
+
+      <PieChartCard
+        title={t.personsByActivity}
+        subtitle={t.activityDistribution}
+        data={personsByActivity}
+        emptyText={t.noDataYet}
+        tooltipUnit={{ one: t.chartPerson, many: t.chartPersons }}
       />
 
       <PieChartCard
@@ -133,6 +177,7 @@ export default function StatsPeopleTab({ people, t }) {
         subtitle={t.genderSplit}
         data={personsByGender}
         emptyText={t.noDataYet}
+        tooltipUnit={{ one: t.chartPerson, many: t.chartPersons }}
       />
 
       <BarChartCard
@@ -141,6 +186,7 @@ export default function StatsPeopleTab({ people, t }) {
         data={eventsByGender}
         emptyText={t.noDataYet}
         customColors={genderColorMap}
+        tooltipUnit={{ one: t.chartEvent, many: t.chartEvents }}
       />
 
       <BarChartCard
@@ -148,6 +194,7 @@ export default function StatsPeopleTab({ people, t }) {
         subtitle={t.ageDistribution}
         data={personsByAge}
         emptyText={t.noDataYet}
+        tooltipUnit={{ one: t.chartPerson, many: t.chartPersons }}
       />
 
       <BarChartCard
@@ -155,6 +202,7 @@ export default function StatsPeopleTab({ people, t }) {
         subtitle={t.firstLetterDist}
         data={personsByFirstLetter}
         emptyText={t.noDataYet}
+        tooltipUnit={{ one: t.chartPerson, many: t.chartPersons }}
       />
 
       <AgeRangeCard

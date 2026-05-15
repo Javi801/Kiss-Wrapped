@@ -20,11 +20,24 @@ import { PALETTE, TEXT } from "@/lib/constants";
  * Renders a reusable area chart card.
  * It is used for time-based distributions or continuous data.
  */
+function ChartTooltip({ active, payload, label, tooltipUnit }) {
+  if (!active || !payload?.length) return null;
+  const value = payload[0].value;
+  const unit = value === 1 ? tooltipUnit.one : tooltipUnit.many;
+  return (
+    <div style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: "0.5rem", padding: "0.5rem 0.75rem", fontSize: 13 }}>
+      <p style={{ marginBottom: "0.2rem", fontWeight: 500 }}>{label}</p>
+      <p>{`${value} ${unit}`}</p>
+    </div>
+  );
+}
+
 export default function AreaChartCard({
   title,
   subtitle,
   data,
   emptyText,
+  tooltipUnit = null,
 }) {
   // Shared card style for consistency.
   const cardStyle = {
@@ -49,7 +62,7 @@ export default function AreaChartCard({
 
       <CardContent>
         {data.length ? (
-          <div style={{ height: "16rem", width: "100%" }}>
+          <div style={{ height: "16rem", width: "100%", outline: "none" }}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data}>
                 {/* Grid lines */}
@@ -71,7 +84,11 @@ export default function AreaChartCard({
                   fontSize={12}
                 />
 
-                <Tooltip />
+                {tooltipUnit ? (
+                  <Tooltip content={<ChartTooltip tooltipUnit={tooltipUnit} />} />
+                ) : (
+                  <Tooltip />
+                )}
 
                 {/* Area */}
                 <Area

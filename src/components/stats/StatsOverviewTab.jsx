@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import StatTile from "@/components/shared/StatTile";
+import TopPersonTile from "@/components/shared/TopPersonTile";
 import BarChartCard from "@/components/charts/BarChartCard";
 import { hasScore } from "@/lib/format";
 
@@ -30,9 +31,16 @@ export default function StatsOverviewTab({ people, allEvents, t }) {
     ? (allEvents.length / people.length).toFixed(1)
     : "0.0";
 
-  // Read the first ranked person for the summary tile.
-  const mostActivePerson = peopleMostEvents[0]?.label || "—";
-  const mostActiveCount = peopleMostEvents[0]?.value || 0;
+  // Find all people tied for the top position (at least 1 event).
+  const topPeople = useMemo(() => {
+    const withEvents = [...people]
+      .map((person) => ({ label: person.name, value: person.events?.length || 0 }))
+      .filter((p) => p.value > 0)
+      .sort((a, b) => b.value - a.value);
+    if (!withEvents.length) return [];
+    const max = withEvents[0].value;
+    return withEvents.filter((p) => p.value === max);
+  }, [people]);
 
   // Keep only events with a valid score for score metrics.
   const scoredEvents = allEvents.filter((event) => hasScore(event.score));
@@ -53,10 +61,10 @@ export default function StatsOverviewTab({ people, allEvents, t }) {
           value={averageEventsPerPerson}
           helper={t.acrossAll}
         />
-        <StatTile
-          label={t.topPerson}
-          value={mostActiveCount}
-          helper={mostActivePerson}
+        <TopPersonTile
+          label={topPeople.length > 1 ? t.topPersonPlural : t.topPerson}
+          topPeople={topPeople}
+          t={t}
         />
       </div>
 
@@ -79,6 +87,7 @@ export default function StatsOverviewTab({ people, allEvents, t }) {
         data={peopleMostEvents}
         emptyText={t.noDataYet}
         rotateXLabels={true}
+        tooltipUnit={{ one: t.chartEvent, many: t.chartEvents }}
       />
     </div>
   );

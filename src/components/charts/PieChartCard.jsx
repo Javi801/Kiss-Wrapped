@@ -19,11 +19,25 @@ import { getColorForCategory } from "@/lib/format";
  * Renders a reusable pie chart with legend.
  * It supports automatic color assignment and category-based colors.
  */
+function ChartTooltip({ active, payload, tooltipUnit }) {
+  if (!active || !payload?.length) return null;
+  const value = payload[0].value;
+  const label = payload[0].name;
+  const unit = value === 1 ? tooltipUnit.one : tooltipUnit.many;
+  return (
+    <div style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: "0.5rem", padding: "0.5rem 0.75rem", fontSize: 13 }}>
+      <p style={{ marginBottom: "0.2rem", fontWeight: 500 }}>{label}</p>
+      <p>{`${value} ${unit}`}</p>
+    </div>
+  );
+}
+
 export default function PieChartCard({
   title,
   subtitle,
   data,
   emptyText,
+  tooltipUnit = null,
 }) {
   // Resolve colors for each slice.
   const fills = data.map(
@@ -57,7 +71,7 @@ export default function PieChartCard({
         {data.length ? (
           <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", overflow: "hidden" }}>
             {/* Chart */}
-            <div style={{ height: "14rem", width: "100%" }}>
+            <div style={{ height: "14rem", width: "100%", outline: "none" }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -72,7 +86,11 @@ export default function PieChartCard({
                       <Cell key={entry.label} fill={fills[index]} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  {tooltipUnit ? (
+                    <Tooltip content={<ChartTooltip tooltipUnit={tooltipUnit} />} />
+                  ) : (
+                    <Tooltip />
+                  )}
                 </PieChart>
               </ResponsiveContainer>
             </div>
