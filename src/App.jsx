@@ -172,18 +172,12 @@ export default function KissRecorderApp() {
   // Clears all app data and resets the app to its initial state.
   async function clearAllAppData() {
     try {
-      // Remove persisted people data.
       await clearPeopleFromDevice();
-
-      // Reset settings to defaults.
-      await saveSettings({ iconColor: "yellow", language: "en" });
     } catch (error) {
       if (import.meta.env.DEV) console.error("Failed to clear app data", error);
     }
 
-    // Reset in-memory state.
     setPeople([]);
-    setLanguage("en");
     screenHistoryRef.current = [];
     setScreen("intro");
   }
