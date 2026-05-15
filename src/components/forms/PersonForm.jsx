@@ -31,10 +31,12 @@ export default function PersonForm({
   mode,
 }) {
   // Local form state initialization.
+  const currentYear = new Date().getFullYear();
+
   const [form, setForm] = useState(
     initialValues || {
       name: "",
-      age: "",
+      birthYear: "",
       gender: "",
       howWeMet: "",
       zodiacSign: "",
@@ -57,9 +59,10 @@ export default function PersonForm({
 
     if (!form.name.trim()) next.name = t.requiredName;
 
-    if (!String(form.age).trim()) next.age = t.requiredAge;
-    else if (!Number.isInteger(Number(form.age)) || Number(form.age) <= 0)
-      next.age = t.validAge;
+    const year = Number(form.birthYear);
+    if (!String(form.birthYear).trim()) next.birthYear = t.requiredBirthYear;
+    else if (!Number.isInteger(year) || year < currentYear - 120 || year > currentYear)
+      next.birthYear = t.validBirthYear;
 
     if (!form.gender) next.gender = t.requiredGender;
 
@@ -83,7 +86,7 @@ export default function PersonForm({
 
     onSave({
       ...form,
-      age: Number(form.age),
+      birthYear: Number(form.birthYear),
       detail: form.detail.trim(),
       howWeMet: includeHowWeMet
         ? form.howWeMet.trim()
@@ -119,21 +122,21 @@ export default function PersonForm({
           )}
         </div>
 
-        {/* Age + Gender */}
+        {/* Birth Year + Gender */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "1rem" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            <Label>{t.age} *</Label>
+            <Label>{t.birthYear} *</Label>
             <Input
               type="number"
-              value={form.age}
-              onChange={(e) => update("age", e.target.value)}
-              min={1}
-              max={120}
+              value={form.birthYear}
+              onChange={(e) => update("birthYear", e.target.value)}
+              min={currentYear - 120}
+              max={currentYear}
               className="rounded-2xl"
-            style={{ ...inputStyle }}
+              style={{ ...inputStyle }}
             />
-            {errors.age && (
-              <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.age}</p>
+            {errors.birthYear && (
+              <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.birthYear}</p>
             )}
           </div>
 
