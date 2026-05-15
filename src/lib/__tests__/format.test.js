@@ -3,6 +3,7 @@ import { COPY, GENDER_COLORS } from "@/lib/constants";
 import {
   translateActivity,
   translateGender,
+  eventIsMissingRequired,
   personHasIncompleteEvent,
   hasScore,
   renderKisses,
@@ -87,6 +88,42 @@ describe("translateGender", () => {
   });
   it("falls back to other for unknown values", () => {
     expect(translateGender("nonbinary", t)).toBe(t.other);
+  });
+});
+
+const COMPLETE_PERSON = {
+  name: "Ana",
+  age: 25,
+  gender: "female",
+  zodiacSign: "♒ Aquarius",
+  activity: "studies",
+  events: [{ place: "café", situation: "first date" }],
+};
+
+describe("eventIsMissingRequired", () => {
+  it("returns false when both place and situation are present", () => {
+    expect(eventIsMissingRequired({ place: "café", situation: "first date" })).toBe(false);
+  });
+  it("returns true when place is absent", () => {
+    expect(eventIsMissingRequired({ situation: "first date" })).toBe(true);
+  });
+  it("returns true when place is an empty string", () => {
+    expect(eventIsMissingRequired({ place: "", situation: "first date" })).toBe(true);
+  });
+  it("returns true when place is only whitespace", () => {
+    expect(eventIsMissingRequired({ place: "   ", situation: "first date" })).toBe(true);
+  });
+  it("returns true when situation is absent", () => {
+    expect(eventIsMissingRequired({ place: "café" })).toBe(true);
+  });
+  it("returns true when situation is an empty string", () => {
+    expect(eventIsMissingRequired({ place: "café", situation: "" })).toBe(true);
+  });
+  it("returns true when situation is only whitespace", () => {
+    expect(eventIsMissingRequired({ place: "café", situation: "   " })).toBe(true);
+  });
+  it("returns true when both fields are absent", () => {
+    expect(eventIsMissingRequired({})).toBe(true);
   });
 });
 
