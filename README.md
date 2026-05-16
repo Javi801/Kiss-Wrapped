@@ -39,6 +39,7 @@ A lightweight personal tracking web app to log interactions ("events") with peop
 - **Zodiac-based age calculation:** age is derived from birth year and zodiac sign end date, so it increments on the zodiac birthday rather than a fixed calendar date
 - **Age-at-event charts:** the "People by age" and "Age range" charts can switch between current age and the age each person had at the time of their events
 - **PDF export** of the full stats dashboard
+- **Theme support:** light, green and dark palettes, with UI colors driven by shared palette tokens and persisted theme selection
 - **Localization:** English and Spanish
 - **Local persistence** via browser/device storage (no backend required)
 
@@ -49,6 +50,7 @@ A lightweight personal tracking web app to log interactions ("events") with peop
 | React | 19 | UI framework |
 | Vite | 8 | Build tool and dev server |
 | Tailwind CSS | 4 | Utility-first styling |
+| Custom theme context | n/a | Shared palette access for light, green and dark themes |
 | shadcn/ui + Radix UI | latest | Accessible UI primitives |
 | Recharts | 3 | Charts (bar, pie, radar, area, heatmap) |
 | Framer Motion | 12 | Animations |
@@ -73,6 +75,7 @@ src/
 ├── lib/
 │   ├── calendar.js        # Calendar grid and date navigation helpers
 │   ├── constants.js       # PALETTE, TEXT, CHART_COLORS, translations (EN/ES)
+│   ├── theme.jsx          # Theme context and palette hook used across the UI
 │   ├── date.js            # Date validation, formatting, zodiac age calculation
 │   ├── device-storage.js  # Capacitor/localStorage persistence layer
 │   ├── format.js          # Score rendering, label translations, zodiac helpers
