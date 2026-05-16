@@ -25,7 +25,7 @@ import {
   loadSettings,
   saveSettings,
 } from "@/lib/device-storage";
-import { STORAGE_KEY, ICON_COLOR_KEY, LANGUAGE_KEY } from "@/lib/constants";
+import { STORAGE_KEY, ICON_COLOR_KEY, LANGUAGE_KEY, THEME_KEY } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // loadPeopleFromDevice
@@ -287,7 +287,7 @@ describe("loadSettings (web path)", () => {
   });
 
   it("returns defaults when no settings are saved", async () => {
-    expect(await loadSettings()).toEqual({ iconColor: "yellow", language: "en" });
+    expect(await loadSettings()).toEqual({ iconColor: "yellow", language: "en", theme: "pink" });
   });
 
   it("returns the saved iconColor", async () => {
@@ -300,11 +300,17 @@ describe("loadSettings (web path)", () => {
     expect((await loadSettings()).language).toBe("es");
   });
 
+  it("returns the saved theme", async () => {
+    localStorage.setItem(THEME_KEY, "dark");
+    expect((await loadSettings()).theme).toBe("dark");
+  });
+
   it("falls back to default iconColor when only language is saved", async () => {
     localStorage.setItem(LANGUAGE_KEY, "es");
     const settings = await loadSettings();
     expect(settings.iconColor).toBe("yellow");
     expect(settings.language).toBe("es");
+    expect(settings.theme).toBe("pink");
   });
 
   it("falls back to default language when only iconColor is saved", async () => {
@@ -312,6 +318,7 @@ describe("loadSettings (web path)", () => {
     const settings = await loadSettings();
     expect(settings.iconColor).toBe("pink");
     expect(settings.language).toBe("en");
+    expect(settings.theme).toBe("pink");
   });
 });
 
@@ -333,6 +340,11 @@ describe("saveSettings (web path)", () => {
     expect(localStorage.getItem(LANGUAGE_KEY)).toBe("es");
   });
 
+  it("saves theme to localStorage", async () => {
+    await saveSettings({ iconColor: "pink", language: "es", theme: "dark" });
+    expect(localStorage.getItem(THEME_KEY)).toBe("dark");
+  });
+
   it("does not overwrite iconColor when it is undefined", async () => {
     localStorage.setItem(ICON_COLOR_KEY, "yellow");
     await saveSettings({ language: "es" });
@@ -345,8 +357,14 @@ describe("saveSettings (web path)", () => {
     expect(localStorage.getItem(LANGUAGE_KEY)).toBe("en");
   });
 
+  it("does not overwrite theme when it is undefined", async () => {
+    localStorage.setItem(THEME_KEY, "green");
+    await saveSettings({ iconColor: "pink" });
+    expect(localStorage.getItem(THEME_KEY)).toBe("green");
+  });
+
   it("round-trips correctly through save and load", async () => {
-    await saveSettings({ iconColor: "blue", language: "es" });
-    expect(await loadSettings()).toEqual({ iconColor: "blue", language: "es" });
+    await saveSettings({ iconColor: "blue", language: "es", theme: "dark" });
+    expect(await loadSettings()).toEqual({ iconColor: "blue", language: "es", theme: "dark" });
   });
 });
