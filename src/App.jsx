@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { Search, Users, BarChart3, UserPlus } from "lucide-react";
 import { App as CapacitorApp } from "@capacitor/app";
 
-import { PALETTE, TEXT, COPY } from "@/lib/constants";
+import { PALETTES, TEXT, COPY } from "@/lib/constants";
+import { ThemeProvider } from "@/lib/theme";
 import { setAppIconColor } from "@/plugins/appicon";
 import { todayString } from "@/lib/date";
 import { uid, normalizePeople } from "@/lib/helpers";
@@ -47,6 +48,9 @@ export default function KissRecorderApp() {
 
   // Icon color palette selected by the user.
   const [iconColor, setIconColor] = useState("yellow");
+
+  // Active UI theme.
+  const [theme, setTheme] = useState("pink");
 
   // Prevents saving before the initial load completes.
   const [isLoaded, setIsLoaded] = useState(false);
@@ -128,6 +132,7 @@ export default function KissRecorderApp() {
         if (isMounted) {
           if (settings.language === "en" || settings.language === "es") setLanguage(settings.language);
           if (["yellow", "blue", "pink", "purple"].includes(settings.iconColor)) setIconColor(settings.iconColor);
+          if (["pink", "green", "dark"].includes(settings.theme)) setTheme(settings.theme);
         }
       } catch (error) {
         if (import.meta.env.DEV) console.error("Failed to load app data", error);
@@ -160,19 +165,33 @@ export default function KissRecorderApp() {
     });
   }, [people, isLoaded]);
 
-  // Persists settings whenever language or iconColor change (after boot).
+  // Persists settings whenever language, iconColor or theme change (after boot).
   useEffect(() => {
     if (!isLoaded) return;
-    saveSettings({ iconColor, language }).catch((error) => {
+    saveSettings({ iconColor, language, theme }).catch((error) => {
       if (import.meta.env.DEV) console.error("Failed to save settings", error);
     });
-  }, [iconColor, language, isLoaded]);
+  }, [iconColor, language, theme, isLoaded]);
+
+  // Applies the dark class to <html> so shadcn portal components also get dark styles.
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [theme]);
 
   // Switches the icon from user actions only, because Android may kill the app while changing aliases.
   async function changeIconColor(newColor) {
     setIconColor(newColor);
-    await saveSettings({ iconColor: newColor, language });
+    await saveSettings({ iconColor: newColor, language, theme });
     setAppIconColor(newColor);
+  }
+
+  async function changeTheme(newTheme) {
+    setTheme(newTheme);
+    await saveSettings({ iconColor, language, theme: newTheme });
   }
 
   // Active translation dictionary.
@@ -312,12 +331,15 @@ export default function KissRecorderApp() {
   // Hide bottom navigation on screens that use a focused layout.
   const hideBottomBar = screen === "add" || screen === "intro";
 
+  const palette = PALETTES[theme] ?? PALETTES.pink;
+
   return (
+    <ThemeProvider theme={theme}>
     <div
       style={{
         height: "100vh",
-        color: "#0f172a",
-        background: `linear-gradient(180deg, ${PALETTE.bgGradientFrom}, ${PALETTE.bgSoft}, ${PALETTE.sky})`,
+        color: palette.text,
+        background: `linear-gradient(180deg, ${palette.bgGradientFrom}, ${palette.bgSoft}, ${palette.sky})`,
       }}
     >
       <div style={{ margin: "0 auto", display: "flex", height: "100%", width: "100%", maxWidth: "28rem", flexDirection: "column", paddingLeft: "1rem", paddingRight: "1rem" }}>
@@ -346,6 +368,8 @@ export default function KissRecorderApp() {
               setLanguage={setLanguage}
               iconColor={iconColor}
               setIconColor={changeIconColor}
+              theme={theme}
+              setTheme={changeTheme}
             />
           ) : null}
 
@@ -389,8 +413,8 @@ export default function KissRecorderApp() {
               right: 0,
               zIndex: 50,
               backdropFilter: "blur(8px)",
-              borderTop: `1px solid ${PALETTE.inputBorder}`,
-              backgroundColor: "rgba(255,255,255,0.8)",
+              borderTop: `1px solid ${palette.inputBorder}`,
+              backgroundColor: palette.navBarBg,
             }}
           >
             <div style={{ margin: "0 auto", display: "grid", maxWidth: "28rem", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "0.25rem", paddingLeft: "0.75rem", paddingRight: "0.75rem", paddingTop: "0.75rem", paddingBottom: "0.75rem" }}>
@@ -417,9 +441,9 @@ export default function KissRecorderApp() {
                       fontWeight: "500",
                       transition: "all 150ms cubic-bezier(0.4, 0, 0.2, 1)",
                       background: active
-                        ? `linear-gradient(90deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`
+                        ? `linear-gradient(90deg, ${palette.rose}, ${palette.roseSoft})`
                         : "transparent",
-                      color: active ? "#ffffff" : PALETTE.textSoft,
+                      color: active ? "#ffffff" : palette.textSoft,
                     }}
                   >
                     <Icon style={{ height: "1rem", width: "1rem" }} />
@@ -433,5 +457,6 @@ export default function KissRecorderApp() {
 
       </div>
     </div>
+    </ThemeProvider>
   );
 }
