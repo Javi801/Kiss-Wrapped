@@ -1,5 +1,4 @@
 import { usePalette } from "@/lib/theme";
-import BubbleStarsBackground from "@/components/visuals/BubbleStarsBackground";
 import HeroVisualPlaceholder from "@/components/visuals/HeroVisualPlaceholder";
 import InteractiveBubbles from "@/components/visuals/InteractiveBubbles";
 
@@ -22,9 +21,6 @@ export default function IntroScreen({ onOpenMain, t }) {
         background: `linear-gradient(135deg, ${PALETTE.blush}, ${PALETTE.lilac}, ${PALETTE.sky})`,
       }}
     >
-      {/* Floating animated background elements */}
-      <BubbleStarsBackground />
-
       {/* Interactive poppable bubbles */}
       <InteractiveBubbles />
 
