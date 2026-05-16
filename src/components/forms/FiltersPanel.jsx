@@ -86,7 +86,7 @@ function Chip({ label, selected, onClick }) {
         fontWeight: selected ? "600" : "400",
         cursor: "pointer",
         transition: "all 0.15s",
-        boxShadow: selected ? "0 1px 4px rgba(226,115,150,0.28)" : "none",
+        boxShadow: selected ? `0 1px 4px ${PALETTE.roseShadow}` : "none",
       }}
     >
       {label}

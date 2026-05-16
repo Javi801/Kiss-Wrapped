@@ -23,7 +23,7 @@ export default function HeroVisualPlaceholder() {
         justifyContent: "center",
         borderRadius: "9999px",
         backdropFilter: "blur(4px)",
-        backgroundColor: "rgba(255,255,255,0.55)",
+        backgroundColor: PALETTE.surfaceBg,
       }}
     >
       {/* Background gradient layer */}
@@ -35,7 +35,7 @@ export default function HeroVisualPlaceholder() {
           bottom: "1.5rem",
           left: "1.5rem",
           borderRadius: "9999px",
-          background: `linear-gradient(135deg, ${PALETTE.blush}, #fff7fb, ${PALETTE.sky})`,
+          background: `linear-gradient(135deg, ${PALETTE.blush}, ${PALETTE.cardSoft}, ${PALETTE.sky})`,
         }}
       />
 

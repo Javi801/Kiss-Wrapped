@@ -317,7 +317,7 @@ export default function MainScreen({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  boxShadow: `0 4px 14px rgba(226,115,150,0.35)`,
+                  boxShadow: `0 4px 14px ${PALETTE.roseGlow}`,
                 }}
               >
                 <Languages style={{ height: "1.5rem", width: "1.5rem", color: "white" }} />
@@ -343,10 +343,10 @@ export default function MainScreen({
                     ...TEXT.base,
                     fontWeight: selected ? "600" : "400",
                     borderColor: selected ? PALETTE.rose : PALETTE.line,
-                    backgroundColor: selected ? "#fff0f5" : "white",
+                    backgroundColor: selected ? PALETTE.blush : PALETTE.card,
                     color: selected ? PALETTE.rose : PALETTE.text,
                     boxShadow: selected
-                      ? "0 2px 8px rgba(226,115,150,0.18)"
+                      ? `0 2px 8px ${PALETTE.roseShadow}`
                       : "none",
                   }}
                   onClick={() => {

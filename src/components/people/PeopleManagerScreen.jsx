@@ -236,7 +236,7 @@ export default function PeopleManagerScreen({
                   alignItems: "center",
                   justifyContent: "center",
                   flexShrink: 0,
-                  boxShadow: "0 2px 8px rgba(226,115,150,0.3)",
+                  boxShadow: `0 2px 8px ${PALETTE.roseGlow}`,
                 }}>
                   <Filter size={14} style={{ color: "white" }} />
                 </div>

@@ -52,7 +52,7 @@ export default function IntroScreen({ onOpenMain, t }) {
           left: "1rem",
           zIndex: 10,
           padding: "0.25rem",
-          color: "#fda4af",
+          color: PALETTE.roseSoft,
           opacity: 0.4,
           transition: "opacity 150ms",
           background: "none",
