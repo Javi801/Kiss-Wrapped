@@ -1,9 +1,11 @@
 import TileCard from "./TileCard";
 import { tileColors } from "./tileColors";
 import { TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 
 export default function StatTile({ label, value, helper, accent = false }) {
-  const colors = tileColors(accent);
+  const PALETTE = usePalette();
+  const colors = tileColors(accent, PALETTE);
 
   return (
     <TileCard accent={accent}>

@@ -2,11 +2,13 @@ import { useState, useRef } from "react";
 import TileCard from "./TileCard";
 import { tileColors } from "./tileColors";
 import { TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 
 const DOT_LIMIT = 7;
 
 export default function TopPersonTile({ label, topPeople, t }) {
-  const colors = tileColors(false);
+  const PALETTE = usePalette();
+  const colors = tileColors(false, PALETTE);
   const isMultiple = topPeople.length > 1;
   const isEmpty = topPeople.length === 0;
   const [activeIdx, setActiveIdx] = useState(0);

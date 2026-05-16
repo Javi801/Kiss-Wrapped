@@ -1,15 +1,16 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { PALETTE } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 
 /**
  * Shared card shell used by StatTile and SettingsTile.
  * Edit padding, rounding, shadow, or blur here to affect both.
  */
 export default function TileCard({ accent = false, children, contentStyle }) {
+  const PALETTE = usePalette();
   const borderColor = accent ? "rgba(255,255,255,0.25)" : PALETTE.cardBorder;
   const background = accent
     ? "rgba(255,255,255,0.22)"
-    : "rgba(255,255,255,0.92)";
+    : PALETTE.cardBg;
 
   return (
     <Card
