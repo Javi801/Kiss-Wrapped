@@ -60,7 +60,7 @@ export default function AreaChartCard({
         <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>
           {title}
         </CardTitle>
-        <CardDescription>{subtitle}</CardDescription>
+        <CardDescription style={{ color: PALETTE.textSoft }}>{subtitle}</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -69,7 +69,7 @@ export default function AreaChartCard({
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data}>
                 {/* Grid lines */}
-                <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={PALETTE.cardBorder} />
 
                 {/* X axis */}
                 <XAxis
@@ -77,6 +77,7 @@ export default function AreaChartCard({
                   tickLine={false}
                   axisLine={false}
                   fontSize={12}
+                  tick={{ fill: PALETTE.textSoft }}
                 />
 
                 {/* Y axis */}
@@ -85,6 +86,7 @@ export default function AreaChartCard({
                   tickLine={false}
                   axisLine={false}
                   fontSize={12}
+                  tick={{ fill: PALETTE.textSoft }}
                 />
 
                 {tooltipUnit ? (

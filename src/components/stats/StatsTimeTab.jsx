@@ -143,8 +143,8 @@ export default function StatsTimeTab({ people, allEvents, t }) {
           }}
         >
           <CardHeader style={{ paddingBottom: "0.5rem" }}>
-            <CardTitle style={TEXT.title}>{t.multiYearSubtitle}</CardTitle>
-            <CardDescription>{t.yearOverlap}</CardDescription>
+            <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>{t.multiYearSubtitle}</CardTitle>
+            <CardDescription style={{ color: PALETTE.textSoft }}>{t.yearOverlap}</CardDescription>
           </CardHeader>
 
           <CardContent>

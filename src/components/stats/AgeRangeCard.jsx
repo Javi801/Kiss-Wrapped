@@ -154,8 +154,8 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
       <CardHeader style={{ paddingBottom: "0.5rem" }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "0.75rem" }}>
           <div>
-            <CardTitle style={TEXT.title}>{title}</CardTitle>
-            <CardDescription>
+            <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>{title}</CardTitle>
+            <CardDescription style={{ color: PALETTE.textSoft }}>
               {splitByYear ? t.agesAsOfYear : t.allYears}
             </CardDescription>
           </div>

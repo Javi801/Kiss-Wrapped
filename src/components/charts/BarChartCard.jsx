@@ -41,6 +41,7 @@ export default function BarChartCard({
   headerAction = null,
 }) {
   const PALETTE = usePalette();
+  const chartColors = PALETTE.chartColors ?? CHART_COLORS;
   // Shared container style for consistency across charts.
   const cardStyle = {
     borderColor: PALETTE.cardBorder,
@@ -60,14 +61,14 @@ export default function BarChartCard({
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "0.75rem" }}>
             <div>
               <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>{title}</CardTitle>
-              <CardDescription>{subtitle}</CardDescription>
+              <CardDescription style={{ color: PALETTE.textSoft }}>{subtitle}</CardDescription>
             </div>
             {headerAction}
           </div>
         ) : (
           <>
             <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>{title}</CardTitle>
-            <CardDescription>{subtitle}</CardDescription>
+            <CardDescription style={{ color: PALETTE.textSoft }}>{subtitle}</CardDescription>
           </>
         )}
       </CardHeader>
@@ -78,7 +79,7 @@ export default function BarChartCard({
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data} margin={{ top: 5, right: 5, left: -15, bottom: 5 }}>
                 {/* Background grid */}
-                <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={PALETTE.cardBorder} />
 
                 {/* X axis with optional rotation */}
                 <XAxis
@@ -90,6 +91,7 @@ export default function BarChartCard({
                   textAnchor={rotateXLabels ? "end" : "middle"}
                   height={rotateXLabels ? 62 : 30}
                   interval={0}
+                  tick={{ fill: PALETTE.textSoft }}
                 />
 
                 {/* Y axis */}
@@ -98,6 +100,7 @@ export default function BarChartCard({
                   tickLine={false}
                   axisLine={false}
                   fontSize={12}
+                  tick={{ fill: PALETTE.textSoft }}
                   width={yAxisLabel ? 50 : 40}
                   label={yAxisLabel ? {
                     value: yAxisLabel,
@@ -120,7 +123,7 @@ export default function BarChartCard({
                     // Use custom color if provided, otherwise fallback to palette.
                     const fill =
                       (customColors && customColors[entry.label]) ||
-                      CHART_COLORS[index % CHART_COLORS.length];
+                      chartColors[index % chartColors.length];
 
                     return (
                       <Cell key={`${entry.label}-${index}`} fill={fill} />

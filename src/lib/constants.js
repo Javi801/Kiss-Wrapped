@@ -52,6 +52,17 @@ export const PALETTES = {
     navBarBg: "rgba(255,255,255,0.8)",
     roseShadow: "rgba(226,115,150,0.2)",
     roseGlow: "rgba(226,115,150,0.35)",
+    chartColors: [
+      "#e27396",
+      "#a2d2ff",
+      "#b3dee2",
+      "#cdb4db",
+      "#eaf2d7",
+      "#f49cbb",
+      "#b8c0ff",
+      "#c8b6ff",
+    ],
+    chartHeatmapRgb: "226, 115, 150",
   },
   green: {
     bg: "#f6fbf8",
@@ -86,6 +97,17 @@ export const PALETTES = {
     navBarBg: "rgba(255,255,255,0.8)",
     roseShadow: "rgba(90,158,114,0.2)",
     roseGlow: "rgba(90,158,114,0.35)",
+    chartColors: [
+      "#5a9e72",
+      "#7bb7a5",
+      "#8bb7e8",
+      "#d7b36a",
+      "#a8d5b5",
+      "#b08bd8",
+      "#f2a65a",
+      "#6fb3c8",
+    ],
+    chartHeatmapRgb: "90, 158, 114",
   },
   dark: {
     bg: "#0f0d1a",
@@ -120,6 +142,17 @@ export const PALETTES = {
     navBarBg: "rgba(15,13,26,0.85)",
     roseShadow: "rgba(139,124,248,0.2)",
     roseGlow: "rgba(139,124,248,0.35)",
+    chartColors: [
+      "#8b7cf8",
+      "#4a9fe8",
+      "#3fb6b2",
+      "#d6a657",
+      "#c084fc",
+      "#f472b6",
+      "#7dd3fc",
+      "#a3e635",
+    ],
+    chartHeatmapRgb: "139, 124, 248",
   },
 };
 

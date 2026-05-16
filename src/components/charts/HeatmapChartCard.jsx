@@ -11,11 +11,11 @@ const MIN_DATA_W = 80;
 const ROW_H = 36;
 const GAP = 3;
 
-function cellColor(count, maxCount, cardSoft) {
+function cellColor(count, maxCount, cardSoft, heatmapRgb) {
   if (!count || !maxCount) return cardSoft;
   const t = count / maxCount;
   const alpha = 0.15 + t * 0.85;
-  return `rgba(226, 115, 150, ${alpha})`;
+  return `rgba(${heatmapRgb}, ${alpha})`;
 }
 
 export default function HeatmapChartCard({ title, subtitle, data, allYears, emptyText }) {
@@ -63,7 +63,7 @@ export default function HeatmapChartCard({ title, subtitle, data, allYears, empt
     >
       <CardHeader style={{ paddingBottom: "0.5rem" }}>
         <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>{title}</CardTitle>
-        <CardDescription>{subtitle}</CardDescription>
+        <CardDescription style={{ color: PALETTE.textSoft }}>{subtitle}</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -118,7 +118,12 @@ export default function HeatmapChartCard({ title, subtitle, data, allYears, empt
                             width={cellW}
                             height={cellH}
                             rx={4}
-                            fill={cellColor(count, maxCount, PALETTE.cardSoft)}
+                            fill={cellColor(
+                              count,
+                              maxCount,
+                              PALETTE.cardSoft,
+                              PALETTE.chartHeatmapRgb ?? "226, 115, 150",
+                            )}
                           />
                           {count > 0 && cellW > 20 && (
                             <text

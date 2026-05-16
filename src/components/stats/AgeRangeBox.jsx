@@ -37,8 +37,8 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText, bare =
         style={{ boxShadow: "none", borderColor: PALETTE.innerCardBorder, backgroundColor: PALETTE.cardSoft }}
       >
         <CardHeader style={{ paddingBottom: "0.5rem" }}>
-          <CardTitle style={TEXT.title}>{title}</CardTitle>
-          {subtitle ? <CardDescription>{subtitle}</CardDescription> : null}
+          <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>{title}</CardTitle>
+          {subtitle ? <CardDescription style={{ color: PALETTE.textSoft }}>{subtitle}</CardDescription> : null}
         </CardHeader>
         <CardContent>{emptyContent}</CardContent>
       </Card>
@@ -159,8 +159,8 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText, bare =
       style={{ boxShadow: "none", borderColor: PALETTE.innerCardBorder, backgroundColor: PALETTE.cardSoft }}
     >
       <CardHeader style={{ paddingBottom: "0.5rem" }}>
-        <CardTitle style={TEXT.title}>{title}</CardTitle>
-        <CardDescription>{subtitle || `${min} - ${max}`}</CardDescription>
+        <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>{title}</CardTitle>
+        <CardDescription style={{ color: PALETTE.textSoft }}>{subtitle || `${min} - ${max}`}</CardDescription>
       </CardHeader>
       <CardContent>{chartContent}</CardContent>
     </Card>

@@ -35,7 +35,7 @@ export default function RadarChartCard({ title, subtitle, data, emptyText, toolt
     <Card className="rounded-3xl" style={{ boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)", backdropFilter: "blur(8px)", ...cardStyle }}>
       <CardHeader style={{ paddingBottom: "0.5rem" }}>
         <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>{title}</CardTitle>
-        <CardDescription>{subtitle}</CardDescription>
+        <CardDescription style={{ color: PALETTE.textSoft }}>{subtitle}</CardDescription>
       </CardHeader>
       <CardContent>
         {hasData ? (

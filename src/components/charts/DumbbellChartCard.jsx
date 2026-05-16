@@ -53,7 +53,7 @@ export default function DumbbellChartCard({ title, subtitle, data, allYears, emp
     >
       <CardHeader style={{ paddingBottom: "0.5rem" }}>
         <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>{title}</CardTitle>
-        <CardDescription>{subtitle}</CardDescription>
+        <CardDescription style={{ color: PALETTE.textSoft }}>{subtitle}</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -147,7 +147,7 @@ export default function DumbbellChartCard({ title, subtitle, data, allYears, emp
                         cy={cy}
                         r={DOT_R}
                         fill={PALETTE.rose}
-                        stroke="white"
+                        stroke={PALETTE.card}
                         strokeWidth={2}
                       />
                     ))}

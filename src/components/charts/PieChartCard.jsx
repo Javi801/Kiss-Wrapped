@@ -42,11 +42,12 @@ export default function PieChartCard({
   tooltipUnit = null,
 }) {
   const PALETTE = usePalette();
+  const chartColors = PALETTE.chartColors ?? CHART_COLORS;
   // Resolve colors for each slice.
   const fills = data.map(
     (entry, index) =>
       getColorForCategory(entry.label) ||
-      CHART_COLORS[index % CHART_COLORS.length],
+      chartColors[index % chartColors.length],
   );
 
   // Shared card styling.
@@ -67,7 +68,7 @@ export default function PieChartCard({
         <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>
           {title}
         </CardTitle>
-        <CardDescription>{subtitle}</CardDescription>
+        <CardDescription style={{ color: PALETTE.textSoft }}>{subtitle}</CardDescription>
       </CardHeader>
 
       <CardContent>
