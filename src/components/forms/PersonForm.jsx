@@ -13,7 +13,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { GENDERS, ZODIAC_OPTIONS, PALETTE, TEXT } from "@/lib/constants";
+import { GENDERS, ZODIAC_OPTIONS, TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 import { translateGender } from "@/lib/format";
 import { calculateAge, deriveBirthYear, isWithinZodiacPeriod } from "@/lib/date";
 
@@ -31,6 +32,7 @@ export default function PersonForm({
   saveLabel,
   mode,
 }) {
+  const PALETTE = usePalette();
   // Local form state initialization.
   const [form, setForm] = useState(() => {
     if (!initialValues) {

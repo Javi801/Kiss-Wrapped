@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { PALETTE, TEXT } from "@/lib/constants";
+import { TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 import { parseCalendarDate, toCalendarDate, buildDayGrid, nextCalView } from "@/lib/calendar";
 
 function getMonthLabel(year, month) {
@@ -18,22 +19,22 @@ const DAY_HEADERS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 
 const YEAR_PAGE_SIZE = 12;
 
-const navBtn = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "1.75rem",
-  height: "1.75rem",
-  borderRadius: "50%",
-  border: "none",
-  backgroundColor: "transparent",
-  color: PALETTE.textSoft,
-  cursor: "pointer",
-  transition: "background-color 0.1s",
-};
-
 // Text input paired with a calendar dropdown; value format is yyyy.MM.dd.
 export function DatePicker({ value, onChange, placeholder, className, style }) {
+  const PALETTE = usePalette();
+  const navBtn = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "1.75rem",
+    height: "1.75rem",
+    borderRadius: "50%",
+    border: "none",
+    backgroundColor: "transparent",
+    color: PALETTE.textSoft,
+    cursor: "pointer",
+    transition: "background-color 0.1s",
+  };
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
 
