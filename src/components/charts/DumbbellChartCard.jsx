@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { PALETTE, TEXT } from "@/lib/constants";
+import { TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 
 const MARGIN_TOP = 28;
 const MARGIN_RIGHT = 16;
@@ -11,6 +12,7 @@ const ROW_H = 44;
 const DOT_R = 4;
 
 export default function DumbbellChartCard({ title, subtitle, data, allYears, emptyText }) {
+  const PALETTE = usePalette();
   const containerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(300);
 

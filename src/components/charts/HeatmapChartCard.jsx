@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { PALETTE, TEXT } from "@/lib/constants";
+import { TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 
 const MARGIN_TOP = 28;
 const MARGIN_RIGHT = 8;
@@ -10,15 +11,15 @@ const MIN_DATA_W = 80;
 const ROW_H = 36;
 const GAP = 3;
 
-// Interpolates between the empty-cell background and the rose accent.
-function cellColor(count, maxCount) {
-  if (!count || !maxCount) return PALETTE.cardSoft;
+function cellColor(count, maxCount, cardSoft) {
+  if (!count || !maxCount) return cardSoft;
   const t = count / maxCount;
   const alpha = 0.15 + t * 0.85;
   return `rgba(226, 115, 150, ${alpha})`;
 }
 
 export default function HeatmapChartCard({ title, subtitle, data, allYears, emptyText }) {
+  const PALETTE = usePalette();
   const containerRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(300);
 
@@ -117,7 +118,7 @@ export default function HeatmapChartCard({ title, subtitle, data, allYears, empt
                             width={cellW}
                             height={cellH}
                             rx={4}
-                            fill={cellColor(count, maxCount)}
+                            fill={cellColor(count, maxCount, PALETTE.cardSoft)}
                           />
                           {count > 0 && cellW > 20 && (
                             <text

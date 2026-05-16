@@ -14,7 +14,8 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { PALETTE, TEXT } from "@/lib/constants";
+import { TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 
 /**
  * Renders a reusable area chart card.
@@ -39,6 +40,7 @@ export default function AreaChartCard({
   emptyText,
   tooltipUnit = null,
 }) {
+  const PALETTE = usePalette();
   // Shared card style for consistency.
   const cardStyle = {
     borderColor: PALETTE.cardBorder,

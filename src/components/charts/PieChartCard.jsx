@@ -12,7 +12,8 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { PALETTE, CHART_COLORS, TEXT } from "@/lib/constants";
+import { CHART_COLORS, TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 import { getColorForCategory } from "@/lib/format";
 
 /**
@@ -39,6 +40,7 @@ export default function PieChartCard({
   emptyText,
   tooltipUnit = null,
 }) {
+  const PALETTE = usePalette();
   // Resolve colors for each slice.
   const fills = data.map(
     (entry, index) =>

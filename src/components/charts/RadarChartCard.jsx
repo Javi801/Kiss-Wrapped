@@ -8,7 +8,8 @@ import {
   Tooltip,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { PALETTE, TEXT } from "@/lib/constants";
+import { TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 
 function ChartTooltip({ active, payload, tooltipUnit }) {
   if (!active || !payload?.length) return null;
@@ -24,6 +25,7 @@ function ChartTooltip({ active, payload, tooltipUnit }) {
 }
 
 export default function RadarChartCard({ title, subtitle, data, emptyText, tooltipUnit = null }) {
+  const PALETTE = usePalette();
   const cardStyle = { borderColor: PALETTE.cardBorder, backgroundColor: PALETTE.cardBg };
   const emptyStyle = { borderColor: PALETTE.inputBorder, color: PALETTE.textSoft };
   const hasData = data.some((d) => d.value > 0);

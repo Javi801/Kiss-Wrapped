@@ -9,7 +9,8 @@ import {
   Cell,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { PALETTE, CHART_COLORS, TEXT } from "@/lib/constants";
+import { CHART_COLORS, TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 
 /**
  * Renders a reusable bar chart card.
@@ -38,6 +39,7 @@ export default function BarChartCard({
   tooltipUnit = null,
   headerAction = null,
 }) {
+  const PALETTE = usePalette();
   // Shared container style for consistency across charts.
   const cardStyle = {
     borderColor: PALETTE.cardBorder,
