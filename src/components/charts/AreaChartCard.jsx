@@ -71,13 +71,14 @@ export default function AreaChartCard({
                 {/* Grid lines */}
                 <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={PALETTE.cardBorder} />
 
-                {/* X axis */}
+                {/* X axis — show ~8 equidistant ticks regardless of data length */}
                 <XAxis
                   dataKey="label"
                   tickLine={false}
                   axisLine={false}
                   fontSize={12}
                   tick={{ fill: PALETTE.textSoft }}
+                  interval={Math.max(0, Math.round(data.length / 8) - 1)}
                 />
 
                 {/* Y axis */}

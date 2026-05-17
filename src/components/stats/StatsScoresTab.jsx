@@ -37,18 +37,21 @@ export default function StatsScoresTab({ people, allEvents, t }) {
     return [...map.entries()].map(([label, value]) => ({ label, value }));
   }, [scoredEvents, t]);
 
-  // Groups people by how many events they have.
+  // Groups people by how many events they have, filling all integers from 0 to max.
   const numberOfEventsByNumberOfPersons = useMemo(() => {
     const map = new Map();
 
     for (const person of people) {
       const eventCount = person.events?.length || 0;
-      map.set(String(eventCount), (map.get(String(eventCount)) || 0) + 1);
+      map.set(eventCount, (map.get(eventCount) || 0) + 1);
     }
 
-    return [...map.entries()]
-      .sort((a, b) => Number(a[0]) - Number(b[0]))
-      .map(([label, value]) => ({ label, value }));
+    if (map.size === 0) return [];
+    const maxCount = Math.max(...map.keys());
+    return Array.from({ length: maxCount + 1 }, (_, i) => ({
+      label: String(i),
+      value: map.get(i) || 0,
+    }));
   }, [people]);
 
   // Compares scored events against unscored events.
