@@ -59,6 +59,25 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
 
   const locale = t.langCode === "es" ? "es-ES" : "en-GB";
 
+  // Intl formatters cached per locale — constructing them is expensive
+  const fmtWeekday = useMemo(
+    () => new Intl.DateTimeFormat(locale, { weekday: "short" }),
+    [locale],
+  );
+  const fmtDayMonth = useMemo(
+    () => new Intl.DateTimeFormat(locale, { day: "numeric", month: "short" }),
+    [locale],
+  );
+  const fmtDayMonthYear = useMemo(
+    () => new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric" }),
+    [locale],
+  );
+  const fmtMonthYear = useMemo(
+    () => new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }),
+    [locale],
+  );
+
+  // Single-pass count by date key (yyyy.MM.dd → n)
   const countByDate = useMemo(() => {
     const map = new Map();
     for (const ev of allEvents) {
@@ -67,7 +86,17 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
     return map;
   }, [allEvents]);
 
-  const { data, title, avg, canNext } = useMemo(() => {
+  // Single-pass count by year-month key (yyyy.MM → n) for year view
+  const countByMonth = useMemo(() => {
+    const map = new Map();
+    for (const [k, c] of countByDate) {
+      const ym = k.slice(0, 7); // "yyyy.MM"
+      map.set(ym, (map.get(ym) || 0) + c);
+    }
+    return map;
+  }, [countByDate]);
+
+  const { data, title, avg, maxValue, canNext } = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -80,19 +109,17 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
       const items = Array.from({ length: 7 }, (_, i) => {
         const d = new Date(mon);
         d.setDate(mon.getDate() + i);
-        const raw = new Intl.DateTimeFormat(locale, { weekday: "short" })
-          .format(d)
-          .replace(/\.$/, "");
+        const raw = fmtWeekday.format(d).replace(/\.$/, "");
         return { label: capitalize(raw), value: countByDate.get(dateToKey(d)) || 0 };
       });
 
       const sun = new Date(mon);
       sun.setDate(mon.getDate() + 6);
-      const fmt = (d, opts) => new Intl.DateTimeFormat(locale, opts).format(d);
-      const ttl = `${fmt(mon, { day: "numeric", month: "short" })} – ${fmt(sun, { day: "numeric", month: "short", year: "numeric" })}`;
+      const ttl = `${fmtDayMonth.format(mon)} – ${fmtDayMonthYear.format(sun)}`;
 
       const total = items.reduce((s, d) => s + d.value, 0);
-      return { data: items, title: ttl, avg: total / 7, canNext: offset < 0 };
+      const maxValue = Math.max(...items.map((d) => d.value), 1);
+      return { data: items, title: ttl, avg: total / 7, maxValue, canNext: offset < 0 };
     }
 
     if (gran === "month") {
@@ -102,7 +129,6 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
       const mm = String(mo + 1).padStart(2, "0");
       const dim = new Date(yr, mo + 1, 0).getDate();
 
-      // 4 evenly spaced label indices
       const lblSet = new Set([
         0,
         Math.round(dim / 3) - 1,
@@ -117,32 +143,31 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
         return { label: lbl, value: countByDate.get(key) || 0 };
       });
 
-      const raw = new Intl.DateTimeFormat(locale, {
-        month: "long",
-        year: "numeric",
-      }).format(ref);
-
       const total = items.reduce((s, d) => s + d.value, 0);
-      return { data: items, title: capitalize(raw), avg: total / dim, canNext: offset < 0 };
+      const maxValue = Math.max(...items.map((d) => d.value), 1);
+      return {
+        data: items,
+        title: capitalize(fmtMonthYear.format(ref)),
+        avg: total / dim,
+        maxValue,
+        canNext: offset < 0,
+      };
     }
 
     if (gran === "year") {
       const yr = today.getFullYear() + offset;
       const items = Array.from({ length: 12 }, (_, i) => {
         const mo = i + 1;
-        const prefix = `${yr}.${String(mo).padStart(2, "0")}.`;
-        let value = 0;
-        for (const [k, c] of countByDate) {
-          if (k.startsWith(prefix)) value += c;
-        }
-        return { label: String(mo), value };
+        const ym = `${yr}.${String(mo).padStart(2, "0")}`;
+        return { label: String(mo), value: countByMonth.get(ym) || 0 };
       });
       const total = items.reduce((s, d) => s + d.value, 0);
-      return { data: items, title: String(yr), avg: total / 12, canNext: offset < 0 };
+      const maxValue = Math.max(...items.map((d) => d.value), 1);
+      return { data: items, title: String(yr), avg: total / 12, maxValue, canNext: offset < 0 };
     }
 
-    return { data: [], title: "", avg: 0, canNext: false };
-  }, [gran, offset, locale, countByDate]);
+    return { data: [], title: "", avg: 0, maxValue: 1, canNext: false };
+  }, [gran, offset, countByDate, countByMonth, fmtWeekday, fmtDayMonth, fmtDayMonthYear, fmtMonthYear]);
 
   const granLabels = { week: t.granWeek, month: t.granMonth, year: t.granYear };
   const tooltipUnit = { one: t.chartEvent, many: t.chartEvents };
@@ -270,7 +295,7 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
                 interval={0}
                 padding={{ left: 10, right: 10 }}
               />
-              <YAxis hide width={0} />
+              <YAxis hide domain={[0, maxValue]} />
               <Tooltip
                 cursor={{ fill: P.accentShadow }}
                 content={<TooltipContent tooltipUnit={tooltipUnit} />}
