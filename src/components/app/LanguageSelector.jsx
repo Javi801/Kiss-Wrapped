@@ -8,13 +8,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { PALETTE, TEXT } from "@/lib/constants";
+import { TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 
 /**
  * Renders an inline language selector designed to scale to more languages.
  * It avoids floating UI to reduce click and layering issues.
  */
 export default function LanguageSelector({ language, setLanguage, t }) {
+  const PALETTE = usePalette();
   // Centralize selector styling for consistency with the dashboard actions.
   const triggerStyle = {
     borderColor: PALETTE.inputBorder,
@@ -37,7 +39,7 @@ export default function LanguageSelector({ language, setLanguage, t }) {
         >
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
             <Languages
-              style={{ height: "1.25rem", width: "1.25rem", flexShrink: 0, color: PALETTE.rose }}
+              style={{ height: "1.25rem", width: "1.25rem", flexShrink: 0, color: PALETTE.accent }}
             />
             <SelectValue placeholder={t.language} />
           </div>

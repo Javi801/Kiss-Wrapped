@@ -6,7 +6,8 @@ import {
   translateGender,
   getColorForCategory,
 } from "@/lib/format";
-import { ZODIAC_OPTIONS, PALETTE, TEXT } from "@/lib/constants";
+import { ZODIAC_OPTIONS, TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 import { calculateAge, calculateAgeAtEvent } from "@/lib/date";
 
 import BarChartCard from "@/components/charts/BarChartCard";
@@ -19,6 +20,7 @@ import AgeRangeCard from "@/components/stats/AgeRangeCard";
  * It groups event and person data by zodiac, activity, gender, age, and name initials.
  */
 export default function StatsPeopleTab({ people, t }) {
+  const PALETTE = usePalette();
   const [ageAtEvent, setAgeAtEvent] = useState(false);
 
   // Counts people per zodiac sign, filling in zeros for all 12 signs.
@@ -222,7 +224,7 @@ export default function StatsPeopleTab({ people, t }) {
         tooltipUnit={{ one: t.chartPerson, many: t.chartPersons }}
         headerAction={
           <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", flexShrink: 0 }}>
-            <span style={{ ...TEXT.caption, color: ageAtEvent ? PALETTE.rose : PALETTE.textSoft }}>
+            <span style={{ ...TEXT.caption, color: ageAtEvent ? PALETTE.accent : PALETTE.textSoft }}>
               {t.ageAtEvent}
             </span>
             <button
@@ -234,7 +236,7 @@ export default function StatsPeopleTab({ people, t }) {
                 width: "2.25rem",
                 height: "1.25rem",
                 borderRadius: "9999px",
-                backgroundColor: ageAtEvent ? PALETTE.rose : "#d1d5db",
+                backgroundColor: ageAtEvent ? PALETTE.accent : PALETTE.line,
                 border: "none",
                 cursor: "pointer",
                 position: "relative",

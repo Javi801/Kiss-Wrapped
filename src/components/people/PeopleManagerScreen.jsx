@@ -11,7 +11,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-import { PALETTE, TEXT } from "@/lib/constants";
+import { TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 import { formatDisplayDate, calculateAge } from "@/lib/date";
 import { getFirstEventDate, getLastEventDate } from "@/lib/stats";
 
@@ -33,6 +34,7 @@ export default function PeopleManagerScreen({
   language,
   modalBackRef,
 }) {
+  const PALETTE = usePalette();
   const [query, setQuery] = useState("");
 
   const [filters, setFilters] = useState({
@@ -183,7 +185,7 @@ export default function PeopleManagerScreen({
       <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
         <div style={{ position: "relative", flex: "1 1 0%" }}>
           <Search
-            style={{ pointerEvents: "none", position: "absolute", left: "0.75rem", top: "50%", height: "1rem", width: "1rem", transform: "translateY(-50%)", color: PALETTE.rose }}
+            style={{ pointerEvents: "none", position: "absolute", left: "0.75rem", top: "50%", height: "1rem", width: "1rem", transform: "translateY(-50%)", color: PALETTE.accent }}
           />
           <Input
             className="rounded-2xl"
@@ -216,11 +218,11 @@ export default function PeopleManagerScreen({
           <SheetContent
             side="right"
             style={{
-              width: "92%",
-              maxWidth: "24rem",
+              width: "80%",
+              maxWidth: "20rem",
               overflowY: "auto",
               borderLeftColor: PALETTE.cardBorder,
-              background: `linear-gradient(180deg, #f4edfb 0%, #eae5f7 50%, #d6ecfe 100%)`,
+              background: `linear-gradient(180deg, ${PALETTE.accentMuted} 0%, ${PALETTE.card} 55%)`,
             }}
           >
             <SheetHeader style={{ padding: "1.25rem 1rem 0.75rem" }}>
@@ -229,17 +231,17 @@ export default function PeopleManagerScreen({
                   width: "2rem",
                   height: "2rem",
                   borderRadius: "0.625rem",
-                  background: `linear-gradient(135deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`,
+                  background: `linear-gradient(135deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   flexShrink: 0,
-                  boxShadow: "0 2px 8px rgba(226,115,150,0.3)",
+                  boxShadow: `0 2px 8px ${PALETTE.accentGlow}`,
                 }}>
                   <Filter size={14} style={{ color: "white" }} />
                 </div>
                 <SheetTitle style={{
-                  background: `linear-gradient(90deg, ${PALETTE.text}, ${PALETTE.rose})`,
+                  background: `linear-gradient(90deg, ${PALETTE.text}, ${PALETTE.accent})`,
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
@@ -314,7 +316,7 @@ export default function PeopleManagerScreen({
                     width: "20px",
                     height: "20px",
                     borderRadius: "50%",
-                    backgroundColor: PALETTE.blush,
+                    backgroundColor: PALETTE.accentMuted,
                     opacity: activeLetter !== null ? 0.85 : 0,
                     pointerEvents: "none",
                     transition: "top 0.2s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease, transform 0.2s ease",
@@ -343,7 +345,7 @@ export default function PeopleManagerScreen({
                         fontSize: "0.55rem",
                         fontWeight: selected ? "800" : active ? "700" : "400",
                         lineHeight: 1,
-                        color: selected ? PALETTE.deep : active ? PALETTE.rose : PALETTE.textSoft,
+                        color: selected ? PALETTE.accentEmphasis : active ? PALETTE.accent : PALETTE.textSoft,
                         opacity: active ? 1 : 0.3,
                         cursor: active ? "pointer" : "default",
                         transition: "color 0.15s",
@@ -381,7 +383,7 @@ export default function PeopleManagerScreen({
                       backgroundColor: PALETTE.surfaceBg,
                     }}
                   >
-                    <p style={{ ...TEXT.label, textTransform: "uppercase", letterSpacing: "0.16em", color: PALETTE.rose }}>
+                    <p style={{ ...TEXT.label, textTransform: "uppercase", letterSpacing: "0.16em", color: PALETTE.accent }}>
                       {groupBy === "lastEventDate" && group !== t.noEvents
                         ? formatDisplayDate(group)
                         : group}
@@ -419,7 +421,7 @@ export default function PeopleManagerScreen({
             <Button
               variant="outline"
               className="rounded-2xl"
-              style={{ borderColor: PALETTE.inputBorder, backgroundColor: "white" }}
+              style={{ borderColor: PALETTE.inputBorder, backgroundColor: PALETTE.card }}
               onClick={() => {
                 setQuery("");
                 setFilters({

@@ -13,7 +13,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { GENDERS, ZODIAC_OPTIONS, PALETTE, TEXT } from "@/lib/constants";
+import { GENDERS, ZODIAC_OPTIONS, TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 import { translateGender } from "@/lib/format";
 import { calculateAge, deriveBirthYear, isWithinZodiacPeriod } from "@/lib/date";
 
@@ -31,6 +32,7 @@ export default function PersonForm({
   saveLabel,
   mode,
 }) {
+  const PALETTE = usePalette();
   // Local form state initialization.
   const [form, setForm] = useState(() => {
     if (!initialValues) {
@@ -152,7 +154,7 @@ export default function PersonForm({
                         fontWeight: 500,
                         cursor: "pointer",
                         border: "none",
-                        backgroundColor: birthdayAlreadyHappened === val ? PALETTE.rose : "transparent",
+                        backgroundColor: birthdayAlreadyHappened === val ? PALETTE.accent : "transparent",
                         color: birthdayAlreadyHappened === val ? "#fff" : PALETTE.textSoft,
                         transition: "background-color 0.15s, color 0.15s",
                       }}
@@ -297,7 +299,7 @@ export default function PersonForm({
             flex: "1 1 0%",
             color: "white",
             boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-            background: `linear-gradient(90deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`,
+            background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
           }}
         >
           <Save style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />

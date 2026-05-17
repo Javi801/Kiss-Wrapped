@@ -1,7 +1,8 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { PALETTE, TEXT } from "@/lib/constants";
+import { TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 import AgeRangeBox from "@/components/stats/AgeRangeBox";
 import { getYearKey, calculateAgeAtEvent } from "@/lib/date";
 
@@ -62,6 +63,7 @@ function niceAxis(dataMin, dataMax) {
 }
 
 export default function AgeRangeCard({ title, people, emptyText, t }) {
+  const PALETTE = usePalette();
   const [splitByYear, setSplitByYear] = useState(false);
 
   const yearsData = useMemo(() => {
@@ -152,8 +154,8 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
       <CardHeader style={{ paddingBottom: "0.5rem" }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "0.75rem" }}>
           <div>
-            <CardTitle style={TEXT.title}>{title}</CardTitle>
-            <CardDescription>
+            <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>{title}</CardTitle>
+            <CardDescription style={{ color: PALETTE.textSoft }}>
               {splitByYear ? t.agesAsOfYear : t.allYears}
             </CardDescription>
           </div>
@@ -162,7 +164,7 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
             type="button"
             variant="outline"
             className="rounded-2xl"
-            style={{ backgroundColor: "rgba(255,255,255,0.7)", borderColor: PALETTE.inputBorder }}
+            style={{ backgroundColor: PALETTE.controlBg, borderColor: PALETTE.inputBorder }}
             onClick={() => setSplitByYear((prev) => !prev)}
           >
             {splitByYear ? t.showAllTogether : t.divideByYear}
@@ -204,13 +206,13 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
                 {/* Boxplot row */}
                 <div style={{ position: "relative", flex: 1, height: "2rem" }}>
                   <div
-                    style={{ position: "absolute", left: "3%", right: "3%", top: "50%", height: "1px", transform: "translateY(-50%)", backgroundColor: "#e7d5de" }}
+                    style={{ position: "absolute", left: "3%", right: "3%", top: "50%", height: "1px", transform: "translateY(-50%)", backgroundColor: PALETTE.line }}
                   />
                   <div
-                    style={{ position: "absolute", top: "50%", height: "1.25rem", width: "2px", transform: "translateY(-50%)", left: `${minPos}%`, backgroundColor: PALETTE.rose }}
+                    style={{ position: "absolute", top: "50%", height: "1.25rem", width: "2px", transform: "translateY(-50%)", left: `${minPos}%`, backgroundColor: PALETTE.accent }}
                   />
                   <div
-                    style={{ position: "absolute", top: "50%", height: "1.25rem", width: "2px", transform: "translateY(-50%)", left: `${maxPos}%`, backgroundColor: PALETTE.rose }}
+                    style={{ position: "absolute", top: "50%", height: "1.25rem", width: "2px", transform: "translateY(-50%)", left: `${maxPos}%`, backgroundColor: PALETTE.accent }}
                   />
                   <div
                     className="rounded-sm"
@@ -219,14 +221,14 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
                       top: "50%",
                       height: "1.25rem",
                       transform: "translateY(-50%)",
-                      border: `2px solid ${PALETTE.rose}`,
+                      border: `2px solid ${PALETTE.accent}`,
                       left: `${boxLeft}%`,
                       width: `${boxWidth}%`,
-                      backgroundColor: PALETTE.roseSoft,
+                      backgroundColor: PALETTE.accentSoft,
                     }}
                   />
                   <div
-                    style={{ position: "absolute", top: "50%", height: "1.5rem", width: "2px", transform: "translateY(-50%)", left: `${medianPos}%`, backgroundColor: PALETTE.deep }}
+                    style={{ position: "absolute", top: "50%", height: "1.5rem", width: "2px", transform: "translateY(-50%)", left: `${medianPos}%`, backgroundColor: PALETTE.accentEmphasis }}
                   />
                 </div>
               </div>
@@ -249,7 +251,7 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
                         transform: isFirst ? "none" : isLast ? "translateX(-100%)" : "translateX(-50%)",
                         ...TEXT.body,
                         fontWeight: "500",
-                        color: PALETTE.deep,
+                        color: PALETTE.accentEmphasis,
                         whiteSpace: "nowrap",
                       }}
                     >

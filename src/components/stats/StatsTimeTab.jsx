@@ -6,11 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import BarChartCard from "@/components/charts/BarChartCard";
 import DumbbellChartCard from "@/components/charts/DumbbellChartCard";
 import HeatmapChartCard from "@/components/charts/HeatmapChartCard";
-import { PALETTE, TEXT } from "@/lib/constants";
+import { TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 import { getMonthKey, getYearKey } from "@/lib/date";
 
 // Renders the time-based statistics tab. It shows monthly, yearly, and multi-year event patterns.
 export default function StatsTimeTab({ people, allEvents, t }) {
+  const PALETTE = usePalette();
   // Groups all events by month. Keys are generated in yyyy-MM format.
   const eventsPerMonth = useMemo(() => {
     const map = new Map();
@@ -141,8 +143,8 @@ export default function StatsTimeTab({ people, allEvents, t }) {
           }}
         >
           <CardHeader style={{ paddingBottom: "0.5rem" }}>
-            <CardTitle style={TEXT.title}>{t.multiYearSubtitle}</CardTitle>
-            <CardDescription>{t.yearOverlap}</CardDescription>
+            <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>{t.multiYearSubtitle}</CardTitle>
+            <CardDescription style={{ color: PALETTE.textSoft }}>{t.yearOverlap}</CardDescription>
           </CardHeader>
 
           <CardContent>
@@ -162,7 +164,7 @@ export default function StatsTimeTab({ people, allEvents, t }) {
 
                     <Badge
                       className="rounded-full"
-                      style={{ border: "none", color: "white", backgroundColor: PALETTE.rose }}
+                      style={{ border: "none", color: "white", backgroundColor: PALETTE.accent }}
                     >
                       {item.value}
                     </Badge>

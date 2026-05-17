@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { PALETTE, TEXT } from "@/lib/constants";
+import { TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 import { calculateAge } from "@/lib/date";
 
 /**
@@ -9,6 +10,7 @@ import { calculateAge } from "@/lib/date";
  * When bare=true, renders only the chart content without the Card wrapper.
  */
 export default function AgeRangeBox({ title, subtitle, people, emptyText, bare = false }) {
+  const PALETTE = usePalette();
   const ages = useMemo(
     () => people
       .map((p) => calculateAge(p.birthYear, p.zodiacSign) ?? p.age)
@@ -35,8 +37,8 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText, bare =
         style={{ boxShadow: "none", borderColor: PALETTE.innerCardBorder, backgroundColor: PALETTE.cardSoft }}
       >
         <CardHeader style={{ paddingBottom: "0.5rem" }}>
-          <CardTitle style={TEXT.title}>{title}</CardTitle>
-          {subtitle ? <CardDescription>{subtitle}</CardDescription> : null}
+          <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>{title}</CardTitle>
+          {subtitle ? <CardDescription style={{ color: PALETTE.textSoft }}>{subtitle}</CardDescription> : null}
         </CardHeader>
         <CardContent>{emptyContent}</CardContent>
       </Card>
@@ -96,13 +98,13 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText, bare =
       {/* Boxplot */}
       <div style={{ position: "relative", height: "3.5rem", marginBottom: "0.75rem" }}>
         <div
-          style={{ position: "absolute", left: "3%", right: "3%", top: "50%", height: "0.125rem", transform: "translateY(-50%)", backgroundColor: "#e7d5de" }}
+          style={{ position: "absolute", left: "3%", right: "3%", top: "50%", height: "0.125rem", transform: "translateY(-50%)", backgroundColor: PALETTE.line }}
         />
         <div
-          style={{ position: "absolute", top: "50%", height: "2rem", width: "0.125rem", transform: "translateY(-50%)", left: `${minPos}%`, backgroundColor: PALETTE.rose }}
+          style={{ position: "absolute", top: "50%", height: "2rem", width: "0.125rem", transform: "translateY(-50%)", left: `${minPos}%`, backgroundColor: PALETTE.accent }}
         />
         <div
-          style={{ position: "absolute", top: "50%", height: "2rem", width: "0.125rem", transform: "translateY(-50%)", left: `${maxPos}%`, backgroundColor: PALETTE.rose }}
+          style={{ position: "absolute", top: "50%", height: "2rem", width: "0.125rem", transform: "translateY(-50%)", left: `${maxPos}%`, backgroundColor: PALETTE.accent }}
         />
         <div
           className="rounded-sm"
@@ -111,14 +113,14 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText, bare =
             top: "50%",
             height: "2rem",
             transform: "translateY(-50%)",
-            border: `2px solid ${PALETTE.rose}`,
+            border: `2px solid ${PALETTE.accent}`,
             left: `${boxLeft}%`,
             width: `${boxWidth}%`,
-            backgroundColor: PALETTE.roseSoft,
+            backgroundColor: PALETTE.accentSoft,
           }}
         />
         <div
-          style={{ position: "absolute", top: "50%", height: "2.5rem", width: "0.125rem", transform: "translateY(-50%)", left: `${medianPos}%`, backgroundColor: PALETTE.deep }}
+          style={{ position: "absolute", top: "50%", height: "2.5rem", width: "0.125rem", transform: "translateY(-50%)", left: `${medianPos}%`, backgroundColor: PALETTE.accentEmphasis }}
         />
       </div>
 
@@ -137,7 +139,7 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText, bare =
                 transform: isFirst ? "none" : isLast ? "translateX(-100%)" : "translateX(-50%)",
                 ...TEXT.body,
                 fontWeight: "500",
-                color: PALETTE.deep,
+                color: PALETTE.accentEmphasis,
                 whiteSpace: "nowrap",
               }}
             >
@@ -157,8 +159,8 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText, bare =
       style={{ boxShadow: "none", borderColor: PALETTE.innerCardBorder, backgroundColor: PALETTE.cardSoft }}
     >
       <CardHeader style={{ paddingBottom: "0.5rem" }}>
-        <CardTitle style={TEXT.title}>{title}</CardTitle>
-        <CardDescription>{subtitle || `${min} - ${max}`}</CardDescription>
+        <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>{title}</CardTitle>
+        <CardDescription style={{ color: PALETTE.textSoft }}>{subtitle || `${min} - ${max}`}</CardDescription>
       </CardHeader>
       <CardContent>{chartContent}</CardContent>
     </Card>

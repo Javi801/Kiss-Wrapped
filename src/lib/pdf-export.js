@@ -13,7 +13,7 @@ import { getColorForCategory } from "@/lib/format";
 function drawWindowCard(doc, x, y, w, h, title, bodyFn) {
   // Build the card and line colors from the shared palette.
   const cardRgb = hexToRgb("#f5edf7");
-  const lineRgb = hexToRgb(PALETTE.deep2);
+  const lineRgb = hexToRgb(PALETTE.accentEmphasis2);
 
   // Paint the rounded card background.
   doc.setFillColor(cardRgb.r, cardRgb.g, cardRgb.b);
@@ -25,9 +25,9 @@ function drawWindowCard(doc, x, y, w, h, title, bodyFn) {
   doc.line(x, y + 12, x + w, y + 12);
 
   // Draw the decorative circles at the top-left of the card.
-  const pink = hexToRgb(PALETTE.rose);
-  const lilac = hexToRgb(PALETTE.lavender);
-  const sky = hexToRgb(PALETTE.sky2);
+  const pink = hexToRgb(PALETTE.accent);
+  const lilac = hexToRgb(PALETTE.emphasisEnd);
+  const sky = hexToRgb(PALETTE.accent2);
 
   doc.setFillColor(pink.r, pink.g, pink.b);
   doc.circle(x + 8, y + 6, 1.6, "F");
@@ -97,7 +97,7 @@ function drawSimpleBarChart(
   h,
   title,
   data,
-  color = PALETTE.rose,
+  color = PALETTE.accent,
   rotateLabels = false,
 ) {
   // Resolve chart colors once to keep the drawing code cleaner.
@@ -191,9 +191,9 @@ function drawLegendList(doc, x, y, items) {
  */
 function paintBackground(doc, pageW, pageH) {
   // Prepare the layered background colors.
-  const bg1 = hexToRgb(PALETTE.blush);
+  const bg1 = hexToRgb(PALETTE.accentMuted);
   const bg2 = hexToRgb("#f6ecfb");
-  const bg3 = hexToRgb(PALETTE.sky);
+  const bg3 = hexToRgb(PALETTE.gradientEnd);
 
   // Fill the full-page background.
   doc.setFillColor(bg1.r, bg1.g, bg1.b);
@@ -239,7 +239,7 @@ export async function exportStatsPdf(people, t) {
     t.appTitle,
     (pdf, x, y) => {
       // Use stronger contrast for the cover title and softer text for the subtitle.
-      const text = hexToRgb(PALETTE.deep2);
+      const text = hexToRgb(PALETTE.accentEmphasis2);
       const soft = hexToRgb(PALETTE.textSoft);
 
       pdf.setTextColor(text.r, text.g, text.b);
@@ -328,7 +328,7 @@ export async function exportStatsPdf(people, t) {
         120,
         t.peopleMostEvents,
         stats.peopleMostEvents,
-        PALETTE.rose,
+        PALETTE.accent,
         true,
       );
     },
@@ -353,7 +353,7 @@ export async function exportStatsPdf(people, t) {
         72,
         t.eventsPerMonth,
         stats.eventsPerMonth,
-        PALETTE.rose,
+        PALETTE.accent,
         true,
       );
       drawSimpleBarChart(
@@ -364,7 +364,7 @@ export async function exportStatsPdf(people, t) {
         56,
         t.eventsPerYear,
         stats.eventsPerYear,
-        PALETTE.sky2,
+        PALETTE.accent2,
         false,
       );
 
@@ -406,7 +406,7 @@ export async function exportStatsPdf(people, t) {
         58,
         t.eventsByZodiac,
         stats.eventsByZodiac,
-        PALETTE.rose,
+        PALETTE.accent,
         true,
       );
       drawSimpleBarChart(
@@ -455,7 +455,7 @@ export async function exportStatsPdf(people, t) {
         64,
         t.scoreDistribution,
         stats.scoresByKisses.filter((d) => d.value > 0),
-        PALETTE.rose,
+        PALETTE.accent,
         true,
       );
       drawSimpleBarChart(
@@ -466,7 +466,7 @@ export async function exportStatsPdf(people, t) {
         58,
         t.eventsByPersonCount,
         stats.numberOfEventsByNumberOfPersons,
-        PALETTE.sky2,
+        PALETTE.accent2,
         false,
       );
 

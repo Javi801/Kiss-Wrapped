@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { PALETTE } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 import mainBackground from "@/assets/main-background.png";
 
 /**
@@ -8,6 +8,9 @@ import mainBackground from "@/assets/main-background.png";
  * Falls back gracefully if the image fails to load.
  */
 export default function HeroVisualPlaceholder() {
+  const PALETTE = usePalette();
+  const heroSurfaceBg =
+    PALETTE.bg === "#0f0d1a" ? "rgba(255,255,255,0.16)" : PALETTE.surfaceBg;
   // Track if the image loads correctly.
   const [hasImage, setHasImage] = useState(true);
 
@@ -22,7 +25,7 @@ export default function HeroVisualPlaceholder() {
         justifyContent: "center",
         borderRadius: "9999px",
         backdropFilter: "blur(4px)",
-        backgroundColor: "rgba(255,255,255,0.55)",
+        backgroundColor: heroSurfaceBg,
       }}
     >
       {/* Background gradient layer */}
@@ -34,7 +37,7 @@ export default function HeroVisualPlaceholder() {
           bottom: "1.5rem",
           left: "1.5rem",
           borderRadius: "9999px",
-          background: `linear-gradient(135deg, ${PALETTE.blush}, #fff7fb, ${PALETTE.sky})`,
+          background: `linear-gradient(135deg, ${PALETTE.accentMuted}, ${PALETTE.cardSoft}, ${PALETTE.gradientEnd})`,
         }}
       />
 

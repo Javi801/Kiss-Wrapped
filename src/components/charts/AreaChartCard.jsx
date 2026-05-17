@@ -14,18 +14,20 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { PALETTE, TEXT } from "@/lib/constants";
+import { TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 
 /**
  * Renders a reusable area chart card.
  * It is used for time-based distributions or continuous data.
  */
 function ChartTooltip({ active, payload, label, tooltipUnit }) {
+  const PALETTE = usePalette();
   if (!active || !payload?.length) return null;
   const value = payload[0].value;
   const unit = value === 1 ? tooltipUnit.one : tooltipUnit.many;
   return (
-    <div style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: "0.5rem", padding: "0.5rem 0.75rem", fontSize: 13 }}>
+    <div style={{ background: PALETTE.card, border: `1px solid ${PALETTE.line}`, color: PALETTE.text, borderRadius: "0.5rem", padding: "0.5rem 0.75rem", fontSize: 13 }}>
       <p style={{ marginBottom: "0.2rem", fontWeight: 500 }}>{label}</p>
       <p>{`${value} ${unit}`}</p>
     </div>
@@ -39,6 +41,7 @@ export default function AreaChartCard({
   emptyText,
   tooltipUnit = null,
 }) {
+  const PALETTE = usePalette();
   // Shared card style for consistency.
   const cardStyle = {
     borderColor: PALETTE.cardBorder,
@@ -57,7 +60,7 @@ export default function AreaChartCard({
         <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>
           {title}
         </CardTitle>
-        <CardDescription>{subtitle}</CardDescription>
+        <CardDescription style={{ color: PALETTE.textSoft }}>{subtitle}</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -66,7 +69,7 @@ export default function AreaChartCard({
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data}>
                 {/* Grid lines */}
-                <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={PALETTE.cardBorder} />
 
                 {/* X axis */}
                 <XAxis
@@ -74,6 +77,7 @@ export default function AreaChartCard({
                   tickLine={false}
                   axisLine={false}
                   fontSize={12}
+                  tick={{ fill: PALETTE.textSoft }}
                 />
 
                 {/* Y axis */}
@@ -82,6 +86,7 @@ export default function AreaChartCard({
                   tickLine={false}
                   axisLine={false}
                   fontSize={12}
+                  tick={{ fill: PALETTE.textSoft }}
                 />
 
                 {tooltipUnit ? (
@@ -94,8 +99,8 @@ export default function AreaChartCard({
                 <Area
                   type="monotone"
                   dataKey="value"
-                  stroke={PALETTE.sky2}
-                  fill={PALETTE.sky}
+                  stroke={PALETTE.accent2}
+                  fill={PALETTE.gradientEnd}
                 />
               </AreaChart>
             </ResponsiveContainer>

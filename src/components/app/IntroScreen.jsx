@@ -1,5 +1,4 @@
-import { PALETTE } from "@/lib/constants";
-import BubbleStarsBackground from "@/components/visuals/BubbleStarsBackground";
+import { usePalette } from "@/lib/theme";
 import HeroVisualPlaceholder from "@/components/visuals/HeroVisualPlaceholder";
 import InteractiveBubbles from "@/components/visuals/InteractiveBubbles";
 
@@ -8,6 +7,7 @@ import InteractiveBubbles from "@/components/visuals/InteractiveBubbles";
  * Acts as a playful gate before entering the main app.
  */
 export default function IntroScreen({ onOpenMain, t }) {
+  const PALETTE = usePalette();
   return (
     <div
       style={{
@@ -18,12 +18,9 @@ export default function IntroScreen({ onOpenMain, t }) {
         justifyContent: "center",
         overflow: "hidden",
         zIndex: 10,
-        background: `linear-gradient(135deg, ${PALETTE.blush}, ${PALETTE.lilac}, ${PALETTE.sky})`,
+        background: `linear-gradient(135deg, ${PALETTE.accentMuted}, ${PALETTE.gradientMid}, ${PALETTE.gradientEnd})`,
       }}
     >
-      {/* Floating animated background elements */}
-      <BubbleStarsBackground />
-
       {/* Interactive poppable bubbles */}
       <InteractiveBubbles />
 
@@ -51,7 +48,7 @@ export default function IntroScreen({ onOpenMain, t }) {
           left: "1rem",
           zIndex: 10,
           padding: "0.25rem",
-          color: "#fda4af",
+          color: PALETTE.accentSoft,
           opacity: 0.4,
           transition: "opacity 150ms",
           background: "none",

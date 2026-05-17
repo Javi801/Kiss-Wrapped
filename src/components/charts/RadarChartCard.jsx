@@ -8,15 +8,17 @@ import {
   Tooltip,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { PALETTE, TEXT } from "@/lib/constants";
+import { TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 
 function ChartTooltip({ active, payload, tooltipUnit }) {
+  const PALETTE = usePalette();
   if (!active || !payload?.length) return null;
   const value = payload[0].value;
   const label = payload[0].payload?.label;
   const unit = tooltipUnit ? (value === 1 ? tooltipUnit.one : tooltipUnit.many) : null;
   return (
-    <div style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: "0.5rem", padding: "0.5rem 0.75rem", fontSize: 13 }}>
+    <div style={{ background: PALETTE.card, border: `1px solid ${PALETTE.line}`, color: PALETTE.text, borderRadius: "0.5rem", padding: "0.5rem 0.75rem", fontSize: 13 }}>
       <p style={{ marginBottom: "0.2rem", fontWeight: 500 }}>{label}</p>
       <p>{`${value}${unit ? ` ${unit}` : ""}`}</p>
     </div>
@@ -24,6 +26,7 @@ function ChartTooltip({ active, payload, tooltipUnit }) {
 }
 
 export default function RadarChartCard({ title, subtitle, data, emptyText, tooltipUnit = null }) {
+  const PALETTE = usePalette();
   const cardStyle = { borderColor: PALETTE.cardBorder, backgroundColor: PALETTE.cardBg };
   const emptyStyle = { borderColor: PALETTE.inputBorder, color: PALETTE.textSoft };
   const hasData = data.some((d) => d.value > 0);
@@ -32,7 +35,7 @@ export default function RadarChartCard({ title, subtitle, data, emptyText, toolt
     <Card className="rounded-3xl" style={{ boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)", backdropFilter: "blur(8px)", ...cardStyle }}>
       <CardHeader style={{ paddingBottom: "0.5rem" }}>
         <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>{title}</CardTitle>
-        <CardDescription>{subtitle}</CardDescription>
+        <CardDescription style={{ color: PALETTE.textSoft }}>{subtitle}</CardDescription>
       </CardHeader>
       <CardContent>
         {hasData ? (
@@ -57,11 +60,11 @@ export default function RadarChartCard({ title, subtitle, data, emptyText, toolt
                 )}
                 <Radar
                   dataKey="value"
-                  stroke={PALETTE.rose}
-                  fill={PALETTE.rose}
+                  stroke={PALETTE.accent}
+                  fill={PALETTE.accent}
                   fillOpacity={0.3}
                   strokeWidth={2}
-                  dot={{ r: 3, fill: PALETTE.rose, strokeWidth: 0 }}
+                  dot={{ r: 3, fill: PALETTE.accent, strokeWidth: 0 }}
                   activeDot={{ r: 5 }}
                 />
               </RadarChart>

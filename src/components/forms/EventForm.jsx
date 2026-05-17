@@ -24,11 +24,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-import { PALETTE, SCORE_OPTIONS, TEXT } from "@/lib/constants";
+import { SCORE_OPTIONS, TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 import { todayString, isValidDateString, isFutureDate } from "@/lib/date";
 import { hasScore, renderKisses } from "@/lib/format";
 
 export default function EventForm({ initialValues, onSave, onCancel, onDelete, t }) {
+  const PALETTE = usePalette();
   const [date, setDate] = useState(initialValues?.date || todayString());
   const [details, setDetails] = useState(initialValues?.details || "");
   const [score, setScore] = useState(
@@ -189,7 +191,7 @@ export default function EventForm({ initialValues, onSave, onCancel, onDelete, t
               flex: "1 1 0%",
               color: "white",
               boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-              background: `linear-gradient(90deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`,
+              background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
             }}
           >
             {t.saveEvent}

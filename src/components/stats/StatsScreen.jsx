@@ -10,7 +10,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { PALETTE, TEXT } from "@/lib/constants";
+import { TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 import { exportStatsPdf, saveErrorLog } from "@/lib/pdf-export";
 
 import StatsOverviewTab from "@/components/stats/StatsOverviewTab";
@@ -23,6 +24,7 @@ import StatsScoresTab from "@/components/stats/StatsScoresTab";
  * It prepares shared data and delegates each section to a dedicated tab component.
  */
 export default function StatsScreen({ people, t }) {
+  const PALETTE = usePalette();
   const [tab, setTab] = useState("overview");
   // null = idle, "success" = exported OK, Error instance = export failed
   const [pdfStatus, setPdfStatus] = useState(null);
@@ -134,11 +136,11 @@ export default function StatsScreen({ people, t }) {
                 transition: "all 150ms cubic-bezier(0.4, 0, 0.2, 1)",
                 border: active ? "none" : `1px solid ${PALETTE.inputBorder}`,
                 background: active
-                  ? `linear-gradient(90deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`
+                  ? `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`
                   : PALETTE.controlBg,
                 color: active ? "white" : PALETTE.text,
                 boxShadow: active
-                  ? "0 6px 16px rgba(226,115,150,0.18)"
+                  ? `0 6px 16px ${PALETTE.accentShadow}`
                   : "none",
               }}
             >
@@ -174,13 +176,13 @@ export default function StatsScreen({ people, t }) {
           style={{ background: PALETTE.bgSoft, borderColor: PALETTE.line }}
         >
           <DialogHeader>
-            <DialogTitle style={{ color: PALETTE.deep2 }}>{t.pdfEmptyTitle}</DialogTitle>
+            <DialogTitle style={{ color: PALETTE.accentEmphasis2 }}>{t.pdfEmptyTitle}</DialogTitle>
             <DialogDescription style={{ color: PALETTE.textSoft }}>{t.pdfEmptyDesc}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button
               className="rounded-xl"
-              style={{ background: `linear-gradient(90deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`, color: "white", border: "none" }}
+              style={{ background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`, color: "white", border: "none" }}
               onClick={() => setPdfStatus(null)}
             >
               {t.close}
@@ -200,16 +202,16 @@ export default function StatsScreen({ people, t }) {
           style={{ background: PALETTE.bgSoft, borderColor: PALETTE.line }}
         >
           <DialogHeader>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: PALETTE.rose }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: PALETTE.accent }}>
               <CheckCircle2 style={{ height: "1.25rem", width: "1.25rem", flexShrink: 0 }} />
-              <DialogTitle style={{ color: PALETTE.rose }}>{t.pdfSuccessTitle}</DialogTitle>
+              <DialogTitle style={{ color: PALETTE.accent }}>{t.pdfSuccessTitle}</DialogTitle>
             </div>
             <DialogDescription style={{ color: PALETTE.textSoft }}>{t.pdfSuccessDesc}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button
               className="rounded-xl"
-              style={{ background: `linear-gradient(90deg, ${PALETTE.rose}, ${PALETTE.roseSoft})`, color: "white", border: "none" }}
+              style={{ background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`, color: "white", border: "none" }}
               onClick={() => setPdfStatus(null)}
             >
               {t.close}
@@ -229,9 +231,9 @@ export default function StatsScreen({ people, t }) {
           style={{ background: PALETTE.bgSoft, borderColor: PALETTE.line }}
         >
           <DialogHeader>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: PALETTE.deep }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: PALETTE.accentEmphasis }}>
               <TriangleAlert style={{ height: "1.25rem", width: "1.25rem", flexShrink: 0 }} />
-              <DialogTitle style={{ color: PALETTE.deep }}>{t.pdfErrorTitle}</DialogTitle>
+              <DialogTitle style={{ color: PALETTE.accentEmphasis }}>{t.pdfErrorTitle}</DialogTitle>
             </div>
             <DialogDescription style={{ color: PALETTE.textSoft }}>{t.pdfErrorDesc}</DialogDescription>
           </DialogHeader>
@@ -246,7 +248,7 @@ export default function StatsScreen({ people, t }) {
             </Button>
             <Button
               className="rounded-xl"
-              style={{ background: PALETTE.deep, color: "white", border: "none" }}
+              style={{ background: PALETTE.accentEmphasis, color: "white", border: "none" }}
               onClick={() => {
                 saveErrorLog(pdfStatus).catch(console.error);
                 setPdfStatus(null);

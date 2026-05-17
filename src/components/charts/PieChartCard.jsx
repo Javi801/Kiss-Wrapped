@@ -12,7 +12,8 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { PALETTE, CHART_COLORS, TEXT } from "@/lib/constants";
+import { CHART_COLORS, TEXT } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 import { getColorForCategory } from "@/lib/format";
 
 /**
@@ -20,12 +21,13 @@ import { getColorForCategory } from "@/lib/format";
  * It supports automatic color assignment and category-based colors.
  */
 function ChartTooltip({ active, payload, tooltipUnit }) {
+  const PALETTE = usePalette();
   if (!active || !payload?.length) return null;
   const value = payload[0].value;
   const label = payload[0].name;
   const unit = value === 1 ? tooltipUnit.one : tooltipUnit.many;
   return (
-    <div style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: "0.5rem", padding: "0.5rem 0.75rem", fontSize: 13 }}>
+    <div style={{ background: PALETTE.card, border: `1px solid ${PALETTE.line}`, color: PALETTE.text, borderRadius: "0.5rem", padding: "0.5rem 0.75rem", fontSize: 13 }}>
       <p style={{ marginBottom: "0.2rem", fontWeight: 500 }}>{label}</p>
       <p>{`${value} ${unit}`}</p>
     </div>
@@ -39,11 +41,13 @@ export default function PieChartCard({
   emptyText,
   tooltipUnit = null,
 }) {
+  const PALETTE = usePalette();
+  const chartColors = PALETTE.chartColors ?? CHART_COLORS;
   // Resolve colors for each slice.
   const fills = data.map(
     (entry, index) =>
       getColorForCategory(entry.label) ||
-      CHART_COLORS[index % CHART_COLORS.length],
+      chartColors[index % chartColors.length],
   );
 
   // Shared card styling.
@@ -64,7 +68,7 @@ export default function PieChartCard({
         <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>
           {title}
         </CardTitle>
-        <CardDescription>{subtitle}</CardDescription>
+        <CardDescription style={{ color: PALETTE.textSoft }}>{subtitle}</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -101,7 +105,7 @@ export default function PieChartCard({
                 <div
                   key={entry.label}
                   className="rounded-full"
-                  style={{ maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingLeft: "0.75rem", paddingRight: "0.75rem", paddingTop: "0.25rem", paddingBottom: "0.25rem", ...TEXT.caption, backgroundColor: "#f8f4f7", color: PALETTE.textSoft }}
+                  style={{ maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingLeft: "0.75rem", paddingRight: "0.75rem", paddingTop: "0.25rem", paddingBottom: "0.25rem", ...TEXT.caption, backgroundColor: PALETTE.cardSoft, color: PALETTE.textSoft }}
                 >
                   <span style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
                     <span

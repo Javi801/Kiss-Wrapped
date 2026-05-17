@@ -24,7 +24,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-import { PALETTE, TEXT, abbreviateZodiacMonths } from "@/lib/constants";
+import { TEXT, abbreviateZodiacMonths } from "@/lib/constants";
+import { usePalette } from "@/lib/theme";
 import { formatShortDate, calculateAge } from "@/lib/date";
 import {
   translateActivity,
@@ -53,6 +54,7 @@ export default function PersonCard({
   t,
   language,
 }) {
+  const PALETTE = usePalette();
   // Expand/collapse state.
   const [expanded, setExpanded] = useState(false);
 
@@ -86,9 +88,8 @@ export default function PersonCard({
             boxShadow: hasIncompleteEvent
               ? "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1), 0 0 0 2px #f9d58a"
               : "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-            borderColor: hasIncompleteEvent ? "#f9d58a" : "#efd8e4",
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.97), rgba(255,248,252,0.95))",
+            borderColor: hasIncompleteEvent ? "#f9d58a" : PALETTE.cardBorder,
+            background: `linear-gradient(180deg, ${PALETTE.cardSoft}, ${PALETTE.accentMuted})`,
           }}
         >
           <CardContent style={{ padding: 0 }}>
@@ -130,11 +131,11 @@ export default function PersonCard({
               </div>
 
               {/* Toggle icon */}
-              <div className="rounded-2xl" style={{ padding: "0.5rem", backgroundColor: "#fff0f6" }}>
+              <div className="rounded-2xl" style={{ padding: "0.5rem", backgroundColor: PALETTE.accentMuted }}>
                 {expanded ? (
-                  <ChevronUp style={{ height: "1.25rem", width: "1.25rem", color: PALETTE.rose }} />
+                  <ChevronUp style={{ height: "1.25rem", width: "1.25rem", color: PALETTE.accent }} />
                 ) : (
-                  <ChevronDown style={{ height: "1.25rem", width: "1.25rem", color: PALETTE.rose }} />
+                  <ChevronDown style={{ height: "1.25rem", width: "1.25rem", color: PALETTE.accent }} />
                 )}
               </div>
             </button>
@@ -167,7 +168,10 @@ export default function PersonCard({
 
                     {/* Actions */}
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-                      <Button onClick={() => setEditingPerson(true)}>
+                      <Button
+                        onClick={() => setEditingPerson(true)}
+                        style={{ background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`, color: "white", border: "none" }}
+                      >
                         <Pencil style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
                         {t.editPerson}
                       </Button>
@@ -176,6 +180,7 @@ export default function PersonCard({
                         onClick={() =>
                           setEventModal({ open: true, mode: "add", event: null })
                         }
+                        style={{ background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`, color: "white", border: "none" }}
                       >
                         <Plus style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
                         {t.addEvent}
@@ -241,8 +246,8 @@ export default function PersonCard({
                             className="rounded-2xl"
                             style={{
                               width: "100%",
-                              border: eventIsMissingRequired(event) ? "1px solid #f9d58a" : "1px solid #e2e8f0",
-                              backgroundColor: eventIsMissingRequired(event) ? "rgba(249,213,138,0.08)" : "white",
+                              border: eventIsMissingRequired(event) ? "1px solid #f9d58a" : `1px solid ${PALETTE.innerCardBorder}`,
+                              backgroundColor: eventIsMissingRequired(event) ? "rgba(249,213,138,0.08)" : PALETTE.card,
                               padding: "0.75rem",
                               textAlign: "left",
                             }}
@@ -261,7 +266,7 @@ export default function PersonCard({
                               </span>
 
                               {hasScore(event.score) && (
-                                <Badge>{renderKisses(event.score, t)}</Badge>
+                                <Badge style={{ backgroundColor: PALETTE.accentShadow, color: PALETTE.accent, border: "none" }}>{renderKisses(event.score, t)}</Badge>
                               )}
                             </div>
 
@@ -276,7 +281,7 @@ export default function PersonCard({
                               </div>
                             )}
 
-                            <p style={{ marginTop: "0.5rem", ...TEXT.body, color: "#64748b" }}>
+                            <p style={{ marginTop: "0.5rem", ...TEXT.body, color: PALETTE.textSoft }}>
                               {event.details || t.noDetailsAdded}
                             </p>
 
