@@ -25,11 +25,11 @@ export default function StatsScoresTab({ people, allEvents, t }) {
   const scoresByKisses = useMemo(() => {
     const map = new Map();
 
-    for (const score of SCORE_OPTIONS) {
+    for (const score of SCORE_OPTIONS.filter((s) => s > 0)) {
       map.set(renderKisses(score, t), 0);
     }
 
-    for (const event of scoredEvents) {
+    for (const event of scoredEvents.filter((e) => e.score > 0)) {
       const label = renderKisses(event.score, t);
       map.set(label, (map.get(label) || 0) + 1);
     }
