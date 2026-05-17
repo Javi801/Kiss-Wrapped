@@ -209,7 +209,7 @@ export default function PersonsTimelineChartCard({ people, t }) {
       const title =
         rangeDays === 0
           ? fmtDayMonthYear.format(firstDate)
-          : `${fmtDayMonth.format(firstDate)} – ${fmtDayMonthYear.format(lastDate)}`;
+          : `${fmtDayMonthYear.format(firstDate)} – ${fmtDayMonthYear.format(lastDate)}`;
 
       if (rangeDays < 7) {
         const items = Array.from({ length: rangeDays + 1 }, (_, i) => {
