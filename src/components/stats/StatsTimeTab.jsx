@@ -2,6 +2,7 @@ import { useMemo } from "react";
 
 import BarChartCard from "@/components/charts/BarChartCard";
 import DumbbellChartCard from "@/components/charts/DumbbellChartCard";
+import EventsTimelineChartCard from "@/components/charts/EventsTimelineChartCard";
 import HeatmapChartCard from "@/components/charts/HeatmapChartCard";
 import { getMonthKey, getYearKey } from "@/lib/date";
 
@@ -80,6 +81,8 @@ export default function StatsTimeTab({ people, allEvents, t }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+      <EventsTimelineChartCard allEvents={allEvents} t={t} />
+
       <BarChartCard
         title={t.eventsPerMonth}
         subtitle={t.monthlyActivity}
