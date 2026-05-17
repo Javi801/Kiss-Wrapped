@@ -193,6 +193,12 @@ describe("getZodiacEndDate", () => {
   it("returns null for an empty string", () => {
     expect(getZodiacEndDate("")).toBeNull();
   });
+  it("returns null when the end date uses an unknown month name", () => {
+    expect(getZodiacEndDate("♈ Aries (March 21 - Foo 19)")).toBeNull();
+  });
+  it("returns null when the date range separator is missing", () => {
+    expect(getZodiacEndDate("♈ Aries (March 21 April 19)")).toBeNull();
+  });
 });
 
 describe("getZodiacStartDate", () => {
@@ -210,6 +216,9 @@ describe("getZodiacStartDate", () => {
   });
   it("returns null for an empty string", () => {
     expect(getZodiacStartDate("")).toBeNull();
+  });
+  it("returns null when the start date uses an unknown Spanish month name", () => {
+    expect(getZodiacStartDate("♈ Aries (21 foo - 19 abril)")).toBeNull();
   });
 });
 
@@ -275,6 +284,9 @@ describe("calculateAge", () => {
   });
   it("returns null for null zodiacSign", () => {
     expect(calculateAge(2000, null)).toBeNull();
+  });
+  it("returns null for an unrecognized zodiac sign", () => {
+    expect(calculateAge(2000, "Unknown Sign")).toBeNull();
   });
 });
 
