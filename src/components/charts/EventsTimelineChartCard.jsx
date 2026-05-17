@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TEXT } from "@/lib/constants";
 import { usePalette } from "@/lib/theme";
 
-const GRANS = ["week", "month", "year"];
+const GRANS = ["week", "month", "year", "historic"];
 
 function dateToKey(d) {
   const y = d.getFullYear();
@@ -74,6 +74,10 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
   );
   const fmtMonthYear = useMemo(
     () => new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }),
+    [locale],
+  );
+  const fmtShortMonth = useMemo(
+    () => new Intl.DateTimeFormat(locale, { month: "short" }),
     [locale],
   );
 
@@ -166,10 +170,75 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
       return { data: items, title: String(yr), avg: total / 12, maxValue, canNext: offset < 0 };
     }
 
-    return { data: [], title: "", avg: 0, maxValue: 1, canNext: false };
-  }, [gran, offset, countByDate, countByMonth, fmtWeekday, fmtDayMonth, fmtDayMonthYear, fmtMonthYear]);
+    if (gran === "historic") {
+      const keys = allEvents.map((e) => e.date).filter(Boolean).sort();
+      if (!keys.length) return { data: [], title: "—", avg: 0, maxValue: 1, canNext: false };
 
-  const granLabels = { week: t.granWeek, month: t.granMonth, year: t.granYear };
+      const parseKey = (k) => {
+        const [y, m, d] = k.split(".");
+        return new Date(+y, +m - 1, +d);
+      };
+
+      const firstDate = parseKey(keys[0]);
+      const lastDate = parseKey(keys[keys.length - 1]);
+      const rangeDays = Math.round((lastDate - firstDate) / 86400000);
+
+      const title =
+        rangeDays === 0
+          ? fmtDayMonthYear.format(firstDate)
+          : `${fmtDayMonth.format(firstDate)} – ${fmtDayMonthYear.format(lastDate)}`;
+
+      if (rangeDays < 7) {
+        const items = Array.from({ length: rangeDays + 1 }, (_, i) => {
+          const d = new Date(firstDate);
+          d.setDate(firstDate.getDate() + i);
+          const raw = fmtWeekday.format(d).replace(/\.$/, "");
+          return { label: capitalize(raw), value: countByDate.get(dateToKey(d)) || 0 };
+        });
+        const total = items.reduce((s, x) => s + x.value, 0);
+        return { data: items, title, avg: total / items.length, maxValue: Math.max(...items.map((x) => x.value), 1), canNext: false };
+      }
+
+      if (rangeDays <= 365) {
+        const items = Array.from({ length: rangeDays + 1 }, (_, i) => {
+          const d = new Date(firstDate);
+          d.setDate(firstDate.getDate() + i);
+          const label = d.getDate() === 1 ? capitalize(fmtShortMonth.format(d).replace(/\.$/, "")) : "";
+          return { label, value: countByDate.get(dateToKey(d)) || 0 };
+        });
+        const total = items.reduce((s, x) => s + x.value, 0);
+        return { data: items, title, avg: total / items.length, maxValue: Math.max(...items.map((x) => x.value), 1), canNext: false };
+      }
+
+      // > 1 year: one bar per month, year label at each January (thinned if many years)
+      const yr1 = firstDate.getFullYear(), mo1 = firstDate.getMonth();
+      const yr2 = lastDate.getFullYear(), mo2 = lastDate.getMonth();
+      const items = [];
+      let y = yr1, m = mo1;
+      while (y < yr2 || (y === yr2 && m <= mo2)) {
+        const ym = `${y}.${String(m + 1).padStart(2, "0")}`;
+        items.push({ label: m === 0 ? String(y) : "", value: countByMonth.get(ym) || 0 });
+        if (++m > 11) { m = 0; y++; }
+      }
+      const MAX_YEAR_LABELS = 5;
+      const janIndices = items.reduce((acc, item, i) => { if (item.label) acc.push(i); return acc; }, []);
+      if (janIndices.length > MAX_YEAR_LABELS) {
+        const step = (janIndices.length - 1) / (MAX_YEAR_LABELS - 1);
+        const keepSet = new Set(
+          Array.from({ length: MAX_YEAR_LABELS }, (_, i) => janIndices[Math.round(i * step)])
+        );
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].label && !keepSet.has(i)) items[i] = { ...items[i], label: "" };
+        }
+      }
+      const total = items.reduce((s, x) => s + x.value, 0);
+      return { data: items, title, avg: total / items.length, maxValue: Math.max(...items.map((x) => x.value), 1), canNext: false };
+    }
+
+    return { data: [], title: "", avg: 0, maxValue: 1, canNext: false };
+  }, [gran, offset, countByDate, countByMonth, fmtWeekday, fmtDayMonth, fmtDayMonthYear, fmtMonthYear, fmtShortMonth, allEvents]);
+
+  const granLabels = { week: t.granWeek, month: t.granMonth, year: t.granYear, historic: t.granHistoric };
   const tooltipUnit = { one: t.chartEvent, many: t.chartEvents };
 
   const navBtn = (enabled) => ({
@@ -247,9 +316,11 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
             gap: "0.5rem",
           }}
         >
-          <button onClick={() => setOffset((o) => o - 1)} style={navBtn(true)}>
-            <ChevronLeft size={18} />
-          </button>
+          {gran !== "historic" && (
+            <button onClick={() => setOffset((o) => o - 1)} style={navBtn(true)}>
+              <ChevronLeft size={18} />
+            </button>
+          )}
           <span
             style={{
               ...TEXT.body,
@@ -261,13 +332,15 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
           >
             {title}
           </span>
-          <button
-            onClick={() => setOffset((o) => o + 1)}
-            disabled={!canNext}
-            style={navBtn(canNext)}
-          >
-            <ChevronRight size={18} />
-          </button>
+          {gran !== "historic" && (
+            <button
+              onClick={() => setOffset((o) => o + 1)}
+              disabled={!canNext}
+              style={navBtn(canNext)}
+            >
+              <ChevronRight size={18} />
+            </button>
+          )}
         </div>
 
         <p style={{ ...TEXT.body, color: P.textSoft, textAlign: "center", marginTop: "0.25rem" }}>
