@@ -142,21 +142,21 @@ export default function PersonForm({
             )}
             {showBirthdayCheckbox && (
               <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
-                <p style={{ ...TEXT.caption, color: PALETTE.textSoft }}>{t.birthdayAlreadyHappened}</p>
-                <div style={{ display: "flex", borderRadius: "0.75rem", overflow: "hidden", border: `1px solid ${PALETTE.inputBorder}`, width: "fit-content" }}>
+                <p style={{ ...TEXT.caption, color: PALETTE.text }}>{mode === "add" ? t.birthdayAlreadyHappened : t.birthdayAlreadyHappenedThird}</p>
+                <div style={{ display: "flex", borderRadius: "0.75rem", overflow: "hidden", border: `1px solid ${PALETTE.inputBorder}`, width: "fit-content", backgroundColor: PALETTE.inputBg }}>
                   {[true, false].map((val) => (
                     <button
                       key={String(val)}
                       type="button"
                       onClick={() => setBirthdayAlreadyHappened(val)}
                       style={{
-                        padding: "0.2rem 0.85rem",
+                        padding: "0.25rem 1rem",
                         ...TEXT.caption,
                         fontWeight: 500,
                         cursor: "pointer",
                         border: "none",
                         backgroundColor: birthdayAlreadyHappened === val ? PALETTE.accent : "transparent",
-                        color: birthdayAlreadyHappened === val ? "#fff" : PALETTE.textSoft,
+                        color: birthdayAlreadyHappened === val ? "#fff" : PALETTE.text,
                         transition: "background-color 0.15s, color 0.15s",
                       }}
                     >

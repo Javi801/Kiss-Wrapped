@@ -7,6 +7,7 @@ export const STORAGE_KEY = "kiss-recorder-local-v3";
 export const LANGUAGE_KEY = "kiss-recorder-language-local-v3";
 export const ICON_COLOR_KEY = "kiss-recorder-icon-color-v1";
 export const THEME_KEY = "kiss-recorder-theme-v1";
+export const STATS_VISIBLE_KEY = "kiss-recorder-stats-visible-v1";
 export const PEOPLE_FILE_NAME = "kiss-recorder-people.json";
 export const SETTINGS_FILE_NAME = "kiss-recorder-settings.json";
 
@@ -510,7 +511,8 @@ export const COPY = {
     pdfEmptyDesc: "You need at least one person and one event to export statistics.",
     savePdfErrorLog: "Save error log",
     close: "Close",
-    birthdayAlreadyHappened: "Has the birthday already happened this year?",
+    birthdayAlreadyHappened: "Has your birthday already happened this year?",
+    birthdayAlreadyHappenedThird: "Has their birthday already happened this year?",
     birthdayYes: "Yes",
     birthdayNo: "Not yet",
   },
@@ -781,7 +783,8 @@ export const COPY = {
     pdfEmptyDesc: "Necesitas al menos una persona y un evento para exportar estadísticas.",
     savePdfErrorLog: "Guardar registro de error",
     close: "Cerrar",
-    birthdayAlreadyHappened: "¿Ya pasó el cumpleaños este año?",
+    birthdayAlreadyHappened: "Ya estuviste de cumpleaños este año?",
+    birthdayAlreadyHappenedThird: "¿Ya estuvo de cumpleaños este año?",
     birthdayYes: "Sí",
     birthdayNo: "Todavía no",
   },

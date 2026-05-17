@@ -52,6 +52,9 @@ export default function KissRecorderApp() {
   // Active UI theme.
   const [theme, setTheme] = useState("pink");
 
+  // Whether the stats tiles on the home screen are visible.
+  const [statsVisible, setStatsVisible] = useState(true);
+
   // Prevents saving before the initial load completes.
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -133,6 +136,7 @@ export default function KissRecorderApp() {
           if (settings.language === "en" || settings.language === "es") setLanguage(settings.language);
           if (["yellow", "blue", "pink", "purple"].includes(settings.iconColor)) setIconColor(settings.iconColor);
           if (["pink", "green", "dark"].includes(settings.theme)) setTheme(settings.theme);
+          setStatsVisible(settings.statsVisible);
         }
       } catch (error) {
         if (import.meta.env.DEV) console.error("Failed to load app data", error);
@@ -165,13 +169,13 @@ export default function KissRecorderApp() {
     });
   }, [people, isLoaded]);
 
-  // Persists settings whenever language, iconColor or theme change (after boot).
+  // Persists settings whenever language, iconColor, theme or statsVisible change (after boot).
   useEffect(() => {
     if (!isLoaded) return;
-    saveSettings({ iconColor, language, theme }).catch((error) => {
+    saveSettings({ iconColor, language, theme, statsVisible }).catch((error) => {
       if (import.meta.env.DEV) console.error("Failed to save settings", error);
     });
-  }, [iconColor, language, theme, isLoaded]);
+  }, [iconColor, language, theme, statsVisible, isLoaded]);
 
   // Applies the dark class to <html> so shadcn portal components also get dark styles.
   useEffect(() => {
@@ -370,6 +374,8 @@ export default function KissRecorderApp() {
               setIconColor={changeIconColor}
               theme={theme}
               setTheme={changeTheme}
+              statsVisible={statsVisible}
+              setStatsVisible={setStatsVisible}
             />
           ) : null}
 

@@ -49,12 +49,13 @@ export default function MainScreen({
   setIconColor,
   theme,
   setTheme,
+  statsVisible,
+  setStatsVisible,
 }) {
   const PALETTE = usePalette();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [statsVisible, setStatsVisible] = useState(true);
   // null = idle | { fileName, isNative, hadMissingFields } = success | Error = failed
   const [jsonExportStatus, setJsonExportStatus] = useState(null);
   // null = idle | { type: "confirm", count, data } | { type: "success", count } | { type: "error_type" | "error_format" }
@@ -457,7 +458,7 @@ export default function MainScreen({
             style={dataButtonStyle}
             onClick={handleExportJson}
           >
-            <Download style={{ height: "1.25rem", width: "1.25rem", color: PALETTE.accent2 }} />
+            <Upload style={{ height: "1.25rem", width: "1.25rem", color: PALETTE.accent2 }} />
             <span style={dataButtonLabelStyle}>{t.exportJsonLabel}</span>
           </Button>
 
@@ -467,7 +468,7 @@ export default function MainScreen({
             style={dataButtonStyle}
             onClick={() => fileInputRef.current?.click()}
           >
-            <Upload style={{ height: "1.25rem", width: "1.25rem", color: PALETTE.accent2 }} />
+            <Download style={{ height: "1.25rem", width: "1.25rem", color: PALETTE.accent2 }} />
             <span style={dataButtonLabelStyle}>{t.importJsonLabel}</span>
           </Button>
 
