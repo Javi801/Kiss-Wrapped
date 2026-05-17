@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { BarChart3, Clock3, UserRound, BadgePercent, Download, CheckCircle2, TriangleAlert } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ import StatsScoresTab from "@/components/stats/StatsScoresTab";
 export default function StatsScreen({ people, t }) {
   const PALETTE = usePalette();
   const [tab, setTab] = useState("overview");
+  const [, startTransition] = useTransition();
   // null = idle, "success" = exported OK, Error instance = export failed
   const [pdfStatus, setPdfStatus] = useState(null);
 
@@ -122,7 +123,7 @@ export default function StatsScreen({ people, t }) {
           return (
             <button
               key={item.key}
-              onClick={() => setTab(item.key)}
+              onClick={() => startTransition(() => setTab(item.key))}
               className="rounded-2xl"
               style={{
                 display: "flex",

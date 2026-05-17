@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import BarChartCard from "@/components/charts/BarChartCard";
 import DumbbellChartCard from "@/components/charts/DumbbellChartCard";
@@ -8,6 +8,13 @@ import { getMonthKey, getYearKey } from "@/lib/date";
 
 // Renders the time-based statistics tab. It shows monthly, yearly, and multi-year event patterns.
 export default function StatsTimeTab({ people, allEvents, t }) {
+  // Defer the two heaviest charts (Dumbbell + Heatmap) to a subsequent frame
+  // so the first paint shows the lighter charts without blocking.
+  const [showDeferred, setShowDeferred] = useState(false);
+  useEffect(() => {
+    const id = setTimeout(() => setShowDeferred(true), 60);
+    return () => clearTimeout(id);
+  }, []);
   // Groups all events by month. Keys are generated in yyyy-MM format.
   const eventsPerMonth = useMemo(() => {
     const map = new Map();
@@ -113,21 +120,25 @@ export default function StatsTimeTab({ people, allEvents, t }) {
         tooltipUnit={{ one: t.chartYear, many: t.years }}
       />
 
-      <DumbbellChartCard
-        title={t.dumbbellChart}
-        subtitle={t.dumbbellDesc}
-        data={personsWithEventsInMultipleYears}
-        allYears={allYears}
-        emptyText={t.noMultiYearPeopleYet}
-      />
+      {showDeferred && (
+        <>
+          <DumbbellChartCard
+            title={t.dumbbellChart}
+            subtitle={t.dumbbellDesc}
+            data={personsWithEventsInMultipleYears}
+            allYears={allYears}
+            emptyText={t.noMultiYearPeopleYet}
+          />
 
-      <HeatmapChartCard
-        title={t.heatmapChart}
-        subtitle={t.heatmapDesc}
-        data={personsWithEventsInMultipleYears}
-        allYears={allYears}
-        emptyText={t.noMultiYearPeopleYet}
-      />
+          <HeatmapChartCard
+            title={t.heatmapChart}
+            subtitle={t.heatmapDesc}
+            data={personsWithEventsInMultipleYears}
+            allYears={allYears}
+            emptyText={t.noMultiYearPeopleYet}
+          />
+        </>
+      )}
     </div>
   );
 }
