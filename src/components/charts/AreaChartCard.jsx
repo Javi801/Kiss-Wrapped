@@ -89,6 +89,7 @@ export default function AreaChartCard({
                   fontSize={12}
                   tick={{ fill: PALETTE.textSoft }}
                   width={40}
+                  domain={[0, (dataMax) => dataMax + 1]}
                 />
 
                 {tooltipUnit ? (
