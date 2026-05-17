@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import BarChartCard from "@/components/charts/BarChartCard";
 import DumbbellChartCard from "@/components/charts/DumbbellChartCard";
 import EventsTimelineChartCard from "@/components/charts/EventsTimelineChartCard";
+import MultiYearTopCard from "@/components/charts/MultiYearTopCard";
 import PersonsTimelineChartCard from "@/components/charts/PersonsTimelineChartCard";
 import HeatmapChartCard from "@/components/charts/HeatmapChartCard";
 import { getYearKey } from "@/lib/date";
@@ -51,11 +52,32 @@ export default function StatsTimeTab({ people, allEvents, t }) {
             if (y) yearCounts[y] = (yearCounts[y] || 0) + 1;
           }
 
-          return { label: person.name, value: years.length, years, yearCounts };
+          return {
+            label: person.name,
+            value: years.length,
+            years,
+            yearCounts,
+            totalEvents: (person.events || []).length,
+          };
         })
         .filter((item) => item.value >= 2)
         .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label)),
     [people],
+  );
+
+  // Top 3 sorted by: most distinct years → most events → oldest event year → name.
+  const top3MultiYear = useMemo(
+    () =>
+      [...personsWithEventsInMultipleYears]
+        .sort(
+          (a, b) =>
+            b.value - a.value ||
+            b.totalEvents - a.totalEvents ||
+            (a.years[0] ?? "").localeCompare(b.years[0] ?? "") ||
+            a.label.localeCompare(b.label),
+        )
+        .slice(0, 3),
+    [personsWithEventsInMultipleYears],
   );
 
   // Histogram: how many people appear in exactly N distinct years (N = 2, 3, 4, ...).
@@ -87,6 +109,8 @@ export default function StatsTimeTab({ people, allEvents, t }) {
         xAxisLabel={t.years}
         tooltipUnit={{ one: t.chartPerson, many: t.chartPersons }}
       />
+
+      <MultiYearTopCard top3={top3MultiYear} t={t} />
 
       {showDeferred && (
         <>
