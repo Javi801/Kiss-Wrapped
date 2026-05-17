@@ -42,6 +42,9 @@ describe("getFirstEventDate", () => {
     ]);
     expect(getFirstEventDate(p)).toBe("2023.01.15");
   });
+  it("returns null when sorted events do not contain a date", () => {
+    expect(getFirstEventDate(makePerson("Ana", [{}]))).toBeNull();
+  });
   it("does not mutate the original events array", () => {
     const events = [makeEvent("2024.06.01"), makeEvent("2023.01.15")];
     const p = makePerson("Ana", events);
@@ -68,6 +71,9 @@ describe("getLastEventDate", () => {
       makeEvent("2025.12.31"),
     ]);
     expect(getLastEventDate(p)).toBe("2025.12.31");
+  });
+  it("returns null when sorted events do not contain a date", () => {
+    expect(getLastEventDate(makePerson("Ana", [{}]))).toBeNull();
   });
   it("does not mutate the original events array", () => {
     const events = [makeEvent("2024.06.01"), makeEvent("2025.12.31")];
