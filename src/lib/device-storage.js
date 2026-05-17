@@ -1,6 +1,6 @@
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
-import { PEOPLE_FILE_NAME, SETTINGS_FILE_NAME, STORAGE_KEY, LANGUAGE_KEY, ICON_COLOR_KEY, THEME_KEY } from "@/lib/constants";
+import { PEOPLE_FILE_NAME, SETTINGS_FILE_NAME, STORAGE_KEY, LANGUAGE_KEY, ICON_COLOR_KEY, THEME_KEY, STATS_VISIBLE_KEY } from "@/lib/constants";
 
 // Returns localStorage only when it is safely available
 export function getSafeStorage() {
@@ -82,7 +82,7 @@ export async function savePeopleToDevice(people) {
   storage.setItem(STORAGE_KEY, JSON.stringify(people));
 }
 
-const SETTINGS_DEFAULTS = { iconColor: 'yellow', language: 'en', theme: 'pink' }
+const SETTINGS_DEFAULTS = { iconColor: 'yellow', language: 'en', theme: 'pink', statsVisible: true }
 
 // Loads app settings from native file system or localStorage.
 // On native, if the settings file doesn't exist yet, migrates values from
@@ -95,14 +95,18 @@ export async function loadSettings() {
         directory: Directory.Data,
         encoding: Encoding.UTF8,
       })
-      return { ...SETTINGS_DEFAULTS, ...JSON.parse(result.data || '{}') }
+      const saved = JSON.parse(result.data || '{}')
+      if (typeof saved.statsVisible === 'string') saved.statsVisible = saved.statsVisible !== 'false'
+      return { ...SETTINGS_DEFAULTS, ...saved }
     } catch {
       // Missing native settings are migrated from localStorage when possible.
       const storage = getSafeStorage()
+      const rawVisible = storage?.getItem(STATS_VISIBLE_KEY)
       const migrated = {
-        iconColor: storage?.getItem(ICON_COLOR_KEY) || SETTINGS_DEFAULTS.iconColor,
-        language:  storage?.getItem(LANGUAGE_KEY)  || SETTINGS_DEFAULTS.language,
-        theme:     storage?.getItem(THEME_KEY)      || SETTINGS_DEFAULTS.theme,
+        iconColor:    storage?.getItem(ICON_COLOR_KEY) || SETTINGS_DEFAULTS.iconColor,
+        language:     storage?.getItem(LANGUAGE_KEY)  || SETTINGS_DEFAULTS.language,
+        theme:        storage?.getItem(THEME_KEY)      || SETTINGS_DEFAULTS.theme,
+        statsVisible: rawVisible === null ? SETTINGS_DEFAULTS.statsVisible : rawVisible !== 'false',
       }
       // Persist migrated values so future reads use the file
       await saveSettings(migrated).catch(() => {})
@@ -111,20 +115,22 @@ export async function loadSettings() {
   }
   const storage = getSafeStorage()
   if (!storage) return { ...SETTINGS_DEFAULTS }
+  const rawVisible = storage.getItem(STATS_VISIBLE_KEY)
   return {
-    iconColor: storage.getItem(ICON_COLOR_KEY) || SETTINGS_DEFAULTS.iconColor,
-    language:  storage.getItem(LANGUAGE_KEY)  || SETTINGS_DEFAULTS.language,
-    theme:     storage.getItem(THEME_KEY)      || SETTINGS_DEFAULTS.theme,
+    iconColor:    storage.getItem(ICON_COLOR_KEY) || SETTINGS_DEFAULTS.iconColor,
+    language:     storage.getItem(LANGUAGE_KEY)  || SETTINGS_DEFAULTS.language,
+    theme:        storage.getItem(THEME_KEY)      || SETTINGS_DEFAULTS.theme,
+    statsVisible: rawVisible === null ? SETTINGS_DEFAULTS.statsVisible : rawVisible !== 'false',
   }
 }
 
 // Saves app settings to native file system or localStorage
-export async function saveSettings({ iconColor, language, theme }) {
+export async function saveSettings({ iconColor, language, theme, statsVisible }) {
   if (isNativePlatform()) {
     await Filesystem.writeFile({
       path: SETTINGS_FILE_NAME,
       directory: Directory.Data,
-      data: JSON.stringify({ iconColor, language, theme }),
+      data: JSON.stringify({ iconColor, language, theme, statsVisible }),
       encoding: Encoding.UTF8,
       recursive: true,
     })
@@ -135,6 +141,7 @@ export async function saveSettings({ iconColor, language, theme }) {
   if (iconColor !== undefined) storage.setItem(ICON_COLOR_KEY, iconColor)
   if (language !== undefined) storage.setItem(LANGUAGE_KEY, language)
   if (theme !== undefined) storage.setItem(THEME_KEY, theme)
+  if (statsVisible !== undefined) storage.setItem(STATS_VISIBLE_KEY, String(statsVisible))
 }
 
 const PERSON_REQUIRED_STRINGS = ["name", "gender", "howWeMet", "zodiacSign", "activity"];

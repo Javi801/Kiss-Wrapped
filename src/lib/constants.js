@@ -7,6 +7,7 @@ export const STORAGE_KEY = "kiss-recorder-local-v3";
 export const LANGUAGE_KEY = "kiss-recorder-language-local-v3";
 export const ICON_COLOR_KEY = "kiss-recorder-icon-color-v1";
 export const THEME_KEY = "kiss-recorder-theme-v1";
+export const STATS_VISIBLE_KEY = "kiss-recorder-stats-visible-v1";
 export const PEOPLE_FILE_NAME = "kiss-recorder-people.json";
 export const SETTINGS_FILE_NAME = "kiss-recorder-settings.json";
 

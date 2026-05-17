@@ -49,12 +49,13 @@ export default function MainScreen({
   setIconColor,
   theme,
   setTheme,
+  statsVisible,
+  setStatsVisible,
 }) {
   const PALETTE = usePalette();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [statsVisible, setStatsVisible] = useState(true);
   // null = idle | { fileName, isNative, hadMissingFields } = success | Error = failed
   const [jsonExportStatus, setJsonExportStatus] = useState(null);
   // null = idle | { type: "confirm", count, data } | { type: "success", count } | { type: "error_type" | "error_format" }
