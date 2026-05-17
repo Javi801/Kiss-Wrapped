@@ -1,6 +1,6 @@
 # Kiss Recorder
 
-![build status](https://img.shields.io/badge/status-development-yellow)
+![status](https://img.shields.io/badge/status-stable-green)
 ![license](https://img.shields.io/badge/license-MIT-blue)
 
 A lightweight personal tracking web app to log interactions ("events") with people, analyze patterns, and visualize statistics over time. Built with React, Tailwind CSS and packaged with Capacitor for mobile support.
@@ -9,6 +9,7 @@ A lightweight personal tracking web app to log interactions ("events") with peop
 ## Table of Contents
 
 - [Features](#features)
+- [Download](#download)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
@@ -20,9 +21,8 @@ A lightweight personal tracking web app to log interactions ("events") with peop
   - [Running tests](#running-tests)
   - [Coverage](#coverage)
   - [What is tested](#what-is-tested)
-- [Capacitor / Mobile (iOS & Android)](#capacitor--mobile-ios--android)
+- [Capacitor / Mobile (Android)](#capacitor--mobile-android)
   - [iOS notes and permissions](#ios-notes-and-permissions)
-  - [Android notes](#android-notes)
 - [Data Model](#data-model)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
@@ -42,6 +42,23 @@ A lightweight personal tracking web app to log interactions ("events") with peop
 - **Theme support:** light, green and dark palettes, with UI colors driven by shared palette tokens and persisted theme selection
 - **Localization:** English and Spanish
 - **Local persistence** via browser/device storage (no backend required)
+
+## Download
+
+The first stable release is available from the GitHub Releases page.
+
+Android users can download the APK from the latest release and install it manually. Because the app is not distributed through Google Play yet, Android may show a warning before installation.
+
+### Android APK
+
+To install the app on Android:
+
+1. Download the `.apk` file from the latest GitHub release.
+2. Open it on your Android device.
+3. Allow installation from unknown sources if Android prompts you.
+4. Follow the Android installation steps.
+
+Note: KissRecorder is currently distributed manually and is not yet available on Google Play.
 
 ## Tech Stack
 
