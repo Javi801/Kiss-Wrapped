@@ -339,7 +339,7 @@ export default function KissRecorderApp() {
       style={{
         height: "100vh",
         color: palette.text,
-        background: `linear-gradient(180deg, ${palette.bgGradientFrom}, ${palette.bgSoft}, ${palette.sky})`,
+        background: `linear-gradient(180deg, ${palette.bgGradientFrom}, ${palette.bgSoft}, ${palette.gradientEnd})`,
       }}
     >
       <div style={{ margin: "0 auto", display: "flex", height: "100%", width: "100%", maxWidth: "28rem", flexDirection: "column", paddingLeft: "1rem", paddingRight: "1rem" }}>
@@ -441,7 +441,7 @@ export default function KissRecorderApp() {
                       fontWeight: "500",
                       transition: "all 150ms cubic-bezier(0.4, 0, 0.2, 1)",
                       background: active
-                        ? `linear-gradient(90deg, ${palette.rose}, ${palette.roseSoft})`
+                        ? `linear-gradient(90deg, ${palette.accent}, ${palette.accentSoft})`
                         : "transparent",
                       color: active ? "#ffffff" : palette.textSoft,
                     }}
