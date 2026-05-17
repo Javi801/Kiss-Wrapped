@@ -7,7 +7,7 @@ const MARGIN_TOP = 40;
 const MARGIN_RIGHT = 8;
 const MARGIN_BOTTOM = 8;
 const APPROX_CHAR_PX = 6;
-const MIN_COL_W = 44;
+const MIN_COL_W = 36;
 const ROW_H = 36;
 const GAP = 3;
 
