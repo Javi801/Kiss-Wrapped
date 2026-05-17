@@ -67,7 +67,7 @@ export default function AreaChartCard({
         {data.length ? (
           <div style={{ height: "16rem", width: "100%", outline: "none" }}>
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data}>
+              <AreaChart data={data} margin={{ top: 5, right: 5, left: -15, bottom: 5 }}>
                 {/* Grid lines */}
                 <CartesianGrid vertical={false} strokeDasharray="3 3" stroke={PALETTE.cardBorder} />
 
@@ -88,6 +88,7 @@ export default function AreaChartCard({
                   axisLine={false}
                   fontSize={12}
                   tick={{ fill: PALETTE.textSoft }}
+                  width={40}
                 />
 
                 {tooltipUnit ? (
