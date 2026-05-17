@@ -26,7 +26,7 @@ function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-function TooltipContent({ active, payload, tooltipUnit, noEventsLabel, onLabel }) {
+function TooltipContent({ active, payload, tooltipUnit, noPersonsLabel, onLabel }) {
   const P = usePalette();
   if (!active || !payload?.length) return null;
   const item = payload[0]?.payload;
@@ -40,7 +40,7 @@ function TooltipContent({ active, payload, tooltipUnit, noEventsLabel, onLabel }
     padding: "0.5rem 0.75rem",
     fontSize: 13,
   };
-  if (v === 0) return <div style={boxStyle}><p>{noEventsLabel}</p></div>;
+  if (v === 0) return <div style={boxStyle}><p>{noPersonsLabel}</p></div>;
   const unit = v === 1 ? tooltipUnit.one : tooltipUnit.many;
   return (
     <div style={boxStyle}>
@@ -49,14 +49,13 @@ function TooltipContent({ active, payload, tooltipUnit, noEventsLabel, onLabel }
   );
 }
 
-export default function EventsTimelineChartCard({ allEvents, t }) {
+export default function PersonsTimelineChartCard({ people, t }) {
   const P = usePalette();
   const [gran, setGran] = useState("week");
   const [offset, setOffset] = useState(0);
 
   const locale = t.langCode === "es" ? "es-ES" : "en-GB";
 
-  // Intl formatters cached per locale — constructing them is expensive
   const fmtWeekday = useMemo(
     () => new Intl.DateTimeFormat(locale, { weekday: "short" }),
     [locale],
@@ -82,24 +81,44 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
     [locale],
   );
 
-  // Single-pass count by date key (yyyy.MM.dd → n)
+  // Unique person count per date key (yyyy.MM.dd → n)
   const countByDate = useMemo(() => {
     const map = new Map();
-    for (const ev of allEvents) {
-      if (ev.date) map.set(ev.date, (map.get(ev.date) || 0) + 1);
+    for (const person of people) {
+      const seen = new Set();
+      for (const ev of person.events || []) {
+        if (ev.date && !seen.has(ev.date)) {
+          seen.add(ev.date);
+          map.set(ev.date, (map.get(ev.date) || 0) + 1);
+        }
+      }
     }
     return map;
-  }, [allEvents]);
+  }, [people]);
 
-  // Single-pass count by year-month key (yyyy.MM → n) for year view
+  // Unique person count per year-month key (yyyy.MM → n)
   const countByMonth = useMemo(() => {
     const map = new Map();
-    for (const [k, c] of countByDate) {
-      const ym = k.slice(0, 7); // "yyyy.MM"
-      map.set(ym, (map.get(ym) || 0) + c);
+    for (const person of people) {
+      const seen = new Set();
+      for (const ev of person.events || []) {
+        if (ev.date) {
+          const ym = ev.date.slice(0, 7);
+          if (!seen.has(ym)) {
+            seen.add(ym);
+            map.set(ym, (map.get(ym) || 0) + 1);
+          }
+        }
+      }
     }
     return map;
-  }, [countByDate]);
+  }, [people]);
+
+  // All event dates (for historic range calculation)
+  const allEventDates = useMemo(
+    () => people.flatMap((p) => (p.events || []).map((e) => e.date)).filter(Boolean),
+    [people],
+  );
 
   const { data, title, avg, maxValue, canNext } = useMemo(() => {
     const today = new Date();
@@ -174,7 +193,7 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
     }
 
     if (gran === "historic") {
-      const keys = allEvents.map((e) => e.date).filter(Boolean).sort();
+      const keys = allEventDates.slice().sort();
       if (!keys.length) return { data: [], title: "—", avg: 0, maxValue: 1, canNext: false };
 
       const parseKey = (k) => {
@@ -243,10 +262,10 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
     }
 
     return { data: [], title: "", avg: 0, maxValue: 1, canNext: false };
-  }, [gran, offset, countByDate, countByMonth, fmtWeekday, fmtWeekdayLong, fmtDayMonth, fmtDayMonthYear, fmtMonthYear, fmtShortMonth, allEvents]);
+  }, [gran, offset, countByDate, countByMonth, fmtWeekday, fmtWeekdayLong, fmtDayMonth, fmtDayMonthYear, fmtMonthYear, fmtShortMonth, allEventDates]);
 
   const granLabels = { week: t.granWeek, month: t.granMonth, year: t.granYear, historic: t.granHistoric };
-  const tooltipUnit = { one: t.chartEvent, many: t.chartEvents };
+  const tooltipUnit = { one: t.chartPerson, many: t.chartPersons };
 
   const navBtn = (enabled) => ({
     background: "none",
@@ -272,7 +291,7 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
     >
       <CardHeader style={{ paddingBottom: "0.25rem" }}>
         <CardTitle style={{ ...TEXT.title, color: P.text }}>
-          {t.timelineTitle}
+          {t.personsTimelineTitle}
         </CardTitle>
 
         {/* Granularity selector */}
@@ -352,7 +371,7 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
 
         <p style={{ ...TEXT.body, color: P.textSoft, textAlign: "center", marginTop: "0.25rem" }}>
           {avg % 1 === 0 ? avg : avg.toFixed(1)}{" "}
-          {avg === 1 ? t.chartEvent : t.chartEvents}{" "}
+          {avg === 1 ? t.chartPerson : t.chartPersons}{" "}
           {t.timelineAvg}
         </p>
       </CardHeader>
@@ -406,7 +425,7 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
               <YAxis hide domain={[0, maxValue]} />
               <Tooltip
                 cursor={{ fill: P.accentShadow }}
-                content={<TooltipContent tooltipUnit={tooltipUnit} noEventsLabel={t.noEvents} onLabel={t.timelineOn} />}
+                content={<TooltipContent tooltipUnit={tooltipUnit} noPersonsLabel={t.noPersons} onLabel={t.timelineOn} />}
               />
               <Bar dataKey="value" radius={[6, 6, 0, 0]} fill={P.accent} />
             </BarChart>

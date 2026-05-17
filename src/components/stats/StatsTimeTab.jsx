@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import BarChartCard from "@/components/charts/BarChartCard";
 import DumbbellChartCard from "@/components/charts/DumbbellChartCard";
 import EventsTimelineChartCard from "@/components/charts/EventsTimelineChartCard";
+import PersonsTimelineChartCard from "@/components/charts/PersonsTimelineChartCard";
 import HeatmapChartCard from "@/components/charts/HeatmapChartCard";
 import { getYearKey } from "@/lib/date";
 
@@ -60,6 +61,7 @@ export default function StatsTimeTab({ people, allEvents, t }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <EventsTimelineChartCard allEvents={allEvents} t={t} />
+      <PersonsTimelineChartCard people={people} t={t} />
 
       <BarChartCard
         title={t.multiYearPeople}
