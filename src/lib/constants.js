@@ -207,7 +207,7 @@ const MONTH_ABBR = {
 export function abbreviateZodiacMonths(zodiacString) {
   return zodiacString.replace(
     /January|February|March|April|May|June|July|August|September|October|November|December|enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre/g,
-    (m) => MONTH_ABBR[m] ?? m,
+    (m) => MONTH_ABBR[m],
   );
 }
 
