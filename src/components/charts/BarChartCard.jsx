@@ -40,6 +40,7 @@ export default function BarChartCard({
   yAxisLabel = null,
   tooltipUnit = null,
   headerAction = null,
+  maxXTicks = null,
 }) {
   const PALETTE = usePalette();
   const chartColors = PALETTE.chartColors ?? CHART_COLORS;
@@ -54,6 +55,13 @@ export default function BarChartCard({
     borderColor: PALETTE.inputBorder,
     color: PALETTE.textSoft,
   };
+
+  // Equidistant tick labels for the X axis when maxXTicks is set and data exceeds the limit.
+  const xTicks = maxXTicks && data.length > maxXTicks
+    ? Array.from({ length: maxXTicks }, (_, i) =>
+        data[Math.round(i * (data.length - 1) / (maxXTicks - 1))].label
+      )
+    : null;
 
   // Width for the category axis in horizontal mode, based on longest label.
   const labelAxisWidth = horizontal
@@ -135,6 +143,7 @@ export default function BarChartCard({
                   textAnchor={rotateXLabels ? "end" : "middle"}
                   height={rotateXLabels ? 62 : 30}
                   interval={0}
+                  ticks={xTicks ?? undefined}
                   tick={{ fill: PALETTE.textSoft }}
                 />
 

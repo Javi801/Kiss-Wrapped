@@ -61,31 +61,24 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText, bare =
   const median = quantile(0.5);
   const q3 = quantile(0.75);
 
-  // Compute a "nice" axis with evenly-spaced ticks that may extend beyond min/max.
-  const dataRange = max - min;
-  let step;
-  if (dataRange === 0) {
-    step = 1;
-  } else {
-    const rawStep = dataRange / 4;
-    if (rawStep <= 1) step = 1;
-    else if (rawStep <= 2) step = 2;
-    else if (rawStep <= 5) step = 5;
-    else if (rawStep <= 10) step = 10;
-    else step = Math.ceil(rawStep / 5) * 5;
-  }
-
-  const axisMin = Math.floor(min / step) * step;
-  const axisMax =
-    Math.ceil(max / step) * step === axisMin
-      ? axisMin + step
-      : Math.ceil(max / step) * step;
+  const axisMin = min;
+  const axisMax = max;
   const axisRange = axisMax - axisMin;
 
-  const tickValues = [];
-  for (let v = axisMin; v <= axisMax; v += step) tickValues.push(v);
+  let tickValues;
+  if (axisRange === 0) {
+    tickValues = [min];
+  } else {
+    const count = Math.min(5, axisRange + 1);
+    const raw = Array.from({ length: count }, (_, i) =>
+      Math.round(axisMin + (axisRange * i) / (count - 1))
+    );
+    tickValues = [...new Set(raw)];
+  }
 
-  const toPos = (v) => 3 + ((v - axisMin) / axisRange) * 94;
+  const toPos = axisRange === 0
+    ? () => 50
+    : (v) => 3 + ((v - axisMin) / axisRange) * 94;
 
   const minPos = toPos(min);
   const maxPos = toPos(max);

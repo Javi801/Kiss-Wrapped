@@ -98,39 +98,41 @@ export default function StatsPeopleTab({ people, t }) {
     return [...map.entries()].map(([label, value]) => ({ label, value }));
   }, [people, t]);
 
-  // Counts how many people exist for each age (current age).
+  // Counts how many people exist for each age (current age), filling zeros for the full min–max range.
   const personsByAge = useMemo(() => {
-    const map = new Map();
-
+    const ageMap = new Map();
     for (const person of people) {
       const age = calculateAge(person.birthYear, person.zodiacSign) ?? person.age;
-      const key = String(age);
-      if (key !== "undefined" && key !== "null") map.set(key, (map.get(key) || 0) + 1);
+      if (Number.isFinite(age)) ageMap.set(age, (ageMap.get(age) || 0) + 1);
     }
-
-    return [...map.entries()]
-      .sort((a, b) => Number(a[0]) - Number(b[0]))
-      .map(([label, value]) => ({ label, value }));
+    if (!ageMap.size) return [];
+    const min = Math.min(...ageMap.keys());
+    const max = Math.max(...ageMap.keys());
+    return Array.from({ length: max - min + 1 }, (_, i) => ({
+      label: String(min + i),
+      value: ageMap.get(min + i) || 0,
+    }));
   }, [people]);
 
-  // Counts how many people were at each age at the time of their events.
+  // Counts how many people were at each age at the time of their events, filling zeros for the full min–max range.
   // A person contributes 1 to each distinct age they appeared at across all events.
   const personsByAgeAtEvent = useMemo(() => {
-    const map = new Map();
-
+    const ageMap = new Map();
     for (const person of people) {
       const seenAges = new Set();
       for (const event of (person.events || [])) {
         const age = calculateAgeAtEvent(person.birthYear, person.zodiacSign, event.date) ?? person.age;
-        const key = String(age);
-        if (key !== "undefined" && key !== "null") seenAges.add(key);
+        if (Number.isFinite(age)) seenAges.add(age);
       }
-      for (const key of seenAges) map.set(key, (map.get(key) || 0) + 1);
+      for (const age of seenAges) ageMap.set(age, (ageMap.get(age) || 0) + 1);
     }
-
-    return [...map.entries()]
-      .sort((a, b) => Number(a[0]) - Number(b[0]))
-      .map(([label, value]) => ({ label, value }));
+    if (!ageMap.size) return [];
+    const min = Math.min(...ageMap.keys());
+    const max = Math.max(...ageMap.keys());
+    return Array.from({ length: max - min + 1 }, (_, i) => ({
+      label: String(min + i),
+      value: ageMap.get(min + i) || 0,
+    }));
   }, [people]);
 
   // Counts people grouped by the first letter of their name.
@@ -179,6 +181,7 @@ export default function StatsPeopleTab({ people, t }) {
         subtitle={ageAtEvent ? t.ageAtEventDesc : t.ageDistribution}
         data={ageAtEvent ? personsByAgeAtEvent : personsByAge}
         emptyText={t.noDataYet}
+        maxXTicks={6}
         tooltipUnit={{ one: t.chartPerson, many: t.chartPersons }}
         headerAction={
           <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", flexShrink: 0 }}>
