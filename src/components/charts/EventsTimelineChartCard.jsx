@@ -26,28 +26,24 @@ function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-function TooltipContent({ active, payload, label, tooltipUnit }) {
+function TooltipContent({ active, payload, tooltipUnit, noEventsLabel, onLabel }) {
   const P = usePalette();
   if (!active || !payload?.length) return null;
   const v = payload[0].value;
+  const tooltipLabel = payload[0]?.payload?.tooltipLabel;
+  const boxStyle = {
+    background: P.cardBg,
+    border: `1px solid ${P.cardBorder}`,
+    color: P.text,
+    borderRadius: "0.5rem",
+    padding: "0.5rem 0.75rem",
+    fontSize: 13,
+  };
+  if (v === 0) return <div style={boxStyle}><p>{noEventsLabel}</p></div>;
   const unit = v === 1 ? tooltipUnit.one : tooltipUnit.many;
   return (
-    <div
-      style={{
-        background: P.cardBg,
-        border: `1px solid ${P.cardBorder}`,
-        color: P.text,
-        borderRadius: "0.5rem",
-        padding: "0.5rem 0.75rem",
-        fontSize: 13,
-      }}
-    >
-      {label && (
-        <p style={{ marginBottom: "0.2rem", fontWeight: 500 }}>{label}</p>
-      )}
-      <p>
-        {v} {unit}
-      </p>
+    <div style={boxStyle}>
+      <p>{v} {unit} {onLabel} {tooltipLabel}</p>
     </div>
   );
 }
@@ -78,6 +74,10 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
   );
   const fmtShortMonth = useMemo(
     () => new Intl.DateTimeFormat(locale, { month: "short" }),
+    [locale],
+  );
+  const fmtWeekdayLong = useMemo(
+    () => new Intl.DateTimeFormat(locale, { weekday: "long" }),
     [locale],
   );
 
@@ -114,7 +114,8 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
         const d = new Date(mon);
         d.setDate(mon.getDate() + i);
         const raw = fmtWeekday.format(d).replace(/\.$/, "");
-        return { label: capitalize(raw), value: countByDate.get(dateToKey(d)) || 0 };
+        const tooltipLabel = fmtWeekdayLong.format(d).replace(/\.$/, "");
+        return { label: capitalize(raw), tooltipLabel, value: countByDate.get(dateToKey(d)) || 0 };
       });
 
       const sun = new Date(mon);
@@ -144,7 +145,7 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
         const day = i + 1;
         const key = `${yr}.${mm}.${String(day).padStart(2, "0")}`;
         const lbl = lblSet.has(i) ? `${String(day).padStart(2, "0")}-${mm}` : "";
-        return { label: lbl, value: countByDate.get(key) || 0 };
+        return { label: lbl, tooltipLabel: `${String(day).padStart(2, "0")}-${mm}`, value: countByDate.get(key) || 0 };
       });
 
       const total = items.reduce((s, d) => s + d.value, 0);
@@ -163,7 +164,8 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
       const items = Array.from({ length: 12 }, (_, i) => {
         const mo = i + 1;
         const ym = `${yr}.${String(mo).padStart(2, "0")}`;
-        return { label: String(mo), value: countByMonth.get(ym) || 0 };
+        const tooltipLabel = capitalize(fmtShortMonth.format(new Date(yr, i, 1)).replace(/\.$/, ""));
+        return { label: String(mo), tooltipLabel, value: countByMonth.get(ym) || 0 };
       });
       const total = items.reduce((s, d) => s + d.value, 0);
       const maxValue = Math.max(...items.map((d) => d.value), 1);
@@ -193,7 +195,8 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
           const d = new Date(firstDate);
           d.setDate(firstDate.getDate() + i);
           const raw = fmtWeekday.format(d).replace(/\.$/, "");
-          return { label: capitalize(raw), value: countByDate.get(dateToKey(d)) || 0 };
+          const tooltipLabel = fmtWeekdayLong.format(d).replace(/\.$/, "");
+          return { label: capitalize(raw), tooltipLabel, value: countByDate.get(dateToKey(d)) || 0 };
         });
         const total = items.reduce((s, x) => s + x.value, 0);
         return { data: items, title, avg: total / items.length, maxValue: Math.max(...items.map((x) => x.value), 1), canNext: false };
@@ -204,7 +207,9 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
           const d = new Date(firstDate);
           d.setDate(firstDate.getDate() + i);
           const label = d.getDate() === 1 ? capitalize(fmtShortMonth.format(d).replace(/\.$/, "")) : "";
-          return { label, value: countByDate.get(dateToKey(d)) || 0 };
+          const dd = String(d.getDate()).padStart(2, "0");
+          const mo = String(d.getMonth() + 1).padStart(2, "0");
+          return { label, tooltipLabel: `${dd}-${mo}`, value: countByDate.get(dateToKey(d)) || 0 };
         });
         const total = items.reduce((s, x) => s + x.value, 0);
         return { data: items, title, avg: total / items.length, maxValue: Math.max(...items.map((x) => x.value), 1), canNext: false };
@@ -217,7 +222,8 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
       let y = yr1, m = mo1;
       while (y < yr2 || (y === yr2 && m <= mo2)) {
         const ym = `${y}.${String(m + 1).padStart(2, "0")}`;
-        items.push({ label: m === 0 ? String(y) : "", value: countByMonth.get(ym) || 0 });
+        const tooltipLabel = `${capitalize(fmtShortMonth.format(new Date(y, m, 1)).replace(/\.$/, ""))} ${y}`;
+        items.push({ label: m === 0 ? String(y) : "", tooltipLabel, value: countByMonth.get(ym) || 0 });
         if (++m > 11) { m = 0; y++; }
       }
       const MAX_YEAR_LABELS = 5;
@@ -236,7 +242,7 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
     }
 
     return { data: [], title: "", avg: 0, maxValue: 1, canNext: false };
-  }, [gran, offset, countByDate, countByMonth, fmtWeekday, fmtDayMonth, fmtDayMonthYear, fmtMonthYear, fmtShortMonth, allEvents]);
+  }, [gran, offset, countByDate, countByMonth, fmtWeekday, fmtWeekdayLong, fmtDayMonth, fmtDayMonthYear, fmtMonthYear, fmtShortMonth, allEvents]);
 
   const granLabels = { week: t.granWeek, month: t.granMonth, year: t.granYear, historic: t.granHistoric };
   const tooltipUnit = { one: t.chartEvent, many: t.chartEvents };
@@ -399,7 +405,7 @@ export default function EventsTimelineChartCard({ allEvents, t }) {
               <YAxis hide domain={[0, maxValue]} />
               <Tooltip
                 cursor={{ fill: P.accentShadow }}
-                content={<TooltipContent tooltipUnit={tooltipUnit} />}
+                content={<TooltipContent tooltipUnit={tooltipUnit} noEventsLabel={t.noEvents} onLabel={t.timelineOn} />}
               />
               <Bar dataKey="value" radius={[6, 6, 0, 0]} fill={P.accent} />
             </BarChart>
