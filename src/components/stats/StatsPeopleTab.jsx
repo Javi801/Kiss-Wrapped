@@ -10,10 +10,10 @@ import { usePalette } from "@/lib/theme";
 import { calculateAge, calculateAgeAtEvent } from "@/lib/date";
 
 import BarChartCard from "@/components/charts/BarChartCard";
-import RadarChartCard from "@/components/charts/RadarChartCard";
 import AgeRangeCard from "@/components/stats/AgeRangeCard";
 import ActivityDonutCard from "@/components/stats/ActivityDonutCard";
 import GenderDonutCard from "@/components/stats/GenderDonutCard";
+import ZodiacRadarCard from "@/components/stats/ZodiacRadarCard";
 
 /**
  * Renders the people-focused statistics tab.
@@ -47,7 +47,7 @@ export default function StatsPeopleTab({ people, t }) {
       .map(([label, value]) => ({ label, value }));
   }, [people, t]);
 
-  // Sums total events by zodiac sign. The displayed label uses the short zodiac name only.
+  // Sums total events by zodiac sign, sorted by count (for bar chart).
   const eventsByZodiac = useMemo(() => {
     const map = new Map();
 
@@ -60,6 +60,18 @@ export default function StatsPeopleTab({ people, t }) {
       .sort((a, b) => b[1] - a[1])
       .map(([label, value]) => ({ label, value }));
   }, [people]);
+
+  // Sums total events by zodiac sign keeping all 12 signs in zodiac order (for radar chart).
+  const eventsByZodiacOrdered = useMemo(() => {
+    const lang = t.studies === "estudia" ? "es" : "en";
+    const allSigns = ZODIAC_OPTIONS[lang].map(getShortZodiacLabel);
+    const map = new Map(allSigns.map((s) => [s, 0]));
+    for (const person of people) {
+      const key = getShortZodiacLabel(person.zodiacSign);
+      if (map.has(key)) map.set(key, map.get(key) + (person.events?.length || 0));
+    }
+    return allSigns.map((label) => ({ label, value: map.get(label) }));
+  }, [people, t]);
 
   // Sums total events by translated activity label.
   const eventsByActivity = useMemo(() => {
@@ -159,12 +171,11 @@ export default function StatsPeopleTab({ people, t }) {
         tooltipUnit={{ one: t.chartEvent, many: t.chartEvents }}
       />
 
-      <RadarChartCard
-        title={t.personsByZodiac}
-        subtitle={t.zodiacDistribution}
-        data={personsByZodiac}
+      <ZodiacRadarCard
+        personsByZodiac={personsByZodiac}
+        eventsByZodiac={eventsByZodiacOrdered}
         emptyText={t.noDataYet}
-        tooltipUnit={{ one: t.chartPerson, many: t.chartPersons }}
+        t={t}
       />
 
       <ActivityDonutCard
