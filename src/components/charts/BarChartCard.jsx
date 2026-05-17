@@ -40,6 +40,7 @@ export default function BarChartCard({
   yAxisLabel = null,
   tooltipUnit = null,
   headerAction = null,
+  tabs = null,
   maxXTicks = null,
 }) {
   const PALETTE = usePalette();
@@ -88,6 +89,7 @@ export default function BarChartCard({
             <CardDescription style={{ color: PALETTE.textSoft }}>{subtitle}</CardDescription>
           </>
         )}
+        {tabs}
       </CardHeader>
 
       <CardContent>

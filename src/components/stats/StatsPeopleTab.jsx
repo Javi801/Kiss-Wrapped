@@ -6,7 +6,7 @@ import {
   translateActivity,
   translateGender,
 } from "@/lib/format";
-import { ZODIAC_OPTIONS, TEXT } from "@/lib/constants";
+import { ZODIAC_OPTIONS } from "@/lib/constants";
 import { usePalette } from "@/lib/theme";
 import { calculateAge, calculateAgeAtEvent } from "@/lib/date";
 
@@ -183,44 +183,28 @@ export default function StatsPeopleTab({ people, t }) {
         emptyText={t.noDataYet}
         maxXTicks={6}
         tooltipUnit={{ one: t.chartPerson, many: t.chartPersons }}
-        headerAction={
-          <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", flexShrink: 0 }}>
-            <span style={{ ...TEXT.caption, color: ageAtEvent ? PALETTE.accent : PALETTE.textSoft }}>
-              {t.ageAtEvent}
-            </span>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={ageAtEvent}
-              onClick={() => setAgeAtEvent((prev) => !prev)}
-              style={{
-                width: "2.25rem",
-                height: "1.25rem",
-                borderRadius: "9999px",
-                backgroundColor: ageAtEvent ? PALETTE.accent : PALETTE.line,
-                border: "none",
-                cursor: "pointer",
-                position: "relative",
-                transition: "background-color 0.2s",
-                flexShrink: 0,
-                padding: 0,
-                outline: "none",
-              }}
-            >
-              <span
+        tabs={
+          <div style={{ display: "flex", gap: "0.25rem", padding: "0.25rem", background: PALETTE.accentMuted, borderRadius: "0.875rem", marginTop: "0.5rem" }}>
+            {[{ label: t.ageCurrent, value: false }, { label: t.ageAtEvent, value: true }].map(({ label, value }) => (
+              <button
+                key={label}
+                onClick={() => setAgeAtEvent(value)}
                 style={{
-                  position: "absolute",
-                  top: "0.125rem",
-                  left: ageAtEvent ? "calc(100% - 1.125rem)" : "0.125rem",
-                  width: "1rem",
-                  height: "1rem",
-                  borderRadius: "9999px",
-                  backgroundColor: "white",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
-                  transition: "left 0.2s",
+                  flex: 1,
+                  padding: "0.3rem 0",
+                  borderRadius: "0.625rem",
+                  border: "none",
+                  fontSize: "0.75rem",
+                  fontWeight: ageAtEvent === value ? 600 : 400,
+                  background: ageAtEvent === value ? `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})` : "transparent",
+                  color: ageAtEvent === value ? "white" : PALETTE.textSoft,
+                  cursor: "pointer",
+                  transition: "all 150ms",
                 }}
-              />
-            </button>
+              >
+                {label}
+              </button>
+            ))}
           </div>
         }
       />
