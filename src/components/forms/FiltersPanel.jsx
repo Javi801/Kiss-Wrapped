@@ -240,23 +240,6 @@ export default function FiltersPanel({
 
       <Divider />
 
-      {/* Zodiac */}
-      <div>
-        <SectionLabel icon={Star} label={t.zodiacSign} />
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
-          {ZODIAC_OPTIONS[language].map((item) => (
-            <Chip
-              key={item}
-              label={formatZodiacDates(item)}
-              selected={filters.zodiacSign.includes(item)}
-              onClick={() => toggleZodiac(item)}
-            />
-          ))}
-        </div>
-      </div>
-
-      <Divider />
-
       {/* Event date range */}
       <div>
         <SectionLabel icon={Calendar} label={t.eventDateRange} />
@@ -275,6 +258,23 @@ export default function FiltersPanel({
             className="rounded-2xl"
             style={inputStyle}
           />
+        </div>
+      </div>
+
+      <Divider />
+
+      {/* Zodiac */}
+      <div>
+        <SectionLabel icon={Star} label={t.zodiacSign} />
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
+          {ZODIAC_OPTIONS[language].map((item) => (
+            <Chip
+              key={item}
+              label={formatZodiacDates(item)}
+              selected={filters.zodiacSign.includes(item)}
+              onClick={() => toggleZodiac(item)}
+            />
+          ))}
         </div>
       </div>
 
