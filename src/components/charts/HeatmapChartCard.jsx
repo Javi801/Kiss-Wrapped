@@ -7,6 +7,8 @@ const MARGIN_TOP = 40;
 const MARGIN_RIGHT = 8;
 const MARGIN_BOTTOM = 8;
 const APPROX_CHAR_PX = 6;
+const NAMES_W = 80;
+const MAX_NAME_CHARS = Math.floor((NAMES_W - 14) / APPROX_CHAR_PX);
 const MIN_COL_W = 36;
 const ROW_H = 36;
 const GAP = 3;
@@ -43,8 +45,7 @@ export default function HeatmapChartCard({ title, subtitle, data, allYears, empt
     scrolledRef.current = true;
   }, [containerWidth]);
 
-  const longestName = data.length ? Math.max(...data.map((d) => d.label.length)) : 10;
-  const marginLeft = Math.max(80, longestName * APPROX_CHAR_PX + 16);
+  const marginLeft = NAMES_W;
 
   const numYears = allYears.length;
   const availableW = Math.max(containerWidth - marginLeft, 0);
@@ -87,18 +88,23 @@ export default function HeatmapChartCard({ title, subtitle, data, allYears, empt
               style={{ flexShrink: 0 }}
               aria-hidden="true"
             >
-              {data.map((person, i) => (
-                <text
-                  key={person.label}
-                  x={marginLeft - 8}
-                  y={MARGIN_TOP + i * ROW_H + ROW_H / 2 + 4}
-                  textAnchor="end"
-                  fontSize={12}
-                  fill={PALETTE.text}
-                >
-                  {person.label}
-                </text>
-              ))}
+              {data.map((person, i) => {
+                const label = person.label.length > MAX_NAME_CHARS
+                  ? person.label.slice(0, MAX_NAME_CHARS - 1) + "…"
+                  : person.label;
+                return (
+                  <text
+                    key={person.label}
+                    x={marginLeft - 8}
+                    y={MARGIN_TOP + i * ROW_H + ROW_H / 2 + 4}
+                    textAnchor="end"
+                    fontSize={12}
+                    fill={PALETTE.text}
+                  >
+                    {label}
+                  </text>
+                );
+              })}
             </svg>
 
             {/* Scrollable right: diagonal year labels + data cells */}
