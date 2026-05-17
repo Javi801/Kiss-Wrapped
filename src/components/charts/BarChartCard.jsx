@@ -112,9 +112,9 @@ export default function BarChartCard({
                 />
 
                 {tooltipUnit ? (
-                  <Tooltip content={<ChartTooltip tooltipUnit={tooltipUnit} />} />
+                  <Tooltip cursor={{ fill: PALETTE.accentShadow }} content={<ChartTooltip tooltipUnit={tooltipUnit} />} />
                 ) : (
-                  <Tooltip />
+                  <Tooltip cursor={{ fill: PALETTE.accentShadow }} />
                 )}
 
                 {/* Bars */}
