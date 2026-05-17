@@ -168,7 +168,10 @@ export default function PersonCard({
 
                     {/* Actions */}
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-                      <Button onClick={() => setEditingPerson(true)}>
+                      <Button
+                        onClick={() => setEditingPerson(true)}
+                        style={{ background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`, color: "white", border: "none" }}
+                      >
                         <Pencil style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
                         {t.editPerson}
                       </Button>
@@ -177,6 +180,7 @@ export default function PersonCard({
                         onClick={() =>
                           setEventModal({ open: true, mode: "add", event: null })
                         }
+                        style={{ background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`, color: "white", border: "none" }}
                       >
                         <Plus style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
                         {t.addEvent}
@@ -262,7 +266,7 @@ export default function PersonCard({
                               </span>
 
                               {hasScore(event.score) && (
-                                <Badge>{renderKisses(event.score, t)}</Badge>
+                                <Badge style={{ backgroundColor: PALETTE.accentShadow, color: PALETTE.accent, border: "none" }}>{renderKisses(event.score, t)}</Badge>
                               )}
                             </div>
 
