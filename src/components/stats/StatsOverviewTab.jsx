@@ -72,7 +72,7 @@ export default function StatsOverviewTab({ people, allEvents, t }) {
         <StatTile
           label={t.averageScore}
           value={averageScore}
-          helper={t.scores}
+          helper={t.scoreOutOf}
         />
         <StatTile
           label={t.totalEvents}
