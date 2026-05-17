@@ -4,17 +4,16 @@ import {
   getShortZodiacLabel,
   translateActivity,
   translateGender,
-  getColorForCategory,
 } from "@/lib/format";
 import { ZODIAC_OPTIONS, TEXT } from "@/lib/constants";
 import { usePalette } from "@/lib/theme";
 import { calculateAge, calculateAgeAtEvent } from "@/lib/date";
 
 import BarChartCard from "@/components/charts/BarChartCard";
-import PieChartCard from "@/components/charts/PieChartCard";
 import RadarChartCard from "@/components/charts/RadarChartCard";
 import AgeRangeCard from "@/components/stats/AgeRangeCard";
 import ActivityDonutCard from "@/components/stats/ActivityDonutCard";
+import GenderDonutCard from "@/components/stats/GenderDonutCard";
 
 /**
  * Renders the people-focused statistics tab.
@@ -149,21 +148,6 @@ export default function StatsPeopleTab({ people, t }) {
       .map(([label, value]) => ({ label, value }));
   }, [people]);
 
-  /**
-   * Builds a custom color map for gender-related labels.
-   * This keeps gender charts visually consistent across datasets.
-   */
-  const genderColorMap = useMemo(() => {
-    const map = {};
-
-    for (const item of [...personsByGender, ...eventsByGender]) {
-      const custom = getColorForCategory(item.label);
-      if (custom) map[item.label] = custom;
-    }
-
-    return map;
-  }, [personsByGender, eventsByGender]);
-
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <BarChartCard
@@ -190,21 +174,11 @@ export default function StatsPeopleTab({ people, t }) {
         t={t}
       />
 
-      <PieChartCard
-        title={t.personsByGender}
-        subtitle={t.genderSplit}
-        data={personsByGender}
+      <GenderDonutCard
+        personsByGender={personsByGender}
+        eventsByGender={eventsByGender}
         emptyText={t.noDataYet}
-        tooltipUnit={{ one: t.chartPerson, many: t.chartPersons }}
-      />
-
-      <BarChartCard
-        title={t.eventsByGender}
-        subtitle={t.eventsGenderSplit}
-        data={eventsByGender}
-        emptyText={t.noDataYet}
-        customColors={genderColorMap}
-        tooltipUnit={{ one: t.chartEvent, many: t.chartEvents }}
+        t={t}
       />
 
       <BarChartCard
