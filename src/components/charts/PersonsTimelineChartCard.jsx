@@ -12,6 +12,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TEXT } from "@/lib/constants";
 import { usePalette } from "@/lib/theme";
+import TimelineCalendarPopup from "@/components/charts/TimelineCalendarPopup";
 
 const GRANS = ["week", "month", "year", "historic"];
 
@@ -352,17 +353,27 @@ export default function PersonsTimelineChartCard({ people, t }) {
               <ChevronLeft size={18} />
             </button>
           )}
-          <span
-            style={{
-              ...TEXT.body,
-              color: P.text,
-              fontWeight: 500,
-              textAlign: "center",
-              flex: 1,
-            }}
-          >
-            {title}
-          </span>
+          {gran !== "historic" ? (
+            <TimelineCalendarPopup
+              gran={gran}
+              offset={offset}
+              onOffsetChange={setOffset}
+              locale={locale}
+              title={title}
+            />
+          ) : (
+            <span
+              style={{
+                ...TEXT.body,
+                color: P.text,
+                fontWeight: 500,
+                textAlign: "center",
+                flex: 1,
+              }}
+            >
+              {title}
+            </span>
+          )}
           {gran !== "historic" && (
             <button
               onClick={() => setOffset((o) => o + 1)}
