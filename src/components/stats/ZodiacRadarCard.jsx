@@ -20,6 +20,7 @@ import { usePalette } from "@/lib/theme";
 
 const MODES = ["persons", "events"];
 
+
 function ChartTooltip({ active, payload, tooltipUnit }) {
   const P = usePalette();
   if (!active || !payload?.length) return null;
@@ -123,7 +124,7 @@ export default function ZodiacRadarCard({
         {hasData ? (
           <div style={{ height: "18rem", width: "100%" }}>
             <ResponsiveContainer width="100%" height="100%">
-              <RadarChart data={data} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
+              <RadarChart data={data} margin={{ top: 10, right: 30, bottom: 10, left: 30 }} startAngle={210}>
                 <PolarGrid stroke={P.cardBorder} />
                 <PolarAngleAxis
                   dataKey="label"
@@ -134,6 +135,7 @@ export default function ZodiacRadarCard({
                   tick={{ fontSize: 9, fill: P.textSoft }}
                   tickCount={3}
                   axisLine={false}
+                  angle={90}
                 />
                 <Tooltip content={<ChartTooltip tooltipUnit={tooltipUnit} />} />
                 <Radar
