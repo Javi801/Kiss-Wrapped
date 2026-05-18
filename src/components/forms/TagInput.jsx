@@ -1,4 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { Input } from "@/components/ui/input";
 import { TEXT } from "@/lib/constants";
@@ -16,7 +17,7 @@ export default function TagInput({
 }) {
   const PALETTE = usePalette();
   const [open, setOpen] = useState(false);
-  const [dropdownStyle, setDropdownStyle] = useState({});
+  const [rect, setRect] = useState(null);
   const containerRef = useRef(null);
 
   const trimmed = value.trim();
@@ -25,29 +26,50 @@ export default function TagInput({
   );
   const showAddOption =
     trimmed && !tags.some((t) => t.toLowerCase() === trimmed.toLowerCase());
+  const showDropdown = open && rect && (filtered.length > 0 || showAddOption);
 
-  const showDropdown = open && (filtered.length > 0 || showAddOption);
+  function measure() {
+    if (containerRef.current) {
+      setRect(containerRef.current.getBoundingClientRect());
+    }
+  }
 
-  // Position the dropdown via fixed coords to escape Dialog overflow clipping.
-  useLayoutEffect(() => {
-    if (!open || !containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    setDropdownStyle({
-      position: "fixed",
-      top: rect.bottom + 4,
-      left: rect.left,
-      width: rect.width,
-      zIndex: 9999,
-    });
-  }, [open]);
+  function handleFocus() {
+    measure();
+    setOpen(true);
+  }
+
+  function handleChange(e) {
+    onChange(e.target.value);
+    measure();
+    setOpen(true);
+  }
 
   useEffect(() => {
     if (!open) return;
-    function close(e) {
+
+    function closeIfOutside(e) {
       if (!containerRef.current?.contains(e.target)) setOpen(false);
     }
-    document.addEventListener("mousedown", close);
-    return () => document.removeEventListener("mousedown", close);
+
+    function reposition() {
+      if (!containerRef.current) return;
+      const newRect = containerRef.current.getBoundingClientRect();
+      if (newRect.bottom < 0 || newRect.top > window.innerHeight) {
+        setOpen(false);
+      } else {
+        setRect(newRect);
+      }
+    }
+
+    document.addEventListener("mousedown", closeIfOutside);
+    window.addEventListener("scroll", reposition, true);
+    window.addEventListener("resize", reposition);
+    return () => {
+      document.removeEventListener("mousedown", closeIfOutside);
+      window.removeEventListener("scroll", reposition, true);
+      window.removeEventListener("resize", reposition);
+    };
   }, [open]);
 
   function selectTag(tag) {
@@ -65,18 +87,23 @@ export default function TagInput({
     <div ref={containerRef}>
       <Input
         value={value}
-        onChange={(e) => { onChange(e.target.value); setOpen(true); }}
-        onFocus={() => setOpen(true)}
+        onChange={handleChange}
+        onFocus={handleFocus}
         onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }}
         placeholder={placeholder}
         maxLength={maxLength}
         className="rounded-2xl"
         style={style}
       />
-      {showDropdown && (
+
+      {showDropdown && createPortal(
         <div
           style={{
-            ...dropdownStyle,
+            position: "fixed",
+            top: rect.bottom + 4,
+            left: rect.left,
+            width: rect.width,
+            zIndex: 9999,
             borderRadius: "0.75rem",
             border: `1px solid ${PALETTE.inputBorder}`,
             backgroundColor: PALETTE.card,
@@ -127,7 +154,8 @@ export default function TagInput({
               {`+ ${addTagLabel} "${trimmed}"`}
             </button>
           )}
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );
