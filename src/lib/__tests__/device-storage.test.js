@@ -25,7 +25,7 @@ import {
   loadSettings,
   saveSettings,
 } from "@/lib/device-storage";
-import { STORAGE_KEY, ICON_COLOR_KEY, LANGUAGE_KEY, THEME_KEY, SITUATION_TAGS_KEY } from "@/lib/constants";
+import { STORAGE_KEY, ICON_COLOR_KEY, LANGUAGE_KEY, THEME_KEY, SITUATION_TAGS_KEY, PLACE_TAGS_KEY } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // loadPeopleFromDevice
@@ -287,7 +287,7 @@ describe("loadSettings (web path)", () => {
   });
 
   it("returns defaults when no settings are saved", async () => {
-    expect(await loadSettings()).toEqual({ iconColor: "yellow", language: "en", theme: "pink", statsVisible: true, situationTags: [] });
+    expect(await loadSettings()).toEqual({ iconColor: "yellow", language: "en", theme: "pink", statsVisible: true, situationTags: [], placeTags: [] });
   });
 
   it("returns the saved iconColor", async () => {
@@ -328,6 +328,15 @@ describe("loadSettings (web path)", () => {
 
   it("returns empty situationTags when none are saved", async () => {
     expect((await loadSettings()).situationTags).toEqual([]);
+  });
+
+  it("returns saved placeTags", async () => {
+    localStorage.setItem(PLACE_TAGS_KEY, JSON.stringify(["Café", "Home"]));
+    expect((await loadSettings()).placeTags).toEqual(["Café", "Home"]);
+  });
+
+  it("returns empty placeTags when none are saved", async () => {
+    expect((await loadSettings()).placeTags).toEqual([]);
   });
 });
 
@@ -383,8 +392,19 @@ describe("saveSettings (web path)", () => {
     expect(JSON.parse(localStorage.getItem(SITUATION_TAGS_KEY))).toEqual(["Existing"]);
   });
 
+  it("saves placeTags to localStorage", async () => {
+    await saveSettings({ placeTags: ["Café", "Home"] });
+    expect(JSON.parse(localStorage.getItem(PLACE_TAGS_KEY))).toEqual(["Café", "Home"]);
+  });
+
+  it("does not overwrite placeTags when it is undefined", async () => {
+    localStorage.setItem(PLACE_TAGS_KEY, JSON.stringify(["Existing"]));
+    await saveSettings({ iconColor: "pink" });
+    expect(JSON.parse(localStorage.getItem(PLACE_TAGS_KEY))).toEqual(["Existing"]);
+  });
+
   it("round-trips correctly through save and load", async () => {
-    await saveSettings({ iconColor: "blue", language: "es", theme: "dark", statsVisible: true, situationTags: ["Date", "Party"] });
-    expect(await loadSettings()).toEqual({ iconColor: "blue", language: "es", theme: "dark", statsVisible: true, situationTags: ["Date", "Party"] });
+    await saveSettings({ iconColor: "blue", language: "es", theme: "dark", statsVisible: true, situationTags: ["Date", "Party"], placeTags: ["Café", "Home"] });
+    expect(await loadSettings()).toEqual({ iconColor: "blue", language: "es", theme: "dark", statsVisible: true, situationTags: ["Date", "Party"], placeTags: ["Café", "Home"] });
   });
 });
