@@ -29,7 +29,7 @@ import { usePalette } from "@/lib/theme";
 import { todayString, isValidDateString, isFutureDate } from "@/lib/date";
 import { hasScore, renderKisses } from "@/lib/format";
 
-export default function EventForm({ initialValues, onSave, onCancel, onDelete, t, situationTags = [], onAddSituationTag }) {
+export default function EventForm({ initialValues, onSave, onCancel, onDelete, t, situationTags = [], onAddSituationTag, placeTags = [], onAddPlaceTag }) {
   const PALETTE = usePalette();
   const [date, setDate] = useState(initialValues?.date || todayString());
   const [details, setDetails] = useState(initialValues?.details || "");
@@ -43,6 +43,9 @@ export default function EventForm({ initialValues, onSave, onCancel, onDelete, t
   const [addingTag, setAddingTag] = useState(false);
   const [newTagText, setNewTagText] = useState("");
   const newTagInputRef = useRef(null);
+
+  const [addingPlaceTag, setAddingPlaceTag] = useState(false);
+  const [newPlaceTagText, setNewPlaceTagText] = useState("");
 
   const [errors, setErrors] = useState({});
 
@@ -79,6 +82,15 @@ export default function EventForm({ initialValues, onSave, onCancel, onDelete, t
     setSituation(tag);
     setNewTagText("");
     setAddingTag(false);
+  }
+
+  function confirmNewPlaceTag() {
+    const tag = newPlaceTagText.trim();
+    if (!tag) return;
+    onAddPlaceTag?.(tag);
+    setPlace(tag);
+    setNewPlaceTagText("");
+    setAddingPlaceTag(false);
   }
 
   const inputStyle = {
@@ -127,6 +139,86 @@ export default function EventForm({ initialValues, onSave, onCancel, onDelete, t
       {/* Place */}
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <Label>{t.eventPlace} *</Label>
+
+        {/* Tag chips */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.375rem", alignItems: "center" }}>
+          {placeTags.map((tag) => {
+            const selected = place === tag;
+            return (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => setPlace(selected ? "" : tag)}
+                style={{
+                  padding: "0.25rem 0.75rem",
+                  borderRadius: "9999px",
+                  ...TEXT.caption,
+                  border: `1px solid ${selected ? PALETTE.accent : PALETTE.inputBorder}`,
+                  backgroundColor: selected ? PALETTE.accentMuted : PALETTE.inputBg,
+                  color: selected ? PALETTE.accent : PALETTE.textSoft,
+                  fontWeight: selected ? "600" : "400",
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                }}
+              >
+                {tag}
+              </button>
+            );
+          })}
+
+          {/* Add tag inline */}
+          {addingPlaceTag ? (
+            <div style={{ display: "flex", gap: "0.25rem", alignItems: "center", flex: "1 1 10rem" }}>
+              <Input
+                value={newPlaceTagText}
+                onChange={(e) => setNewPlaceTagText(e.target.value)}
+                placeholder={t.newTagPlaceholder}
+                maxLength={50}
+                autoFocus
+                className="rounded-2xl"
+                style={{ ...inputStyle, ...TEXT.input, height: "1.75rem", flex: 1 }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") { e.preventDefault(); confirmNewPlaceTag(); }
+                  if (e.key === "Escape") { setAddingPlaceTag(false); setNewPlaceTagText(""); }
+                }}
+              />
+              <Button
+                type="button"
+                className="rounded-2xl"
+                style={{ height: "1.75rem", padding: "0 0.625rem", ...TEXT.caption, background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`, color: "white", border: "none" }}
+                onClick={confirmNewPlaceTag}
+              >
+                {t.addTagConfirm ?? "+"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-2xl"
+                style={{ height: "1.75rem", padding: "0 0.625rem", ...TEXT.caption, ...inputStyle }}
+                onClick={() => { setAddingPlaceTag(false); setNewPlaceTagText(""); }}
+              >
+                ✕
+              </Button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setAddingPlaceTag(true)}
+              style={{
+                padding: "0.25rem 0.625rem",
+                borderRadius: "9999px",
+                ...TEXT.caption,
+                border: `1px dashed ${PALETTE.inputBorder}`,
+                backgroundColor: "transparent",
+                color: PALETTE.textSoft,
+                cursor: "pointer",
+              }}
+            >
+              + {t.addTag}
+            </button>
+          )}
+        </div>
+
         <Input
           value={place}
           onChange={(e) => setPlace(e.target.value)}
