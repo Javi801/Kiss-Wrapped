@@ -80,6 +80,7 @@ export default function TagInput({
   function handleAddTag() {
     if (!trimmed) return;
     onAddTag?.(trimmed);
+    onChange(trimmed);
     setOpen(false);
   }
 
