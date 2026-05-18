@@ -102,11 +102,15 @@ export async function loadSettings() {
       // Missing native settings are migrated from localStorage when possible.
       const storage = getSafeStorage()
       const rawVisible = storage?.getItem(STATS_VISIBLE_KEY)
+      const rawSituationTags = storage?.getItem(SITUATION_TAGS_KEY)
+      const rawPlaceTags = storage?.getItem(PLACE_TAGS_KEY)
       const migrated = {
-        iconColor:    storage?.getItem(ICON_COLOR_KEY) || SETTINGS_DEFAULTS.iconColor,
-        language:     storage?.getItem(LANGUAGE_KEY)  || SETTINGS_DEFAULTS.language,
-        theme:        storage?.getItem(THEME_KEY)      || SETTINGS_DEFAULTS.theme,
-        statsVisible: rawVisible === null ? SETTINGS_DEFAULTS.statsVisible : rawVisible !== 'false',
+        iconColor:     storage?.getItem(ICON_COLOR_KEY) || SETTINGS_DEFAULTS.iconColor,
+        language:      storage?.getItem(LANGUAGE_KEY)   || SETTINGS_DEFAULTS.language,
+        theme:         storage?.getItem(THEME_KEY)       || SETTINGS_DEFAULTS.theme,
+        statsVisible:  rawVisible === null ? SETTINGS_DEFAULTS.statsVisible : rawVisible !== 'false',
+        situationTags: rawSituationTags ? JSON.parse(rawSituationTags) : [],
+        placeTags:     rawPlaceTags ? JSON.parse(rawPlaceTags) : [],
       }
       // Persist migrated values so future reads use the file
       await saveSettings(migrated).catch(() => {})

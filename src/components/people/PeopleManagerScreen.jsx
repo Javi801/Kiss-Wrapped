@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Search, Filter, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -57,6 +57,8 @@ export default function PeopleManagerScreen({
   const alphabetRef = useRef(null);
   const [activeLetter, setActiveLetter] = useState(null);
   const fadeTimerRef = useRef(null);
+
+  useEffect(() => () => clearTimeout(fadeTimerRef.current), []);
 
   function activateLetter(letter) {
     if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current);
@@ -168,6 +170,7 @@ export default function PeopleManagerScreen({
 
   function handleAlphabetTouchMove(e) {
     e.preventDefault();
+    if (!e.touches.length) return;
     const touch = e.touches[0];
     const target = document.elementFromPoint(touch.clientX, touch.clientY);
     const letter = target?.dataset?.letter;

@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Search, Users, BarChart3, UserPlus } from "lucide-react";
 import { App as CapacitorApp } from "@capacitor/app";
+import { Capacitor } from "@capacitor/core";
 
 import { PALETTES, TEXT, COPY } from "@/lib/constants";
 import { ThemeProvider } from "@/lib/theme";
@@ -21,6 +22,7 @@ import PeopleManagerScreen from "@/components/people/PeopleManagerScreen";
 import HomeScreen from "./components/app/HomeScreen";
 import AddPersonScreen from "./components/app/AddPersonScreen";
 import IntroScreen from "./components/app/IntroScreen";
+import PrivacyScreen from "./components/app/PrivacyScreen";
 import StatsScreen from "@/components/stats/StatsScreen";
 
 /**
@@ -63,6 +65,9 @@ export default function KissRecorderApp() {
 
   // Prevents saving before the initial load completes.
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // True while the app is backgrounded — triggers the privacy overlay.
+  const [isPrivate, setIsPrivate] = useState(false);
 
   // Keep screenRef in sync so the Capacitor listener always sees the latest value.
   useEffect(() => {
@@ -118,6 +123,29 @@ export default function KissRecorderApp() {
     return () => {
       listenerPromise.then((h) => h.remove());
     };
+  }, []);
+
+  useEffect(() => {
+    const hide = () => setIsPrivate(true);
+
+    if (Capacitor.isNativePlatform()) {
+      // pause fires early (before the app-switcher screenshot) and is reliable for showing.
+      // resume fires spuriously on EMUI ~1s after pause even while still in the switcher,
+      // so we ignore it and only restore via appStateChange which fires on true foreground.
+      document.addEventListener("pause", hide);
+      const capListener = CapacitorApp.addListener("appStateChange", ({ isActive }) => {
+        if (isActive) setIsPrivate(false);
+      });
+      return () => {
+        document.removeEventListener("pause", hide);
+        capListener.then((h) => h.remove());
+      };
+    }
+
+    // Web / browser dev: visibilitychange is the only option
+    const handleVisibility = () => setIsPrivate(document.hidden);
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
   }, []);
 
   /**
@@ -202,13 +230,11 @@ export default function KissRecorderApp() {
   // Switches the icon from user actions only, because Android may kill the app while changing aliases.
   async function changeIconColor(newColor) {
     setIconColor(newColor);
-    await saveSettings({ iconColor: newColor, language, theme });
     setAppIconColor(newColor);
   }
 
-  async function changeTheme(newTheme) {
+  function changeTheme(newTheme) {
     setTheme(newTheme);
-    await saveSettings({ iconColor, language, theme: newTheme });
   }
 
   // Active translation dictionary.
@@ -490,6 +516,9 @@ export default function KissRecorderApp() {
 
       </div>
     </div>
+    <AnimatePresence>
+      {isPrivate && <PrivacyScreen key="privacy" />}
+    </AnimatePresence>
     </ThemeProvider>
   );
 }

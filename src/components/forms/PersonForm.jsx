@@ -42,7 +42,7 @@ export default function PersonForm({
     const displayAge = initialValues.birthYear
       ? String(calculateAge(initialValues.birthYear, zodiacSign) ?? "")
       : String(initialValues.age ?? "");
-    return { ...initialValues, zodiacSign, age: displayAge };
+    return { ...initialValues, zodiacSign, age: displayAge, howWeMet: initialValues.howWeMet ?? "", detail: initialValues.detail ?? "" };
   });
 
   const [errors, setErrors] = useState({});
