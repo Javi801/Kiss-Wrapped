@@ -5,8 +5,8 @@ export default function PrivacyScreen() {
   const PALETTE = usePalette();
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1, transition: { duration: 0.08 } }}
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 1, transition: { duration: 0 } }}
       exit={{ opacity: 0, transition: { duration: 0.25, ease: "easeOut" } }}
       style={{
         position: "fixed",
