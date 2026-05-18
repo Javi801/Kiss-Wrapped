@@ -158,6 +158,7 @@ export function getStatsData(people, t) {
     const map = new Map();
     for (const person of people) {
       const age = calculateAge(person.birthYear, person.zodiacSign) ?? person.age;
+      if (age == null) continue;
       map.set(String(age), (map.get(String(age)) || 0) + 1);
     }
     return [...map.entries()]
