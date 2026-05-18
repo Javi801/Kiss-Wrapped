@@ -55,6 +55,8 @@ export default function PersonCard({
   language,
   situationTags,
   onAddSituationTag,
+  placeTags,
+  onAddPlaceTag,
 }) {
   const PALETTE = usePalette();
   // Expand/collapse state.
@@ -368,6 +370,8 @@ export default function PersonCard({
             t={t}
             situationTags={situationTags}
             onAddSituationTag={onAddSituationTag}
+            placeTags={placeTags}
+            onAddPlaceTag={onAddPlaceTag}
           />
         </DialogContent>
       </Dialog>
