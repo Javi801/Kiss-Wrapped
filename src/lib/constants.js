@@ -10,6 +10,7 @@ export const THEME_KEY = "kiss-recorder-theme-v1";
 export const STATS_VISIBLE_KEY = "kiss-recorder-stats-visible-v1";
 export const SITUATION_TAGS_KEY = "kiss-recorder-situation-tags-v1";
 export const PLACE_TAGS_KEY = "kiss-recorder-place-tags-v1";
+export const ONBOARDING_DONE_KEY = "kiss-recorder-onboarding-done-v1";
 export const PEOPLE_FILE_NAME = "kiss-recorder-people.json";
 export const SETTINGS_FILE_NAME = "kiss-recorder-settings.json";
 

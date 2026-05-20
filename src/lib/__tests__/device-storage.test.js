@@ -294,7 +294,7 @@ describe("loadSettings (web path)", () => {
   });
 
   it("returns defaults when no settings are saved", async () => {
-    expect(await loadSettings()).toEqual({ iconColor: "yellow", language: "en", theme: "pink", statsVisible: true, situationTags: [], placeTags: [] });
+    expect(await loadSettings()).toEqual({ iconColor: "yellow", language: "en", theme: "pink", statsVisible: true, situationTags: [], placeTags: [], onboardingDone: false });
   });
 
   it("returns the saved iconColor", async () => {
@@ -411,8 +411,8 @@ describe("saveSettings (web path)", () => {
   });
 
   it("round-trips correctly through save and load", async () => {
-    await saveSettings({ iconColor: "blue", language: "es", theme: "dark", statsVisible: true, situationTags: ["Date", "Party"], placeTags: ["Café", "Home"] });
-    expect(await loadSettings()).toEqual({ iconColor: "blue", language: "es", theme: "dark", statsVisible: true, situationTags: ["Date", "Party"], placeTags: ["Café", "Home"] });
+    await saveSettings({ iconColor: "blue", language: "es", theme: "dark", statsVisible: true, situationTags: ["Date", "Party"], placeTags: ["Café", "Home"], onboardingDone: true });
+    expect(await loadSettings()).toEqual({ iconColor: "blue", language: "es", theme: "dark", statsVisible: true, situationTags: ["Date", "Party"], placeTags: ["Café", "Home"], onboardingDone: true });
   });
 });
 
