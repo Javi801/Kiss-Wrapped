@@ -4,7 +4,7 @@ import { Search, Users, BarChart3, UserPlus } from "lucide-react";
 import { App as CapacitorApp } from "@capacitor/app";
 import { Capacitor } from "@capacitor/core";
 
-import { PALETTES, TEXT, COPY, detectDeviceLanguage } from "@/lib/constants";
+import { PALETTES, TEXT, COPY, ONBOARDING_VERSION, detectDeviceLanguage } from "@/lib/constants";
 import { ThemeProvider } from "@/lib/theme";
 import { setAppIconColor } from "@/plugins/appicon";
 import { todayString } from "@/lib/date";
@@ -34,8 +34,8 @@ export default function KissRecorderApp() {
   // Main people dataset used across the whole app.
   const [people, setPeople] = useState([]);
 
-  // Current visible screen.
-  const [screen, setScreen] = useState("intro");
+  // Current visible screen. Boot starts blank until persisted settings are read.
+  const [screen, setScreen] = useState("boot");
 
   // Navigation history stack for hardware back button support.
   const screenHistoryRef = useRef([]);
@@ -44,7 +44,7 @@ export default function KissRecorderApp() {
   // The back button handler checks this before doing screen navigation.
   const modalBackRef = useRef(null);
   // Ref keeps the latest screen value accessible inside the Capacitor listener.
-  const screenRef = useRef("intro");
+  const screenRef = useRef("boot");
 
   // Current UI language.
   const [language, setLanguage] = useState("en");
@@ -67,6 +67,7 @@ export default function KissRecorderApp() {
   // Whether the onboarding flow has been completed (true = skip, show app normally).
   // Initialized to true to avoid flashing the onboarding on re-renders; boot corrects it.
   const [onboardingDone, setOnboardingDone] = useState(true);
+  const [onboardingVersion, setOnboardingVersion] = useState(ONBOARDING_VERSION);
 
   // Prevents saving before the initial load completes.
   const [isLoaded, setIsLoaded] = useState(false);
@@ -173,13 +174,19 @@ export default function KissRecorderApp() {
         // Restore saved settings (language + icon color).
         const settings = await loadSettings();
         if (isMounted) {
-          if (!settings.onboardingDone) {
-            // First launch: detect the device language and show onboarding.
-            setLanguage(detectDeviceLanguage());
+          if (settings.language === "en" || settings.language === "es") setLanguage(settings.language);
+
+          const needsOnboarding = !settings.onboardingDone || settings.onboardingVersion !== ONBOARDING_VERSION;
+          if (needsOnboarding) {
+            // First launch or updated tutorial: show onboarding.
+            if (!settings.onboardingDone) setLanguage(detectDeviceLanguage());
             setOnboardingDone(false);
+            setOnboardingVersion(settings.onboardingVersion || 0);
             setScreen("onboarding");
           } else {
-            if (settings.language === "en" || settings.language === "es") setLanguage(settings.language);
+            setOnboardingDone(true);
+            setOnboardingVersion(settings.onboardingVersion);
+            setScreen("intro");
           }
 
           if (["yellow", "blue", "pink", "purple"].includes(settings.iconColor)) setIconColor(settings.iconColor);
@@ -196,7 +203,13 @@ export default function KissRecorderApp() {
         if (import.meta.env.DEV) console.error("Failed to load app data", error);
 
         // Fallback to an empty dataset if loading fails.
-        if (isMounted) setPeople([]);
+        if (isMounted) {
+          setPeople([]);
+          setOnboardingDone(false);
+          setOnboardingVersion(0);
+          setLanguage(detectDeviceLanguage());
+          setScreen("onboarding");
+        }
       } finally {
         // Mark app as loaded only if the component is still mounted.
         if (isMounted) setIsLoaded(true);
@@ -226,10 +239,10 @@ export default function KissRecorderApp() {
   // Persists settings whenever language, iconColor, theme, statsVisible, situationTags, placeTags or onboardingDone change (after boot).
   useEffect(() => {
     if (!isLoaded) return;
-    saveSettings({ iconColor, language, theme, statsVisible, situationTags, placeTags, onboardingDone }).catch((error) => {
+    saveSettings({ iconColor, language, theme, statsVisible, situationTags, placeTags, onboardingDone, onboardingVersion }).catch((error) => {
       if (import.meta.env.DEV) console.error("Failed to save settings", error);
     });
-  }, [iconColor, language, theme, statsVisible, situationTags, placeTags, onboardingDone, isLoaded]);
+  }, [iconColor, language, theme, statsVisible, situationTags, placeTags, onboardingDone, onboardingVersion, isLoaded]);
 
   // Applies the dark class to <html> so shadcn portal components also get dark styles.
   useEffect(() => {
@@ -392,6 +405,7 @@ export default function KissRecorderApp() {
    */
   function handleOnboardingComplete() {
     setOnboardingDone(true);
+    setOnboardingVersion(ONBOARDING_VERSION);
     screenHistoryRef.current = [];
     setScreen("intro");
   }
@@ -405,7 +419,7 @@ export default function KissRecorderApp() {
   ];
 
   // Hide bottom navigation on screens that use a focused layout.
-  const hideBottomBar = screen === "add" || screen === "intro" || screen === "onboarding";
+  const hideBottomBar = screen === "boot" || screen === "add" || screen === "intro" || screen === "onboarding";
 
   const palette = PALETTES[theme] ?? PALETTES.pink;
 

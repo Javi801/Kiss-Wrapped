@@ -11,6 +11,8 @@ export const STATS_VISIBLE_KEY = "kiss-recorder-stats-visible-v1";
 export const SITUATION_TAGS_KEY = "kiss-recorder-situation-tags-v1";
 export const PLACE_TAGS_KEY = "kiss-recorder-place-tags-v1";
 export const ONBOARDING_DONE_KEY = "kiss-recorder-onboarding-done-v1";
+export const ONBOARDING_VERSION_KEY = "kiss-recorder-onboarding-version-v1";
+export const ONBOARDING_VERSION = 2;
 export const PEOPLE_FILE_NAME = "kiss-recorder-people.json";
 export const SETTINGS_FILE_NAME = "kiss-recorder-settings.json";
 

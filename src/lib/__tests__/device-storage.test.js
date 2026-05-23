@@ -32,7 +32,7 @@ import {
   loadSettings,
   saveSettings,
 } from "@/lib/device-storage";
-import { STORAGE_KEY, ICON_COLOR_KEY, LANGUAGE_KEY, THEME_KEY, SITUATION_TAGS_KEY, PLACE_TAGS_KEY } from "@/lib/constants";
+import { STORAGE_KEY, ICON_COLOR_KEY, LANGUAGE_KEY, THEME_KEY, SITUATION_TAGS_KEY, PLACE_TAGS_KEY, ONBOARDING_VERSION_KEY } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // loadPeopleFromDevice
@@ -294,7 +294,7 @@ describe("loadSettings (web path)", () => {
   });
 
   it("returns defaults when no settings are saved", async () => {
-    expect(await loadSettings()).toEqual({ iconColor: "yellow", language: "en", theme: "pink", statsVisible: true, situationTags: [], placeTags: [], onboardingDone: false });
+    expect(await loadSettings()).toEqual({ iconColor: "yellow", language: "en", theme: "pink", statsVisible: true, situationTags: [], placeTags: [], onboardingDone: false, onboardingVersion: 0 });
   });
 
   it("returns the saved iconColor", async () => {
@@ -411,8 +411,13 @@ describe("saveSettings (web path)", () => {
   });
 
   it("round-trips correctly through save and load", async () => {
-    await saveSettings({ iconColor: "blue", language: "es", theme: "dark", statsVisible: true, situationTags: ["Date", "Party"], placeTags: ["Café", "Home"], onboardingDone: true });
-    expect(await loadSettings()).toEqual({ iconColor: "blue", language: "es", theme: "dark", statsVisible: true, situationTags: ["Date", "Party"], placeTags: ["Café", "Home"], onboardingDone: true });
+    await saveSettings({ iconColor: "blue", language: "es", theme: "dark", statsVisible: true, situationTags: ["Date", "Party"], placeTags: ["Café", "Home"], onboardingDone: true, onboardingVersion: 2 });
+    expect(await loadSettings()).toEqual({ iconColor: "blue", language: "es", theme: "dark", statsVisible: true, situationTags: ["Date", "Party"], placeTags: ["Café", "Home"], onboardingDone: true, onboardingVersion: 2 });
+  });
+
+  it("saves onboardingVersion to localStorage", async () => {
+    await saveSettings({ onboardingVersion: 2 });
+    expect(localStorage.getItem(ONBOARDING_VERSION_KEY)).toBe("2");
   });
 });
 
