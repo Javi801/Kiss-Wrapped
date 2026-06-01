@@ -39,6 +39,19 @@ export function mergeEventTagsFromPeople(people, existingTags, field) {
   return merged;
 }
 
+export function mergePeopleFieldTags(people, existingTags, field) {
+  const seen = new Set(existingTags.map((t) => t.toLowerCase()));
+  const merged = [...existingTags];
+  for (const person of people) {
+    const s = person[field]?.trim();
+    if (s && !seen.has(s.toLowerCase())) {
+      seen.add(s.toLowerCase());
+      merged.push(s);
+    }
+  }
+  return merged;
+}
+
 // Converts hex color to RGB object
 export function hexToRgb(hex) {
   const normalized = hex.replace("#", "");

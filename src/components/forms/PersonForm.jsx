@@ -3,6 +3,7 @@ import { Save } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import TagInput from "@/components/forms/TagInput";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -31,6 +32,9 @@ export default function PersonForm({
   includeHowWeMet = true,
   saveLabel,
   mode,
+  howWeMetTags = [],
+  onAddHowWeMetTag,
+  isParentOpen,
 }) {
   const PALETTE = usePalette();
   // Local form state initialization.
@@ -197,12 +201,16 @@ export default function PersonForm({
         {includeHowWeMet && (
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             <Label>{t.howWeMet} *</Label>
-            <Input
+            <TagInput
               value={form.howWeMet}
-              onChange={(e) => update("howWeMet", e.target.value)}
+              onChange={(val) => update("howWeMet", val)}
+              tags={howWeMetTags}
+              onAddTag={onAddHowWeMetTag}
               maxLength={200}
               className="rounded-2xl"
-            style={{ ...inputStyle }}
+              style={{ ...inputStyle }}
+              addTagLabel={t.addTag}
+              isParentOpen={isParentOpen}
             />
             <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: "right" }}>
               {form.howWeMet.length}/200

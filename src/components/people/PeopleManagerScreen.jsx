@@ -37,6 +37,8 @@ export default function PeopleManagerScreen({
   onAddSituationTag,
   placeTags,
   onAddPlaceTag,
+  howWeMetTags,
+  onAddHowWeMetTag,
 }) {
   const PALETTE = usePalette();
   const [query, setQuery] = useState("");
@@ -416,6 +418,8 @@ export default function PeopleManagerScreen({
                         onAddSituationTag={onAddSituationTag}
                         placeTags={placeTags}
                         onAddPlaceTag={onAddPlaceTag}
+                        howWeMetTags={howWeMetTags}
+                        onAddHowWeMetTag={onAddHowWeMetTag}
                       />
                     ))}
                   </div>

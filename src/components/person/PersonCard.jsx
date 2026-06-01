@@ -57,6 +57,8 @@ export default function PersonCard({
   onAddSituationTag,
   placeTags,
   onAddPlaceTag,
+  howWeMetTags,
+  onAddHowWeMetTag,
 }) {
   const PALETTE = usePalette();
   // Expand/collapse state.
@@ -325,6 +327,9 @@ export default function PersonCard({
             onCancel={() => setEditingPerson(false)}
             t={t}
             language={language}
+            howWeMetTags={howWeMetTags}
+            onAddHowWeMetTag={onAddHowWeMetTag}
+            isParentOpen={editingPerson}
           />
         </DialogContent>
       </Dialog>

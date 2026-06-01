@@ -8,7 +8,7 @@ import { PALETTES, TEXT, COPY, ONBOARDING_VERSION, detectDeviceLanguage } from "
 import { ThemeProvider } from "@/lib/theme";
 import { setAppIconColor } from "@/plugins/appicon";
 import { todayString } from "@/lib/date";
-import { uid, normalizePeople, mergeEventTagsFromPeople } from "@/lib/helpers";
+import { uid, normalizePeople, mergeEventTagsFromPeople, mergePeopleFieldTags } from "@/lib/helpers";
 import { hasScore } from "@/lib/format";
 import {
   loadPeopleFromDevice,
@@ -63,6 +63,9 @@ export default function KissRecorderApp() {
 
   // User-defined place tags shared across all event forms.
   const [placeTags, setPlaceTags] = useState([]);
+
+  // User-defined how-we-met tags shared across all person forms.
+  const [howWeMetTags, setHowWeMetTags] = useState([]);
 
   // Whether the onboarding flow has been completed (true = skip, show app normally).
   // Initialized to true to avoid flashing the onboarding on re-renders; boot corrects it.
@@ -198,6 +201,9 @@ export default function KissRecorderApp() {
 
           const savedPlaceTags = Array.isArray(settings.placeTags) ? settings.placeTags : [];
           setPlaceTags(mergeEventTagsFromPeople(loadedPeople, savedPlaceTags, "place"));
+
+          const savedHowWeMetTags = Array.isArray(settings.howWeMetTags) ? settings.howWeMetTags : [];
+          setHowWeMetTags(mergePeopleFieldTags(loadedPeople, savedHowWeMetTags, "howWeMet"));
         }
       } catch (error) {
         if (import.meta.env.DEV) console.error("Failed to load app data", error);
@@ -239,10 +245,10 @@ export default function KissRecorderApp() {
   // Persists settings whenever language, iconColor, theme, statsVisible, situationTags, placeTags or onboardingDone change (after boot).
   useEffect(() => {
     if (!isLoaded) return;
-    saveSettings({ iconColor, language, theme, statsVisible, situationTags, placeTags, onboardingDone, onboardingVersion }).catch((error) => {
+    saveSettings({ iconColor, language, theme, statsVisible, situationTags, placeTags, howWeMetTags, onboardingDone, onboardingVersion }).catch((error) => {
       if (import.meta.env.DEV) console.error("Failed to save settings", error);
     });
-  }, [iconColor, language, theme, statsVisible, situationTags, placeTags, onboardingDone, onboardingVersion, isLoaded]);
+  }, [iconColor, language, theme, statsVisible, situationTags, placeTags, howWeMetTags, onboardingDone, onboardingVersion, isLoaded]);
 
   // Applies the dark class to <html> so shadcn portal components also get dark styles.
   useEffect(() => {
@@ -274,6 +280,11 @@ export default function KissRecorderApp() {
   // Adds a new place tag if it doesn't already exist.
   function addPlaceTag(tag) {
     setPlaceTags((prev) => (prev.includes(tag) ? prev : [...prev, tag]));
+  }
+
+  // Adds a new how-we-met tag if it doesn't already exist.
+  function addHowWeMetTag(tag) {
+    setHowWeMetTags((prev) => (prev.includes(tag) ? prev : [...prev, tag]));
   }
 
   // Clears all app data and resets the app to its initial state.
@@ -497,6 +508,8 @@ export default function KissRecorderApp() {
               onAddSituationTag={addSituationTag}
               placeTags={placeTags}
               onAddPlaceTag={addPlaceTag}
+              howWeMetTags={howWeMetTags}
+              onAddHowWeMetTag={addHowWeMetTag}
             />
           ) : null}
 
