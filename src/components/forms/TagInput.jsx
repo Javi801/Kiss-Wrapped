@@ -182,7 +182,7 @@ export default function TagInput({
                   <button
                     key={tag}
                     type="button"
-                    onMouseDown={(e) => { e.preventDefault(); selectTag(tag); }}
+                    onPointerDown={(e) => { e.preventDefault(); selectTag(tag); }}
                     style={{
                       display: "block",
                       width: "100%",
@@ -203,7 +203,7 @@ export default function TagInput({
               {showAddOption && (
                 <button
                   type="button"
-                  onMouseDown={(e) => { e.preventDefault(); handleAddTag(); }}
+                  onPointerDown={(e) => { e.preventDefault(); handleAddTag(); }}
                   style={{
                     display: "block",
                     width: "100%",
