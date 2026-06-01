@@ -95,6 +95,7 @@ export default function TagInput({
         value={value}
         onChange={handleChange}
         onFocus={handleFocus}
+        onBlur={() => setOpen(false)}
         onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }}
         placeholder={placeholder}
         maxLength={maxLength}
