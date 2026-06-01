@@ -20,6 +20,7 @@ export default function TagInput({
   const [open, setOpen] = useState(false);
   const [rect, setRect] = useState(null);
   const containerRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   const trimmed = value.trim();
   const filtered = tags.filter(
@@ -51,7 +52,10 @@ export default function TagInput({
     if (!effectiveOpen) return;
 
     function closeIfOutside(e) {
-      if (!containerRef.current?.contains(e.target)) setOpen(false);
+      if (
+        !containerRef.current?.contains(e.target) &&
+        !dropdownRef.current?.contains(e.target)
+      ) setOpen(false);
     }
 
     function reposition() {
@@ -108,6 +112,7 @@ export default function TagInput({
           const maxHeight = Math.min(openUpward ? spaceAbove : spaceBelow, 240);
           return (
             <div
+              ref={dropdownRef}
               style={{
                 position: "fixed",
                 ...(openUpward
