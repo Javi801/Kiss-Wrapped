@@ -67,7 +67,7 @@ export default function PersonForm({
     if (!form.name.trim()) next.name = t.requiredName;
 
     if (!String(form.age).trim()) next.age = t.requiredAge;
-    else if (!Number.isInteger(Number(form.age)) || Number(form.age) <= 0)
+    else if (!Number.isInteger(Number(form.age)) || Number(form.age) <= 0 || Number(form.age) > 120)
       next.age = t.validAge;
 
     if (!form.gender) next.gender = t.requiredGender;
