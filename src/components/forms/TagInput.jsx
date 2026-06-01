@@ -115,6 +115,7 @@ export default function TagInput({
             backgroundColor: PALETTE.card,
             boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
             overflow: "hidden",
+            pointerEvents: "auto",
           }}
         >
           {filtered.map((tag, i) => {
