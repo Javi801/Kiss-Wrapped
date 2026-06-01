@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Pencil, Plus, Trash2, Calendar, ChevronDown, ChevronUp } from "lucide-react";
 
@@ -86,7 +86,7 @@ export default function PersonCard({
 
   return (
     <>
-      <motion.div layout>
+      <motion.div layout style={{ paddingBottom: "0.375rem" }}>
         <Card
           className="rounded-3xl"
           style={{
@@ -132,7 +132,6 @@ export default function PersonCard({
                   <span>•</span>
                   <span>{abbreviateZodiacMonths(person.zodiacSign)}</span>
                 </div>
-
 
               </div>
 
