@@ -1,5 +1,6 @@
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
+import { Share } from "@capacitor/share";
 import { PEOPLE_FILE_NAME, SETTINGS_FILE_NAME, STORAGE_KEY, LANGUAGE_KEY, ICON_COLOR_KEY, THEME_KEY, STATS_VISIBLE_KEY, SITUATION_TAGS_KEY, PLACE_TAGS_KEY, ONBOARDING_DONE_KEY, ONBOARDING_VERSION_KEY } from "@/lib/constants";
 
 // Returns localStorage only when it is safely available
@@ -196,32 +197,23 @@ function normalizeForExport(people) {
 }
 
 // Exports people data as a JSON file to external storage (native) or browser download (web).
-// Returns { fileName, isNative, hadMissingFields } so callers can show the saved location to the user.
+// Exports people data as a JSON file via the native share sheet so the user can pick the save location.
 export async function exportPeopleJson(people) {
   const fileName = `kiss-recorder-data-${new Date().toISOString().slice(0, 10)}.json`;
   const { normalized, hadMissingFields } = normalizeForExport(people);
   const content = JSON.stringify(normalized, null, 2);
-  const native = isNativePlatform();
 
-  if (native) {
-    await Filesystem.writeFile({
-      path: fileName,
-      directory: Directory.External,
-      data: content,
-      encoding: Encoding.UTF8,
-      recursive: true,
-    });
-    return { fileName, isNative: true, hadMissingFields };
-  }
-
-  const blob = new Blob([content], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = fileName;
-  a.click();
-  URL.revokeObjectURL(url);
-  return { fileName, isNative: false, hadMissingFields };
+  await Filesystem.writeFile({
+    path: fileName,
+    directory: Directory.Cache,
+    data: content,
+    encoding: Encoding.UTF8,
+    recursive: true,
+  });
+  const { uri } = await Filesystem.getUri({ path: fileName, directory: Directory.Cache });
+  await Share.share({ files: [uri] });
+  Filesystem.deleteFile({ path: fileName, directory: Directory.Cache }).catch(() => {});
+  return { fileName, isNative: true, hadMissingFields };
 }
 
 // Clears persisted people data from native file system or localStorage

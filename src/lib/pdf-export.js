@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
+import { Share } from "@capacitor/share";
 import { CHART_COLORS, PALETTE } from "@/lib/constants";
-import { isNativePlatform } from "@/lib/device-storage";
 import { hexToRgb } from "@/lib/helpers";
 import { getStatsData } from "@/lib/stats";
 import { getColorForCategory } from "@/lib/format";
@@ -483,21 +483,16 @@ export async function exportStatsPdf(people, t) {
   // Build a date-based file name to make exports easy to identify.
   const fileName = `kiss-recorder-stats-2-${new Date().toISOString().slice(0, 10)}.pdf`;
 
-  // Save to the native Documents directory when running on device.
-  if (isNativePlatform()) {
-    const base64 = doc.output("datauristring").split(",")[1];
-
-    await Filesystem.writeFile({
-      path: fileName,
-      directory: Directory.External,
-      data: base64,
-      recursive: true,
-    });
-    return;
-  }
-
-  // Fall back to the browser download flow on web.
-  doc.save(fileName);
+  const base64 = doc.output("datauristring").split(",")[1];
+  await Filesystem.writeFile({
+    path: fileName,
+    directory: Directory.Cache,
+    data: base64,
+    recursive: true,
+  });
+  const { uri } = await Filesystem.getUri({ path: fileName, directory: Directory.Cache });
+  await Share.share({ files: [uri] });
+  Filesystem.deleteFile({ path: fileName, directory: Directory.Cache }).catch(() => {});
 }
 
 /**
@@ -509,22 +504,14 @@ export async function saveErrorLog(error) {
   const content = `KissRecorder PDF Export Error\n${timestamp}\n\n${error?.message || String(error)}`;
   const fileName = `kiss-recorder-error-${timestamp.slice(0, 10)}.txt`;
 
-  if (isNativePlatform()) {
-    await Filesystem.writeFile({
-      path: fileName,
-      directory: Directory.External,
-      data: content,
-      encoding: Encoding.UTF8,
-      recursive: true,
-    });
-    return;
-  }
-
-  const blob = new Blob([content], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = fileName;
-  a.click();
-  URL.revokeObjectURL(url);
+  await Filesystem.writeFile({
+    path: fileName,
+    directory: Directory.Cache,
+    data: content,
+    encoding: Encoding.UTF8,
+    recursive: true,
+  });
+  const { uri } = await Filesystem.getUri({ path: fileName, directory: Directory.Cache });
+  await Share.share({ files: [uri] });
+  Filesystem.deleteFile({ path: fileName, directory: Directory.Cache }).catch(() => {});
 }
