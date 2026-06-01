@@ -96,6 +96,7 @@ const COMPLETE_PERSON = {
   name: "Ana",
   birthYear: 2000,
   gender: "female",
+  howWeMet: "school",
   zodiacSign: "♒ Aquarius",
   activity: "studies",
   events: [{ place: "café", situation: "first date" }],

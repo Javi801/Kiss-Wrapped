@@ -74,6 +74,18 @@ export function calculateAge(birthYear, zodiacSign) {
   return ageAtDate(birthYear, endDate, new Date());
 }
 
+// Like calculateAge but adds 1 when the person already had their calendar birthday
+// within the active zodiac period. This corrects the off-by-one that arises because
+// deriveBirthYear maps the entered age to the *upcoming* zodiac turn when the flag
+// is true, so calculateAge returns age−1 until the period ends.
+export function calculateDisplayAge(birthYear, zodiacSign, birthdayAlreadyHappened) {
+  const age = calculateAge(birthYear, zodiacSign);
+  if (age != null && birthdayAlreadyHappened && isWithinZodiacPeriod(zodiacSign)) {
+    return age + 1;
+  }
+  return age;
+}
+
 // Derives birth year from a known current age and zodiac sign.
 // `birthdayAlreadyHappened` resolves the edge case when today falls inside
 // the zodiac period: true means the user's calendar birthday has already

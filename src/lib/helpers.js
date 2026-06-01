@@ -10,6 +10,7 @@ export function normalizePeople(rawPeople) {
   return Array.isArray(rawPeople)
     ? rawPeople.map((person) => ({
         ...person,
+        realName: person.realName || "",
         events: Array.isArray(person.events)
           ? person.events.map((event) => ({
               ...event,
@@ -34,6 +35,19 @@ export function mergeEventTagsFromPeople(people, existingTags, field) {
         seen.add(s.toLowerCase());
         merged.push(s);
       }
+    }
+  }
+  return merged;
+}
+
+export function mergePeopleFieldTags(people, existingTags, field) {
+  const seen = new Set(existingTags.map((t) => t.toLowerCase()));
+  const merged = [...existingTags];
+  for (const person of people) {
+    const s = person[field]?.trim();
+    if (s && !seen.has(s.toLowerCase())) {
+      seen.add(s.toLowerCase());
+      merged.push(s);
     }
   }
   return merged;

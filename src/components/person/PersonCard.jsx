@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Pencil, Plus, Trash2, Calendar, ChevronDown, ChevronUp } from "lucide-react";
 
@@ -26,7 +26,7 @@ import {
 
 import { TEXT, abbreviateZodiacMonths } from "@/lib/constants";
 import { usePalette } from "@/lib/theme";
-import { formatShortDate, calculateAge } from "@/lib/date";
+import { formatShortDate, calculateDisplayAge } from "@/lib/date";
 import {
   translateActivity,
   translateGender,
@@ -57,6 +57,8 @@ export default function PersonCard({
   onAddSituationTag,
   placeTags,
   onAddPlaceTag,
+  howWeMetTags,
+  onAddHowWeMetTag,
 }) {
   const PALETTE = usePalette();
   // Expand/collapse state.
@@ -84,7 +86,7 @@ export default function PersonCard({
 
   return (
     <>
-      <motion.div layout>
+      <motion.div layout style={{ paddingBottom: "0.375rem" }}>
         <Card
           className="rounded-3xl"
           style={{
@@ -122,7 +124,7 @@ export default function PersonCard({
                 <div
                   style={{ marginTop: "0.5rem", display: "flex", flexWrap: "wrap", gap: "0.5rem", ...TEXT.caption, color: PALETTE.textSoft }}
                 >
-                  <span>{calculateAge(person.birthYear, person.zodiacSign) ?? person.age} {t.years}</span>
+                  <span>{calculateDisplayAge(person.birthYear, person.zodiacSign, person.birthdayAlreadyHappened) ?? person.age} {t.years}</span>
                   <span>•</span>
                   <span>{translateGender(person.gender, t)}</span>
                   <span>•</span>
@@ -130,7 +132,6 @@ export default function PersonCard({
                   <span>•</span>
                   <span>{abbreviateZodiacMonths(person.zodiacSign)}</span>
                 </div>
-
 
               </div>
 
@@ -155,8 +156,13 @@ export default function PersonCard({
                 >
                   <div style={{ display: "flex", flexDirection: "column", gap: "1rem", padding: "0rem 1.25rem 1.25rem" }}>
                     {/* Extra info */}
-                    {(person.howWeMet || person.detail) && (
+                    {(person.realName || person.howWeMet || person.detail) && (
                       <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                        {person.realName && (
+                          <p style={{ ...TEXT.body, color: PALETTE.text }}>
+                            {t.realName}: {person.realName}
+                          </p>
+                        )}
                         {person.howWeMet && (
                           <p style={{ ...TEXT.body, color: PALETTE.text }}>
                             {t.met}: {person.howWeMet}
@@ -325,6 +331,10 @@ export default function PersonCard({
             onCancel={() => setEditingPerson(false)}
             t={t}
             language={language}
+            includeRealName
+            howWeMetTags={howWeMetTags}
+            onAddHowWeMetTag={onAddHowWeMetTag}
+            isParentOpen={editingPerson}
           />
         </DialogContent>
       </Dialog>

@@ -3,6 +3,7 @@ import { Save } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import TagInput from "@/components/forms/TagInput";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -16,7 +17,7 @@ import {
 import { GENDERS, ZODIAC_OPTIONS, TEXT } from "@/lib/constants";
 import { usePalette } from "@/lib/theme";
 import { translateGender, getZodiacForLanguage } from "@/lib/format";
-import { calculateAge, deriveBirthYear, isWithinZodiacPeriod } from "@/lib/date";
+import { calculateDisplayAge, deriveBirthYear, isWithinZodiacPeriod } from "@/lib/date";
 
 /**
  * Form used for creating or editing a person.
@@ -29,24 +30,28 @@ export default function PersonForm({
   t,
   language,
   includeHowWeMet = true,
+  includeRealName = false,
   saveLabel,
   mode,
+  howWeMetTags = [],
+  onAddHowWeMetTag,
+  isParentOpen,
 }) {
   const PALETTE = usePalette();
   // Local form state initialization.
   const [form, setForm] = useState(() => {
     if (!initialValues) {
-      return { name: "", age: "", gender: "", howWeMet: "", zodiacSign: "", activity: "", detail: "" };
+      return { name: "", realName: "", age: "", gender: "", howWeMet: "", zodiacSign: "", activity: "", detail: "" };
     }
     const zodiacSign = getZodiacForLanguage(initialValues.zodiacSign, language);
     const displayAge = initialValues.birthYear
-      ? String(calculateAge(initialValues.birthYear, zodiacSign) ?? "")
+      ? String(calculateDisplayAge(initialValues.birthYear, zodiacSign, initialValues.birthdayAlreadyHappened) ?? "")
       : String(initialValues.age ?? "");
-    return { ...initialValues, zodiacSign, age: displayAge, howWeMet: initialValues.howWeMet ?? "", detail: initialValues.detail ?? "" };
+    return { ...initialValues, zodiacSign, age: displayAge, realName: initialValues.realName ?? "", howWeMet: initialValues.howWeMet ?? "", detail: initialValues.detail ?? "" };
   });
 
   const [errors, setErrors] = useState({});
-  const [birthdayAlreadyHappened, setBirthdayAlreadyHappened] = useState(false);
+  const [birthdayAlreadyHappened, setBirthdayAlreadyHappened] = useState(initialValues?.birthdayAlreadyHappened ?? false);
 
   const showBirthdayCheckbox = isWithinZodiacPeriod(form.zodiacSign);
 
@@ -62,7 +67,7 @@ export default function PersonForm({
     if (!form.name.trim()) next.name = t.requiredName;
 
     if (!String(form.age).trim()) next.age = t.requiredAge;
-    else if (!Number.isInteger(Number(form.age)) || Number(form.age) <= 0)
+    else if (!Number.isInteger(Number(form.age)) || Number(form.age) <= 0 || Number(form.age) > 120)
       next.age = t.validAge;
 
     if (!form.gender) next.gender = t.requiredGender;
@@ -89,11 +94,13 @@ export default function PersonForm({
     onSave({
       ...rest,
       birthYear: deriveBirthYear(Number(age), form.zodiacSign, showBirthdayCheckbox && birthdayAlreadyHappened),
+      birthdayAlreadyHappened: showBirthdayCheckbox ? birthdayAlreadyHappened : (initialValues?.birthdayAlreadyHappened ?? false),
       detail: form.detail.trim(),
       howWeMet: includeHowWeMet
         ? form.howWeMet.trim()
         : initialValues?.howWeMet || "",
       name: form.name.trim(),
+      realName: includeRealName ? form.realName.trim() : initialValues?.realName || "",
     });
   }
 
@@ -106,21 +113,40 @@ export default function PersonForm({
   return (
     <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <div style={{ display: "grid", gap: "1rem" }}>
-        {/* Name */}
+        {/* Name + Real name grouped */}
         <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-          <Label>{t.name} *</Label>
-          <Input
-            value={form.name}
-            onChange={(e) => update("name", e.target.value)}
-            maxLength={100}
-            className="rounded-2xl"
-            style={{ ...inputStyle }}
-          />
-          <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: "right" }}>
-            {form.name.length}/100
-          </p>
-          {errors.name && (
-            <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.name}</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+            <Label>{t.name} *</Label>
+            <Input
+              value={form.name}
+              onChange={(e) => update("name", e.target.value)}
+              maxLength={100}
+              className="rounded-2xl"
+              style={{ ...inputStyle }}
+            />
+            <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: "right" }}>
+              {form.name.length}/100
+            </p>
+            {errors.name && (
+              <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.name}</p>
+            )}
+          </div>
+
+          {includeRealName && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              <Label>{t.realName}</Label>
+              <Input
+                value={form.realName}
+                onChange={(e) => update("realName", e.target.value)}
+                maxLength={100}
+                className="rounded-2xl"
+                placeholder={t.realNamePlaceholder}
+                style={{ ...inputStyle }}
+              />
+              <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: "right" }}>
+                {form.realName.length}/100
+              </p>
+            </div>
           )}
         </div>
 
@@ -197,12 +223,16 @@ export default function PersonForm({
         {includeHowWeMet && (
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             <Label>{t.howWeMet} *</Label>
-            <Input
+            <TagInput
               value={form.howWeMet}
-              onChange={(e) => update("howWeMet", e.target.value)}
+              onChange={(val) => update("howWeMet", val)}
+              tags={howWeMetTags}
+              onAddTag={onAddHowWeMetTag}
               maxLength={200}
               className="rounded-2xl"
-            style={{ ...inputStyle }}
+              style={{ ...inputStyle }}
+              addTagLabel={t.addTag}
+              isParentOpen={isParentOpen}
             />
             <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: "right" }}>
               {form.howWeMet.length}/200
