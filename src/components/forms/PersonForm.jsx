@@ -160,7 +160,7 @@ export default function PersonForm({
                         transition: "background-color 0.15s, color 0.15s",
                       }}
                     >
-                      {val ? t.yes : t.no}
+                      {val ? t.birthdayYes : t.birthdayNo}
                     </button>
                   ))}
                 </div>
