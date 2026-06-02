@@ -11,6 +11,7 @@ import {
   getZodiacStartDate,
   isWithinZodiacPeriod,
   calculateAge,
+  calculateDisplayAge,
   calculateAgeAtEvent,
   deriveBirthYear,
 } from "@/lib/date";
@@ -346,5 +347,38 @@ describe("calculateAgeAtEvent", () => {
   it("uses the zodiac end date to calculate age at an event", () => {
     expect(calculateAgeAtEvent(2000, ARIES_EN, "2026.04.18")).toBe(25);
     expect(calculateAgeAtEvent(2000, ARIES_EN, "2026.04.19")).toBe(26);
+  });
+});
+
+describe("calculateDisplayAge", () => {
+  beforeEach(() => { vi.useFakeTimers(); });
+  afterEach(() => { vi.useRealTimers(); });
+
+  it("returns calculateAge result when outside the zodiac period", () => {
+    vi.setSystemTime(new Date("2026-04-20T12:00:00")); // day after Aries ends
+    expect(calculateDisplayAge(2000, ARIES_EN, false)).toBe(26);
+  });
+
+  it("returns calculateAge result inside period when birthdayAlreadyHappened is false", () => {
+    vi.setSystemTime(new Date("2026-04-05T12:00:00")); // within Aries
+    expect(calculateDisplayAge(2000, ARIES_EN, false)).toBe(25);
+  });
+
+  it("returns calculateAge + 1 inside period when birthdayAlreadyHappened is true", () => {
+    vi.setSystemTime(new Date("2026-04-05T12:00:00")); // within Aries
+    expect(calculateDisplayAge(2000, ARIES_EN, true)).toBe(26);
+  });
+
+  it("returns null for null birthYear", () => {
+    expect(calculateDisplayAge(null, ARIES_EN, false)).toBeNull();
+  });
+
+  it("returns null for unrecognized zodiac sign", () => {
+    expect(calculateDisplayAge(2000, "Unknown Sign", false)).toBeNull();
+  });
+
+  it("is equivalent to calculateAge when birthdayAlreadyHappened is false outside the period", () => {
+    vi.setSystemTime(new Date("2026-03-15T12:00:00")); // before Aries
+    expect(calculateDisplayAge(2000, ARIES_EN, false)).toBe(calculateAge(2000, ARIES_EN));
   });
 });
