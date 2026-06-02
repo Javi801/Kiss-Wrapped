@@ -167,6 +167,7 @@ export async function saveSettings({ iconColor, language, theme, statsVisible, s
 }
 
 const PERSON_REQUIRED_STRINGS = ["name", "gender", "howWeMet", "zodiacSign", "activity"];
+const PERSON_OPTIONAL_STRINGS = ["realName"];
 const EVENT_REQUIRED_STRINGS  = ["date", "place", "situation"];
 
 // Fills missing required fields with empty values before export.
@@ -179,6 +180,9 @@ function normalizeForExport(people) {
 
     for (const field of PERSON_REQUIRED_STRINGS) {
       if (p[field] == null) { p[field] = ""; hadMissingFields = true; }
+    }
+    for (const field of PERSON_OPTIONAL_STRINGS) {
+      if (p[field] == null) p[field] = "";
     }
     if (p.birthYear == null) { p.birthYear = null; hadMissingFields = true; }
 

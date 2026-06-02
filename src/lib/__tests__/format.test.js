@@ -94,6 +94,7 @@ describe("translateGender", () => {
 
 const COMPLETE_PERSON = {
   name: "Ana",
+  realName: "Ana García",
   birthYear: 2000,
   gender: "female",
   howWeMet: "school",
