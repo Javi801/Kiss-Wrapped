@@ -123,8 +123,10 @@ export default function KissRecorderApp() {
           const prev = history[history.length - 1];
           screenHistoryRef.current = history.slice(0, -1);
           setScreen(prev);
+        } else if (current === "main") {
+          CapacitorApp.exitApp();
         } else {
-          setScreen("intro");
+          setScreen("main");
         }
       }
     });
@@ -469,6 +471,7 @@ export default function KissRecorderApp() {
               setTheme={changeTheme}
               statsVisible={statsVisible}
               setStatsVisible={setStatsVisible}
+              modalBackRef={modalBackRef}
             />
           ) : null}
 
@@ -505,7 +508,7 @@ export default function KissRecorderApp() {
           ) : null}
 
           {/* Statistics screen */}
-          {screen === "stats" ? <StatsScreen people={people} t={t} /> : null}
+          {screen === "stats" ? <StatsScreen people={people} t={t} modalBackRef={modalBackRef} /> : null}
         </motion.div>
 
         {/* Bottom navigation */}
