@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { uid, normalizePeople, hexToRgb, mergeEventTagsFromPeople } from "@/lib/helpers";
+import { uid, normalizePeople, hexToRgb, mergeEventTagsFromPeople, mergePeopleFieldTags } from "@/lib/helpers";
 
 describe("uid", () => {
   it("returns a non-empty alphanumeric string", () => {
@@ -7,6 +7,10 @@ describe("uid", () => {
   });
   it("returns a different value on each call", () => {
     expect(uid()).not.toBe(uid());
+  });
+  it("generates 1000 unique values with no collisions", () => {
+    const ids = Array.from({ length: 1000 }, uid);
+    expect(new Set(ids).size).toBe(1000);
   });
 });
 
@@ -22,6 +26,9 @@ describe("hexToRgb", () => {
   });
   it("accepts hex without # prefix", () => {
     expect(hexToRgb("ffffff")).toEqual({ r: 255, g: 255, b: 255 });
+  });
+  it("accepts uppercase hex", () => {
+    expect(hexToRgb("#FFFFFF")).toEqual({ r: 255, g: 255, b: 255 });
   });
 });
 
@@ -151,5 +158,68 @@ describe("normalizePeople", () => {
     expect(event.place).toBe("café");
     expect(event.situation).toBe("first date");
     expect(event.observations).toBe("nice");
+  });
+  it("preserves null detail and undefined observations on events unchanged", () => {
+    const people = [{ name: "Ana", events: [{ detail: null, observations: undefined, score: 1 }] }];
+    const event = normalizePeople(people)[0].events[0];
+    expect(event.detail).toBeNull();
+    expect(event.observations).toBeUndefined();
+  });
+});
+
+describe("mergePeopleFieldTags", () => {
+  it("returns existing tags unchanged when people array is empty", () => {
+    expect(mergePeopleFieldTags([], ["Party"], "howWeMet")).toEqual(["Party"]);
+  });
+
+  it("appends new values found in person fields", () => {
+    expect(mergePeopleFieldTags([{ howWeMet: "App" }], [], "howWeMet")).toEqual(["App"]);
+  });
+
+  it("works for a different person field (activity)", () => {
+    expect(mergePeopleFieldTags([{ activity: "works" }], [], "activity")).toEqual(["works"]);
+  });
+
+  it("preserves existing tags at the front", () => {
+    const result = mergePeopleFieldTags([{ howWeMet: "App" }], ["Friends"], "howWeMet");
+    expect(result).toEqual(["Friends", "App"]);
+  });
+
+  it("skips values that already exist in tags (case-insensitive)", () => {
+    expect(mergePeopleFieldTags([{ howWeMet: "app" }], ["App"], "howWeMet")).toEqual(["App"]);
+    expect(mergePeopleFieldTags([{ howWeMet: "APP" }], ["App"], "howWeMet")).toEqual(["App"]);
+  });
+
+  it("deduplicates across multiple people", () => {
+    const people = [{ howWeMet: "App" }, { howWeMet: "app" }];
+    expect(mergePeopleFieldTags(people, [], "howWeMet")).toEqual(["App"]);
+  });
+
+  it("ignores empty and whitespace-only values", () => {
+    expect(mergePeopleFieldTags([{ howWeMet: "" }, { howWeMet: "  " }], [], "howWeMet")).toEqual([]);
+  });
+
+  it("trims whitespace before comparing", () => {
+    expect(mergePeopleFieldTags([{ howWeMet: "  App  " }], ["App"], "howWeMet")).toEqual(["App"]);
+  });
+
+  it("preserves casing of existing tags on duplicate", () => {
+    const result = mergePeopleFieldTags([{ howWeMet: "app" }], ["App"], "howWeMet");
+    expect(result[0]).toBe("App");
+  });
+
+  it("preserves casing of first new occurrence", () => {
+    const people = [{ howWeMet: "First Date" }, { howWeMet: "first date" }];
+    expect(mergePeopleFieldTags(people, [], "howWeMet")).toEqual(["First Date"]);
+  });
+
+  it("skips people without the requested field", () => {
+    expect(mergePeopleFieldTags([{ name: "Ana" }], [], "howWeMet")).toEqual([]);
+  });
+
+  it("does not mutate the existingTags array", () => {
+    const existing = ["Friends"];
+    mergePeopleFieldTags([{ howWeMet: "App" }], existing, "howWeMet");
+    expect(existing).toEqual(["Friends"]);
   });
 });
