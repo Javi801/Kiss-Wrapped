@@ -6,484 +6,326 @@ import { hexToRgb } from "@/lib/helpers";
 import { getStatsData } from "@/lib/stats";
 import { getColorForCategory } from "@/lib/format";
 
-/**
- * Draws a window-style container used as the main card on each PDF page.
- * It also delegates the inner content rendering through the body callback.
- */
-function drawWindowCard(doc, x, y, w, h, title, bodyFn) {
-  // Build the card and line colors from the shared palette.
-  const cardRgb = hexToRgb("#f5edf7");
-  const lineRgb = hexToRgb(PALETTE.accentEmphasis2);
+const SLIDE_BG = "#fff6fb";
+const INK = "#4a243c";
+const SOFT_INK = "#7b6574";
+const PANEL = "#ffffff";
+const PANEL_SOFT = "#f9edf5";
+const GRID = "#ead5e2";
 
-  // Paint the rounded card background.
-  doc.setFillColor(cardRgb.r, cardRgb.g, cardRgb.b);
-  doc.roundedRect(x, y, w, h, 8, 8, "F");
-
-  // Draw the header separator line.
-  doc.setDrawColor(lineRgb.r, lineRgb.g, lineRgb.b);
-  doc.setLineWidth(0.6);
-  doc.line(x, y + 12, x + w, y + 12);
-
-  // Draw the decorative circles at the top-left of the card.
-  const pink = hexToRgb(PALETTE.accent);
-  const lilac = hexToRgb(PALETTE.emphasisEnd);
-  const sky = hexToRgb(PALETTE.accent2);
-
-  doc.setFillColor(pink.r, pink.g, pink.b);
-  doc.circle(x + 8, y + 6, 1.6, "F");
-
-  doc.setFillColor(lilac.r, lilac.g, lilac.b);
-  doc.circle(x + 14, y + 6, 1.6, "F");
-
-  doc.setFillColor(sky.r, sky.g, sky.b);
-  doc.circle(x + 20, y + 6, 1.6, "F");
-
-  // Render the card title.
-  doc.setTextColor(lineRgb.r, lineRgb.g, lineRgb.b);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.text(title, x + 12, y + 28);
-
-  // Let the caller draw the inner content inside the safe content area.
-  bodyFn?.(doc, x + 12, y + 38, w - 24, h - 50);
+function rgb(hex) {
+  return hexToRgb(hex);
 }
 
-/**
- * Draws a compact metric block with label, value, and optional helper text.
- * This is used for summary KPIs across the PDF pages.
- */
-function drawMetric(doc, x, y, w, h, label, value, helper) {
-  // Resolve the colors used in the metric block.
-  const fill = hexToRgb("#fff7fb");
-  const line = hexToRgb("#ecd6e0");
-  const text = hexToRgb(PALETTE.text);
-  const soft = hexToRgb(PALETTE.textSoft);
+function setColor(doc, method, color) {
+  const c = rgb(color);
+  doc[method](c.r, c.g, c.b);
+}
 
-  // Draw the metric container.
-  doc.setFillColor(fill.r, fill.g, fill.b);
-  doc.setDrawColor(line.r, line.g, line.b);
-  doc.roundedRect(x, y, w, h, 5, 5, "FD");
+function fillPage(doc, pageW, pageH, index) {
+  setColor(doc, "setFillColor", SLIDE_BG);
+  doc.rect(0, 0, pageW, pageH, "F");
 
-  // Render the top label.
-  doc.setTextColor(soft.r, soft.g, soft.b);
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.text(label, x + 6, y + 10);
+  setColor(doc, "setFillColor", index % 2 ? "#eef8fb" : "#fae3ef");
+  doc.circle(pageW - 24, 20, 35, "F");
+  setColor(doc, "setFillColor", index % 2 ? "#fee7df" : "#e7ecff");
+  doc.circle(18, pageH - 14, 30, "F");
 
-  // Render the main metric value.
-  doc.setTextColor(text.r, text.g, text.b);
+  setColor(doc, "setTextColor", SOFT_INK);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(24);
-  doc.text(String(value), x + 6, y + 24);
+  doc.setFontSize(8);
+  doc.text("KISSWRAPPED", 14, 13);
+  doc.text(String(index).padStart(2, "0"), pageW - 20, pageH - 10);
+}
 
-  // Render helper text only when available.
+function fitText(doc, text, maxWidth, size) {
+  doc.setFontSize(size);
+  return doc.splitTextToSize(String(text), maxWidth);
+}
+
+function drawTitle(doc, title, subtitle, x, y, w) {
+  setColor(doc, "setTextColor", INK);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(28);
+  doc.text(fitText(doc, title, w, 28), x, y);
+
+  if (!subtitle) return;
+  setColor(doc, "setTextColor", SOFT_INK);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+  doc.text(fitText(doc, subtitle, w, 11), x, y + 16);
+}
+
+function drawPill(doc, x, y, text, fill = PALETTE.accent) {
+  const label = String(text).toUpperCase();
+  const width = Math.max(45, label.length * 2.2 + 10);
+  setColor(doc, "setFillColor", fill);
+  doc.roundedRect(x, y, width, 10, 5, 5, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.text(label, x + 5, y + 6.6);
+}
+
+function drawHeroMetric(doc, x, y, value, label, helper, color = PALETTE.accent) {
+  setColor(doc, "setTextColor", color);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(44);
+  doc.text(String(value), x, y);
+
+  setColor(doc, "setTextColor", INK);
+  doc.setFontSize(13);
+  doc.text(String(label), x, y + 13);
+
   if (helper) {
-    doc.setTextColor(soft.r, soft.g, soft.b);
+    setColor(doc, "setTextColor", SOFT_INK);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
-    doc.text(helper, x + 6, y + 34);
+    doc.text(fitText(doc, helper, 62, 9), x, y + 22);
   }
 }
 
-/**
- * Draws a simple bar chart directly into the PDF canvas.
- * The chart is intentionally lightweight to keep output stable and predictable.
- */
-function drawSimpleBarChart(
-  doc,
-  x,
-  y,
-  w,
-  h,
-  title,
-  data,
-  color = PALETTE.accent,
-  rotateLabels = false,
-) {
-  // Resolve chart colors once to keep the drawing code cleaner.
-  const text = hexToRgb(PALETTE.text);
-  const soft = hexToRgb(PALETTE.textSoft);
-  const grid = hexToRgb("#eadbe4");
-  const bar = hexToRgb(color);
+function drawMetricCard(doc, x, y, w, h, label, value, helper, color = PALETTE.accent) {
+  setColor(doc, "setFillColor", PANEL);
+  setColor(doc, "setDrawColor", "#eed7e3");
+  doc.roundedRect(x, y, w, h, 5, 5, "FD");
+  drawHeroMetric(doc, x + 7, y + 20, value, label, helper, color);
+}
 
-  // Render the chart title first.
-  doc.setTextColor(text.r, text.g, text.b);
+function drawRankList(doc, x, y, w, title, items, emptyText) {
+  setColor(doc, "setTextColor", INK);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(13);
+  doc.setFontSize(14);
   doc.text(title, x, y);
 
-  // Stop early when there is no data to draw.
-  if (!data.length) {
-    doc.setTextColor(soft.r, soft.g, soft.b);
+  const rows = items.filter((item) => item.value > 0).slice(0, 7);
+  if (!rows.length) {
+    setColor(doc, "setTextColor", SOFT_INK);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(emptyText, x, y + 12);
+    return;
+  }
+
+  const max = Math.max(...rows.map((item) => item.value), 1);
+  rows.forEach((item, index) => {
+    const rowY = y + 14 + index * 11;
+    const barW = Math.max(10, ((w - 58) * item.value) / max);
+    const color = CHART_COLORS[index % CHART_COLORS.length];
+
+    setColor(doc, "setTextColor", SOFT_INK);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.text(String(index + 1), x, rowY + 4);
+
+    setColor(doc, "setFillColor", PANEL_SOFT);
+    doc.roundedRect(x + 8, rowY, w - 42, 7, 3, 3, "F");
+    setColor(doc, "setFillColor", color);
+    doc.roundedRect(x + 8, rowY, barW, 7, 3, 3, "F");
+
+    setColor(doc, "setTextColor", INK);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text(String(item.label).slice(0, 22), x + 11, rowY + 5);
+    doc.setFont("helvetica", "bold");
+    doc.text(String(item.value), x + w - 18, rowY + 5);
+  });
+}
+
+function drawColumnChart(doc, x, y, w, h, title, data, color = PALETTE.accent) {
+  setColor(doc, "setTextColor", INK);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.text(title, x, y);
+
+  const rows = data.filter((item) => item.value > 0).slice(-12);
+  if (!rows.length) {
+    setColor(doc, "setTextColor", SOFT_INK);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.text("No data", x, y + 12);
     return;
   }
 
-  // Compute chart dimensions and scaling values.
-  const chartTop = y + 10;
-  const chartHeight = h - 28;
-  const chartBottom = chartTop + chartHeight;
-  const maxValue = Math.max(...data.map((d) => d.value), 1);
-  const barWidth = Math.max(8, (w - 12) / data.length - 4);
+  const chartTop = y + 14;
+  const chartBottom = y + h;
+  const chartH = h - 26;
+  const max = Math.max(...rows.map((item) => item.value), 1);
+  const step = w / rows.length;
+  const barW = Math.max(5, step - 5);
 
-  // Draw horizontal guide lines to make values easier to read.
-  doc.setDrawColor(grid.r, grid.g, grid.b);
-  for (let i = 0; i <= 4; i++) {
-    const gy = chartTop + (chartHeight / 4) * i;
+  setColor(doc, "setDrawColor", GRID);
+  doc.setLineWidth(0.25);
+  for (let i = 0; i < 4; i++) {
+    const gy = chartTop + (chartH / 3) * i;
     doc.line(x, gy, x + w, gy);
   }
 
-  // Draw every bar using the normalized scale against the max value.
-  data.forEach((item, index) => {
-    const bx = x + 4 + index * ((w - 8) / data.length);
-    const bh = (item.value / maxValue) * (chartHeight - 10);
+  rows.forEach((item, index) => {
+    const bh = Math.max(2, (item.value / max) * chartH);
+    const bx = x + index * step + (step - barW) / 2;
+    setColor(doc, "setFillColor", color);
+    doc.roundedRect(bx, chartBottom - bh, barW, bh, 2, 2, "F");
 
-    doc.setFillColor(bar.r, bar.g, bar.b);
-    doc.roundedRect(bx, chartBottom - bh, barWidth, bh, 2, 2, "F");
+    setColor(doc, "setTextColor", SOFT_INK);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.text(String(item.label).slice(-7), bx - 1, chartBottom + 6, { angle: 330 });
+  });
+}
 
-    // Draw the label below the bar and rotate it when requested.
-    doc.setTextColor(soft.r, soft.g, soft.b);
+function drawBubbleLegend(doc, x, y, title, items) {
+  setColor(doc, "setTextColor", INK);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.text(title, x, y);
+
+  items.filter((item) => item.value > 0).slice(0, 6).forEach((item, index) => {
+    const col = index % 2;
+    const row = Math.floor(index / 2);
+    const itemX = x + col * 64;
+    const itemY = y + 15 + row * 16;
+    const color = getColorForCategory(item.label) || CHART_COLORS[index % CHART_COLORS.length];
+
+    setColor(doc, "setFillColor", color);
+    doc.circle(itemX, itemY, 4, "F");
+    setColor(doc, "setTextColor", INK);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.text(String(item.value), itemX + 8, itemY + 1);
+    setColor(doc, "setTextColor", SOFT_INK);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8);
-
-    const label = String(item.label).slice(0, 12);
-    if (rotateLabels) {
-      doc.text(label, bx + 1, chartBottom + 8, { angle: 320 });
-    } else {
-      doc.text(label, bx, chartBottom + 6);
-    }
+    doc.text(String(item.label).slice(0, 18), itemX + 19, itemY + 1);
   });
 }
 
-/**
- * Draws a simple legend list with colored bullets and text labels.
- * It is useful for categorical summaries that do not need full charts.
- */
-function drawLegendList(doc, x, y, items) {
-  // Use shared text color for all legend labels.
-  const text = hexToRgb(PALETTE.text);
+function addSlide(doc, pageW, pageH, index, draw) {
+  if (index > 1) doc.addPage();
+  fillPage(doc, pageW, pageH, index);
+  draw();
+}
 
-  items.forEach((item, index) => {
-    // Prefer category-specific colors and fall back to the chart palette.
-    const color =
-      getColorForCategory(item.label) ||
-      CHART_COLORS[index % CHART_COLORS.length];
-    const rgb = hexToRgb(color);
-    const rowY = y + index * 8;
+function topLabel(data) {
+  return data.find((item) => item.value > 0)?.label || "-";
+}
 
-    // Draw the colored bullet.
-    doc.setFillColor(rgb.r, rgb.g, rgb.b);
-    doc.circle(x, rowY, 1.5, "F");
+function buildWrappedCopy(t) {
+  const es = t.langCode === "es";
+  return {
+    title: "kisswrapped",
+    subtitle: es
+      ? "Una presentación privada para hablar de tus estadísticas de KissRecorder."
+      : "A private deck for talking through your KissRecorder statistics.",
+    yearLabel: es ? "Tu recorrido en números" : "Your story in numbers",
+    headline: es ? "Tu resumen ya está listo" : "Your recap is ready",
+    peopleSlide: es ? "Las personas que marcaron el ritmo" : "The people who set the rhythm",
+    timeSlide: es ? "Así se movió el tiempo" : "How time moved",
+    profileSlide: es ? "El mapa de perfiles" : "The profile map",
+    scoreSlide: es ? "Las calificaciones cuentan otra parte" : "Ratings tell another part",
+    closeSlide: es ? "Fin de kisswrapped" : "End of kisswrapped",
+    closeText: es
+      ? "Hecho para revisar patrones, recordar momentos y contar la historia detrás de los datos."
+      : "Made to review patterns, remember moments, and tell the story behind the data.",
+  };
+}
 
-    // Draw the label and numeric value next to the bullet.
-    doc.setTextColor(text.r, text.g, text.b);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.text(`${item.label}: ${item.value}`, x + 4, rowY + 1);
-  });
+function buildScoreLabels(scoresByKisses, t) {
+  return scoresByKisses.map((item, index) => ({
+    label: index === 0 ? t.noScore : `${index} ${index === 1 ? t.kiss : t.kisses}`,
+    value: item.value,
+  }));
 }
 
 /**
- * Paints the shared decorative background for a PDF page.
- * This keeps every page visually consistent across the report.
- */
-function paintBackground(doc, pageW, pageH) {
-  // Prepare the layered background colors.
-  const bg1 = hexToRgb(PALETTE.accentMuted);
-  const bg2 = hexToRgb("#f6ecfb");
-  const bg3 = hexToRgb(PALETTE.gradientEnd);
-
-  // Fill the full-page background.
-  doc.setFillColor(bg1.r, bg1.g, bg1.b);
-  doc.rect(0, 0, pageW, pageH, "F");
-
-  // Add the inner rounded panel.
-  doc.setFillColor(bg2.r, bg2.g, bg2.b);
-  doc.roundedRect(10, 10, pageW - 20, pageH - 20, 10, 10, "F");
-
-  // Add subtle decorative circles with low opacity.
-  doc.setFillColor(bg3.r, bg3.g, bg3.b);
-  doc.setGState?.(new doc.GState({ opacity: 0.08 }));
-  doc.circle(pageW - 25, 20, 18, "F");
-  doc.circle(22, pageH - 20, 16, "F");
-
-  // Restore default opacity when supported by the environment.
-  if (doc.setGState) {
-    doc.setGState(new doc.GState({ opacity: 1 }));
-  }
-}
-
-/**
- * Exports the statistics report as a multi-page PDF.
- * On native platforms the file is saved to Documents, and on web it is downloaded.
+ * Exports the statistics as a KissWrapped deck: a landscape, slide-like PDF.
+ * On native platforms the file is saved to cache and shared through the system sheet.
  */
 export async function exportStatsPdf(people, t) {
-  // Build all derived statistics once to reuse them across the report.
   const stats = getStatsData(people, t);
-
-  // Create the PDF document and cache page dimensions.
-  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const copy = buildWrappedCopy(t);
+  const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
+  const topPersonValue = stats.mostActiveCount ? stats.mostActivePerson : "-";
+  const topMonth = topLabel(stats.eventsPerMonth);
+  const topYear = topLabel(stats.eventsPerYear);
+  const scoresByLabel = buildScoreLabels(stats.scoresByKisses, t);
 
-  // Draw the cover page with the most important summary metrics.
-  paintBackground(doc, pageW, pageH);
-  drawWindowCard(
-    doc,
-    24,
-    24,
-    pageW - 48,
-    pageH - 48,
-    t.appTitle,
-    (pdf, x, y) => {
-      // Use stronger contrast for the cover title and softer text for the subtitle.
-      const text = hexToRgb(PALETTE.accentEmphasis2);
-      const soft = hexToRgb(PALETTE.textSoft);
+  addSlide(doc, pageW, pageH, 1, () => {
+    drawPill(doc, 20, 24, copy.yearLabel);
+    setColor(doc, "setTextColor", PALETTE.accentEmphasis2);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(52);
+    doc.text(copy.title, 20, 66);
+    setColor(doc, "setTextColor", INK);
+    doc.setFontSize(24);
+    doc.text(copy.headline, 21, 85);
+    setColor(doc, "setTextColor", SOFT_INK);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.text(fitText(doc, copy.subtitle, 118, 12), 22, 101);
 
-      pdf.setTextColor(text.r, text.g, text.b);
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(30);
-      pdf.text(t.pdfReady, x + 10, y + 25);
+    drawMetricCard(doc, 170, 45, 46, 55, t.peopleSaved, people.length, "", PALETTE.accent);
+    drawMetricCard(doc, 222, 45, 46, 55, t.totalEvents, stats.allEvents.length, "", PALETTE.accent2);
+    drawMetricCard(doc, 170, 108, 98, 48, t.topPerson, topPersonValue, `${stats.mostActiveCount} ${t.events}`, PALETTE.aqua);
+  });
 
-      pdf.setTextColor(soft.r, soft.g, soft.b);
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(12);
-      pdf.text(t.reportGenerated, x + 10, y + 40);
+  addSlide(doc, pageW, pageH, 2, () => {
+    drawTitle(doc, copy.peopleSlide, t.topTracked, 18, 38, 124);
+    drawHeroMetric(doc, 22, 96, stats.mostActiveCount, t.topPerson, topPersonValue, PALETTE.accent);
+    drawRankList(doc, 145, 38, 110, t.peopleMostEvents, stats.peopleMostEvents, t.noDataYet);
+  });
 
-      // Render headline metrics for people, events, and top person.
-      drawMetric(pdf, x + 8, y + 75, 48, 34, t.peopleSaved, people.length, "");
-      drawMetric(
-        pdf,
-        x + 62,
-        y + 75,
-        48,
-        34,
-        t.totalEvents,
-        stats.allEvents.length,
-        "",
-      );
-      drawMetric(
-        pdf,
-        x + 116,
-        y + 75,
-        48,
-        34,
-        t.topPerson,
-        stats.mostActiveCount,
-        stats.mostActivePerson,
-      );
-    },
-  );
+  addSlide(doc, pageW, pageH, 3, () => {
+    drawTitle(doc, copy.timeSlide, t.monthlyActivity, 18, 36, 122);
+    drawMetricCard(doc, 22, 80, 58, 50, t.chartYear, topYear, t.yearlyTotals, PALETTE.accent2);
+    drawMetricCard(doc, 88, 80, 58, 50, t.granMonth, topMonth, t.monthlyActivity, PALETTE.accent);
+    drawColumnChart(doc, 156, 38, 104, 95, t.eventsPerMonth, stats.eventsPerMonth, PALETTE.accent);
+    drawRankList(
+      doc,
+      22,
+      148,
+      220,
+      t.multiYearPeople,
+      stats.personsWithEventsInMultipleYears.map((item) => ({
+        label: `${item.label} (${item.years.join(", ")})`,
+        value: item.value,
+      })),
+      t.noMultiYearPeopleYet,
+    );
+  });
 
-  // Add the overview page with aggregate metrics and top tracked people.
-  doc.addPage();
-  paintBackground(doc, pageW, pageH);
-  drawWindowCard(
-    doc,
-    16,
-    16,
-    pageW - 32,
-    pageH - 32,
-    t.overview,
-    (pdf, x, y, w) => {
-      drawMetric(
-        pdf,
-        x,
-        y,
-        50,
-        34,
-        t.avgEvents,
-        stats.averageEventsPerPerson,
-        t.acrossAll,
-      );
-      drawMetric(
-        pdf,
-        x + 56,
-        y,
-        50,
-        34,
-        t.averageScore,
-        stats.averageScore,
-        t.scores,
-      );
-      drawMetric(
-        pdf,
-        x + 112,
-        y,
-        50,
-        34,
-        t.topPerson,
-        stats.mostActiveCount,
-        stats.mostActivePerson,
-      );
+  addSlide(doc, pageW, pageH, 4, () => {
+    drawTitle(doc, copy.profileSlide, t.statsGroupProfiles, 18, 34, 126);
+    drawRankList(doc, 20, 72, 105, t.eventsByZodiac, stats.eventsByZodiac, t.noDataYet);
+    drawRankList(doc, 144, 72, 105, t.eventsByActivity, stats.eventsByActivity, t.noDataYet);
+    drawBubbleLegend(doc, 20, 160, t.personsByGender, stats.personsByGender);
+    drawBubbleLegend(doc, 154, 160, t.eventsByGender, stats.eventsByGender);
+  });
 
-      // Show the people with the highest number of events.
-      drawSimpleBarChart(
-        pdf,
-        x,
-        y + 52,
-        w,
-        120,
-        t.peopleMostEvents,
-        stats.peopleMostEvents,
-        PALETTE.accent,
-        true,
-      );
-    },
-  );
+  addSlide(doc, pageW, pageH, 5, () => {
+    drawTitle(doc, copy.scoreSlide, t.scoreDistributionDesc, 18, 36, 132);
+    drawMetricCard(doc, 22, 82, 62, 52, t.averageScore, stats.averageScore, t.scoreOutOf, PALETTE.accent);
+    drawRankList(doc, 112, 46, 105, t.scoreDistribution, scoresByLabel, t.noDataYet);
+    drawBubbleLegend(doc, 22, 154, t.scoredVsUnscored, stats.scoredVsUnscored);
+  });
 
-  // Add the time page with monthly, yearly, and multi-year activity.
-  doc.addPage();
-  paintBackground(doc, pageW, pageH);
-  drawWindowCard(
-    doc,
-    16,
-    16,
-    pageW - 32,
-    pageH - 32,
-    t.time,
-    (pdf, x, y, w) => {
-      drawSimpleBarChart(
-        pdf,
-        x,
-        y,
-        w,
-        72,
-        t.eventsPerMonth,
-        stats.eventsPerMonth,
-        PALETTE.accent,
-        true,
-      );
-      drawSimpleBarChart(
-        pdf,
-        x,
-        y + 84,
-        w,
-        56,
-        t.eventsPerYear,
-        stats.eventsPerYear,
-        PALETTE.accent2,
-        false,
-      );
+  addSlide(doc, pageW, pageH, 6, () => {
+    setColor(doc, "setTextColor", PALETTE.accentEmphasis2);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(42);
+    doc.text(copy.closeSlide, 26, 78);
+    setColor(doc, "setTextColor", SOFT_INK);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(14);
+    doc.text(fitText(doc, copy.closeText, 145, 14), 28, 98);
+    drawMetricCard(doc, 198, 70, 58, 50, t.totalEvents, stats.allEvents.length, t.reportGenerated, PALETTE.accent);
+  });
 
-      // Add the list of people whose events span multiple years.
-      const text = hexToRgb(PALETTE.text);
-      pdf.setTextColor(text.r, text.g, text.b);
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(13);
-      pdf.text(t.multiYearPeople, x, y + 150);
-
-      drawLegendList(
-        pdf,
-        x + 2,
-        y + 160,
-        stats.personsWithEventsInMultipleYears.slice(0, 8).map((item) => ({
-          label: `${item.label} (${item.years.join(", ")})`,
-          value: item.value,
-        })),
-      );
-    },
-  );
-
-  // Add the people page with zodiac, activity, and gender summaries.
-  doc.addPage();
-  paintBackground(doc, pageW, pageH);
-  drawWindowCard(
-    doc,
-    16,
-    16,
-    pageW - 32,
-    pageH - 32,
-    t.peopleStats,
-    (pdf, x, y, w) => {
-      drawSimpleBarChart(
-        pdf,
-        x,
-        y,
-        w,
-        58,
-        t.eventsByZodiac,
-        stats.eventsByZodiac,
-        PALETTE.accent,
-        true,
-      );
-      drawSimpleBarChart(
-        pdf,
-        x,
-        y + 70,
-        w,
-        52,
-        t.eventsByActivity,
-        stats.eventsByActivity,
-        PALETTE.aqua,
-        true,
-      );
-
-      // Split the lower area into two legend-based summaries by gender.
-      const text = hexToRgb(PALETTE.text);
-      pdf.setTextColor(text.r, text.g, text.b);
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(13);
-      pdf.text(t.personsByGender, x, y + 136);
-      drawLegendList(pdf, x + 2, y + 146, stats.personsByGender);
-
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(13);
-      pdf.text(t.eventsByGender, x + 82, y + 136);
-      drawLegendList(pdf, x + 84, y + 146, stats.eventsByGender);
-    },
-  );
-
-  // Add the scores page with scoring distribution and event-count buckets.
-  doc.addPage();
-  paintBackground(doc, pageW, pageH);
-  drawWindowCard(
-    doc,
-    16,
-    16,
-    pageW - 32,
-    pageH - 32,
-    t.scores,
-    (pdf, x, y, w) => {
-      drawSimpleBarChart(
-        pdf,
-        x,
-        y,
-        w,
-        64,
-        t.scoreDistribution,
-        stats.scoresByKisses.filter((d) => d.value > 0),
-        PALETTE.accent,
-        true,
-      );
-      drawSimpleBarChart(
-        pdf,
-        x,
-        y + 78,
-        w,
-        58,
-        t.eventsByPersonCount,
-        stats.numberOfEventsByNumberOfPersons,
-        PALETTE.accent2,
-        false,
-      );
-
-      // Add a final legend comparing scored and unscored events.
-      const text = hexToRgb(PALETTE.text);
-      pdf.setTextColor(text.r, text.g, text.b);
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(13);
-      pdf.text(t.scoreDistributionDesc, x, y + 150);
-      drawLegendList(pdf, x + 2, y + 160, stats.scoredVsUnscored);
-    },
-  );
-
-  // Build a date-based file name to make exports easy to identify.
-  const fileName = `kiss-recorder-stats-2-${new Date().toISOString().slice(0, 10)}.pdf`;
-
+  const fileName = `kisswrapped-${new Date().toISOString().slice(0, 10)}.pdf`;
   const base64 = doc.output("datauristring").split(",")[1];
+
   await Filesystem.writeFile({
     path: fileName,
     directory: Directory.Cache,
@@ -496,8 +338,8 @@ export async function exportStatsPdf(people, t) {
 }
 
 /**
- * Saves an error log to Documents (native) or triggers a text file download (web).
- * No feedback is shown after saving — the caller is responsible for any UI.
+ * Saves an error log to cache and opens the system share sheet.
+ * The caller is responsible for any user-visible feedback.
  */
 export async function saveErrorLog(error) {
   const timestamp = new Date().toISOString();
