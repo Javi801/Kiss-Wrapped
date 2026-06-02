@@ -4,9 +4,11 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 const mockNative = vi.hoisted(() => ({ isNative: false }));
 const mockFilesystem = vi.hoisted(() => ({
   readFile: vi.fn(),
-  writeFile: vi.fn(),
-  deleteFile: vi.fn(),
+  writeFile: vi.fn().mockResolvedValue(undefined),
+  deleteFile: vi.fn().mockResolvedValue(undefined),
+  getUri: vi.fn().mockResolvedValue({ uri: "file:///mock/export.json" }),
 }));
+const mockShare = vi.hoisted(() => ({ share: vi.fn().mockResolvedValue(undefined) }));
 
 vi.mock("@capacitor/core", () => ({
   Capacitor: { isNativePlatform: () => mockNative.isNative },
@@ -14,15 +16,11 @@ vi.mock("@capacitor/core", () => ({
 
 vi.mock("@capacitor/filesystem", () => ({
   Filesystem: mockFilesystem,
-  Directory: { Data: "DATA", External: "EXTERNAL" },
+  Directory: { Data: "DATA", External: "EXTERNAL", Cache: "CACHE" },
   Encoding: { UTF8: "utf8" },
 }));
 
-// jsdom does not implement these URL methods
-global.URL.createObjectURL = vi.fn(() => "blob:mock");
-global.URL.revokeObjectURL = vi.fn();
-// Prevent jsdom errors when the anchor is programmatically clicked
-HTMLAnchorElement.prototype.click = vi.fn();
+vi.mock("@capacitor/share", () => ({ Share: mockShare }));
 
 import {
   loadPeopleFromDevice,
@@ -32,7 +30,7 @@ import {
   loadSettings,
   saveSettings,
 } from "@/lib/device-storage";
-import { STORAGE_KEY, ICON_COLOR_KEY, LANGUAGE_KEY, THEME_KEY, SITUATION_TAGS_KEY, PLACE_TAGS_KEY, ONBOARDING_VERSION_KEY } from "@/lib/constants";
+import { STORAGE_KEY, ICON_COLOR_KEY, LANGUAGE_KEY, THEME_KEY, SITUATION_TAGS_KEY, PLACE_TAGS_KEY, ONBOARDING_VERSION_KEY, PEOPLE_FILE_NAME, SETTINGS_FILE_NAME } from "@/lib/constants";
 
 // ---------------------------------------------------------------------------
 // loadPeopleFromDevice
@@ -138,6 +136,7 @@ describe("clearPeopleFromDevice (web path)", () => {
 const COMPLETE_PERSON = {
   id: "p1",
   name: "Ana",
+  realName: "Ana García",
   birthYear: 2000,
   gender: "female",
   howWeMet: "school",
@@ -148,14 +147,19 @@ const COMPLETE_PERSON = {
   ],
 };
 
-describe("exportPeopleJson (web path) — return shape", () => {
+function exportedJson() {
+  const call = mockFilesystem.writeFile.mock.calls.at(-1)?.[0];
+  return call ? JSON.parse(call.data) : null;
+}
+
+describe("exportPeopleJson — return shape", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("returns isNative: false on web", async () => {
+  it("returns isNative: true", async () => {
     const { isNative } = await exportPeopleJson([]);
-    expect(isNative).toBe(false);
+    expect(isNative).toBe(true);
   });
 
   it("returns a fileName matching kiss-recorder-data-YYYY-MM-DD.json", async () => {
@@ -163,10 +167,12 @@ describe("exportPeopleJson (web path) — return shape", () => {
     expect(fileName).toMatch(/^kiss-recorder-data-\d{4}-\d{2}-\d{2}\.json$/);
   });
 
-  it("triggers a browser download via createObjectURL and revokeObjectURL", async () => {
+  it("writes to Cache directory and opens Share sheet", async () => {
     await exportPeopleJson([COMPLETE_PERSON]);
-    expect(URL.createObjectURL).toHaveBeenCalledOnce();
-    expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:mock");
+    expect(mockFilesystem.writeFile).toHaveBeenCalledWith(
+      expect.objectContaining({ directory: "CACHE" })
+    );
+    expect(mockShare.share).toHaveBeenCalledOnce();
   });
 });
 
@@ -185,6 +191,12 @@ describe("exportPeopleJson — hadMissingFields", () => {
     expect(hadMissingFields).toBe(false);
   });
 
+  it("is false when realName is absent (optional field)", async () => {
+    const { realName: _, ...personWithoutRealName } = COMPLETE_PERSON;
+    const { hadMissingFields } = await exportPeopleJson([personWithoutRealName]);
+    expect(hadMissingFields).toBe(false);
+  });
+
   it("is false when optional event fields are absent", async () => {
     const person = {
       ...COMPLETE_PERSON,
@@ -196,6 +208,7 @@ describe("exportPeopleJson — hadMissingFields", () => {
 
   it("is true when a required person string field is null", async () => {
     for (const field of ["name", "gender", "howWeMet", "zodiacSign", "activity"]) {
+      vi.clearAllMocks();
       const { hadMissingFields } = await exportPeopleJson([{ ...COMPLETE_PERSON, [field]: null }]);
       expect(hadMissingFields, `expected true for missing person.${field}`).toBe(true);
     }
@@ -215,6 +228,7 @@ describe("exportPeopleJson — hadMissingFields", () => {
 
   it("is true when a required event string field is null", async () => {
     for (const field of ["date", "place", "situation"]) {
+      vi.clearAllMocks();
       const person = {
         ...COMPLETE_PERSON,
         events: [{ ...COMPLETE_PERSON.events[0], [field]: null }],
@@ -230,58 +244,35 @@ describe("exportPeopleJson — normalizeForExport output content", () => {
     vi.clearAllMocks();
   });
 
-  function captureExportedJson(fn) {
-    return new Promise((resolve) => {
-      const OrigBlob = global.Blob;
-      global.Blob = class extends OrigBlob {
-        constructor(parts, opts) {
-          super(parts, opts);
-          resolve(JSON.parse(parts[0]));
-          global.Blob = OrigBlob;
-        }
-      };
-      fn();
-    });
-  }
-
   it("fills null required person string field with empty string", async () => {
-    const person = { ...COMPLETE_PERSON, name: null };
-    const [exported, _] = await Promise.all([
-      captureExportedJson(() => exportPeopleJson([person])),
-      Promise.resolve(),
-    ]);
-    expect(exported[0].name).toBe("");
+    await exportPeopleJson([{ ...COMPLETE_PERSON, name: null }]);
+    expect(exportedJson()[0].name).toBe("");
   });
 
   it("fills null required event string field with empty string", async () => {
-    const person = {
-      ...COMPLETE_PERSON,
-      events: [{ ...COMPLETE_PERSON.events[0], place: null }],
-    };
-    const [exported] = await Promise.all([
-      captureExportedJson(() => exportPeopleJson([person])),
-      Promise.resolve(),
-    ]);
-    expect(exported[0].events[0].place).toBe("");
+    const person = { ...COMPLETE_PERSON, events: [{ ...COMPLETE_PERSON.events[0], place: null }] };
+    await exportPeopleJson([person]);
+    expect(exportedJson()[0].events[0].place).toBe("");
+  });
+
+  it("fills absent optional realName with empty string without flagging hadMissingFields", async () => {
+    const { realName: _, ...personWithoutRealName } = COMPLETE_PERSON;
+    await exportPeopleJson([personWithoutRealName]);
+    expect(exportedJson()[0].realName).toBe("");
   });
 
   it("leaves birthYear as null when missing", async () => {
-    const person = { ...COMPLETE_PERSON, birthYear: null };
-    const [exported] = await Promise.all([
-      captureExportedJson(() => exportPeopleJson([person])),
-      Promise.resolve(),
-    ]);
-    expect(exported[0].birthYear).toBeNull();
+    await exportPeopleJson([{ ...COMPLETE_PERSON, birthYear: null }]);
+    expect(exportedJson()[0].birthYear).toBeNull();
   });
 
   it("preserves present fields unchanged", async () => {
-    const [exported] = await Promise.all([
-      captureExportedJson(() => exportPeopleJson([COMPLETE_PERSON])),
-      Promise.resolve(),
-    ]);
-    expect(exported[0].name).toBe("Ana");
-    expect(exported[0].birthYear).toBe(2000);
-    expect(exported[0].events[0].place).toBe("café");
+    await exportPeopleJson([COMPLETE_PERSON]);
+    const p = exportedJson()[0];
+    expect(p.name).toBe("Ana");
+    expect(p.realName).toBe("Ana García");
+    expect(p.birthYear).toBe(2000);
+    expect(p.events[0].place).toBe("café");
   });
 });
 
@@ -461,5 +452,131 @@ describe("loadSettings (native path — migration from localStorage)", () => {
     const written = JSON.parse(mockFilesystem.writeFile.mock.calls[0][0].data);
     expect(written.situationTags).toEqual(["Date"]);
     expect(written.placeTags).toEqual(["Home"]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// loadPeopleFromDevice (native path)
+// ---------------------------------------------------------------------------
+describe("loadPeopleFromDevice (native path)", () => {
+  beforeEach(() => {
+    mockNative.isNative = true;
+    vi.clearAllMocks();
+    mockFilesystem.writeFile.mockResolvedValue(undefined);
+    mockFilesystem.deleteFile.mockResolvedValue(undefined);
+    mockFilesystem.getUri.mockResolvedValue({ uri: "file:///mock/export.json" });
+  });
+  afterEach(() => { mockNative.isNative = false; });
+
+  it("reads from Filesystem with Directory.Data", async () => {
+    const people = [{ name: "Ana", events: [] }];
+    mockFilesystem.readFile.mockResolvedValueOnce({ data: JSON.stringify(people) });
+    await loadPeopleFromDevice();
+    expect(mockFilesystem.readFile).toHaveBeenCalledWith(
+      expect.objectContaining({ directory: "DATA" })
+    );
+  });
+
+  it("returns parsed people array from native file", async () => {
+    const people = [{ id: "p1", name: "Ana", events: [] }];
+    mockFilesystem.readFile.mockResolvedValueOnce({ data: JSON.stringify(people) });
+    expect(await loadPeopleFromDevice()).toEqual(people);
+  });
+
+  it("returns empty array when the file does not exist", async () => {
+    mockFilesystem.readFile.mockRejectedValueOnce(new Error("File not found"));
+    expect(await loadPeopleFromDevice()).toEqual([]);
+  });
+
+  it("returns empty array when file content is malformed JSON", async () => {
+    mockFilesystem.readFile.mockResolvedValueOnce({ data: "{bad json" });
+    expect(await loadPeopleFromDevice()).toEqual([]);
+  });
+
+  it("returns empty array when file parses to a non-array", async () => {
+    mockFilesystem.readFile.mockResolvedValueOnce({ data: JSON.stringify({ not: "array" }) });
+    expect(await loadPeopleFromDevice()).toEqual([]);
+  });
+
+  it("migrates legacy age to birthYear", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-06-01T12:00:00"));
+    mockFilesystem.readFile.mockResolvedValueOnce({
+      data: JSON.stringify([{ name: "Ana", age: 25, events: [] }]),
+    });
+    const result = await loadPeopleFromDevice();
+    expect(result[0].birthYear).toBe(2001);
+    expect(result[0].age).toBeUndefined();
+    vi.useRealTimers();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// savePeopleToDevice (native path)
+// ---------------------------------------------------------------------------
+describe("savePeopleToDevice (native path)", () => {
+  beforeEach(() => {
+    mockNative.isNative = true;
+    vi.clearAllMocks();
+    mockFilesystem.writeFile.mockResolvedValue(undefined);
+  });
+  afterEach(() => { mockNative.isNative = false; });
+
+  it("writes to Filesystem with Directory.Data", async () => {
+    await savePeopleToDevice([{ id: "p1", name: "Ana", events: [] }]);
+    expect(mockFilesystem.writeFile).toHaveBeenCalledWith(
+      expect.objectContaining({ path: PEOPLE_FILE_NAME, directory: "DATA" })
+    );
+  });
+
+  it("serializes the people array as JSON", async () => {
+    const people = [{ id: "p1", name: "Ana", events: [] }];
+    await savePeopleToDevice(people);
+    const written = JSON.parse(mockFilesystem.writeFile.mock.calls[0][0].data);
+    expect(written).toEqual(people);
+  });
+
+  it("writes an empty array correctly", async () => {
+    await savePeopleToDevice([]);
+    const written = JSON.parse(mockFilesystem.writeFile.mock.calls[0][0].data);
+    expect(written).toEqual([]);
+  });
+
+  it("does not write to localStorage on native", async () => {
+    localStorage.clear();
+    await savePeopleToDevice([{ id: "p1", name: "Ana", events: [] }]);
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// saveSettings (native path)
+// ---------------------------------------------------------------------------
+describe("saveSettings (native path)", () => {
+  beforeEach(() => {
+    mockNative.isNative = true;
+    vi.clearAllMocks();
+    mockFilesystem.writeFile.mockResolvedValue(undefined);
+  });
+  afterEach(() => { mockNative.isNative = false; });
+
+  it("writes to Filesystem with Directory.Data", async () => {
+    await saveSettings({ iconColor: "pink", language: "es", theme: "dark", statsVisible: false, situationTags: [], placeTags: [], onboardingDone: true, onboardingVersion: 1 });
+    expect(mockFilesystem.writeFile).toHaveBeenCalledWith(
+      expect.objectContaining({ path: SETTINGS_FILE_NAME, directory: "DATA" })
+    );
+  });
+
+  it("serializes all settings fields correctly", async () => {
+    const settings = { iconColor: "pink", language: "es", theme: "dark", statsVisible: false, situationTags: ["Date"], placeTags: ["Café"], onboardingDone: true, onboardingVersion: 2 };
+    await saveSettings(settings);
+    const written = JSON.parse(mockFilesystem.writeFile.mock.calls[0][0].data);
+    expect(written).toEqual(settings);
+  });
+
+  it("does not write to localStorage on native", async () => {
+    localStorage.clear();
+    await saveSettings({ iconColor: "blue" });
+    expect(localStorage.getItem(ICON_COLOR_KEY)).toBeNull();
   });
 });
