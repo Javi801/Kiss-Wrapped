@@ -1,131 +1,162 @@
-# Kiss Recorder
+<h1 align="center">KissRecorder</h1>
 
-![status](https://img.shields.io/badge/status-stable-green)
-![license](https://img.shields.io/badge/license-MIT-blue)
+<p align="center">
+  A private, offline-first app to log your interactions, track patterns, and understand your social life. No account, no server, no cloud.
+</p>
 
-A lightweight personal tracking web app to log interactions ("events") with people, analyze patterns, and visualize statistics over time. Built with React, Tailwind CSS and packaged with Capacitor for mobile support.
+<p align="center">
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React">
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite">
+  <img src="https://img.shields.io/badge/Tailwind-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind">
+  <img src="https://img.shields.io/badge/Capacitor-119EFF?style=for-the-badge&logo=capacitor&logoColor=white" alt="Capacitor">
+</p>
 
-<!-- toc -->
-## Table of Contents
+<p align="center">
+  <strong>Platforms</strong><br>
+  <img src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android">
+  <img src="https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=apple&logoColor=white" alt="iOS">
+  <img src="https://img.shields.io/badge/EMUI-CF0A2C?style=for-the-badge&logo=huawei&logoColor=white" alt="EMUI">
+</p>
 
-- [Features](#features)
-- [Download](#download)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Install](#install)
-  - [Development](#development)
-  - [Build](#build)
-- [Testing](#testing)
-  - [Running tests](#running-tests)
-  - [Coverage](#coverage)
-  - [What is tested](#what-is-tested)
-- [Capacitor / Mobile (Android)](#capacitor--mobile-android)
-  - [iOS notes and permissions](#ios-notes-and-permissions)
-- [Data Model](#data-model)
-- [Troubleshooting](#troubleshooting)
-- [License](#license)
+<br>
+
+<p align="center">
+  <a href="https://github.com/Javi801/KissRecorder/releases">
+    <img src="https://img.shields.io/badge/Version-1.1.0-6366f1?style=for-the-badge&logo=github" alt="Version 1.1.0">
+  </a>
+</p>
+
+<br>
+
+## Overview
+
+KissRecorder is a cross-platform mobile tracker for logging events with the people in your life. You record who, when, where, and how it went, and the app turns that data into charts, patterns, and insights without sending a single byte to a server.
+
+Everything lives on your device. There is no backend, no account, and no sync service. The app runs natively on Android, iOS, and EMUI via Capacitor.
+
+> Built for people who want to understand their social patterns without trading their privacy for it.
+
+At a glance:
+
+- Fully offline, all data stays on device
+- Cross-platform: Android, iOS, and EMUI
+- People profiles with zodiac-aware age tracking
+- Event log with place, situation, and optional score
+- Rich analytics dashboard with four stat tabs
 
 ## Features
 
-- **People management:** add, edit, delete people with attributes — name, birth year, zodiac sign, gender, activity, how you met
-- **Event tracking:** log events with date, free-text details and an optional 1–5 score; edit or delete at any time
-- **Analytics dashboard** with four tabs:
-  - *Overview* — summary tiles and top-person highlights
-  - *Time* — heatmap, area charts and monthly/yearly breakdowns
-  - *People* — distributions by zodiac, gender, activity and age; age range boxplot with optional year split
-  - *Scores* — score distribution, dumbbell chart and average trends
-- **Zodiac-based age calculation:** age is derived from birth year and zodiac sign end date, so it increments on the zodiac birthday rather than a fixed calendar date
-- **Age-at-event charts:** the "People by age" and "Age range" charts can switch between current age and the age each person had at the time of their events
-- **PDF export** of the full stats dashboard
-- **Theme support:** light, green and dark palettes, with UI colors driven by shared palette tokens and persisted theme selection
-- **Localization:** English and Spanish
-- **Local persistence** via browser/device storage (no backend required)
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="assets/<!-- feature-people icon placeholder -->" width="55" alt="People icon"><br>
+      <strong>People profiles</strong><br>
+      Add people with name, optional real name, birth year, zodiac sign, gender, activity, and a tag-based <em>how we met</em> field. Age is computed at runtime from the zodiac calendar, not stored.<br><br>
+      <code>Zodiac age</code> <code>Optional real name</code> <code>Tag input</code>
+    </td>
+    <td width="50%" valign="top">
+      <img src="assets/<!-- feature-events icon placeholder -->" width="55" alt="Events icon"><br>
+      <strong>Event log</strong><br>
+      Record each interaction with a date, place, situation, and an optional score from 1 to 5. Events are tied to a person and editable or deletable at any time.<br><br>
+      <code>Dated entries</code> <code>Place + situation tags</code> <code>Scores</code>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="assets/<!-- feature-stats icon placeholder -->" width="55" alt="Stats icon"><br>
+      <strong>Analytics dashboard</strong><br>
+      Four stat tabs: Overview, Time, People, and Scores. Includes heatmaps, area charts, zodiac distributions, score dumbbells, and age-range boxplots.<br><br>
+      <code>Heatmap</code> <code>Distributions</code> <code>Age at event</code>
+    </td>
+    <td width="50%" valign="top">
+      <img src="assets/<!-- feature-export icon placeholder -->" width="55" alt="Export icon"><br>
+      <strong>Export and share</strong><br>
+      Export your full data as a JSON backup and share it via the device's native share sheet.<br><br>
+      <code>JSON backup</code> <code>Native share</code>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="assets/<!-- feature-crash icon placeholder -->" width="55" alt="Crash reporting icon"><br>
+      <strong>Crash reporting</strong><br>
+      An ErrorBoundary wraps the entire app. If something crashes, the error is written to a local log file and the user can share it immediately via the native share sheet.<br><br>
+      <code>ErrorBoundary</code> <code>Local crash log</code> <code>Share to report</code>
+    </td>
+    <td width="50%" valign="top">
+      <img src="assets/<!-- feature-themes icon placeholder -->" width="55" alt="Themes icon"><br>
+      <strong>Themes and localization</strong><br>
+      Three color palettes: light, green, and dark, driven by shared tokens and persisted across sessions. UI available in English and Spanish.<br><br>
+      <code>Light / Green / Dark</code> <code>EN / ES</code> <code>Persisted</code>
+    </td>
+  </tr>
+</table>
 
-## Download
+## Screenshots
 
-The first stable release is available from the GitHub Releases page.
+<table>
+  <tr>
+    <td width="20%" align="center"><img src="assets/<!-- screenshot 1 placeholder -->" alt="Screenshot 1" width="100%"></td>
+    <td width="20%" align="center"><img src="assets/<!-- screenshot 2 placeholder -->" alt="Screenshot 2" width="100%"></td>
+    <td width="20%" align="center"><img src="assets/<!-- screenshot 3 placeholder -->" alt="Screenshot 3" width="100%"></td>
+    <td width="20%" align="center"><img src="assets/<!-- screenshot 4 placeholder -->" alt="Screenshot 4" width="100%"></td>
+    <td width="20%" align="center"><img src="assets/<!-- screenshot 5 placeholder -->" alt="Screenshot 5" width="100%"></td>
+  </tr>
+</table>
 
-Android users can download the APK from the latest release and install it manually. Because the app is not distributed through Google Play yet, Android may show a warning before installation.
+## Project structure
 
-### Android APK
+<table>
+  <tr>
+    <td><strong>Area</strong></td>
+    <td><strong>Responsibility</strong></td>
+  </tr>
+  <tr>
+    <td><code>App.jsx</code></td>
+    <td>Application shell, screen routing, theme context, and settings initialization</td>
+  </tr>
+  <tr>
+    <td><code>components/app/</code></td>
+    <td>Top-level screens: Home, AddPerson, Onboarding, Intro, Language, Theme, Color selectors, ErrorBoundary, and PrivacyScreen</td>
+  </tr>
+  <tr>
+    <td><code>components/stats/</code></td>
+    <td>Stats screen and its four tab components: Overview, Time, People, Scores, plus AgeRangeCard</td>
+  </tr>
+  <tr>
+    <td><code>components/forms/</code></td>
+    <td>PersonForm, EventForm, FiltersPanel, and TagInput</td>
+  </tr>
+  <tr>
+    <td><code>components/charts/</code></td>
+    <td>Generic reusable chart cards: Bar, Pie, Radar, Area, Heatmap, Dumbbell</td>
+  </tr>
+  <tr>
+    <td><code>lib/</code></td>
+    <td>Pure logic: date and zodiac helpers, stats aggregation, PDF export, device storage, theme context, and the cn utility</td>
+  </tr>
+  <tr>
+    <td><code>plugins/</code></td>
+    <td>Native Capacitor plugin helpers</td>
+  </tr>
+</table>
 
-To install the app on Android:
-
-1. Download the `.apk` file from the latest GitHub release.
-2. Open it on your Android device.
-3. Allow installation from unknown sources if Android prompts you.
-4. Follow the Android installation steps.
-
-Note: KissRecorder is currently distributed manually and is not yet available on Google Play.
-
-## Tech Stack
-
-| Package | Version | Purpose |
-|---------|---------|---------|
-| React | 19 | UI framework |
-| Vite | 8 | Build tool and dev server |
-| Tailwind CSS | 4 | Utility-first styling |
-| Custom theme context | n/a | Shared palette access for light, green and dark themes |
-| shadcn/ui + Radix UI | latest | Accessible UI primitives |
-| Recharts | 3 | Charts (bar, pie, radar, area, heatmap) |
-| Framer Motion | 12 | Animations |
-| Lucide React | latest | Icons |
-| jsPDF | 4 | PDF export |
-| Capacitor | 8 | Native mobile packaging (Android) |
-
-## Project Structure
-
-```
-src/
-├── components/
-│   ├── app/          # Top-level screens (Home, AddPerson, Intro, Language)
-│   ├── charts/       # Generic reusable chart cards (Bar, Pie, Radar, Area, Heatmap, Dumbbell)
-│   ├── forms/        # PersonForm, EventForm, FiltersPanel
-│   ├── people/       # People list and empty state
-│   ├── person/       # PersonCard
-│   ├── shared/       # StatTile, TileCard, TopPersonTile, SettingsTile
-│   ├── stats/        # Stats screen and its four tab components + AgeRangeCard
-│   ├── ui/           # shadcn/ui primitives (Button, Card, Dialog, Input…)
-│   └── visuals/      # Decorative background components
-├── lib/
-│   ├── calendar.js        # Calendar grid and date navigation helpers
-│   ├── constants.js       # PALETTE, TEXT, CHART_COLORS, translations (EN/ES)
-│   ├── theme.jsx          # Theme context and palette hook used across the UI
-│   ├── date.js            # Date validation, formatting, zodiac age calculation
-│   ├── device-storage.js  # Capacitor/localStorage persistence layer
-│   ├── format.js          # Score rendering, label translations, zodiac helpers
-│   ├── helpers.js         # ID generation, people normalization
-│   ├── pdf-export.js      # jsPDF stats report generation
-│   └── stats.js           # Pure aggregation functions used by the stats screen
-├── App.jsx
-└── main.jsx
-scripts/
-└── generate-icon.mjs      # Generates app icon assets
-capacitor.config.json
-```
-
-## Getting Started
+## Getting started
 
 ### Prerequisites
 
-- Node.js (LTS) and npm
-- For Android builds: Android Studio and Android SDK (Linux/Windows/macOS)
+- Node.js LTS and npm
+- Android builds: Android Studio and Android SDK
+- iOS builds: macOS and Xcode
+- EMUI builds: AppGallery Connect credentials
 
-### Install
+### Install and run
 
 ```bash
 npm install
-```
-
-### Development
-
-```bash
 npm run dev
 ```
 
-Open your browser at the address shown by Vite (usually `http://localhost:5173`).
+Open your browser at the address shown by Vite, usually `http://localhost:5173`.
 
 ### Build
 
@@ -135,126 +166,97 @@ npm run build
 
 Production output goes to `dist/`.
 
-### Icon generation
+### Android
 
 ```bash
-npm run gen:icon
+npm run build
+npx cap sync android
+npx cap open android
 ```
 
-Regenerates app icon assets from the source image via `scripts/generate-icon.mjs`.
+Build and run from Android Studio on a device or emulator.
+
+### iOS
+
+```bash
+npm run build
+npx cap sync ios
+npx cap open ios
+```
+
+Requires macOS and Xcode. Set a valid Bundle Identifier and signing team before building.
+
+### EMUI
+
+EMUI support follows the same Capacitor build path as Android. Sideload the APK on Huawei devices or distribute through AppGallery. HMS Core services are not required since the app has no cloud dependencies.
 
 ## Testing
 
 The project uses [Vitest](https://vitest.dev/) with the V8 coverage provider.
 
-### Running tests
-
 ```bash
-# run all tests once
-npm test
-
-# watch mode (re-runs on file changes)
-npm run test:watch
-
-# generate coverage report
-npm run test:coverage
+npm test                # run all tests once
+npm run test:watch      # watch mode
+npm run test:coverage   # generate coverage report
 ```
 
-### Coverage
+Coverage is scoped to `src/lib/` with these minimum thresholds enforced by CI:
 
-Coverage is scoped to `src/lib/`. Minimum thresholds enforced by CI:
+| Metric | Threshold |
+|--------|-----------|
+| Statements | 95% |
+| Branches | 90% |
+| Functions | 95% |
+| Lines | 95% |
 
-| Metric     | Threshold |
-|------------|-----------|
-| Statements | 95%       |
-| Branches   | 90%       |
-| Functions  | 95%       |
-| Lines      | 95%       |
+Unit tests in `src/lib/__tests__/` cover: `date.js`, `calendar.js`, `format.js`, `helpers.js`, `stats.js`, `constants.js`, `device-storage.js`, `pdf-export.js`, and `utils.js`.
 
-### What is tested
-
-Unit tests live in `src/lib/__tests__/`:
-
-| File              | What's covered |
-|-------------------|----------------|
-| `date.js`         | Date string validation, formatting, month/year/key extraction, zodiac date parsing, `calculateAge`, `calculateAgeAtEvent`, `deriveBirthYear` |
-| `calendar.js`     | `parseCalendarDate`, `toCalendarDate`, `buildDayGrid`, `nextCalView` |
-| `format.js`       | Score validation, kiss rendering, label translations, zodiac short labels, gender colors |
-| `helpers.js`      | ID generation, people normalization, hex-to-RGB conversion |
-| `stats.js`        | Event date helpers, all `getStatsData` aggregations |
-| `constants.js`    | `abbreviateZodiacMonths` and related formatting helpers |
-| `device-storage.js` | Storage read/write with mocked Capacitor/localStorage |
-
-`pdf-export.js` is intentionally excluded (DOM + file system side effects).
-
-## Capacitor / Mobile (Android)
-
-The app is packaged with Capacitor 8. The web build output directory is `dist` as defined in `capacitor.config.json`.
-
-```bash
-# build web assets first
-npm run build
-
-# add the platform (only once)
-npx cap add android
-
-# sync web assets into the native project after web changes
-npx cap sync android
-
-# open in Android Studio
-npx cap open android
-```
-
-For production builds, configure keystore signing in the Android project and declare any required permissions in `AndroidManifest.xml`.
-
-### iOS notes and permissions
-
-iOS builds require macOS and Xcode. If you add the iOS platform:
-
-```bash
-npx cap add ios
-npx cap sync ios
-npx cap open ios
-```
-
-If the app records audio, add a microphone usage description to `Info.plist`:
-
-```xml
-<key>NSMicrophoneUsageDescription</key>
-<string>Kiss Recorder needs microphone access to record audio for events.</string>
-```
-
-Ensure the Bundle Identifier in Xcode matches a provisioning profile and a signing team is selected.
-
-## Data Model
+## Data model
 
 ```js
 Person {
   id:         string
   name:       string
-  birthYear:  number          // used with zodiacSign to derive current age
-  zodiacSign: string          // e.g. "Aries (March 21 - April 19)"
+  realName:   string          // optional
+  birthYear:  number
+  zodiacSign: string          // e.g. "Aries"
   gender:     string
   activity:   string
-  howWeMet:   string
+  howWeMet:   string          // tag-based
   events:     Event[]
 }
 
 Event {
-  id:      string
-  date:    string        // format: "yyyy.MM.dd"
-  details: string
-  score:   number | null // 1–5, or null if unrated
+  id:        string
+  date:      string           // "yyyy.MM.dd"
+  place:     string
+  situation: string
+  score:     number | null    // 1 to 5, or null
+}
+
+Settings {
+  language:         string    // en or es
+  theme:            string    // light, green, or dark
+  iconColor:        string
+  statsVisible:     boolean
+  situationTags:    string[]
+  placeTags:        string[]
+  onboardingDone:   boolean
+  onboardingVersion: number
 }
 ```
 
-Age is never stored directly on the person. It is computed at runtime via `calculateAge(birthYear, zodiacSign)`, which increments when the zodiac sign's end date passes each year. `calculateAgeAtEvent(birthYear, zodiacSign, eventDate)` is used in charts that display age as of the moment of each event.
+Age is computed at runtime via `calculateAge` and never stored on the person.
 
-## Troubleshooting
+## Download
 
-- If the native build can't find web assets, confirm you ran `npm run build` and then `npx cap sync <platform>`.
-- For iOS build issues, check signing settings and valid provisioning profiles in Xcode.
-- If audio recording fails on a device, verify the microphone permission was granted at runtime.
+Releases are published on the [GitHub Releases page](https://github.com/Javi801/KissRecorder/releases).
+
+| Platform | How to install |
+|----------|---------------|
+| **Android** | Download the `.apk` and sideload it. Allow installation from unknown sources if prompted. Not on Google Play yet. |
+| **iOS** | Build from source via Xcode or wait for a TestFlight link. Not on the App Store yet. |
+| **EMUI** | Download the `.apk` and sideload it on your Huawei device. No HMS dependencies required. Not on AppGallery yet. |
 
 ## License
 
