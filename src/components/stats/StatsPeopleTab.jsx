@@ -178,6 +178,7 @@ export default function StatsPeopleTab({ people, t }) {
         data={personsByFirstLetter}
         emptyText={t.noDataYet}
         tooltipUnit={{ one: t.chartPerson, many: t.chartPersons }}
+        showAllTicks
       />
 
       <ZodiacRadarCard
@@ -206,7 +207,6 @@ export default function StatsPeopleTab({ people, t }) {
         subtitle={ageAtEvent ? t.ageAtEventDesc : t.ageDistribution}
         data={ageAtEvent ? personsByAgeAtEvent : personsByAge}
         emptyText={t.noDataYet}
-        maxXTicks={6}
         tooltipUnit={{ one: t.chartPerson, many: t.chartPersons }}
         tabs={
           <div style={{ display: "flex", gap: "0.25rem", padding: "0.25rem", background: PALETTE.accentMuted, borderRadius: "0.875rem", marginTop: "0.5rem" }}>
