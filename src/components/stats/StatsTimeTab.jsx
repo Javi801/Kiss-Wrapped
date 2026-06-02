@@ -18,18 +18,6 @@ export default function StatsTimeTab({ people, allEvents, t }) {
     return () => clearTimeout(id);
   }, []);
 
-  // Full year range with no gaps, derived from all events across all people.
-  const allYears = useMemo(() => {
-    const nums = allEvents
-      .map((e) => getYearKey(e.date))
-      .filter(Boolean)
-      .map(Number);
-    if (!nums.length) return [];
-    const min = Math.min(...nums);
-    const max = Math.max(...nums);
-    return Array.from({ length: max - min + 1 }, (_, i) => String(min + i));
-  }, [allEvents]);
-
   /**
    * People whose events span two or more distinct years.
    * yearCounts maps each year string to the number of events that year.
@@ -64,6 +52,17 @@ export default function StatsTimeTab({ people, allEvents, t }) {
         .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label)),
     [people],
   );
+
+  // Year range with no gaps, derived only from people who appear in multiple years.
+  // Using allEvents would include years that only have single-appearance people,
+  // leaving empty columns at the edges of the charts.
+  const allYears = useMemo(() => {
+    const nums = personsWithEventsInMultipleYears.flatMap((p) => p.years).map(Number);
+    if (!nums.length) return [];
+    const min = Math.min(...nums);
+    const max = Math.max(...nums);
+    return Array.from({ length: max - min + 1 }, (_, i) => String(min + i));
+  }, [personsWithEventsInMultipleYears]);
 
   // Top 3 sorted by: most distinct years → most events → oldest event year → name.
   const top3MultiYear = useMemo(
