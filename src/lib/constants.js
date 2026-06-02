@@ -13,6 +13,9 @@ export const PLACE_TAGS_KEY = "kiss-recorder-place-tags-v1";
 export const ONBOARDING_DONE_KEY = "kiss-recorder-onboarding-done-v1";
 export const ONBOARDING_VERSION_KEY = "kiss-recorder-onboarding-version-v1";
 export const ONBOARDING_VERSION = 2;
+export const APP_VERSION = "1.0";
+export const APP_GITHUB_USER = "Javi801";
+export const APP_GITHUB_REPO = "https://github.com/Javi801/kiss-recorder-app";
 export const PEOPLE_FILE_NAME = "kiss-recorder-people.json";
 export const SETTINGS_FILE_NAME = "kiss-recorder-settings.json";
 
@@ -567,6 +570,17 @@ export const COPY = {
     birthdayAlreadyHappenedThird: "Has their birthday already happened this year?",
     birthdayYes: "Yes",
     birthdayNo: "Not yet",
+    about: "About",
+    aboutVersion: "Version",
+    aboutDeveloper: "Developer",
+    aboutDescription: "A private space for your most meaningful connections. All data stays on your device — no servers, no cloud, no tracking.",
+    aboutFeedback: "Feedback & bugs",
+    aboutFeedbackDesc: "Found a bug or have a suggestion?",
+    aboutFeedbackAction: "Send email",
+    crashTitle: "Something went wrong",
+    crashDesc: "The app encountered an unexpected error and could not continue.",
+    crashShare: "Share error log",
+    crashReload: "Reload app",
     onboardingSkip: "Skip",
     onboardingNext: "Next",
     onboardingDone: "Get started",
@@ -877,6 +891,17 @@ export const COPY = {
     birthdayAlreadyHappenedThird: "¿Ya estuvo de cumpleaños este año?",
     birthdayYes: "Sí",
     birthdayNo: "Todavía no",
+    about: "Acerca de",
+    aboutVersion: "Versión",
+    aboutDeveloper: "Desarrollador",
+    aboutDescription: "Tu espacio privado para tus conexiones más especiales. Todo queda en tu dispositivo — sin servidores, sin nube, sin rastreo.",
+    aboutFeedback: "Sugerencias y errores",
+    aboutFeedbackDesc: "¿Encontraste un error o tienes una sugerencia?",
+    aboutFeedbackAction: "Enviar correo",
+    crashTitle: "Algo salió mal",
+    crashDesc: "La app encontró un error inesperado y no pudo continuar.",
+    crashShare: "Compartir registro de error",
+    crashReload: "Recargar app",
     onboardingSkip: "Omitir",
     onboardingNext: "Siguiente",
     onboardingDone: "Empezar",
