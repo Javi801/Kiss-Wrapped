@@ -5,6 +5,7 @@ import { TEXT } from "@/lib/constants";
 import { usePalette } from "@/lib/theme";
 import AgeRangeBox from "@/components/stats/AgeRangeBox";
 import { getYearKey, calculateAgeAtEvent } from "@/lib/date";
+import FullscreenChartWrapper from "@/components/charts/FullscreenChartWrapper";
 
 // Resolves the canonical age for a person within a year's events.
 // Uses the age with the most events; on a tie, picks the higher age.
@@ -142,6 +143,7 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
   }, [yearsData]);
 
   return (
+    <FullscreenChartWrapper>
     <Card
       className="rounded-3xl"
       style={{
@@ -272,5 +274,6 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
         )}
       </CardContent>
     </Card>
+    </FullscreenChartWrapper>
   );
 }

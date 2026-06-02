@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { TEXT } from "@/lib/constants";
 import { usePalette } from "@/lib/theme";
 import { calculateAge } from "@/lib/date";
+import FullscreenChartWrapper from "@/components/charts/FullscreenChartWrapper";
 
 /**
  * Displays a boxplot visualization for age distribution.
@@ -32,6 +33,7 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText, bare =
     if (bare) return emptyContent;
 
     return (
+      <FullscreenChartWrapper>
       <Card
         className="rounded-3xl"
         style={{ boxShadow: "none", borderColor: PALETTE.innerCardBorder, backgroundColor: PALETTE.cardSoft }}
@@ -42,6 +44,7 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText, bare =
         </CardHeader>
         <CardContent>{emptyContent}</CardContent>
       </Card>
+      </FullscreenChartWrapper>
     );
   }
 
@@ -147,6 +150,7 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText, bare =
   if (bare) return chartContent;
 
   return (
+    <FullscreenChartWrapper>
     <Card
       className="rounded-3xl"
       style={{ boxShadow: "none", borderColor: PALETTE.innerCardBorder, backgroundColor: PALETTE.cardSoft }}
@@ -157,5 +161,6 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText, bare =
       </CardHeader>
       <CardContent>{chartContent}</CardContent>
     </Card>
+    </FullscreenChartWrapper>
   );
 }
