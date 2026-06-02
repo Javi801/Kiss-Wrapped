@@ -9,8 +9,7 @@ import mainBackground from "@/assets/main-background.png";
  */
 export default function HeroVisualPlaceholder() {
   const PALETTE = usePalette();
-  const heroSurfaceBg =
-    PALETTE.bg === "#0f0d1a" ? "rgba(255,255,255,0.16)" : PALETTE.surfaceBg;
+  const heroSurfaceBg = PALETTE.isDark ? "rgba(255,255,255,0.16)" : PALETTE.surfaceBg;
   // Track if the image loads correctly.
   const [hasImage, setHasImage] = useState(true);
 

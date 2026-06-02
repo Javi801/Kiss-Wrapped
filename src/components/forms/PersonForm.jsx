@@ -128,7 +128,7 @@ export default function PersonForm({
               {form.name.length}/100
             </p>
             {errors.name && (
-              <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.name}</p>
+              <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.name}</p>
             )}
           </div>
 
@@ -164,7 +164,7 @@ export default function PersonForm({
               style={{ ...inputStyle }}
             />
             {errors.age && (
-              <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.age}</p>
+              <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.age}</p>
             )}
             {showBirthdayCheckbox && (
               <div style={{ display: "flex", flexDirection: "column", gap: "0.35rem" }}>
@@ -182,7 +182,7 @@ export default function PersonForm({
                         cursor: "pointer",
                         border: "none",
                         backgroundColor: birthdayAlreadyHappened === val ? PALETTE.accent : "transparent",
-                        color: birthdayAlreadyHappened === val ? "#fff" : PALETTE.text,
+                        color: birthdayAlreadyHappened === val ? PALETTE.textOnAccent : PALETTE.text,
                         transition: "background-color 0.15s, color 0.15s",
                       }}
                     >
@@ -214,7 +214,7 @@ export default function PersonForm({
             </Select>
 
             {errors.gender && (
-              <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.gender}</p>
+              <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.gender}</p>
             )}
           </div>
         </div>
@@ -238,7 +238,7 @@ export default function PersonForm({
               {form.howWeMet.length}/200
             </p>
             {errors.howWeMet && (
-              <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.howWeMet}</p>
+              <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.howWeMet}</p>
             )}
           </div>
         )}
@@ -264,7 +264,7 @@ export default function PersonForm({
           </Select>
 
           {errors.zodiacSign && (
-            <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.zodiacSign}</p>
+            <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.zodiacSign}</p>
           )}
         </div>
 
@@ -290,7 +290,7 @@ export default function PersonForm({
           </Select>
 
           {errors.activity && (
-            <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.activity}</p>
+            <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.activity}</p>
           )}
         </div>
 
@@ -328,7 +328,7 @@ export default function PersonForm({
           className="rounded-2xl"
           style={{
             flex: "1 1 0%",
-            color: "white",
+            color: PALETTE.textOnAccent,
             boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
             background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
           }}

@@ -6,15 +6,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { TEXT } from "@/lib/constants";
+import { TEXT, PALETTES } from "@/lib/constants";
 import { usePalette } from "@/lib/theme";
 import { SPARKLE_PALETTES, PALETTE_SWATCHES } from "@/components/shared/SparkleIcon";
 
-const THEMES = [
-  { key: "pink",  gradient: "linear-gradient(135deg, #ffddea, #f8abc7, #bde0fe)" },
-  { key: "green", gradient: "linear-gradient(135deg, #d4edda, #a8d5b5, #bde0fe)" },
-  { key: "dark",  gradient: "linear-gradient(135deg, #1a1535, #1e2d5a, #0f1e3d)" },
-];
+const THEMES = Object.keys(PALETTES).map((key) => ({
+  key,
+  gradient: `linear-gradient(135deg, ${PALETTES[key].bgGradientFrom}, ${PALETTES[key].bgGradientVia}, ${PALETTES[key].bgGradientTo})`,
+}));
 
 export default function ColorSelector({
   iconColor,

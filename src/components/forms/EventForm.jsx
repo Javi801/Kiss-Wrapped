@@ -89,7 +89,7 @@ export default function EventForm({ initialValues, onSave, onCancel, onDelete, t
           {t.dateFormatHelper}
         </p>
         {errors.date && (
-          <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.date}</p>
+          <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.date}</p>
         )}
       </div>
 
@@ -129,7 +129,7 @@ export default function EventForm({ initialValues, onSave, onCancel, onDelete, t
           {place.length}/200
         </p>
         {errors.place && (
-          <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.place}</p>
+          <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.place}</p>
         )}
       </div>
 
@@ -151,7 +151,7 @@ export default function EventForm({ initialValues, onSave, onCancel, onDelete, t
           {situation.length}/200
         </p>
         {errors.situation && (
-          <p style={{ ...TEXT.caption, color: "#ef4444" }}>{errors.situation}</p>
+          <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.situation}</p>
         )}
       </div>
 
@@ -195,7 +195,7 @@ export default function EventForm({ initialValues, onSave, onCancel, onDelete, t
             className="rounded-2xl"
             style={{
               flex: "1 1 0%",
-              color: "white",
+              color: PALETTE.textOnAccent,
               boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
               background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
             }}
@@ -219,7 +219,7 @@ export default function EventForm({ initialValues, onSave, onCancel, onDelete, t
                 type="button"
                 variant="outline"
                 className="rounded-2xl w-full"
-                style={{ borderColor: "#ef4444", color: "#ef4444" }}
+                style={{ borderColor: PALETTE.danger, color: PALETTE.danger }}
               >
                 {t.deleteEvent}
               </Button>
@@ -232,7 +232,7 @@ export default function EventForm({ initialValues, onSave, onCancel, onDelete, t
               <AlertDialogFooter>
                 <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
                 <AlertDialogAction
-                  style={{ background: "#ef4444", color: "white" }}
+                  style={{ background: PALETTE.danger, color: PALETTE.textOnAccent }}
                   onClick={onDelete}
                 >
                   {t.deleteEventConfirmAction}
