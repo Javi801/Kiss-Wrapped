@@ -1,4 +1,4 @@
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { BarChart3, Clock3, UserRound, BadgePercent, Download, CheckCircle2, TriangleAlert } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -23,12 +23,17 @@ import StatsScoresTab from "@/components/stats/StatsScoresTab";
  * Renders the full statistics screen with tab navigation.
  * It prepares shared data and delegates each section to a dedicated tab component.
  */
-export default function StatsScreen({ people, t }) {
+export default function StatsScreen({ people, t, modalBackRef }) {
   const PALETTE = usePalette();
   const [tab, setTab] = useState("overview");
   const [, startTransition] = useTransition();
   // null = idle, "success" = exported OK, Error instance = export failed
   const [pdfStatus, setPdfStatus] = useState(null);
+
+  useEffect(() => {
+    if (!modalBackRef) return;
+    modalBackRef.current = pdfStatus !== null ? () => setPdfStatus(null) : null;
+  }, [pdfStatus, modalBackRef]);
 
   // eslint-disable-next-line no-unused-vars -- re-enable once PDF export bug is fixed
   async function handleExport() {

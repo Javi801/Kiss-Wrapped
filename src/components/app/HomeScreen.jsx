@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   BarChart3,
   Check,
@@ -53,6 +53,7 @@ export default function MainScreen({
   setTheme,
   statsVisible,
   setStatsVisible,
+  modalBackRef,
 }) {
   const PALETTE = usePalette();
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -64,6 +65,23 @@ export default function MainScreen({
   // null = idle | { type: "confirm", count, data } | { type: "success", count } | { type: "error_type" | "error_format" }
   const [importStatus, setImportStatus] = useState(null);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (!modalBackRef) return;
+    const anyOpen =
+      tutorialOpen || languageOpen || settingsOpen || confirmOpen ||
+      jsonExportStatus !== null || importStatus !== null;
+    modalBackRef.current = anyOpen
+      ? () => {
+          if (tutorialOpen) setTutorialOpen(false);
+          else if (languageOpen) setLanguageOpen(false);
+          else if (settingsOpen) setSettingsOpen(false);
+          else if (confirmOpen) setConfirmOpen(false);
+          else if (jsonExportStatus !== null) setJsonExportStatus(null);
+          else if (importStatus !== null) setImportStatus(null);
+        }
+      : null;
+  }, [tutorialOpen, languageOpen, settingsOpen, confirmOpen, jsonExportStatus, importStatus, modalBackRef]);
 
   async function handleExportJson() {
     try {

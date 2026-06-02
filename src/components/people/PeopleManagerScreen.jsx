@@ -415,6 +415,7 @@ export default function PeopleManagerScreen({
                         onDeleteAllEvents={onDeleteAllEvents}
                         t={t}
                         language={language}
+                        modalBackRef={modalBackRef}
                         situationTags={situationTags}
                         onAddSituationTag={onAddSituationTag}
                         placeTags={placeTags}

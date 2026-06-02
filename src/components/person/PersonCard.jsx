@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Pencil, Plus, Trash2, Calendar, ChevronDown, ChevronUp } from "lucide-react";
 
@@ -53,6 +53,7 @@ export default function PersonCard({
   onDeleteAllEvents,
   t,
   language,
+  modalBackRef,
   situationTags,
   onAddSituationTag,
   placeTags,
@@ -71,6 +72,20 @@ export default function PersonCard({
     mode: "add",
     event: null,
   });
+
+  useEffect(() => {
+    if (!modalBackRef) return;
+    modalBackRef.current = editingPerson ? () => setEditingPerson(false) : null;
+    return () => { if (editingPerson) modalBackRef.current = null; };
+  }, [editingPerson, modalBackRef]);
+
+  useEffect(() => {
+    if (!modalBackRef) return;
+    modalBackRef.current = eventModal.open
+      ? () => setEventModal((prev) => ({ ...prev, open: false }))
+      : null;
+    return () => { if (eventModal.open) modalBackRef.current = null; };
+  }, [eventModal.open, modalBackRef]);
 
   // Check if any event lacks details.
   const hasIncompleteEvent = personHasIncompleteEvent(person);
