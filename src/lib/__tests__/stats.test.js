@@ -392,4 +392,39 @@ describe("getStatsData", () => {
     const { eventsByActivity } = getStatsData(people, t);
     expect(eventsByActivity[0].value).toBeGreaterThan(eventsByActivity[1].value);
   });
+
+  it("counts events without place or situation in total eventCount", () => {
+    const people = [
+      makePerson("Ana", [
+        { id: "e1", date: "2024.01.01", score: null },
+        { id: "e2", date: "2024.02.01", score: null },
+      ]),
+    ];
+    const { allEvents } = getStatsData(people, t);
+    expect(allEvents).toHaveLength(2);
+  });
+
+  it("includes events without situation in eventsByZodiac count", () => {
+    const people = [
+      makePerson("Ana", [
+        { id: "e1", date: "2024.01.01" },
+        { id: "e2", date: "2024.02.01" },
+      ], { zodiacSign: "♒ Aquarius (January 20 - February 19)" }),
+    ];
+    const { eventsByZodiac } = getStatsData(people, t);
+    const aquarius = eventsByZodiac.find((d) => d.label === "Aquarius");
+    expect(aquarius.value).toBe(2);
+  });
+
+  it("includes events without place in eventsByActivity count", () => {
+    const people = [
+      makePerson("Ana", [
+        { id: "e1", date: "2024.01.01" },
+        { id: "e2", date: "2024.02.01" },
+      ], { activity: "works" }),
+    ];
+    const { eventsByActivity } = getStatsData(people, t);
+    const works = eventsByActivity.find((d) => d.label === t.works);
+    expect(works.value).toBe(2);
+  });
 });
