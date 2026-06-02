@@ -17,6 +17,52 @@ import FullscreenChartWrapper from "./FullscreenChartWrapper";
 const H_LABEL_VIEWPORT_W = 80;
 const H_LABEL_CHAR_W = 7;
 const H_ROW_H = 36;
+const TICK_MIN_SPACING = 40; // px between tick centers — fits 2–3 digit labels comfortably
+const NICE_STEP_MULTIPLIERS = [1, 2, 5, 10, 20, 25, 50, 100, 200, 500, 1000];
+
+/**
+ * Returns evenly-spaced tick labels for a numeric axis, or null to show all ticks.
+ * Picks the smallest "nice" step (1, 2, 5, 10…) where the resulting tick count fits
+ * within maxTicks. Non-numeric labels fall back to equidistant index selection.
+ */
+function niceStepTicks(data, maxTicks) {
+  if (data.length <= maxTicks) return null;
+
+  const nums = data.map(d => Number(d.label));
+  if (!nums.every(n => Number.isFinite(n))) {
+    return Array.from({ length: maxTicks }, (_, i) =>
+      data[Math.round(i * (data.length - 1) / (maxTicks - 1))].label
+    );
+  }
+
+  const min = nums[0];
+  const max = nums[nums.length - 1];
+  const range = max - min;
+  if (range === 0) return null;
+
+  const labelSet = new Set(data.map(d => d.label));
+  const rawStep = range / maxTicks;
+  const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+
+  for (const m of NICE_STEP_MULTIPLIERS) {
+    const step = m * mag;
+    if (step < 1) continue; // skip sub-integer steps for integer labels
+    const firstTick = Math.ceil(min / step) * step;
+    const count = Math.floor((max - firstTick) / step) + 1;
+    // Allow maxTicks+1: aligning to a nice boundary can shift firstTick before
+    // min, producing one extra tick, which is still within the pixel budget.
+    if (count <= maxTicks + 1) {
+      const ticks = [];
+      for (let t = firstTick; t <= max; t += step) {
+        const label = String(Math.round(t));
+        if (labelSet.has(label)) ticks.push(label);
+      }
+      return ticks.length >= 2 ? ticks : null;
+    }
+  }
+
+  return null;
+}
 
 /**
  * Renders a reusable bar chart card.
@@ -49,6 +95,8 @@ export default function BarChartCard({
   headerAction = null,
   tabs = null,
   maxXTicks = null,
+  tickMinSpacing = TICK_MIN_SPACING,
+  showAllTicks = false,
 }) {
   const PALETTE = usePalette();
   const chartColors = PALETTE.chartColors ?? CHART_COLORS;
@@ -64,12 +112,28 @@ export default function BarChartCard({
     color: PALETTE.textSoft,
   };
 
-  // Equidistant tick labels for the X axis when maxXTicks is set and data exceeds the limit.
-  const xTicks = maxXTicks && data.length > maxXTicks
-    ? Array.from({ length: maxXTicks }, (_, i) =>
-        data[Math.round(i * (data.length - 1) / (maxXTicks - 1))].label
-      )
-    : null;
+  // Vertical mode: measure container width to compute responsive X-axis tick count.
+  const vertChartRef = useRef(null);
+  const [vertContainerWidth, setVertContainerWidth] = useState(0);
+  useEffect(() => {
+    if (horizontal) return;
+    const el = vertChartRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => setVertContainerWidth(entry.contentRect.width));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [horizontal]);
+
+  // Responsive tick count: how many ticks fit at TICK_MIN_SPACING px apart.
+  // Falls back to 8 on first render before the ResizeObserver fires.
+  const responsiveTicks = vertContainerWidth > 0
+    ? Math.max(2, Math.floor(vertContainerWidth / tickMinSpacing))
+    : 8;
+  const effectiveMaxTicks = maxXTicks != null
+    ? Math.min(maxXTicks, responsiveTicks)
+    : responsiveTicks;
+
+  const xTicks = showAllTicks ? null : niceStepTicks(data, effectiveMaxTicks);
 
   // Height scales with item count in horizontal mode so bars don't get too cramped.
   const chartHeight = horizontal ? Math.max(data.length * H_ROW_H, 200) : 256;
