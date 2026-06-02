@@ -2,8 +2,9 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Maximize2, X, Download } from "lucide-react";
 import { toPng } from "html-to-image";
-import { Filesystem, Directory } from "@capacitor/filesystem";
+import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
+import { Capacitor } from "@capacitor/core";
 import { usePalette } from "@/lib/theme";
 import { TEXT } from "@/lib/constants";
 import { FullscreenContext } from "./FullscreenContext";
@@ -68,12 +69,49 @@ export default function FullscreenChartWrapper({ children, centerContent = false
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [downloadError, setDownloadError] = useState("");
+  const [downloadErrorObj, setDownloadErrorObj] = useState(null);
+  const [sharingLog, setSharingLog] = useState(false);
   const [hovered, setHovered] = useState(false);
   const captureRef = useRef(null);
   const PALETTE = usePalette();
 
+  const shareDownloadLog = useCallback(async () => {
+    if (!downloadErrorObj) return;
+    setSharingLog(true);
+    try {
+      const timestamp = new Date().toISOString();
+      const platform = Capacitor.getPlatform?.() ?? "unknown";
+      const content = [
+        "KissRecorder Chart Export Error",
+        `Timestamp: ${timestamp}`,
+        `Platform: ${platform}`,
+        `Error: ${downloadErrorObj?.message || String(downloadErrorObj)}`,
+        "",
+        "Stack trace:",
+        downloadErrorObj?.stack || "(no stack trace available)",
+      ].join("\n");
+
+      const fileName = `kiss-recorder-export-error-${timestamp.slice(0, 10)}.txt`;
+      await Filesystem.writeFile({
+        path: fileName,
+        directory: Directory.Cache,
+        data: content,
+        encoding: Encoding.UTF8,
+        recursive: true,
+      });
+      const { uri } = await Filesystem.getUri({ path: fileName, directory: Directory.Cache });
+      await Share.share({ files: [uri] });
+      Filesystem.deleteFile({ path: fileName, directory: Directory.Cache }).catch(() => {});
+    } catch {
+      // sharing failed silently
+    } finally {
+      setSharingLog(false);
+    }
+  }, [downloadErrorObj]);
+
   const open = useCallback(() => {
     setDownloadError("");
+    setDownloadErrorObj(null);
     setIsFullscreen(true);
   }, []);
   const close = useCallback(() => setIsFullscreen(false), []);
@@ -148,6 +186,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
     } catch (error) {
       console.error("Failed to download chart image", error);
       setDownloadError(`Error: ${error?.message || String(error)}`);
+      setDownloadErrorObj(error);
     } finally {
       saved.forEach(({ el: s, overflow, overflowX, overflowY, maxHeight, height }) => {
         s.style.overflow = overflow;
@@ -292,12 +331,33 @@ export default function FullscreenChartWrapper({ children, centerContent = false
                   borderRadius: 999,
                   background: PALETTE.card,
                   color: PALETTE.text,
-                  padding: "0.35rem 0.75rem",
+                  padding: "0.35rem 0.5rem 0.35rem 0.75rem",
                   fontSize: 12,
                   boxShadow: "0 6px 18px rgb(0 0 0 / 0.08)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {downloadError}
+                <button
+                  onClick={shareDownloadLog}
+                  disabled={sharingLog}
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: PALETTE.accent,
+                    background: "none",
+                    border: "none",
+                    cursor: sharingLog ? "default" : "pointer",
+                    opacity: sharingLog ? 0.5 : 1,
+                    padding: "0.1rem 0.25rem",
+                    flexShrink: 0,
+                  }}
+                >
+                  {sharingLog ? "…" : "Compartir log"}
+                </button>
               </div>
             ) : null}
 
