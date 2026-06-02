@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { TEXT } from "@/lib/constants";
 import { usePalette } from "@/lib/theme";
+import FullscreenChartWrapper from "./FullscreenChartWrapper";
 
 const TROPHIES = ["🥇", "🥈", "🥉"];
 
@@ -12,6 +13,7 @@ export default function MultiYearTopCard({ top3, t }) {
   const cardStyle = { borderColor: PALETTE.cardBorder, backgroundColor: PALETTE.cardBg };
 
   return (
+    <FullscreenChartWrapper>
     <Card
       className="rounded-3xl"
       style={{ boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)", backdropFilter: "blur(8px)", ...cardStyle }}
@@ -114,5 +116,6 @@ export default function MultiYearTopCard({ top3, t }) {
         )}
       </CardContent>
     </Card>
+    </FullscreenChartWrapper>
   );
 }

@@ -12,6 +12,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TEXT } from "@/lib/constants";
 import { usePalette } from "@/lib/theme";
+import FullscreenChartWrapper from "./FullscreenChartWrapper";
 import TimelineCalendarPopup from "@/components/charts/TimelineCalendarPopup";
 
 const GRANS = ["week", "month", "year", "historic"];
@@ -286,6 +287,7 @@ export default function PersonsTimelineChartCard({ people, t }) {
   });
 
   return (
+    <FullscreenChartWrapper>
     <Card
       className="rounded-3xl"
       style={{
@@ -393,7 +395,7 @@ export default function PersonsTimelineChartCard({ people, t }) {
       </CardHeader>
 
       <CardContent>
-        <div style={{ height: "15rem", width: "100%", position: "relative" }}>
+        <div data-bar-chart-container style={{ height: "15rem", width: "100%", position: "relative" }}>
           <span
             style={{
               position: "absolute",
@@ -450,5 +452,6 @@ export default function PersonsTimelineChartCard({ people, t }) {
         </div>
       </CardContent>
     </Card>
+    </FullscreenChartWrapper>
   );
 }

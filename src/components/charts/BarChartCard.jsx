@@ -12,6 +12,7 @@ import { useRef, useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CHART_COLORS, TEXT } from "@/lib/constants";
 import { usePalette } from "@/lib/theme";
+import FullscreenChartWrapper from "./FullscreenChartWrapper";
 
 const H_LABEL_VIEWPORT_W = 80;
 const H_LABEL_CHAR_W = 7;
@@ -95,6 +96,7 @@ export default function BarChartCard({
     : H_ROW_H;
 
   return (
+    <FullscreenChartWrapper>
     <Card className="rounded-3xl" style={{ boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)", backdropFilter: "blur(8px)", ...cardStyle }}>
       <CardHeader style={{ paddingBottom: "0.5rem" }}>
         {headerAction ? (
@@ -259,5 +261,6 @@ export default function BarChartCard({
         )}
       </CardContent>
     </Card>
+    </FullscreenChartWrapper>
   );
 }

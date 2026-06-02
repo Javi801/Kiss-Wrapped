@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { TEXT } from "@/lib/constants";
 import { usePalette } from "@/lib/theme";
+import FullscreenChartWrapper from "./FullscreenChartWrapper";
 
 /**
  * Renders a reusable area chart card.
@@ -55,6 +56,7 @@ export default function AreaChartCard({
   };
 
   return (
+    <FullscreenChartWrapper>
     <Card className="rounded-3xl" style={{ boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)", backdropFilter: "blur(8px)", ...cardStyle }}>
       <CardHeader style={{ paddingBottom: "0.5rem" }}>
         <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>
@@ -120,5 +122,6 @@ export default function AreaChartCard({
         )}
       </CardContent>
     </Card>
+    </FullscreenChartWrapper>
   );
 }

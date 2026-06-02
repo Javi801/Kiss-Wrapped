@@ -10,6 +10,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { TEXT } from "@/lib/constants";
 import { usePalette } from "@/lib/theme";
+import FullscreenChartWrapper from "./FullscreenChartWrapper";
 
 function ChartTooltip({ active, payload, tooltipUnit }) {
   const PALETTE = usePalette();
@@ -32,6 +33,7 @@ export default function RadarChartCard({ title, subtitle, data, emptyText, toolt
   const hasData = data.some((d) => d.value > 0);
 
   return (
+    <FullscreenChartWrapper>
     <Card className="rounded-3xl" style={{ boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)", backdropFilter: "blur(8px)", ...cardStyle }}>
       <CardHeader style={{ paddingBottom: "0.5rem" }}>
         <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>{title}</CardTitle>
@@ -80,5 +82,6 @@ export default function RadarChartCard({ title, subtitle, data, emptyText, toolt
         )}
       </CardContent>
     </Card>
+    </FullscreenChartWrapper>
   );
 }
