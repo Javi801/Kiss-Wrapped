@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { TEXT } from "@/lib/constants";
 import { usePalette } from "@/lib/theme";
@@ -154,23 +153,32 @@ export default function AgeRangeCard({ title, people, emptyText, t }) {
       }}
     >
       <CardHeader style={{ paddingBottom: "0.5rem" }}>
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "0.75rem" }}>
-          <div>
-            <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>{title}</CardTitle>
-            <CardDescription style={{ color: PALETTE.textSoft }}>
-              {splitByYear ? t.agesAsOfYear : t.allYears}
-            </CardDescription>
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="rounded-2xl"
-            style={{ backgroundColor: PALETTE.controlBg, borderColor: PALETTE.inputBorder }}
-            onClick={() => setSplitByYear((prev) => !prev)}
-          >
-            {splitByYear ? t.showAllTogether : t.divideByYear}
-          </Button>
+        <CardTitle style={{ ...TEXT.title, color: PALETTE.text }}>{title}</CardTitle>
+        <CardDescription style={{ color: PALETTE.textSoft }}>
+          {splitByYear ? t.agesAsOfYear : t.allYears}
+        </CardDescription>
+        <div style={{ display: "flex", gap: "0.25rem", padding: "0.25rem", background: PALETTE.accentMuted, borderRadius: "0.875rem", marginTop: "0.5rem" }}>
+          {[{ label: t.showAllTogether, value: false }, { label: t.divideByYear, value: true }].map(({ label, value }) => (
+            <button
+              key={String(value)}
+              type="button"
+              onClick={() => setSplitByYear(value)}
+              style={{
+                flex: 1,
+                padding: "0.3rem 0",
+                borderRadius: "0.625rem",
+                border: "none",
+                fontSize: "0.75rem",
+                fontWeight: splitByYear === value ? 600 : 400,
+                background: splitByYear === value ? `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})` : "transparent",
+                color: splitByYear === value ? "white" : PALETTE.textSoft,
+                cursor: "pointer",
+                transition: "all 150ms",
+              }}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </CardHeader>
 
