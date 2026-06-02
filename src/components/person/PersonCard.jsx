@@ -75,18 +75,16 @@ export default function PersonCard({
 
   useEffect(() => {
     if (!modalBackRef) return;
-    if (editingPerson) {
-      modalBackRef.current = () => setEditingPerson(false);
-      return () => { modalBackRef.current = null; };
-    }
+    modalBackRef.current = editingPerson ? () => setEditingPerson(false) : null;
+    return () => { if (editingPerson) modalBackRef.current = null; };
   }, [editingPerson, modalBackRef]);
 
   useEffect(() => {
     if (!modalBackRef) return;
-    if (eventModal.open) {
-      modalBackRef.current = () => setEventModal({ open: false, mode: "add", event: null });
-      return () => { modalBackRef.current = null; };
-    }
+    modalBackRef.current = eventModal.open
+      ? () => setEventModal((prev) => ({ ...prev, open: false }))
+      : null;
+    return () => { if (eventModal.open) modalBackRef.current = null; };
   }, [eventModal.open, modalBackRef]);
 
   // Check if any event lacks details.
