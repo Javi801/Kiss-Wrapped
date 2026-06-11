@@ -406,6 +406,11 @@ describe("saveSettings (web path)", () => {
     expect(await loadSettings()).toEqual({ iconColor: "blue", language: "es", theme: "dark", statsVisible: true, situationTags: ["Date", "Party"], placeTags: ["Café", "Home"], onboardingDone: true, onboardingVersion: 2 });
   });
 
+  it("round-trips statsVisible: false through save and load", async () => {
+    await saveSettings({ statsVisible: false });
+    expect((await loadSettings()).statsVisible).toBe(false);
+  });
+
   it("saves onboardingVersion to localStorage", async () => {
     await saveSettings({ onboardingVersion: 2 });
     expect(localStorage.getItem(ONBOARDING_VERSION_KEY)).toBe("2");
@@ -452,6 +457,59 @@ describe("loadSettings (native path — migration from localStorage)", () => {
     const written = JSON.parse(mockFilesystem.writeFile.mock.calls[0][0].data);
     expect(written.situationTags).toEqual(["Date"]);
     expect(written.placeTags).toEqual(["Home"]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// loadSettings (native path — existing file, success path)
+// ---------------------------------------------------------------------------
+describe("loadSettings (native path — reads existing file)", () => {
+  beforeEach(() => {
+    mockNative.isNative = true;
+    vi.clearAllMocks();
+    mockFilesystem.writeFile.mockResolvedValue(undefined);
+  });
+  afterEach(() => {
+    mockNative.isNative = false;
+  });
+
+  it("returns settings from native file when it exists", async () => {
+    const stored = { iconColor: "pink", language: "es", theme: "dark", statsVisible: true, situationTags: [], placeTags: [], onboardingDone: true, onboardingVersion: 2 };
+    mockFilesystem.readFile.mockResolvedValueOnce({ data: JSON.stringify(stored) });
+    expect(await loadSettings()).toEqual(stored);
+  });
+
+  it("coerces statsVisible string 'false' to boolean false", async () => {
+    mockFilesystem.readFile.mockResolvedValueOnce({ data: JSON.stringify({ statsVisible: "false" }) });
+    expect((await loadSettings()).statsVisible).toBe(false);
+  });
+
+  it("coerces statsVisible string 'true' to boolean true", async () => {
+    mockFilesystem.readFile.mockResolvedValueOnce({ data: JSON.stringify({ statsVisible: "true" }) });
+    expect((await loadSettings()).statsVisible).toBe(true);
+  });
+
+  it("coerces onboardingDone string 'true' to boolean true", async () => {
+    mockFilesystem.readFile.mockResolvedValueOnce({ data: JSON.stringify({ onboardingDone: "true" }) });
+    expect((await loadSettings()).onboardingDone).toBe(true);
+  });
+
+  it("coerces onboardingDone string 'false' to boolean false", async () => {
+    mockFilesystem.readFile.mockResolvedValueOnce({ data: JSON.stringify({ onboardingDone: "false" }) });
+    expect((await loadSettings()).onboardingDone).toBe(false);
+  });
+
+  it("coerces onboardingVersion string to number", async () => {
+    mockFilesystem.readFile.mockResolvedValueOnce({ data: JSON.stringify({ onboardingVersion: "3" }) });
+    expect((await loadSettings()).onboardingVersion).toBe(3);
+  });
+
+  it("fills missing fields with SETTINGS_DEFAULTS", async () => {
+    mockFilesystem.readFile.mockResolvedValueOnce({ data: JSON.stringify({ language: "es" }) });
+    const settings = await loadSettings();
+    expect(settings.iconColor).toBe("yellow");
+    expect(settings.theme).toBe("pink");
+    expect(settings.statsVisible).toBe(true);
   });
 });
 
