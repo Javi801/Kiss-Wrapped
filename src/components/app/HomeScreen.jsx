@@ -69,11 +69,11 @@ export default function MainScreen({
   useEffect(() => {
     if (!modalBackRef) return;
     const anyOpen =
-      tutorialOpen || languageOpen || settingsOpen || confirmOpen ||
+      aboutOpen || languageOpen || settingsOpen || confirmOpen ||
       jsonExportStatus !== null || importStatus !== null;
     modalBackRef.current = anyOpen
       ? () => {
-          if (tutorialOpen) setTutorialOpen(false);
+          if (aboutOpen) setAboutOpen(false);
           else if (languageOpen) setLanguageOpen(false);
           else if (settingsOpen) setSettingsOpen(false);
           else if (confirmOpen) setConfirmOpen(false);
@@ -81,7 +81,7 @@ export default function MainScreen({
           else if (importStatus !== null) setImportStatus(null);
         }
       : null;
-  }, [tutorialOpen, languageOpen, settingsOpen, confirmOpen, jsonExportStatus, importStatus, modalBackRef]);
+  }, [aboutOpen, languageOpen, settingsOpen, confirmOpen, jsonExportStatus, importStatus, modalBackRef]);
 
   async function handleExportJson() {
     try {

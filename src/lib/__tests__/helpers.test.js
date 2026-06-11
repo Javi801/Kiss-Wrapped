@@ -133,6 +133,18 @@ describe("normalizePeople", () => {
     const people = [{ name: "Ana", events: [{ score: 2.5 }] }];
     expect(normalizePeople(people)[0].events[0].score).toBeNull();
   });
+  it("normalizes missing realName to empty string", () => {
+    const people = [{ name: "Ana", events: [] }];
+    expect(normalizePeople(people)[0].realName).toBe("");
+  });
+  it("normalizes null realName to empty string", () => {
+    const people = [{ name: "Ana", realName: null, events: [] }];
+    expect(normalizePeople(people)[0].realName).toBe("");
+  });
+  it("preserves a truthy realName unchanged", () => {
+    const people = [{ name: "Ana", realName: "Ana García", events: [] }];
+    expect(normalizePeople(people)[0].realName).toBe("Ana García");
+  });
   it("replaces a missing events field with an empty array", () => {
     const people = [{ name: "Ana" }];
     expect(normalizePeople(people)[0].events).toEqual([]);

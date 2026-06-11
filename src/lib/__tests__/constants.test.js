@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { abbreviateZodiacMonths } from "@/lib/constants";
+import { describe, it, expect, afterEach } from "vitest";
+import { abbreviateZodiacMonths, detectDeviceLanguage } from "@/lib/constants";
 
 describe("abbreviateZodiacMonths", () => {
   it("abbreviates all twelve English month names", () => {
@@ -62,5 +62,59 @@ describe("abbreviateZodiacMonths", () => {
 
   it("leaves an empty string unchanged", () => {
     expect(abbreviateZodiacMonths("")).toBe("");
+  });
+});
+
+describe("detectDeviceLanguage", () => {
+  const originalNavigator = globalThis.navigator;
+
+  afterEach(() => {
+    Object.defineProperty(globalThis, "navigator", {
+      value: originalNavigator,
+      writable: true,
+      configurable: true,
+    });
+  });
+
+  function setNavigatorLanguage(language, languages) {
+    Object.defineProperty(globalThis, "navigator", {
+      value: { language, languages },
+      writable: true,
+      configurable: true,
+    });
+  }
+
+  it('returns "es" when navigator.language starts with "es"', () => {
+    setNavigatorLanguage("es-CL", ["es-CL"]);
+    expect(detectDeviceLanguage()).toBe("es");
+  });
+
+  it('returns "es" when navigator.language is exactly "es"', () => {
+    setNavigatorLanguage("es", ["es"]);
+    expect(detectDeviceLanguage()).toBe("es");
+  });
+
+  it('returns "en" when navigator.language starts with "en"', () => {
+    setNavigatorLanguage("en-US", ["en-US"]);
+    expect(detectDeviceLanguage()).toBe("en");
+  });
+
+  it('returns "en" for any non-Spanish language', () => {
+    setNavigatorLanguage("fr-FR", ["fr-FR"]);
+    expect(detectDeviceLanguage()).toBe("en");
+  });
+
+  it('falls back to navigator.languages[0] when navigator.language is empty', () => {
+    setNavigatorLanguage("", ["es-AR"]);
+    expect(detectDeviceLanguage()).toBe("es");
+  });
+
+  it('returns "en" when navigator is undefined', () => {
+    Object.defineProperty(globalThis, "navigator", {
+      value: undefined,
+      writable: true,
+      configurable: true,
+    });
+    expect(detectDeviceLanguage()).toBe("en");
   });
 });

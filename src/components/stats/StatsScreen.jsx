@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { BarChart3, Clock3, UserRound, BadgePercent, Download, CheckCircle2, TriangleAlert } from "lucide-react";
+import { BarChart3, Clock3, UserRound, BadgePercent, CheckCircle2, TriangleAlert } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {

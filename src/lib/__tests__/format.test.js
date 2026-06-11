@@ -156,6 +156,12 @@ describe("personHasIncompleteEvent", () => {
   it("returns true when activity is missing", () => {
     expect(personHasIncompleteEvent({ ...COMPLETE_PERSON, activity: "" })).toBe(true);
   });
+  it("returns true when howWeMet is missing", () => {
+    expect(personHasIncompleteEvent({ ...COMPLETE_PERSON, howWeMet: "" })).toBe(true);
+  });
+  it("returns true when howWeMet is only whitespace", () => {
+    expect(personHasIncompleteEvent({ ...COMPLETE_PERSON, howWeMet: "   " })).toBe(true);
+  });
   it("returns true when an event is missing place", () => {
     const person = { ...COMPLETE_PERSON, events: [{ situation: "first date" }] };
     expect(personHasIncompleteEvent(person)).toBe(true);

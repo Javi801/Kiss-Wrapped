@@ -390,7 +390,31 @@ describe("getStatsData", () => {
       }),
     ];
     const { eventsByActivity } = getStatsData(people, t);
-    expect(eventsByActivity[0].value).toBeGreaterThan(eventsByActivity[1].value);
+    expect(eventsByActivity[0]).toEqual({ label: t.works, value: 2 });
+    expect(eventsByActivity[1]).toEqual({ label: t.studies, value: 1 });
+  });
+
+  it("counts events per score in scoresByKisses", () => {
+    const people = [
+      makePerson("Ana", [
+        makeEvent("2024.01.01", 3),
+        makeEvent("2024.02.01", 3),
+        makeEvent("2024.03.01", 1),
+        makeEvent("2024.04.01", null),
+      ]),
+    ];
+    const { scoresByKisses } = getStatsData(people, t);
+    const three = scoresByKisses.find((d) => d.label === "💋💋💋");
+    const one = scoresByKisses.find((d) => d.label === "💋");
+    expect(three?.value).toBe(2);
+    expect(one?.value).toBe(1);
+  });
+
+  it("scoresByKisses pre-seeds all SCORE_OPTIONS with 0 when no events are scored", () => {
+    const people = [makePerson("Ana", [makeEvent("2024.01.01", null)])];
+    const { scoresByKisses } = getStatsData(people, t);
+    expect(scoresByKisses.length).toBe(6); // 0–5
+    expect(scoresByKisses.every((d) => d.value === 0)).toBe(true);
   });
 
   it("counts events without place or situation in total eventCount", () => {
