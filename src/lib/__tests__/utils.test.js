@@ -17,4 +17,16 @@ describe("cn", () => {
   it("returns an empty string for no arguments", () => {
     expect(cn()).toBe("");
   });
+
+  it("includes class from a truthy conditional object", () => {
+    expect(cn({ "bg-red-500": true, "bg-blue-500": false })).toBe("bg-red-500");
+  });
+
+  it("handles array inputs", () => {
+    expect(cn(["a", "b"], "c")).toBe("a b c");
+  });
+
+  it("ignores false and zero in conditional object", () => {
+    expect(cn({ hidden: false, visible: true })).toBe("visible");
+  });
 });
