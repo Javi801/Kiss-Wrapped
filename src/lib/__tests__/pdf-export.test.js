@@ -52,6 +52,36 @@ import { COPY } from '@/lib/constants'
 
 const t = COPY.en
 
+const peopleTwoYears = [
+  {
+    id: '1',
+    name: 'Alice',
+    birthYear: 1990,
+    zodiacSign: 'Aries',
+    gender: 'female',
+    activity: 'active',
+    howWeMet: 'app',
+    events: [
+      { id: 'e1', date: '2024.01.15', place: 'Home', situation: 'casual', score: 4 },
+      { id: 'e2', date: '2024.03.20', place: 'Park', situation: 'date', score: 5 },
+      { id: 'e3', date: '2023.06.10', place: 'Home', situation: 'casual', score: 3 },
+    ],
+  },
+  {
+    id: '2',
+    name: 'Bob',
+    birthYear: 1985,
+    zodiacSign: 'Taurus',
+    gender: 'nonbinary',
+    activity: 'occasional',
+    howWeMet: 'friends',
+    events: [
+      { id: 'e4', date: '2024.02.10', place: 'Bar', situation: 'night out', score: 3 },
+      { id: 'e5', date: '2023.11.05', place: 'Home', situation: 'casual', score: null },
+    ],
+  },
+]
+
 function resetDocMocks() {
   Object.values(mockDoc).forEach((v) => {
     if (typeof v?.mockReset === 'function') v.mockReset()
@@ -164,5 +194,57 @@ describe('saveErrorLog', () => {
     expect(mockFilesystem.deleteFile).toHaveBeenCalledWith(
       expect.objectContaining({ directory: 'CACHE' })
     )
+  })
+})
+
+describe('exportStatsPdf — slide rendering with data', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockDoc.output.mockReturnValue('data:application/pdf;base64,MOCKBASE64')
+    mockDoc.splitTextToSize.mockReturnValue(['text'])
+    mockDoc.getNumberOfPages.mockReturnValue(1)
+    mockFilesystem.writeFile.mockResolvedValue(undefined)
+    mockFilesystem.deleteFile.mockResolvedValue(undefined)
+    mockFilesystem.getUri.mockResolvedValue({ uri: 'file:///mock/export.pdf' })
+    mockShare.share.mockResolvedValue(undefined)
+  })
+
+  it('renders rank list rows when people have events', async () => {
+    await exportStatsPdf(peopleTwoYears, t)
+    const textArgs = mockDoc.text.mock.calls.map((c) => c[0])
+    expect(textArgs).toContain('1')
+  })
+
+  it('renders column chart grid lines for monthly data', async () => {
+    await exportStatsPdf(peopleTwoYears, t)
+    expect(mockDoc.line).toHaveBeenCalled()
+  })
+
+  it('renders bubble circles for gender items', async () => {
+    await exportStatsPdf(peopleTwoYears, t)
+    const circleCalls = mockDoc.circle.mock.calls.length
+    expect(circleCalls).toBeGreaterThan(2)
+  })
+
+  it('uses CHART_COLORS fallback for score labels in bubble legend', async () => {
+    await exportStatsPdf(peopleTwoYears, t)
+    const textArgs = mockDoc.text.mock.calls.map((c) => c[0])
+    expect(textArgs.some((a) => typeof a === 'string' && a.includes('Ratings'))).toBe(true)
+  })
+
+  it('renders multi-year people rank list in slide 3', async () => {
+    await exportStatsPdf(peopleTwoYears, t)
+    const textArgs = mockDoc.text.mock.calls.map((c) => c[0])
+    expect(textArgs.some((a) => typeof a === 'string' && a.includes('Alice'))).toBe(true)
+  })
+
+  it('uses Spanish slide copy when langCode is es', async () => {
+    await exportStatsPdf([], COPY.es)
+    expect(mockFilesystem.writeFile).toHaveBeenCalled()
+  })
+
+  it('skips subtitle line in drawTitle when subtitle is empty', async () => {
+    await exportStatsPdf([], { ...t, topTracked: '' })
+    expect(mockFilesystem.writeFile).toHaveBeenCalled()
   })
 })
