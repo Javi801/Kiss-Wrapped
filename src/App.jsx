@@ -182,19 +182,19 @@ export default function KissRecorderApp() {
           if (settings.language === 'en' || settings.language === 'es')
             setLanguage(settings.language)
 
-          const needsOnboarding =
-            !settings.onboardingDone || settings.onboardingVersion !== ONBOARDING_VERSION
-          if (needsOnboarding) {
-            // First launch or updated tutorial: show onboarding.
-            if (!settings.onboardingDone) setLanguage(detectDeviceLanguage())
-            setOnboardingDone(false)
-            setOnboardingVersion(settings.onboardingVersion || 0)
-            setScreen('onboarding')
-          } else {
-            setOnboardingDone(true)
-            setOnboardingVersion(settings.onboardingVersion)
-            setScreen('intro')
-          }
+          // const needsOnboarding =
+          //   !settings.onboardingDone || settings.onboardingVersion !== ONBOARDING_VERSION
+          // if (needsOnboarding) {
+          //   // First launch or updated tutorial: show onboarding.
+          //   if (!settings.onboardingDone) setLanguage(detectDeviceLanguage())
+          //   setOnboardingDone(false)
+          //   setOnboardingVersion(settings.onboardingVersion || 0)
+          //   setScreen('onboarding')
+          // } else {
+          setOnboardingDone(true)
+          setOnboardingVersion(settings.onboardingVersion)
+          setScreen('intro')
+          // }
 
           if (['yellow', 'blue', 'pink', 'purple'].includes(settings.iconColor))
             setIconColor(settings.iconColor)
@@ -221,7 +221,7 @@ export default function KissRecorderApp() {
           setOnboardingDone(false)
           setOnboardingVersion(0)
           setLanguage(detectDeviceLanguage())
-          setScreen('onboarding')
+          setScreen('intro') // was: 'onboarding'
         }
       } finally {
         // Mark app as loaded only if the component is still mounted.
