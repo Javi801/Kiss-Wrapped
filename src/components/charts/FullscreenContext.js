@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext } from 'react'
 
-export const FullscreenContext = createContext(false);
-export const useFullscreen = () => useContext(FullscreenContext);
+export const FullscreenContext = createContext(false)
+export const useFullscreen = () => useContext(FullscreenContext)

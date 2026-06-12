@@ -1,42 +1,42 @@
-import { useState, useRef, useCallback, useEffect } from "react";
-import { createPortal } from "react-dom";
-import { Maximize2, X, Download } from "lucide-react";
-import { toPng } from "html-to-image";
-import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
-import { Share } from "@capacitor/share";
-import { Capacitor } from "@capacitor/core";
-import { usePalette } from "@/lib/theme";
-import { TEXT } from "@/lib/constants";
-import { FullscreenContext } from "./FullscreenContext";
+import { useState, useRef, useCallback, useEffect } from 'react'
+import { createPortal } from 'react-dom'
+import { Maximize2, X, Download } from 'lucide-react'
+import { toPng } from 'html-to-image'
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem'
+import { Share } from '@capacitor/share'
+import { Capacitor } from '@capacitor/core'
+import { usePalette } from '@/lib/theme'
+import { TEXT } from '@/lib/constants'
+import { FullscreenContext } from './FullscreenContext'
 
 function getChartFilename() {
-  return `kiss-recorder-chart-${new Date().toISOString().slice(0, 10)}.png`;
+  return `kiss-recorder-chart-${new Date().toISOString().slice(0, 10)}.png`
 }
 
 function getCaptureSize(el) {
-  const rect = el.getBoundingClientRect();
+  const rect = el.getBoundingClientRect()
   return {
     width: Math.ceil(Math.max(el.scrollWidth, el.offsetWidth, rect.width)),
     height: Math.ceil(Math.max(el.scrollHeight, el.offsetHeight, rect.height)),
-  };
+  }
 }
 
 async function shareImage(dataUrl, filename) {
-  const base64 = dataUrl.split(",")[1];
+  const base64 = dataUrl.split(',')[1]
 
   await Filesystem.writeFile({
     path: filename,
     directory: Directory.Cache,
     data: base64,
     recursive: true,
-  });
-  const { uri } = await Filesystem.getUri({ path: filename, directory: Directory.Cache });
-  await Share.share({ files: [uri] });
-  Filesystem.deleteFile({ path: filename, directory: Directory.Cache }).catch(() => {});
+  })
+  const { uri } = await Filesystem.getUri({ path: filename, directory: Directory.Cache })
+  await Share.share({ files: [uri] })
+  Filesystem.deleteFile({ path: filename, directory: Directory.Cache }).catch(() => {})
 }
 
 function IconButton({ onClick, disabled, children, palette, title }) {
-  const [hovered, setHovered] = useState(false);
+  const [hovered, setHovered] = useState(false)
   return (
     <button
       onClick={onClick}
@@ -45,110 +45,110 @@ function IconButton({ onClick, disabled, children, palette, title }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         width: 32,
         height: 32,
         borderRadius: 999,
         border: `1px solid ${palette.cardBorder}`,
         background: hovered ? palette.cardSoft : palette.card,
         color: palette.text,
-        cursor: disabled ? "not-allowed" : "pointer",
+        cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.5 : 1,
-        transition: "background 0.12s, opacity 0.12s",
+        transition: 'background 0.12s, opacity 0.12s',
         flexShrink: 0,
       }}
     >
       {children}
     </button>
-  );
+  )
 }
 
 export default function FullscreenChartWrapper({ children, centerContent = false }) {
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [downloading, setDownloading] = useState(false);
-  const [downloadError, setDownloadError] = useState("");
-  const [downloadErrorObj, setDownloadErrorObj] = useState(null);
-  const [sharingLog, setSharingLog] = useState(false);
-  const [hovered, setHovered] = useState(false);
-  const captureRef = useRef(null);
-  const PALETTE = usePalette();
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [downloading, setDownloading] = useState(false)
+  const [downloadError, setDownloadError] = useState('')
+  const [downloadErrorObj, setDownloadErrorObj] = useState(null)
+  const [sharingLog, setSharingLog] = useState(false)
+  const [hovered, setHovered] = useState(false)
+  const captureRef = useRef(null)
+  const PALETTE = usePalette()
 
   const shareDownloadLog = useCallback(async () => {
-    if (!downloadErrorObj) return;
-    setSharingLog(true);
+    if (!downloadErrorObj) return
+    setSharingLog(true)
     try {
-      const timestamp = new Date().toISOString();
-      const platform = Capacitor.getPlatform?.() ?? "unknown";
+      const timestamp = new Date().toISOString()
+      const platform = Capacitor.getPlatform?.() ?? 'unknown'
       const content = [
-        "KissRecorder Chart Export Error",
+        'KissRecorder Chart Export Error',
         `Timestamp: ${timestamp}`,
         `Platform: ${platform}`,
         `Error: ${downloadErrorObj?.message || String(downloadErrorObj)}`,
-        "",
-        "Stack trace:",
-        downloadErrorObj?.stack || "(no stack trace available)",
-      ].join("\n");
+        '',
+        'Stack trace:',
+        downloadErrorObj?.stack || '(no stack trace available)',
+      ].join('\n')
 
-      const fileName = `kiss-recorder-export-error-${timestamp.slice(0, 10)}.txt`;
+      const fileName = `kiss-recorder-export-error-${timestamp.slice(0, 10)}.txt`
       await Filesystem.writeFile({
         path: fileName,
         directory: Directory.Cache,
         data: content,
         encoding: Encoding.UTF8,
         recursive: true,
-      });
-      const { uri } = await Filesystem.getUri({ path: fileName, directory: Directory.Cache });
-      await Share.share({ files: [uri] });
-      Filesystem.deleteFile({ path: fileName, directory: Directory.Cache }).catch(() => {});
+      })
+      const { uri } = await Filesystem.getUri({ path: fileName, directory: Directory.Cache })
+      await Share.share({ files: [uri] })
+      Filesystem.deleteFile({ path: fileName, directory: Directory.Cache }).catch(() => {})
     } catch {
       // sharing failed silently
     } finally {
-      setSharingLog(false);
+      setSharingLog(false)
     }
-  }, [downloadErrorObj]);
+  }, [downloadErrorObj])
 
   const open = useCallback(() => {
-    setDownloadError("");
-    setDownloadErrorObj(null);
-    setIsFullscreen(true);
-  }, []);
-  const close = useCallback(() => setIsFullscreen(false), []);
+    setDownloadError('')
+    setDownloadErrorObj(null)
+    setIsFullscreen(true)
+  }, [])
+  const close = useCallback(() => setIsFullscreen(false), [])
 
   useEffect(() => {
-    if (!isFullscreen) return;
+    if (!isFullscreen) return
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
 
     const onKeyDown = (event) => {
-      if (event.key === "Escape") close();
-    };
-    window.addEventListener("keydown", onKeyDown);
+      if (event.key === 'Escape') close()
+    }
+    window.addEventListener('keydown', onKeyDown)
 
     return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, [close, isFullscreen]);
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [close, isFullscreen])
 
   const download = useCallback(async () => {
-    const el = captureRef.current;
-    if (!el || downloading) return;
-    setDownloadError("");
-    setDownloading(true);
-    const finalFilename = getChartFilename();
+    const el = captureRef.current
+    if (!el || downloading) return
+    setDownloadError('')
+    setDownloading(true)
+    const finalFilename = getChartFilename()
 
     // Temporarily expand all overflow/maxHeight constraints so full content is captured.
-    const allEls = [...el.querySelectorAll("*")];
-    const saved = [];
+    const allEls = [...el.querySelectorAll('*')]
+    const saved = []
     allEls.forEach((s) => {
-      const cs = window.getComputedStyle(s);
-      const clipsOverflow = ["auto", "hidden", "scroll"].some(
+      const cs = window.getComputedStyle(s)
+      const clipsOverflow = ['auto', 'hidden', 'scroll'].some(
         (v) => cs.overflow === v || cs.overflowX === v || cs.overflowY === v
-      );
-      const hasMaxH = cs.maxHeight && cs.maxHeight !== "none" && cs.maxHeight !== "0px";
+      )
+      const hasMaxH = cs.maxHeight && cs.maxHeight !== 'none' && cs.maxHeight !== '0px'
       if (clipsOverflow || hasMaxH) {
         saved.push({
           el: s,
@@ -157,69 +157,69 @@ export default function FullscreenChartWrapper({ children, centerContent = false
           overflowY: s.style.overflowY,
           maxHeight: s.style.maxHeight,
           height: s.style.height,
-        });
+        })
         if (clipsOverflow) {
-          s.style.overflow = "visible";
-          s.style.overflowX = "visible";
-          s.style.overflowY = "visible";
+          s.style.overflow = 'visible'
+          s.style.overflowX = 'visible'
+          s.style.overflowY = 'visible'
         }
         if (hasMaxH) {
-          s.style.maxHeight = "none";
-          s.style.height = "auto";
+          s.style.maxHeight = 'none'
+          s.style.height = 'auto'
         }
       }
-    });
+    })
 
     // Give layout a tick to reflow before capture.
-    await new Promise((r) => setTimeout(r, 80));
+    await new Promise((r) => setTimeout(r, 80))
 
     try {
-      const { width, height } = getCaptureSize(el);
+      const { width, height } = getCaptureSize(el)
       const dataUrl = await toPng(el, {
         backgroundColor: PALETTE.cardBg,
         pixelRatio: 2,
         width,
         height,
-      });
+      })
 
-      await shareImage(dataUrl, finalFilename);
+      await shareImage(dataUrl, finalFilename)
     } catch (error) {
-      console.error("Failed to download chart image", error);
-      setDownloadError(`Error: ${error?.message || String(error)}`);
-      setDownloadErrorObj(error);
+      console.error('Failed to download chart image', error)
+      setDownloadError(`Error: ${error?.message || String(error)}`)
+      setDownloadErrorObj(error)
     } finally {
       saved.forEach(({ el: s, overflow, overflowX, overflowY, maxHeight, height }) => {
-        s.style.overflow = overflow;
-        s.style.overflowX = overflowX;
-        s.style.overflowY = overflowY;
-        s.style.maxHeight = maxHeight;
-        s.style.height = height;
-      });
-      setDownloading(false);
+        s.style.overflow = overflow
+        s.style.overflowX = overflowX
+        s.style.overflowY = overflowY
+        s.style.maxHeight = maxHeight
+        s.style.height = height
+      })
+      setDownloading(false)
     }
-  }, [downloading, PALETTE.cardBg]);
+  }, [downloading, PALETTE.cardBg])
 
   if (isFullscreen) {
     return createPortal(
       <FullscreenContext.Provider value={true}>
         <div
           style={{
-            position: "fixed",
+            position: 'fixed',
             inset: 0,
             zIndex: 9999,
             backgroundColor: PALETTE.bg,
-            overflowY: "auto",
-            overflowX: "hidden",
+            overflowY: 'auto',
+            overflowX: 'hidden',
           }}
         >
           {/* Floating controls */}
           <div
             style={{
-              position: "fixed",
+              position: 'fixed',
               top: 14,
               right: 14,
               zIndex: 10001,
-              display: "flex",
+              display: 'flex',
               gap: 8,
             }}
           >
@@ -240,13 +240,13 @@ export default function FullscreenChartWrapper({ children, centerContent = false
           <div
             ref={captureRef}
             data-fullscreen-chart
-            data-center-content={centerContent ? "true" : undefined}
+            data-center-content={centerContent ? 'true' : undefined}
             style={{
               padding: 0,
-              minHeight: "100dvh",
-              boxSizing: "border-box",
-              position: "relative",
-              display: "flex",
+              minHeight: '100dvh',
+              boxSizing: 'border-box',
+              position: 'relative',
+              display: 'flex',
             }}
           >
             <style>
@@ -322,22 +322,22 @@ export default function FullscreenChartWrapper({ children, centerContent = false
               <div
                 role="status"
                 style={{
-                  position: "absolute",
-                  top: "0.875rem",
-                  left: "50%",
-                  transform: "translateX(-50%)",
+                  position: 'absolute',
+                  top: '0.875rem',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
                   zIndex: 1,
                   border: `1px solid ${PALETTE.inputBorder}`,
                   borderRadius: 999,
                   background: PALETTE.card,
                   color: PALETTE.text,
-                  padding: "0.35rem 0.5rem 0.35rem 0.75rem",
+                  padding: '0.35rem 0.5rem 0.35rem 0.75rem',
                   fontSize: 12,
-                  boxShadow: "0 6px 18px rgb(0 0 0 / 0.08)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  whiteSpace: "nowrap",
+                  boxShadow: '0 6px 18px rgb(0 0 0 / 0.08)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {downloadError}
@@ -348,15 +348,15 @@ export default function FullscreenChartWrapper({ children, centerContent = false
                     fontSize: 11,
                     fontWeight: 600,
                     color: PALETTE.accent,
-                    background: "none",
-                    border: "none",
-                    cursor: sharingLog ? "default" : "pointer",
+                    background: 'none',
+                    border: 'none',
+                    cursor: sharingLog ? 'default' : 'pointer',
                     opacity: sharingLog ? 0.5 : 1,
-                    padding: "0.1rem 0.25rem",
+                    padding: '0.1rem 0.25rem',
                     flexShrink: 0,
                   }}
                 >
-                  {sharingLog ? "…" : "Compartir log"}
+                  {sharingLog ? '…' : 'Compartir log'}
                 </button>
               </div>
             ) : null}
@@ -365,13 +365,13 @@ export default function FullscreenChartWrapper({ children, centerContent = false
             <div
               data-fullscreen-watermark
               style={{
-                position: "absolute",
+                position: 'absolute',
                 color: PALETTE.accent,
                 opacity: PALETTE.watermarkOpacity ?? 0.5,
                 ...TEXT.bodyStrong,
-                letterSpacing: "0.1em",
-                pointerEvents: "none",
-                userSelect: "none",
+                letterSpacing: '0.1em',
+                pointerEvents: 'none',
+                userSelect: 'none',
               }}
             >
               KissRecorder
@@ -380,12 +380,12 @@ export default function FullscreenChartWrapper({ children, centerContent = false
         </div>
       </FullscreenContext.Provider>,
       document.body
-    );
+    )
   }
 
   return (
     <div
-      style={{ position: "relative" }}
+      style={{ position: 'relative' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -394,26 +394,26 @@ export default function FullscreenChartWrapper({ children, centerContent = false
         onClick={open}
         title="Pantalla completa"
         style={{
-          position: "absolute",
+          position: 'absolute',
           top: 12,
           right: 12,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           width: 28,
           height: 28,
           borderRadius: 999,
           border: `1px solid ${PALETTE.accentSoft}`,
           background: hovered ? PALETTE.accentMuted : PALETTE.card,
           color: PALETTE.accent,
-          cursor: "pointer",
+          cursor: 'pointer',
           opacity: hovered ? 1 : 0.65,
-          transition: "opacity 0.15s, background 0.15s",
+          transition: 'opacity 0.15s, background 0.15s',
           zIndex: 10,
         }}
       >
         <Maximize2 size={13} />
       </button>
     </div>
-  );
+  )
 }

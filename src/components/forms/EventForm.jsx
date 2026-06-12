@@ -1,16 +1,16 @@
-import { useState } from "react";
+import { useState } from 'react'
 
-import { Button } from "@/components/ui/button";
-import { DatePicker } from "@/components/ui/date-picker";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from '@/components/ui/button'
+import { DatePicker } from '@/components/ui/date-picker'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,62 +21,73 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog'
 
-import { SCORE_OPTIONS, TEXT } from "@/lib/constants";
-import { usePalette } from "@/lib/theme";
-import { todayString, isValidDateString, isFutureDate } from "@/lib/date";
-import { hasScore, renderKisses } from "@/lib/format";
-import TagInput from "@/components/forms/TagInput";
+import { SCORE_OPTIONS, TEXT } from '@/lib/constants'
+import { usePalette } from '@/lib/theme'
+import { todayString, isValidDateString, isFutureDate } from '@/lib/date'
+import { hasScore, renderKisses } from '@/lib/format'
+import TagInput from '@/components/forms/TagInput'
 
-export default function EventForm({ initialValues, onSave, onCancel, onDelete, t, situationTags = [], onAddSituationTag, placeTags = [], onAddPlaceTag, isParentOpen }) {
-  const PALETTE = usePalette();
-  const [date, setDate] = useState(initialValues?.date || todayString());
-  const [details, setDetails] = useState(initialValues?.details || "");
+export default function EventForm({
+  initialValues,
+  onSave,
+  onCancel,
+  onDelete,
+  t,
+  situationTags = [],
+  onAddSituationTag,
+  placeTags = [],
+  onAddPlaceTag,
+  isParentOpen,
+}) {
+  const PALETTE = usePalette()
+  const [date, setDate] = useState(initialValues?.date || todayString())
+  const [details, setDetails] = useState(initialValues?.details || '')
   const [score, setScore] = useState(
-    hasScore(initialValues?.score) ? String(initialValues.score) : "none",
-  );
-  const [place, setPlace] = useState(initialValues?.place || "");
-  const [situation, setSituation] = useState(initialValues?.situation || "");
-  const [observations, setObservations] = useState(initialValues?.observations || "");
+    hasScore(initialValues?.score) ? String(initialValues.score) : 'none'
+  )
+  const [place, setPlace] = useState(initialValues?.place || '')
+  const [situation, setSituation] = useState(initialValues?.situation || '')
+  const [observations, setObservations] = useState(initialValues?.observations || '')
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({})
 
   function submit(e) {
-    e.preventDefault();
+    e.preventDefault()
 
-    const newErrors = {};
-    if (!isValidDateString(date)) newErrors.date = t.validDateMsg;
-    else if (isFutureDate(date)) newErrors.date = t.futureDateMsg;
-    if (!place.trim()) newErrors.place = t.requiredPlace;
-    if (!situation.trim()) newErrors.situation = t.requiredSituation;
+    const newErrors = {}
+    if (!isValidDateString(date)) newErrors.date = t.validDateMsg
+    else if (isFutureDate(date)) newErrors.date = t.futureDateMsg
+    if (!place.trim()) newErrors.place = t.requiredPlace
+    if (!situation.trim()) newErrors.situation = t.requiredSituation
 
     if (Object.keys(newErrors).length) {
-      setErrors(newErrors);
-      return;
+      setErrors(newErrors)
+      return
     }
 
-    setErrors({});
+    setErrors({})
 
     onSave({
       date,
       details: details.trim(),
-      score: score === "none" ? null : Number(score),
+      score: score === 'none' ? null : Number(score),
       place: place.trim(),
       situation: situation.trim(),
       observations: observations.trim(),
-    });
+    })
   }
 
   const inputStyle = {
     borderColor: PALETTE.inputBorder,
     backgroundColor: PALETTE.inputBg,
-  };
+  }
 
   return (
-    <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+    <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       {/* Date */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         <Label>{t.eventDate} *</Label>
         <DatePicker
           value={date}
@@ -85,16 +96,12 @@ export default function EventForm({ initialValues, onSave, onCancel, onDelete, t
           className="rounded-2xl"
           style={{ ...inputStyle }}
         />
-        <p style={{ ...TEXT.caption, color: PALETTE.textSoft }}>
-          {t.dateFormatHelper}
-        </p>
-        {errors.date && (
-          <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.date}</p>
-        )}
+        <p style={{ ...TEXT.caption, color: PALETTE.textSoft }}>{t.dateFormatHelper}</p>
+        {errors.date && <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.date}</p>}
       </div>
 
       {/* Score */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         <Label>{t.eventScore}</Label>
         <Select value={score} onValueChange={setScore}>
           <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
@@ -112,7 +119,7 @@ export default function EventForm({ initialValues, onSave, onCancel, onDelete, t
       </div>
 
       {/* Place */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         <Label>{t.eventPlace} *</Label>
         <TagInput
           value={place}
@@ -125,16 +132,14 @@ export default function EventForm({ initialValues, onSave, onCancel, onDelete, t
           addTagLabel={t.addTag}
           isParentOpen={isParentOpen}
         />
-        <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: "right" }}>
+        <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
           {place.length}/200
         </p>
-        {errors.place && (
-          <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.place}</p>
-        )}
+        {errors.place && <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.place}</p>}
       </div>
 
       {/* Situation */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         <Label>{t.eventSituation} *</Label>
         <TagInput
           value={situation}
@@ -147,7 +152,7 @@ export default function EventForm({ initialValues, onSave, onCancel, onDelete, t
           addTagLabel={t.addTag}
           isParentOpen={isParentOpen}
         />
-        <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: "right" }}>
+        <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
           {situation.length}/200
         </p>
         {errors.situation && (
@@ -156,7 +161,7 @@ export default function EventForm({ initialValues, onSave, onCancel, onDelete, t
       </div>
 
       {/* Details */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         <Label>{t.eventDetails}</Label>
         <Textarea
           value={details}
@@ -166,13 +171,13 @@ export default function EventForm({ initialValues, onSave, onCancel, onDelete, t
           className="rounded-2xl"
           style={{ ...inputStyle }}
         />
-        <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: "right" }}>
+        <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
           {details.length}/1000
         </p>
       </div>
 
       {/* Observations */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         <Label>{t.eventObservations}</Label>
         <Textarea
           value={observations}
@@ -182,21 +187,21 @@ export default function EventForm({ initialValues, onSave, onCancel, onDelete, t
           className="rounded-2xl"
           style={{ ...inputStyle }}
         />
-        <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: "right" }}>
+        <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
           {observations.length}/1000
         </p>
       </div>
 
       {/* Actions */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-        <div style={{ display: "flex", gap: "0.5rem" }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
           <Button
             type="submit"
             className="rounded-2xl"
             style={{
-              flex: "1 1 0%",
+              flex: '1 1 0%',
               color: PALETTE.textOnAccent,
-              boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+              boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
               background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
             }}
           >
@@ -243,5 +248,5 @@ export default function EventForm({ initialValues, onSave, onCancel, onDelete, t
         )}
       </div>
     </form>
-  );
+  )
 }

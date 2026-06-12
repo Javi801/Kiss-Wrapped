@@ -1,17 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Pencil, Plus, Trash2, Calendar, ChevronDown, ChevronUp } from "lucide-react";
+import { useEffect, useMemo, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Pencil, Plus, Trash2, Calendar, ChevronDown, ChevronUp } from 'lucide-react'
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,11 +22,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog'
 
-import { TEXT, abbreviateZodiacMonths } from "@/lib/constants";
-import { usePalette } from "@/lib/theme";
-import { formatShortDate, calculateDisplayAge } from "@/lib/date";
+import { TEXT, abbreviateZodiacMonths } from '@/lib/constants'
+import { usePalette } from '@/lib/theme'
+import { formatShortDate, calculateDisplayAge } from '@/lib/date'
 import {
   translateActivity,
   translateGender,
@@ -34,10 +34,10 @@ import {
   renderKisses,
   personHasIncompleteEvent,
   eventIsMissingRequired,
-} from "@/lib/format";
+} from '@/lib/format'
 
-import PersonForm from "@/components/forms/PersonForm";
-import EventForm from "@/components/forms/EventForm";
+import PersonForm from '@/components/forms/PersonForm'
+import EventForm from '@/components/forms/EventForm'
 
 /**
  * Displays a person card with expandable event history.
@@ -61,54 +61,55 @@ export default function PersonCard({
   howWeMetTags,
   onAddHowWeMetTag,
 }) {
-  const PALETTE = usePalette();
+  const PALETTE = usePalette()
   // Expand/collapse state.
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(false)
 
   // Modal states.
-  const [editingPerson, setEditingPerson] = useState(false);
+  const [editingPerson, setEditingPerson] = useState(false)
   const [eventModal, setEventModal] = useState({
     open: false,
-    mode: "add",
+    mode: 'add',
     event: null,
-  });
+  })
 
   useEffect(() => {
-    if (!modalBackRef) return;
-    modalBackRef.current = editingPerson ? () => setEditingPerson(false) : null;
-    return () => { if (editingPerson) modalBackRef.current = null; };
-  }, [editingPerson, modalBackRef]);
+    if (!modalBackRef) return
+    modalBackRef.current = editingPerson ? () => setEditingPerson(false) : null
+    return () => {
+      if (editingPerson) modalBackRef.current = null
+    }
+  }, [editingPerson, modalBackRef])
 
   useEffect(() => {
-    if (!modalBackRef) return;
+    if (!modalBackRef) return
     modalBackRef.current = eventModal.open
       ? () => setEventModal((prev) => ({ ...prev, open: false }))
-      : null;
-    return () => { if (eventModal.open) modalBackRef.current = null; };
-  }, [eventModal.open, modalBackRef]);
+      : null
+    return () => {
+      if (eventModal.open) modalBackRef.current = null
+    }
+  }, [eventModal.open, modalBackRef])
 
   // Check if any event lacks details.
-  const hasIncompleteEvent = personHasIncompleteEvent(person);
+  const hasIncompleteEvent = personHasIncompleteEvent(person)
 
   // Sort events descending by date.
   const sortedEvents = useMemo(
-    () =>
-      [...(person.events || [])].sort((a, b) =>
-        a.date < b.date ? 1 : -1,
-      ),
-    [person.events],
-  );
+    () => [...(person.events || [])].sort((a, b) => (a.date < b.date ? 1 : -1)),
+    [person.events]
+  )
 
   return (
     <>
-      <motion.div layout style={{ paddingBottom: "0.375rem" }}>
+      <motion.div layout style={{ paddingBottom: '0.375rem' }}>
         <Card
           className="rounded-3xl"
           style={{
-            overflow: "hidden",
+            overflow: 'hidden',
             boxShadow: hasIncompleteEvent
               ? `0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1), 0 0 0 2px ${PALETTE.warningBorder}`
-              : "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+              : '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
             borderColor: hasIncompleteEvent ? PALETTE.warningBorder : PALETTE.cardBorder,
             background: `linear-gradient(180deg, ${PALETTE.cardSoft}, ${PALETTE.accentMuted})`,
           }}
@@ -116,20 +117,43 @@ export default function PersonCard({
           <CardContent style={{ padding: 0 }}>
             {/* Header */}
             <button
-              style={{ display: "flex", width: "100%", alignItems: "flex-start", justifyContent: "space-between", gap: "0.75rem", padding: "1.25rem", textAlign: "left" }}
+              style={{
+                display: 'flex',
+                width: '100%',
+                alignItems: 'flex-start',
+                justifyContent: 'space-between',
+                gap: '0.75rem',
+                padding: '1.25rem',
+                textAlign: 'left',
+              }}
               onClick={() => setExpanded((v) => !v)}
             >
-              <div style={{ minWidth: 0, flex: "1 1 0%" }}>
+              <div style={{ minWidth: 0, flex: '1 1 0%' }}>
                 {/* Name + badges */}
-                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem" }}>
+                <div
+                  style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.5rem' }}
+                >
                   <h3
-                    style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", ...TEXT.title, color: PALETTE.text }}
+                    style={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      ...TEXT.title,
+                      color: PALETTE.text,
+                    }}
                   >
                     {person.name}
                   </h3>
 
                   {hasIncompleteEvent && (
-                    <Badge className="rounded-full" style={{ border: "none", backgroundColor: PALETTE.warningBadgeBg, color: PALETTE.warningBadgeText }}>
+                    <Badge
+                      className="rounded-full"
+                      style={{
+                        border: 'none',
+                        backgroundColor: PALETTE.warningBadgeBg,
+                        color: PALETTE.warningBadgeText,
+                      }}
+                    >
                       {t.missingEventDetailsBadge}
                     </Badge>
                   )}
@@ -137,9 +161,23 @@ export default function PersonCard({
 
                 {/* Basic info */}
                 <div
-                  style={{ marginTop: "0.5rem", display: "flex", flexWrap: "wrap", gap: "0.5rem", ...TEXT.caption, color: PALETTE.textSoft }}
+                  style={{
+                    marginTop: '0.5rem',
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '0.5rem',
+                    ...TEXT.caption,
+                    color: PALETTE.textSoft,
+                  }}
                 >
-                  <span>{calculateDisplayAge(person.birthYear, person.zodiacSign, person.birthdayAlreadyHappened) ?? person.age} {t.years}</span>
+                  <span>
+                    {calculateDisplayAge(
+                      person.birthYear,
+                      person.zodiacSign,
+                      person.birthdayAlreadyHappened
+                    ) ?? person.age}{' '}
+                    {t.years}
+                  </span>
                   <span>•</span>
                   <span>{translateGender(person.gender, t)}</span>
                   <span>•</span>
@@ -147,15 +185,21 @@ export default function PersonCard({
                   <span>•</span>
                   <span>{abbreviateZodiacMonths(person.zodiacSign)}</span>
                 </div>
-
               </div>
 
               {/* Toggle icon */}
-              <div className="rounded-2xl" style={{ padding: "0.5rem", backgroundColor: PALETTE.accentMuted }}>
+              <div
+                className="rounded-2xl"
+                style={{ padding: '0.5rem', backgroundColor: PALETTE.accentMuted }}
+              >
                 {expanded ? (
-                  <ChevronUp style={{ height: "1.25rem", width: "1.25rem", color: PALETTE.accent }} />
+                  <ChevronUp
+                    style={{ height: '1.25rem', width: '1.25rem', color: PALETTE.accent }}
+                  />
                 ) : (
-                  <ChevronDown style={{ height: "1.25rem", width: "1.25rem", color: PALETTE.accent }} />
+                  <ChevronDown
+                    style={{ height: '1.25rem', width: '1.25rem', color: PALETTE.accent }}
+                  />
                 )}
               </div>
             </button>
@@ -165,14 +209,21 @@ export default function PersonCard({
               {expanded && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
+                  animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  style={{ overflow: "hidden" }}
+                  style={{ overflow: 'hidden' }}
                 >
-                  <div style={{ display: "flex", flexDirection: "column", gap: "1rem", padding: "0rem 1.25rem 1.25rem" }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '1rem',
+                      padding: '0rem 1.25rem 1.25rem',
+                    }}
+                  >
                     {/* Extra info */}
                     {(person.realName || person.howWeMet || person.detail) && (
-                      <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                         {person.realName && (
                           <p style={{ ...TEXT.body, color: PALETTE.text }}>
                             {t.realName}: {person.realName}
@@ -184,44 +235,52 @@ export default function PersonCard({
                           </p>
                         )}
                         {person.detail && (
-                          <p style={{ ...TEXT.body, color: PALETTE.textSoft }}>
-                            {person.detail}
-                          </p>
+                          <p style={{ ...TEXT.body, color: PALETTE.textSoft }}>{person.detail}</p>
                         )}
                       </div>
                     )}
 
                     {/* Actions */}
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                       <Button
                         onClick={() => setEditingPerson(true)}
-                        style={{ background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`, color: PALETTE.textOnAccent, border: "none" }}
+                        style={{
+                          background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
+                          color: PALETTE.textOnAccent,
+                          border: 'none',
+                        }}
                       >
-                        <Pencil style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
+                        <Pencil style={{ marginRight: '0.5rem', height: '1rem', width: '1rem' }} />
                         {t.editPerson}
                       </Button>
 
                       <Button
-                        onClick={() =>
-                          setEventModal({ open: true, mode: "add", event: null })
-                        }
-                        style={{ background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`, color: PALETTE.textOnAccent, border: "none" }}
+                        onClick={() => setEventModal({ open: true, mode: 'add', event: null })}
+                        style={{
+                          background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
+                          color: PALETTE.textOnAccent,
+                          border: 'none',
+                        }}
                       >
-                        <Plus style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
+                        <Plus style={{ marginRight: '0.5rem', height: '1rem', width: '1rem' }} />
                         {t.addEvent}
                       </Button>
 
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button variant="outline" style={{ color: PALETTE.dangerEmphasis }}>
-                            <Trash2 style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
+                            <Trash2
+                              style={{ marginRight: '0.5rem', height: '1rem', width: '1rem' }}
+                            />
                             {t.deletePerson}
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>{t.deletePersonConfirmTitle}</AlertDialogTitle>
-                            <AlertDialogDescription>{t.deletePersonConfirmDesc}</AlertDialogDescription>
+                            <AlertDialogDescription>
+                              {t.deletePersonConfirmDesc}
+                            </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
@@ -239,14 +298,18 @@ export default function PersonCard({
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button variant="outline" style={{ color: PALETTE.dangerEmphasis }}>
-                              <Trash2 style={{ marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
+                              <Trash2
+                                style={{ marginRight: '0.5rem', height: '1rem', width: '1rem' }}
+                              />
                               {t.deleteAllEvents}
                             </Button>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
                               <AlertDialogTitle>{t.deleteAllEventsConfirmTitle}</AlertDialogTitle>
-                              <AlertDialogDescription>{t.deleteAllEventsConfirmDesc}</AlertDialogDescription>
+                              <AlertDialogDescription>
+                                {t.deleteAllEventsConfirmDesc}
+                              </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
@@ -264,54 +327,94 @@ export default function PersonCard({
 
                     {/* Event list */}
                     {sortedEvents.length ? (
-                      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                         {sortedEvents.map((event) => (
                           <button
                             key={event.id}
                             className="rounded-2xl"
                             style={{
-                              width: "100%",
-                              border: eventIsMissingRequired(event) ? `1px solid ${PALETTE.warningBorder}` : `1px solid ${PALETTE.innerCardBorder}`,
-                              backgroundColor: eventIsMissingRequired(event) ? "rgba(249,213,138,0.08)" : PALETTE.card,
-                              padding: "0.75rem",
-                              textAlign: "left",
+                              width: '100%',
+                              border: eventIsMissingRequired(event)
+                                ? `1px solid ${PALETTE.warningBorder}`
+                                : `1px solid ${PALETTE.innerCardBorder}`,
+                              backgroundColor: eventIsMissingRequired(event)
+                                ? 'rgba(249,213,138,0.08)'
+                                : PALETTE.card,
+                              padding: '0.75rem',
+                              textAlign: 'left',
                             }}
                             onClick={() =>
                               setEventModal({
                                 open: true,
-                                mode: "edit",
+                                mode: 'edit',
                                 event,
                               })
                             }
                           >
-                            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span>
-                                <Calendar style={{ display: "inline", marginRight: "0.5rem", height: "1rem", width: "1rem" }} />
+                                <Calendar
+                                  style={{
+                                    display: 'inline',
+                                    marginRight: '0.5rem',
+                                    height: '1rem',
+                                    width: '1rem',
+                                  }}
+                                />
                                 {formatShortDate(event.date, language)}
                               </span>
 
                               {hasScore(event.score) && (
-                                <Badge style={{ backgroundColor: PALETTE.accentShadow, color: PALETTE.accent, border: "none" }}>{renderKisses(event.score, t)}</Badge>
+                                <Badge
+                                  style={{
+                                    backgroundColor: PALETTE.accentShadow,
+                                    color: PALETTE.accent,
+                                    border: 'none',
+                                  }}
+                                >
+                                  {renderKisses(event.score, t)}
+                                </Badge>
                               )}
                             </div>
 
                             {(event.place || event.situation) && (
-                              <div style={{ marginTop: "0.5rem", display: "flex", flexWrap: "wrap", gap: "0.25rem 0.75rem", ...TEXT.caption, color: PALETTE.textSoft }}>
+                              <div
+                                style={{
+                                  marginTop: '0.5rem',
+                                  display: 'flex',
+                                  flexWrap: 'wrap',
+                                  gap: '0.25rem 0.75rem',
+                                  ...TEXT.caption,
+                                  color: PALETTE.textSoft,
+                                }}
+                              >
                                 {event.place && (
-                                  <span><strong>{t.eventPlace}:</strong> {event.place}</span>
+                                  <span>
+                                    <strong>{t.eventPlace}:</strong> {event.place}
+                                  </span>
                                 )}
                                 {event.situation && (
-                                  <span><strong>{t.eventSituation}:</strong> {event.situation}</span>
+                                  <span>
+                                    <strong>{t.eventSituation}:</strong> {event.situation}
+                                  </span>
                                 )}
                               </div>
                             )}
 
-                            <p style={{ marginTop: "0.5rem", ...TEXT.body, color: PALETTE.textSoft }}>
+                            <p
+                              style={{ marginTop: '0.5rem', ...TEXT.body, color: PALETTE.textSoft }}
+                            >
                               {event.details || t.noDetailsAdded}
                             </p>
 
                             {event.observations && (
-                              <p style={{ marginTop: "0.25rem", ...TEXT.caption, color: PALETTE.textSoft }}>
+                              <p
+                                style={{
+                                  marginTop: '0.25rem',
+                                  ...TEXT.caption,
+                                  color: PALETTE.textSoft,
+                                }}
+                              >
                                 {event.observations}
                               </p>
                             )}
@@ -319,7 +422,7 @@ export default function PersonCard({
                         ))}
                       </div>
                     ) : (
-                      <p style={{ ...TEXT.body, textAlign: "center" }}>{t.noEventsYet}</p>
+                      <p style={{ ...TEXT.body, textAlign: 'center' }}>{t.noEventsYet}</p>
                     )}
                   </div>
                 </motion.div>
@@ -340,8 +443,8 @@ export default function PersonCard({
           <PersonForm
             initialValues={person}
             onSave={(values) => {
-              onUpdatePerson(person.id, values);
-              setEditingPerson(false);
+              onUpdatePerson(person.id, values)
+              setEditingPerson(false)
             }}
             onCancel={() => setEditingPerson(false)}
             t={t}
@@ -357,41 +460,35 @@ export default function PersonCard({
       {/* Event modal */}
       <Dialog
         open={eventModal.open}
-        onOpenChange={(open) =>
-          setEventModal((prev) => ({ ...prev, open }))
-        }
+        onOpenChange={(open) => setEventModal((prev) => ({ ...prev, open }))}
       >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {eventModal.mode === "add"
-                ? t.addEventTitle
-                : t.editEventTitle}
+              {eventModal.mode === 'add' ? t.addEventTitle : t.editEventTitle}
             </DialogTitle>
             <DialogDescription>
-              {eventModal.mode === "add"
-                ? t.addEventDesc
-                : t.editEventDesc}
+              {eventModal.mode === 'add' ? t.addEventDesc : t.editEventDesc}
             </DialogDescription>
           </DialogHeader>
 
           <EventForm
             initialValues={eventModal.event}
             onSave={(values) => {
-              if (eventModal.mode === "add")
-                onAddEvent(person.id, values);
-              else
-                onUpdateEvent(person.id, eventModal.event.id, values);
+              if (eventModal.mode === 'add') onAddEvent(person.id, values)
+              else onUpdateEvent(person.id, eventModal.event.id, values)
 
-              setEventModal({ open: false, mode: "add", event: null });
+              setEventModal({ open: false, mode: 'add', event: null })
             }}
-            onCancel={() =>
-              setEventModal({ open: false, mode: "add", event: null })
+            onCancel={() => setEventModal({ open: false, mode: 'add', event: null })}
+            onDelete={
+              eventModal.mode === 'edit'
+                ? () => {
+                    onDeleteEvent(person.id, eventModal.event.id)
+                    setEventModal({ open: false, mode: 'add', event: null })
+                  }
+                : undefined
             }
-            onDelete={eventModal.mode === "edit" ? () => {
-              onDeleteEvent(person.id, eventModal.event.id);
-              setEventModal({ open: false, mode: "add", event: null });
-            } : undefined}
             t={t}
             situationTags={situationTags}
             onAddSituationTag={onAddSituationTag}
@@ -402,5 +499,5 @@ export default function PersonCard({
         </DialogContent>
       </Dialog>
     </>
-  );
+  )
 }

@@ -4,16 +4,16 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select'
 
-import { TEXT, PALETTES } from "@/lib/constants";
-import { usePalette } from "@/lib/theme";
-import { SPARKLE_PALETTES, PALETTE_SWATCHES } from "@/components/shared/SparkleIcon";
+import { TEXT, PALETTES } from '@/lib/constants'
+import { usePalette } from '@/lib/theme'
+import { SPARKLE_PALETTES, PALETTE_SWATCHES } from '@/components/shared/SparkleIcon'
 
 const THEMES = Object.keys(PALETTES).map((key) => ({
   key,
   gradient: `linear-gradient(135deg, ${PALETTES[key].bgGradientFrom}, ${PALETTES[key].bgGradientVia}, ${PALETTES[key].bgGradientTo})`,
-}));
+}))
 
 export default function ColorSelector({
   iconColor,
@@ -23,24 +23,29 @@ export default function ColorSelector({
   t,
   accent = true,
 }) {
-  const PALETTE = usePalette();
+  const PALETTE = usePalette()
   const triggerStyle = {
     borderColor: PALETTE.inputBorder,
     backgroundColor: PALETTE.controlBg,
-  };
-  const colorLabel = (p) =>
-    t[`color${p.charAt(0).toUpperCase() + p.slice(1)}`] ?? p;
+  }
+  const colorLabel = (p) => t[`color${p.charAt(0).toUpperCase() + p.slice(1)}`] ?? p
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       {theme !== undefined && setTheme && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-          <p style={{ ...TEXT.body, textTransform: "uppercase", color: accent ? "rgba(255,255,255,0.88)" : PALETTE.textSoft }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <p
+            style={{
+              ...TEXT.body,
+              textTransform: 'uppercase',
+              color: accent ? 'rgba(255,255,255,0.88)' : PALETTE.textSoft,
+            }}
+          >
             {t.appTheme}
           </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.5rem" }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
             {THEMES.map(({ key, gradient }) => {
-              const selected = theme === key;
+              const selected = theme === key
               return (
                 <button
                   key={key}
@@ -48,42 +53,54 @@ export default function ColorSelector({
                   onClick={() => setTheme(key)}
                   className="rounded-2xl"
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "0.375rem",
-                    padding: "0.5rem",
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '0.375rem',
+                    padding: '0.5rem',
                     border: selected
                       ? `2px solid ${PALETTE.accent}`
                       : `1.5px solid ${PALETTE.inputBorder}`,
                     backgroundColor: selected ? PALETTE.accentMuted : PALETTE.controlBg,
-                    cursor: "pointer",
-                    transition: "all 150ms ease",
+                    cursor: 'pointer',
+                    transition: 'all 150ms ease',
                   }}
                 >
                   <span
                     className="rounded-full"
                     style={{
-                      display: "block",
-                      width: "2rem",
-                      height: "2rem",
+                      display: 'block',
+                      width: '2rem',
+                      height: '2rem',
                       background: gradient,
-                      boxShadow: selected ? "0 2px 8px rgba(0,0,0,0.18)" : "0 1px 3px rgba(0,0,0,0.1)",
+                      boxShadow: selected
+                        ? '0 2px 8px rgba(0,0,0,0.18)'
+                        : '0 1px 3px rgba(0,0,0,0.1)',
                     }}
                   />
-                  <span style={{ ...TEXT.caption, fontWeight: selected ? "700" : "500", color: selected ? PALETTE.accent : PALETTE.textSoft }}>
+                  <span
+                    style={{
+                      ...TEXT.caption,
+                      fontWeight: selected ? '700' : '500',
+                      color: selected ? PALETTE.accent : PALETTE.textSoft,
+                    }}
+                  >
                     {t[`theme${key.charAt(0).toUpperCase() + key.slice(1)}`]}
                   </span>
                 </button>
-              );
+              )
             })}
           </div>
         </div>
       )}
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         <p
-          style={{ ...TEXT.body, textTransform: "uppercase", color: accent ? "rgba(255,255,255,0.88)" : PALETTE.textSoft }}
+          style={{
+            ...TEXT.body,
+            textTransform: 'uppercase',
+            color: accent ? 'rgba(255,255,255,0.88)' : PALETTE.textSoft,
+          }}
         >
           {t.iconColor}
         </p>
@@ -92,9 +109,9 @@ export default function ColorSelector({
           <SelectTrigger
             aria-label={t.iconColor}
             className="rounded-3xl"
-            style={{ height: "3rem", boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)", ...triggerStyle }}
+            style={{ height: '3rem', boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)', ...triggerStyle }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <SelectValue placeholder={t.iconColor} />
             </div>
           </SelectTrigger>
@@ -102,10 +119,10 @@ export default function ColorSelector({
           <SelectContent>
             {SPARKLE_PALETTES.map((p) => (
               <SelectItem key={p} value={p}>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <span
                     className="rounded-full"
-                    style={{ height: "1rem", width: "1rem", background: PALETTE_SWATCHES[p] }}
+                    style={{ height: '1rem', width: '1rem', background: PALETTE_SWATCHES[p] }}
                   />
                   {colorLabel(p)}
                 </div>
@@ -115,5 +132,5 @@ export default function ColorSelector({
         </Select>
       </div>
     </div>
-  );
+  )
 }

@@ -1,41 +1,41 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { usePalette } from "@/lib/theme";
-import mainBackground from "@/assets/main-background.png";
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { usePalette } from '@/lib/theme'
+import mainBackground from '@/assets/main-background.png'
 
 /**
  * Displays the main circular hero visual.
  * Falls back gracefully if the image fails to load.
  */
 export default function HeroVisualPlaceholder() {
-  const PALETTE = usePalette();
-  const heroSurfaceBg = PALETTE.isDark ? "rgba(255,255,255,0.16)" : PALETTE.surfaceBg;
+  const PALETTE = usePalette()
+  const heroSurfaceBg = PALETTE.isDark ? 'rgba(255,255,255,0.16)' : PALETTE.surfaceBg
   // Track if the image loads correctly.
-  const [hasImage, setHasImage] = useState(true);
+  const [hasImage, setHasImage] = useState(true)
 
   return (
     <div
       style={{
-        position: "relative",
-        display: "flex",
-        height: "18rem",
-        width: "18rem",
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: "9999px",
-        backdropFilter: "blur(4px)",
+        position: 'relative',
+        display: 'flex',
+        height: '18rem',
+        width: '18rem',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: '9999px',
+        backdropFilter: 'blur(4px)',
         backgroundColor: heroSurfaceBg,
       }}
     >
       {/* Background gradient layer */}
       <div
         style={{
-          position: "absolute",
-          top: "1.5rem",
-          right: "1.5rem",
-          bottom: "1.5rem",
-          left: "1.5rem",
-          borderRadius: "9999px",
+          position: 'absolute',
+          top: '1.5rem',
+          right: '1.5rem',
+          bottom: '1.5rem',
+          left: '1.5rem',
+          borderRadius: '9999px',
           background: `linear-gradient(135deg, ${PALETTE.accentMuted}, ${PALETTE.cardSoft}, ${PALETTE.gradientEnd})`,
         }}
       />
@@ -43,32 +43,32 @@ export default function HeroVisualPlaceholder() {
       {/* Floating animated container */}
       <motion.div
         animate={{ y: [0, -8, 0] }}
-        transition={{ repeat: Infinity, duration: 4.2, ease: "easeInOut" }}
+        transition={{ repeat: Infinity, duration: 4.2, ease: 'easeInOut' }}
         style={{
-          position: "relative",
+          position: 'relative',
           zIndex: 10,
-          display: "flex",
-          height: "12rem",
-          width: "12rem",
-          alignItems: "center",
-          justifyContent: "center",
-          overflow: "hidden",
-          borderRadius: "32px",
-          textAlign: "center",
+          display: 'flex',
+          height: '12rem',
+          width: '12rem',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+          borderRadius: '32px',
+          textAlign: 'center',
         }}
       >
         {hasImage ? (
           <img
             src={mainBackground}
             alt="KissRecorder visual"
-            style={{ height: "100%", width: "100%", objectFit: "contain" }}
+            style={{ height: '100%', width: '100%', objectFit: 'contain' }}
             onError={() => setHasImage(false)}
           />
         ) : (
           // Fallback when image is missing.
-          <div style={{ paddingLeft: "1.25rem", paddingRight: "1.25rem" }} />
+          <div style={{ paddingLeft: '1.25rem', paddingRight: '1.25rem' }} />
         )}
       </motion.div>
     </div>
-  );
+  )
 }
