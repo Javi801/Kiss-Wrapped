@@ -18,7 +18,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["src/lib/**/*.js"],
-      exclude: ["src/lib/__tests__/**", "src/lib/device-storage.js", "src/lib/pdf-export.js", "src/lib/utils.js"],
+      exclude: ["src/lib/__tests__/**", "src/lib/device-storage.js", "src/lib/utils.js"],
       thresholds: {
         statements: 95,
         branches: 90,

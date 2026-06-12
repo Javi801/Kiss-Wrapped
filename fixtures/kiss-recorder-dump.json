@@ -1,3244 +1,1455 @@
 [
   {
-    "id": "ffd75d02",
-    "name": "Valentina",
-    "age": 23,
-    "gender": "female",
-    "zodiacSign": "♈ Aries (March 21 - April 19)",
-    "activity": "studies",
-    "howWeMet": "At a mutual friend's birthday party",
-    "detail": "Psychology — third year",
-    "events": [
-      {
-        "id": "c45c377c",
-        "date": "2023.04.12",
-        "place": "Karaoke bar",
-        "situation": "Reconnected after months apart",
-        "score": 1,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "44fb727e",
-        "date": "2024.05.16",
-        "place": "Garden party",
-        "situation": "She came over to 'watch a movie'",
-        "score": 2,
-        "details": "",
-        "observations": "Unexpected but great"
-      },
-      {
-        "id": "78fa6e4b",
-        "date": "2024.06.02",
-        "place": "Her place",
-        "situation": "She texted asking to come over late",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "8efda5b6",
-        "date": "2024.06.25",
-        "place": "Summer house at the lake",
-        "situation": "Hot summer day at the pool",
-        "score": null,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "2291505b",
-        "date": "2024.11.11",
-        "place": "Summer house at the lake",
-        "situation": "After the live concert",
-        "score": 3,
-        "details": "",
-        "observations": "She stayed the whole weekend"
-      },
-      {
-        "id": "1df009ac",
-        "date": "2024.12.31",
-        "place": "New Year's Eve club night at Club Noir",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "dbc5f2bf",
-        "date": "2025.06.22",
-        "place": "Garden party",
-        "situation": "Bumped into her at the bar, one thing led to another",
-        "score": 2,
-        "details": "",
-        "observations": "We said it was the last time but it wasn't"
-      },
-      {
-        "id": "4fe07966",
-        "date": "2025.11.09",
-        "place": "Bar Blackout",
-        "situation": "Reconnected after months apart",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "bdabc819",
-        "date": "2025.12.16",
-        "place": "New Year's Eve party venue",
-        "situation": "Friend introduced us and chemistry was immediate",
-        "score": 5,
-        "details": "",
-        "observations": "We said it was the last time but it wasn't"
-      },
-      {
-        "id": "f32f9cf0",
-        "date": "2026.02.26",
-        "place": "Her car after the show",
-        "situation": "After her friend's wedding",
-        "score": 2,
-        "details": "",
-        "observations": "We agreed to keep it casual"
-      },
-      {
-        "id": "2c760849",
-        "date": "2026.03.08",
-        "place": "Summer house at the lake",
-        "situation": "Reconnected after months apart",
-        "score": 3,
-        "details": "",
-        "observations": "She stayed the whole weekend"
-      },
-      {
-        "id": "4e746b1a",
-        "date": "2026.04.29",
-        "place": "Her car after the show",
-        "situation": "Birthday celebration that got wild",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      }
-    ]
-  },
-  {
-    "id": "7a131740",
-    "name": "Camila",
-    "age": 26,
-    "gender": "female",
-    "zodiacSign": "♋ Cancer (June 21 - July 22)",
-    "activity": "works",
-    "howWeMet": "Through Tinder",
-    "detail": "Account manager at a marketing agency",
-    "events": [
-      {
-        "id": "95cbe483",
-        "date": "2021.08.25",
-        "place": "Outdoor festival area",
-        "situation": "End of semester celebration",
-        "score": 5,
-        "details": "",
-        "observations": "Still figuring out what we are"
-      },
-      {
-        "id": "9a8b30b5",
-        "date": "2022.05.20",
-        "place": "Her dorm room",
-        "situation": "We were the last two left at the house party",
-        "score": 1,
-        "details": "",
-        "observations": "Not sure where this is heading"
-      },
-      {
-        "id": "e440cc96",
-        "date": "2022.08.27",
-        "place": "Lake house weekend",
-        "situation": "First time meeting in person after matching online",
-        "score": 4,
-        "details": "",
-        "observations": "We didn't talk for a week after"
-      },
-      {
-        "id": "19fa1e81",
-        "date": "2023.02.14",
-        "place": "Wine bar Botánico",
-        "situation": "Valentine's night out",
-        "score": 4,
-        "details": "",
-        "observations": "She left before morning"
-      },
-      {
-        "id": "b2c478e3",
-        "date": "2023.06.16",
-        "place": "Hotel Meridian",
-        "situation": "After dancing all night at the club",
-        "score": 4,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "b00f91c4",
-        "date": "2023.10.15",
-        "place": "Club Noir",
-        "situation": "She stayed for the weekend without planning it",
-        "score": null,
-        "details": "",
-        "observations": "Best night this year"
-      },
-      {
-        "id": "4a568e8a",
-        "date": "2024.01.20",
-        "place": "Hotel Meridian",
-        "situation": "Festival weekend, last night",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "40dff666",
-        "date": "2024.09.03",
-        "place": "Her friend's apartment",
-        "situation": "Valentine's night out",
-        "score": 3,
-        "details": "",
-        "observations": "Best night this year"
-      }
-    ]
-  },
-  {
-    "id": "8d8cf3de",
-    "name": "Isabella",
-    "age": 22,
-    "gender": "female",
-    "zodiacSign": "♎ Libra (September 23 - October 22)",
-    "activity": "studies and works",
-    "howWeMet": "At a music festival last summer",
-    "detail": "Studies graphic design, barista on weekends",
-    "events": [
-      {
-        "id": "9d9b1155",
-        "date": "2023.02.08",
-        "place": "Marco's house party",
-        "situation": "Party game that got out of hand",
-        "score": 5,
-        "details": "",
-        "observations": "She asked not to tell anyone"
-      },
-      {
-        "id": "d0036390",
-        "date": "2023.03.27",
-        "place": "Birthday loft party",
-        "situation": "Summer house long weekend",
-        "score": 5,
-        "details": "",
-        "observations": "First time we got this far"
-      },
-      {
-        "id": "4520761f",
-        "date": "2024.02.09",
-        "place": "Her sister's place",
-        "situation": "Birthday celebration that got wild",
-        "score": null,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "67a7dccf",
-        "date": "2024.05.25",
-        "place": "Birthday loft party",
-        "situation": "Birthday celebration that got wild",
-        "score": 5,
-        "details": "",
-        "observations": "This has been going on longer than I expected"
-      },
-      {
-        "id": "15c18341",
-        "date": "2024.09.06",
-        "place": "Her sister's place",
-        "situation": "After the gym, went back to hers",
-        "score": 5,
-        "details": "",
-        "observations": "She left before morning"
-      }
-    ]
-  },
-  {
-    "id": "6c671a30",
+    "id": "k4m2x8n1",
     "name": "Sofía",
-    "age": 28,
     "gender": "female",
-    "zodiacSign": "♐ Sagittarius (November 22 - December 21)",
+    "birthYear": 1998,
+    "zodiacSign": "♍ Virgo (August 24 - September 22)",
     "activity": "works",
-    "howWeMet": "Through Bumble",
-    "detail": "Nurse at the central hospital",
+    "detail": "Graphic designer at a studio",
+    "howWeMet": "Through a mutual friend at a gallery opening",
+    "birthdayAlreadyHappened": false,
     "events": [
       {
-        "id": "e128d187",
-        "date": "2020.12.31",
-        "place": "New Year's Eve party at Rodrigo's penthouse",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 1,
-        "details": "",
-        "observations": "Best night this year"
-      },
-      {
-        "id": "f892db75",
-        "date": "2021.04.13",
-        "place": "Outdoor festival area",
-        "situation": "After dancing all night at the club",
-        "score": 4,
-        "details": "",
-        "observations": "We didn't talk for a week after"
-      },
-      {
-        "id": "a38f7c61",
-        "date": "2021.07.04",
-        "place": "New Year's Eve party venue",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "130bd327",
-        "date": "2021.07.10",
-        "place": "Beach house",
-        "situation": "Met at a party and things escalated quickly",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "a2a5991c",
-        "date": "2022.03.30",
-        "place": "Club Noir",
-        "situation": "Hot summer day at the pool",
-        "score": null,
-        "details": "",
-        "observations": "We didn't talk for a week after"
-      },
-      {
-        "id": "bad2c62d",
-        "date": "2022.04.18",
-        "place": "Her sister's place",
-        "situation": "After the live concert",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "e8c5eff1",
-        "date": "2022.05.06",
-        "place": "Beach house",
-        "situation": "Spontaneous late night, just the two of us",
-        "score": 2,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "41ac811c",
-        "date": "2022.05.30",
-        "place": "Music festival campground",
-        "situation": "After her friend's wedding",
-        "score": 4,
-        "details": "",
-        "observations": "First time we got this far"
-      },
-      {
-        "id": "3df02eea",
-        "date": "2022.12.06",
-        "place": "Marco's house party",
-        "situation": "After the live concert",
-        "score": 3,
-        "details": "",
-        "observations": "Best night this year"
-      },
-      {
-        "id": "54aa02d7",
-        "date": "2023.03.24",
-        "place": "Outdoor festival area",
-        "situation": "Bumped into her at the bar, one thing led to another",
-        "score": 4,
-        "details": "",
-        "observations": "Best night this year"
-      },
-      {
-        "id": "68a2d6b7",
-        "date": "2023.05.29",
-        "place": "New Year's Eve party venue",
-        "situation": "End of semester celebration",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "0e2f3e57",
-        "date": "2023.06.14",
-        "place": "Lake house weekend",
-        "situation": "After her friend's wedding",
-        "score": 5,
-        "details": "",
-        "observations": "Things are getting complicated"
-      },
-      {
-        "id": "0a719159",
-        "date": "2023.08.31",
-        "place": "Club Velvet",
-        "situation": "Friend introduced us and chemistry was immediate",
-        "score": null,
-        "details": "",
-        "observations": "She was upfront that she's seeing someone else too"
-      },
-      {
-        "id": "7b986b01",
-        "date": "2023.12.31",
-        "place": "New Year's Eve mega party at Club Electra",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 2,
-        "details": "",
-        "observations": ""
-      }
-    ]
-  },
-  {
-    "id": "33874ef0",
-    "name": "Natalia",
-    "age": 25,
-    "gender": "female",
-    "zodiacSign": "♒ Aquarius (January 20 - February 19)",
-    "activity": "studies",
-    "howWeMet": "In a class we shared last semester",
-    "detail": "Architecture — final thesis year",
-    "events": [
-      {
-        "id": "976f3ae1",
-        "date": "2022.02.11",
-        "place": "Basement flat party",
-        "situation": "Met at a party and things escalated quickly",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "88863b39",
-        "date": "2022.10.28",
-        "place": "Basement flat party",
-        "situation": "Hot summer day at the pool",
-        "score": 5,
-        "details": "",
-        "observations": "She asked not to tell anyone"
-      },
-      {
-        "id": "261fdd65",
-        "date": "2022.10.29",
-        "place": "Halloween house party",
-        "situation": "After drinks with the whole group",
-        "score": 4,
-        "details": "",
-        "observations": "We agreed to keep it casual"
-      },
-      {
-        "id": "2e308787",
-        "date": "2024.12.31",
-        "place": "New Year's Eve club night at Club Noir",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 1,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "296c6490",
-        "date": "2025.05.29",
-        "place": "Her car after the show",
-        "situation": "After work drinks that turned into more",
-        "score": 1,
-        "details": "",
-        "observations": "Unexpected but great"
-      },
-      {
-        "id": "552d621a",
-        "date": "2025.11.17",
-        "place": "Her dorm room",
-        "situation": "First time meeting in person after matching online",
-        "score": null,
-        "details": "",
-        "observations": ""
-      }
-    ]
-  },
-  {
-    "id": "e8eda602",
-    "name": "Mariana",
-    "age": 30,
-    "gender": "female",
-    "zodiacSign": "♊ Gemini (May 21 - June 20)",
-    "activity": "works",
-    "howWeMet": "At a house party three months ago",
-    "detail": "Senior graphic designer, freelance",
-    "events": [
-      {
-        "id": "b58fbba6",
-        "date": "2020.06.20",
-        "place": "Her sister's place",
-        "situation": "After work drinks that turned into more",
-        "score": 2,
-        "details": "",
-        "observations": "Still figuring out what we are"
-      },
-      {
-        "id": "5aa8890b",
-        "date": "2020.07.06",
-        "place": "Club Velvet",
-        "situation": "She came over to 'watch a movie'",
-        "score": 3,
-        "details": "",
-        "observations": "Been thinking about this for a while"
-      },
-      {
-        "id": "77e5b183",
-        "date": "2020.07.13",
-        "place": "Bar near uni",
-        "situation": "Late night walk that ended at my place",
-        "score": 4,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "124df8bd",
-        "date": "2020.07.14",
-        "place": "Office rooftop",
-        "situation": "Late night walk that ended at my place",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "e6330365",
-        "date": "2020.12.14",
-        "place": "Karaoke bar",
-        "situation": "Summer house long weekend",
-        "score": 4,
-        "details": "",
-        "observations": "We said it was the last time but it wasn't"
-      },
-      {
-        "id": "8d5028cc",
-        "date": "2020.12.31",
-        "place": "New Year's Eve party at Rodrigo's penthouse",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": null,
-        "details": "",
-        "observations": "She was upfront that she's seeing someone else too"
-      },
-      {
-        "id": "76546304",
-        "date": "2021.05.12",
-        "place": "Club Velvet",
-        "situation": "After the live concert",
-        "score": null,
-        "details": "",
-        "observations": "She was upfront that she's seeing someone else too"
-      },
-      {
-        "id": "3080b0a7",
-        "date": "2021.06.15",
-        "place": "Beach house",
-        "situation": "End of semester celebration",
-        "score": 3,
-        "details": "",
-        "observations": "Been thinking about this for a while"
-      },
-      {
-        "id": "6ee04ee9",
-        "date": "2021.07.13",
-        "place": "New Year's Eve party venue",
-        "situation": "After a night out with the whole group",
-        "score": 5,
-        "details": "",
-        "observations": "This has been going on longer than I expected"
-      },
-      {
-        "id": "3e2955ba",
-        "date": "2021.08.29",
-        "place": "Lake house weekend",
-        "situation": "Valentine's night out",
-        "score": null,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "a073675d",
-        "date": "2021.09.14",
-        "place": "Outdoor festival area",
-        "situation": "After work drinks that turned into more",
-        "score": 5,
-        "details": "",
-        "observations": "Not sure where this is heading"
-      },
-      {
-        "id": "a6daed41",
-        "date": "2021.09.16",
-        "place": "My car outside her place",
-        "situation": "After her friend's wedding",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "25d030f8",
-        "date": "2022.04.19",
-        "place": "Lounge Bar Cleo",
-        "situation": "Bumped into her at the bar, one thing led to another",
-        "score": 5,
-        "details": "",
-        "observations": "First time we got this far"
-      },
-      {
-        "id": "329c885f",
-        "date": "2022.06.23",
-        "place": "Beach house",
-        "situation": "After the live concert",
-        "score": 4,
-        "details": "",
-        "observations": "Not sure where this is heading"
-      },
-      {
-        "id": "76d08cfb",
-        "date": "2022.09.02",
-        "place": "New Year's Eve party venue",
-        "situation": "She texted asking to come over late",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "e8ed0103",
-        "date": "2022.12.25",
-        "place": "Hotel Meridian",
-        "situation": "After work drinks that turned into more",
-        "score": null,
-        "details": "",
-        "observations": "Still figuring out what we are"
-      },
-      {
-        "id": "91bb2ea8",
-        "date": "2023.01.24",
-        "place": "Her sister's place",
-        "situation": "After her friend's wedding",
-        "score": 4,
-        "details": "",
-        "observations": "Things are getting complicated"
-      },
-      {
-        "id": "95c8fd87",
-        "date": "2023.02.14",
-        "place": "Wine bar Botánico",
-        "situation": "Valentine's night out",
-        "score": null,
-        "details": "",
-        "observations": ""
-      }
-    ]
-  },
-  {
-    "id": "a8c17c9a",
-    "name": "Daniela",
-    "age": 21,
-    "gender": "female",
-    "zodiacSign": "♓ Pisces (February 20 - March 20)",
-    "activity": "studies",
-    "howWeMet": "We work in the same building",
-    "detail": "Business administration — second year",
-    "events": [
-      {
-        "id": "afd6e9dd",
-        "date": "2024.09.14",
-        "place": "Garden party at her friend's place",
-        "situation": "After a night out with the whole group",
-        "score": 5,
-        "details": "",
-        "observations": "Not sure where this is heading"
-      },
-      {
-        "id": "40360d53",
-        "date": "2024.11.05",
-        "place": "Hotel Meridian",
-        "situation": "After dancing all night at the club",
-        "score": 5,
-        "details": "",
-        "observations": "She stayed the whole weekend"
-      },
-      {
-        "id": "0f9dd604",
-        "date": "2025.03.23",
-        "place": "Lake house weekend",
-        "situation": "After a date that went really well",
-        "score": 2,
-        "details": "",
-        "observations": "We didn't talk for a week after"
-      },
-      {
-        "id": "536c9968",
-        "date": "2025.07.01",
-        "place": "Her friend's apartment",
-        "situation": "Birthday celebration that got wild",
-        "score": 1,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "504dbf05",
-        "date": "2025.11.20",
-        "place": "Her sister's place",
-        "situation": "After the live concert",
-        "score": 4,
-        "details": "",
-        "observations": "Great chemistry as always"
-      },
-      {
-        "id": "825712ee",
-        "date": "2026.02.21",
-        "place": "Her friend's apartment",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "6dfc43b4",
-        "date": "2026.04.27",
-        "place": "Her sister's place",
-        "situation": "Reconnected after months apart",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      }
-    ]
-  },
-  {
-    "id": "cc016b15",
-    "name": "Alejandra",
-    "age": 27,
-    "gender": "female",
-    "zodiacSign": "♌ Leo (July 23 - August 23)",
-    "activity": "works",
-    "howWeMet": "She's my roommate's friend",
-    "detail": "Junior associate at a law firm",
-    "events": [
-      {
-        "id": "25466e98",
-        "date": "2021.02.10",
-        "place": "Lounge Bar Cleo",
-        "situation": "Birthday celebration that got wild",
-        "score": 2,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "5e9ff289",
-        "date": "2021.04.17",
-        "place": "House party — Easter weekend",
-        "situation": "After drinks with the whole group",
-        "score": 3,
-        "details": "",
-        "observations": "Not sure where this is heading"
-      },
-      {
-        "id": "44884884",
-        "date": "2021.10.07",
-        "place": "Club Electra",
-        "situation": "Party game that got out of hand",
-        "score": null,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "084ee4e4",
-        "date": "2023.12.31",
-        "place": "New Year's Eve mega party at Club Electra",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      }
-    ]
-  },
-  {
-    "id": "9a12f77d",
-    "name": "Paula",
-    "age": 24,
-    "gender": "female",
-    "zodiacSign": "♉ Taurus (April 20 - May 20)",
-    "activity": "studies and works",
-    "howWeMet": "Blind date set up by a mutual friend",
-    "detail": "Studies medicine, part-time anatomy tutor",
-    "events": [
-      {
-        "id": "505ddba9",
-        "date": "2022.03.19",
-        "place": "Club Electra",
-        "situation": "Valentine's night out",
-        "score": 0,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "9f730b35",
-        "date": "2022.05.12",
-        "place": "Lake house weekend",
-        "situation": "After her friend's wedding",
-        "score": null,
-        "details": "",
-        "observations": "She was upfront that she's seeing someone else too"
-      },
-      {
-        "id": "eb2e3c9b",
-        "date": "2022.07.25",
-        "place": "Lake house weekend",
-        "situation": "First time meeting in person after matching online",
-        "score": 0,
-        "details": "",
-        "observations": "Things are getting complicated"
-      },
-      {
-        "id": "c22ca280",
-        "date": "2022.09.16",
-        "place": "Bar Blackout",
-        "situation": "Late night walk that ended at my place",
-        "score": 4,
-        "details": "",
-        "observations": "She left before morning"
-      },
-      {
-        "id": "2c754cce",
-        "date": "2023.08.28",
-        "place": "Club Electra",
-        "situation": "Hot summer day at the pool",
-        "score": null,
-        "details": "",
-        "observations": "Unexpected but great"
-      },
-      {
-        "id": "f9603a0a",
-        "date": "2023.12.26",
-        "place": "Lake house weekend",
-        "situation": "Hot summer day at the pool",
-        "score": null,
-        "details": "",
-        "observations": "Not sure where this is heading"
-      },
-      {
-        "id": "9128208a",
-        "date": "2024.05.06",
-        "place": "Her friend's apartment",
-        "situation": "After her friend's wedding",
-        "score": 4,
-        "details": "",
-        "observations": "She asked not to tell anyone"
-      },
-      {
-        "id": "d2a2a240",
-        "date": "2025.07.29",
-        "place": "Lake house weekend",
-        "situation": "Festival weekend, last night",
-        "score": null,
-        "details": "",
-        "observations": "She was upfront that she's seeing someone else too"
-      },
-      {
-        "id": "096147fa",
-        "date": "2025.08.31",
-        "place": "Marco's house party",
-        "situation": "End of semester celebration",
-        "score": null,
-        "details": "",
-        "observations": "Best night this year"
-      }
-    ]
-  },
-  {
-    "id": "db18dcc7",
-    "name": "Gabriela",
-    "age": 31,
-    "gender": "female",
-    "zodiacSign": "♎ Libra (September 23 - October 22)",
-    "activity": "works",
-    "howWeMet": "At a university club meeting",
-    "detail": "Senior accountant at a consulting firm",
-    "events": [
-      {
-        "id": "8f9ca9bb",
-        "date": "2020.09.21",
-        "place": "Rooftop bar La Vista",
-        "situation": "After a night out with the whole group",
-        "score": 2,
-        "details": "",
-        "observations": "She asked not to tell anyone"
-      },
-      {
-        "id": "26654d48",
-        "date": "2020.11.20",
+        "id": "e1a27b3c",
+        "date": "2021.04.10",
         "place": "Her place",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 1,
-        "details": "",
-        "observations": "She texted the next morning"
-      },
-      {
-        "id": "b023b79a",
-        "date": "2020.12.31",
-        "place": "New Year's Eve party at Rodrigo's penthouse",
-        "situation": "New Year's countdown kiss that didn't stop",
+        "situation": "First date that turned into more",
         "score": 3,
         "details": "",
         "observations": ""
       },
       {
-        "id": "a6b72590",
-        "date": "2021.01.02",
-        "place": "Music festival campground",
-        "situation": "Valentine's night out",
+        "id": "f2b38c4d",
+        "date": "2021.05.03",
+        "place": "My place",
+        "situation": "Movie night",
         "score": 4,
-        "details": "",
+        "details": "She brought wine. We didn't actually watch the movie.",
         "observations": ""
       },
       {
-        "id": "38b8e076",
-        "date": "2021.04.16",
-        "place": "Karaoke bar",
-        "situation": "She texted asking to come over late",
-        "score": 4,
-        "details": "",
-        "observations": "She left before morning"
-      },
-      {
-        "id": "7e2b0553",
-        "date": "2021.05.21",
-        "place": "Birthday loft party",
-        "situation": "Road trip overnight stop",
-        "score": 2,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "f758e2b1",
-        "date": "2021.06.23",
-        "place": "Her friend's apartment",
-        "situation": "After the gym, went back to hers",
-        "score": 1,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "c47ba7b7",
-        "date": "2022.02.08",
-        "place": "Club Electra",
-        "situation": "Late night walk that ended at my place",
-        "score": 4,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "9a749b3d",
-        "date": "2022.02.27",
-        "place": "Beach house",
-        "situation": "End of semester celebration",
+        "id": "a3c49d5e",
+        "date": "2021.07.15",
+        "place": "Rooftop bar",
+        "situation": "Night out",
         "score": 3,
         "details": "",
-        "observations": "Been thinking about this for a while"
+        "observations": "She seemed distracted. Something felt different that night."
       },
       {
-        "id": "65a262b7",
-        "date": "2022.03.31",
-        "place": "Birthday loft party",
-        "situation": "We were the last two left at the house party",
-        "score": 5,
-        "details": "",
+        "id": "b4d50e6f",
+        "date": "2021.09.01",
+        "place": "Her place",
+        "situation": "Her birthday gathering",
+        "score": 4,
+        "details": "Small group of friends. I was the last to leave.",
         "observations": ""
       },
       {
-        "id": "09b08746",
-        "date": "2022.04.13",
-        "place": "Club Electra",
-        "situation": "Valentine's night out",
+        "id": "c5e61f7a",
+        "date": "2024.02.14",
+        "place": "Bar downtown",
+        "situation": "Ran into her by chance",
         "score": 2,
         "details": "",
-        "observations": "We said it was the last time but it wasn't"
-      },
-      {
-        "id": "397bc2a6",
-        "date": "2022.04.30",
-        "place": "Wine bar Botánico",
-        "situation": "After a date that went really well",
-        "score": 5,
-        "details": "",
-        "observations": "We agreed to keep it casual"
-      },
-      {
-        "id": "90713854",
-        "date": "2022.05.18",
-        "place": "Her friend's apartment",
-        "situation": "After work drinks that turned into more",
-        "score": 4,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "36eec691",
-        "date": "2023.01.06",
-        "place": "Club Velvet",
-        "situation": "After the live concert",
-        "score": 5,
-        "details": "",
-        "observations": "Been thinking about this for a while"
-      },
-      {
-        "id": "7f2c0c9b",
-        "date": "2023.04.02",
-        "place": "Rooftop bar La Vista",
-        "situation": "Spontaneous late night, just the two of us",
-        "score": 5,
-        "details": "",
-        "observations": "Things are getting complicated"
-      },
-      {
-        "id": "b8f29b5d",
-        "date": "2023.05.13",
-        "place": "Office rooftop",
-        "situation": "Spontaneous late night, just the two of us",
-        "score": 5,
-        "details": "",
-        "observations": "We agreed to keep it casual"
+        "observations": "Hadn't seen her in almost three years. Felt nostalgic more than anything."
       }
     ]
   },
   {
-    "id": "db2a943a",
-    "name": "Andrea",
-    "age": 23,
-    "gender": "female",
-    "zodiacSign": "♒ Aquarius (January 20 - February 19)",
-    "activity": "studies",
-    "howWeMet": "Through Instagram DMs",
-    "detail": "Journalism — specialising in digital media",
-    "events": [
-      {
-        "id": "a832a751",
-        "date": "2023.04.14",
-        "place": "Concert venue",
-        "situation": "She texted asking to come over late",
-        "score": null,
-        "details": "",
-        "observations": "She was upfront that she's seeing someone else too"
-      },
-      {
-        "id": "f4265ea8",
-        "date": "2023.11.10",
-        "place": "Her friend's apartment",
-        "situation": "Late night walk that ended at my place",
-        "score": null,
-        "details": "",
-        "observations": "She was upfront that she's seeing someone else too"
-      },
-      {
-        "id": "1a25eb9f",
-        "date": "2024.03.30",
-        "place": "Concert venue",
-        "situation": "First time meeting in person after matching online",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "9b7cab83",
-        "date": "2024.12.31",
-        "place": "New Year's Eve club night at Club Noir",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      }
-    ]
-  },
-  {
-    "id": "f2854734",
-    "name": "Laura",
-    "age": 29,
-    "gender": "female",
-    "zodiacSign": "♑ Capricorn (December 22 - January 19)",
+    "id": "p7r3t5q9",
+    "name": "Jake",
+    "gender": "male",
+    "birthYear": 1997,
+    "zodiacSign": "♏ Scorpio (October 23 - November 21)",
     "activity": "works",
-    "howWeMet": "She's a coworker's girlfriend's friend",
-    "detail": "HR manager at a tech startup",
+    "detail": "Freelance photographer",
+    "howWeMet": "Through a mutual friend, ended up at the same New Year's party",
+    "birthdayAlreadyHappened": false,
     "events": [
       {
-        "id": "c7232d1e",
-        "date": "2020.10.17",
-        "place": "Her sister's place",
-        "situation": "After dancing all night at the club",
-        "score": 5,
-        "details": "",
-        "observations": "Things are getting complicated"
-      },
-      {
-        "id": "dc3dd6cf",
-        "date": "2020.12.28",
-        "place": "Karaoke bar",
-        "situation": "We were the last two left at the house party",
-        "score": 4,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "0e256bba",
-        "date": "2021.01.07",
-        "place": "New Year's Eve party venue",
-        "situation": "Road trip overnight stop",
-        "score": null,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "7ff3f08a",
-        "date": "2021.12.11",
-        "place": "Her dorm room",
-        "situation": "Bumped into her at the bar, one thing led to another",
-        "score": 0,
-        "details": "",
-        "observations": "She asked not to tell anyone"
-      },
-      {
-        "id": "1552a8bd",
+        "id": "d6e72f8b",
         "date": "2021.12.31",
-        "place": "New Year's Eve rooftop bar La Vista",
-        "situation": "New Year's countdown kiss that didn't stop",
+        "place": "Rooftop NYE party",
+        "situation": "New Year's Eve",
         "score": 2,
         "details": "",
-        "observations": ""
-      },
-      {
-        "id": "39f49abc",
-        "date": "2022.08.22",
-        "place": "Garden party",
-        "situation": "After dancing all night at the club",
-        "score": 1,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "fe23096e",
-        "date": "2023.02.03",
-        "place": "Rooftop bar La Vista",
-        "situation": "Spontaneous late night, just the two of us",
-        "score": 4,
-        "details": "",
-        "observations": "First time we got this far"
-      },
-      {
-        "id": "6211ce14",
-        "date": "2023.07.20",
-        "place": "New Year's Eve party venue",
-        "situation": "We were the last two left at the house party",
-        "score": 0,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "12cb242d",
-        "date": "2023.11.22",
-        "place": "Her place",
-        "situation": "After a night out with the whole group",
-        "score": null,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "766232b4",
-        "date": "2023.11.29",
-        "place": "Karaoke bar",
-        "situation": "After her friend's wedding",
-        "score": null,
-        "details": "",
-        "observations": "Been thinking about this for a while"
-      },
-      {
-        "id": "f0d9afc3",
-        "date": "2023.12.20",
-        "place": "Outdoor festival area",
-        "situation": "After the live concert",
-        "score": 3,
-        "details": "",
-        "observations": ""
+        "observations": "Never saw him again after that night."
       }
     ]
   },
   {
-    "id": "99e6503b",
-    "name": "Carolina",
-    "age": 22,
+    "id": "b8w6z1y4",
+    "name": "Mia",
     "gender": "female",
-    "zodiacSign": "♋ Cancer (June 21 - July 22)",
+    "birthYear": 2000,
+    "zodiacSign": "♉ Taurus (April 20 - May 20)",
     "activity": "studies",
-    "howWeMet": "In a class we shared last semester",
-    "detail": "French and German — exchange program",
+    "detail": "Architecture — second year",
+    "howWeMet": "University, same faculty",
+    "birthdayAlreadyHappened": true,
     "events": [
       {
-        "id": "768f286b",
-        "date": "2023.08.14",
-        "place": "My apartment",
-        "situation": "Friend introduced us and chemistry was immediate",
+        "id": "g7f83a9b",
+        "date": "2021.10.15",
+        "place": "University party",
+        "situation": "End of semester celebration",
         "score": 3,
         "details": "",
         "observations": ""
       },
       {
-        "id": "0e0dfcfd",
-        "date": "2025.07.19",
-        "place": "Outdoor music festival",
-        "situation": "Festival weekend, last night",
+        "id": "h8a94b0c",
+        "date": "2021.11.20",
+        "place": "House party",
+        "situation": "House party",
+        "score": 3,
+        "details": "Ran into her there. It happened again almost by itself.",
+        "observations": ""
+      },
+      {
+        "id": "i9b05c1d",
+        "date": "2021.12.05",
+        "place": "Park bench at night",
+        "situation": "Study break that went off track",
         "score": 4,
         "details": "",
-        "observations": "We didn't talk for a week after"
+        "observations": "Then exams came and we drifted. That's just how it went."
       }
     ]
   },
   {
-    "id": "af51f550",
-    "name": "Valeria",
-    "age": 35,
+    "id": "h2j9d5s7",
+    "name": "Camille",
     "gender": "female",
+    "birthYear": 1999,
     "zodiacSign": "♈ Aries (March 21 - April 19)",
     "activity": "works",
-    "howWeMet": "At a bar downtown one random night",
-    "detail": "Real estate agent",
+    "detail": "Marketing coordinator",
+    "howWeMet": "New Year's Eve party, introduced by a mutual friend",
+    "birthdayAlreadyHappened": true,
     "events": [
       {
-        "id": "5a623e8b",
-        "date": "2020.05.15",
-        "place": "Lake house weekend",
-        "situation": "End of semester celebration",
-        "score": 4,
-        "details": "",
-        "observations": "Unexpected but great"
+        "id": "j0c16d2e",
+        "date": "2020.12.31",
+        "place": "Friend's apartment",
+        "situation": "New Year's Eve",
+        "score": 3,
+        "details": "We'd just met that same night. The countdown did the rest.",
+        "observations": ""
       },
       {
-        "id": "43e4ad6c",
-        "date": "2020.07.03",
-        "place": "Her friend's apartment",
-        "situation": "First time meeting in person after matching online",
-        "score": null,
+        "id": "k1d27e3f",
+        "date": "2021.02.14",
+        "place": "Bar",
+        "situation": "Valentine's drinks",
+        "score": 4,
         "details": "",
         "observations": ""
       },
       {
-        "id": "0760a1e1",
-        "date": "2020.10.13",
+        "id": "l2e38f4a",
+        "date": "2021.05.28",
+        "place": "Park",
+        "situation": "Slow afternoon walk",
+        "score": 4,
+        "details": "Late spring, the light was perfect. No real plan.",
+        "observations": ""
+      },
+      {
+        "id": "m3f49a5b",
+        "date": "2021.08.20",
+        "place": "Club",
+        "situation": "Night out",
+        "score": 2,
+        "details": "",
+        "observations": "It felt forced. We both knew something was shifting."
+      },
+      {
+        "id": "n4a50b6c",
+        "date": "2022.01.08",
         "place": "Her place",
-        "situation": "After work drinks that turned into more",
-        "score": 5,
-        "details": "",
-        "observations": "Best night this year"
-      },
-      {
-        "id": "a950891c",
-        "date": "2021.04.04",
-        "place": "Lounge Bar Cleo",
-        "situation": "After her friend's wedding",
+        "situation": "Catching up after the holidays",
         "score": 3,
         "details": "",
-        "observations": "We didn't talk for a week after"
-      },
-      {
-        "id": "aaa81e2b",
-        "date": "2021.04.25",
-        "place": "Her place",
-        "situation": "Summer house long weekend",
-        "score": null,
-        "details": "",
         "observations": ""
       },
       {
-        "id": "e058e58b",
-        "date": "2021.04.27",
-        "place": "New Year's Eve party venue",
-        "situation": "After the live concert",
+        "id": "o5b61c7d",
+        "date": "2022.04.02",
+        "place": "My place",
+        "situation": "She came over, nothing planned",
         "score": 4,
         "details": "",
         "observations": ""
       },
       {
-        "id": "e3e94835",
-        "date": "2021.06.21",
-        "place": "Marco's house party",
-        "situation": "After the gym, went back to hers",
-        "score": 4,
+        "id": "p6c72d8e",
+        "date": "2023.06.17",
+        "place": "Beach bar",
+        "situation": "Reconnected after months of silence",
+        "score": 3,
         "details": "",
-        "observations": "Been thinking about this for a while"
+        "observations": "She texted out of nowhere. Some things don't expire."
       }
     ]
   },
   {
-    "id": "c70272c0",
-    "name": "Elena",
-    "age": 26,
-    "gender": "female",
-    "zodiacSign": "♊ Gemini (May 21 - June 20)",
-    "activity": "studies and works",
-    "howWeMet": "Met at the gym",
-    "detail": "Studies nutrition, barista at a specialty café",
-    "events": [
-      {
-        "id": "93ae2c1d",
-        "date": "2021.07.10",
-        "place": "Beach house weekend",
-        "situation": "Hot summer day at the pool",
-        "score": 3,
-        "details": "",
-        "observations": "She texted the next morning"
-      },
-      {
-        "id": "b2cc1c2f",
-        "date": "2023.02.01",
-        "place": "Karaoke bar",
-        "situation": "Friend introduced us and chemistry was immediate",
-        "score": 4,
-        "details": "",
-        "observations": "We didn't talk for a week after"
-      },
-      {
-        "id": "fce56907",
-        "date": "2023.08.13",
-        "place": "New Year's Eve party venue",
-        "situation": "Party game that got out of hand",
-        "score": 1,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "15b111aa",
-        "date": "2024.01.31",
-        "place": "Birthday loft party",
-        "situation": "After work drinks that turned into more",
-        "score": null,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "a2fb223f",
-        "date": "2024.08.11",
-        "place": "Her car after the show",
-        "situation": "Road trip overnight stop",
-        "score": 4,
-        "details": "",
-        "observations": "She asked not to tell anyone"
-      }
-    ]
-  },
-  {
-    "id": "47a27a15",
-    "name": "Renata",
-    "age": 20,
-    "gender": "female",
-    "zodiacSign": "♍ Virgo (August 24 - September 22)",
-    "activity": "studies",
-    "howWeMet": "At a music festival last summer",
-    "detail": "Fine arts — painting focus",
-    "events": [
-      {
-        "id": "12f23fbd",
-        "date": "2024.06.20",
-        "place": "Her friend's apartment",
-        "situation": "Friend introduced us and chemistry was immediate",
-        "score": null,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "54ed512e",
-        "date": "2024.08.31",
-        "place": "Student flat",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 3,
-        "details": "",
-        "observations": "We didn't talk for a week after"
-      },
-      {
-        "id": "f5d7aace",
-        "date": "2025.02.27",
-        "place": "Hotel Meridian",
-        "situation": "Summer house long weekend",
-        "score": 2,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "68368411",
-        "date": "2025.04.25",
-        "place": "Her place",
-        "situation": "Valentine's night out",
-        "score": 2,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "b0ba41c3",
-        "date": "2025.10.27",
-        "place": "Club Noir",
-        "situation": "Valentine's night out",
-        "score": null,
-        "details": "",
-        "observations": "Unexpected but great"
-      },
-      {
-        "id": "8313d717",
-        "date": "2025.11.14",
-        "place": "My apartment",
-        "situation": "Party game that got out of hand",
-        "score": 3,
-        "details": "",
-        "observations": "She stayed the whole weekend"
-      },
-      {
-        "id": "c58995f2",
-        "date": "2025.12.06",
-        "place": "Rooftop bar La Vista",
-        "situation": "Friend introduced us and chemistry was immediate",
-        "score": 4,
-        "details": "",
-        "observations": "She left before morning"
-      },
-      {
-        "id": "07f3e1bc",
-        "date": "2025.12.14",
-        "place": "Karaoke bar",
-        "situation": "She texted asking to come over late",
-        "score": 2,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "abe8b499",
-        "date": "2026.03.05",
-        "place": "Office rooftop",
-        "situation": "After her friend's wedding",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "cd648a5d",
-        "date": "2026.03.11",
-        "place": "Basement flat party",
-        "situation": "Road trip overnight stop",
-        "score": 4,
-        "details": "",
-        "observations": "She stayed the whole weekend"
-      },
-      {
-        "id": "4bda1019",
-        "date": "2026.03.13",
-        "place": "My apartment",
-        "situation": "Reconnected after months apart",
-        "score": 4,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "d88cf663",
-        "date": "2026.03.17",
-        "place": "Office rooftop",
-        "situation": "After her friend's wedding",
-        "score": null,
-        "details": "",
-        "observations": "First time we got this far"
-      },
-      {
-        "id": "513369d0",
-        "date": "2026.04.22",
-        "place": "Her car after the show",
-        "situation": "We were the last two left at the house party",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      }
-    ]
-  },
-  {
-    "id": "99e6ad71",
-    "name": "Mónica",
-    "age": 32,
-    "gender": "female",
-    "zodiacSign": "♒ Aquarius (January 20 - February 19)",
-    "activity": "works",
-    "howWeMet": "Through Tinder",
-    "detail": "Full-stack developer at a fintech company",
-    "events": [
-      {
-        "id": "e1b8f681",
-        "date": "2020.10.26",
-        "place": "Club Noir",
-        "situation": "Valentine's night out",
-        "score": 4,
-        "details": "",
-        "observations": "Great chemistry as always"
-      },
-      {
-        "id": "07bbe605",
-        "date": "2021.03.15",
-        "place": "Club Electra",
-        "situation": "She texted asking to come over late",
-        "score": 1,
-        "details": "",
-        "observations": "First time we got this far"
-      },
-      {
-        "id": "c394d616",
-        "date": "2021.03.23",
-        "place": "My car outside her place",
-        "situation": "We were the last two left at the house party",
-        "score": 5,
-        "details": "",
-        "observations": "She stayed the whole weekend"
-      },
-      {
-        "id": "faf406a1",
-        "date": "2021.03.27",
-        "place": "Basement flat party",
-        "situation": "She came over to 'watch a movie'",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "ac742130",
-        "date": "2021.12.31",
-        "place": "New Year's Eve rooftop bar La Vista",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "1532f3ae",
-        "date": "2022.02.07",
-        "place": "Music festival campground",
-        "situation": "We were the last two left at the house party",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      }
-    ]
-  },
-  {
-    "id": "13b12b31",
-    "name": "Luciana",
-    "age": 24,
-    "gender": "female",
-    "zodiacSign": "♏ Scorpio (October 23 - November 21)",
-    "activity": "studies",
-    "howWeMet": "She's my roommate's friend",
-    "detail": "Philosophy — writing her thesis on free will",
-    "events": [
-      {
-        "id": "d0de47f6",
-        "date": "2022.06.18",
-        "place": "Music festival campground",
-        "situation": "Festival weekend, last night",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "34001de1",
-        "date": "2024.07.22",
-        "place": "Birthday loft party",
-        "situation": "After a night out with the whole group",
-        "score": null,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "60d074dd",
-        "date": "2025.03.31",
-        "place": "Airbnb in the city center",
-        "situation": "Birthday celebration that got wild",
-        "score": 2,
-        "details": "",
-        "observations": ""
-      }
-    ]
-  },
-  {
-    "id": "0885e1f0",
-    "name": "Fernanda",
-    "age": 28,
-    "gender": "female",
+    "id": "n6v1c3g8",
+    "name": "Tom",
+    "gender": "male",
+    "birthYear": 1996,
     "zodiacSign": "♌ Leo (July 23 - August 23)",
     "activity": "works",
-    "howWeMet": "Through Bumble",
-    "detail": "Physiotherapist, works with athletes",
+    "detail": "Sound engineer",
+    "howWeMet": "At a music festival, we ended up near the same stage",
+    "birthdayAlreadyHappened": false,
     "events": [
       {
-        "id": "26261186",
-        "date": "2021.07.05",
-        "place": "Lounge Bar Cleo",
-        "situation": "We were the last two left at the house party",
-        "score": 5,
-        "details": "",
-        "observations": "She asked not to tell anyone"
-      },
-      {
-        "id": "8a203888",
-        "date": "2021.07.10",
-        "place": "Beach house weekend",
-        "situation": "Hot summer day at the pool",
-        "score": 4,
-        "details": "",
+        "id": "q7d83e9f",
+        "date": "2022.08.06",
+        "place": "Festival grounds",
+        "situation": "Music festival",
+        "score": 3,
+        "details": "Spontaneous. The music was loud and it just made sense.",
         "observations": ""
       },
       {
-        "id": "c0f3b0c2",
-        "date": "2021.10.02",
-        "place": "Club Electra",
-        "situation": "Hot summer day at the pool",
-        "score": 4,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "b39366e3",
-        "date": "2022.04.28",
-        "place": "Rooftop bar La Vista",
-        "situation": "Met at a party and things escalated quickly",
+        "id": "r8e94f0a",
+        "date": "2022.08.07",
+        "place": "Festival campsite",
+        "situation": "Last night of the festival",
         "score": 3,
         "details": "",
-        "observations": "Been thinking about this for a while"
-      },
-      {
-        "id": "5c80d994",
-        "date": "2023.02.25",
-        "place": "Office rooftop",
-        "situation": "Party game that got out of hand",
-        "score": 4,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "2b3c0ee1",
-        "date": "2023.11.30",
-        "place": "Garden party",
-        "situation": "After a date that went really well",
-        "score": 2,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "876f55de",
-        "date": "2023.12.09",
-        "place": "Wine bar Botánico",
-        "situation": "After dancing all night at the club",
-        "score": 3,
-        "details": "",
-        "observations": "Not sure where this is heading"
-      },
-      {
-        "id": "381633f3",
-        "date": "2024.02.02",
-        "place": "Club Noir",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "dbe43df3",
-        "date": "2024.02.27",
-        "place": "Summer house at the lake",
-        "situation": "Birthday celebration that got wild",
-        "score": 5,
-        "details": "",
-        "observations": "She was upfront that she's seeing someone else too"
-      },
-      {
-        "id": "fd8a9475",
-        "date": "2024.05.06",
-        "place": "New Year's Eve party venue",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 4,
-        "details": "",
-        "observations": "Been thinking about this for a while"
+        "observations": "Never exchanged numbers. That was fine."
       }
     ]
   },
   {
-    "id": "7cf927f7",
-    "name": "Carlos",
-    "age": 21,
-    "gender": "male",
-    "zodiacSign": "♓ Pisces (February 20 - March 20)",
-    "activity": "studies",
-    "howWeMet": "At a house party three months ago",
-    "detail": "International relations — first year",
-    "events": [
-      {
-        "id": "d28b309f",
-        "date": "2025.04.19",
-        "place": "Hotel Meridian",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 5,
-        "details": "",
-        "observations": "We said it was the last time but it wasn't"
-      }
-    ]
-  },
-  {
-    "id": "548a0aab",
-    "name": "Sebastián",
-    "age": 33,
-    "gender": "male",
-    "zodiacSign": "♎ Libra (September 23 - October 22)",
-    "activity": "works",
-    "howWeMet": "We work in the same building",
-    "detail": "Head chef at a Mediterranean restaurant",
-    "events": [
-      {
-        "id": "d8afa9e5",
-        "date": "2020.06.12",
-        "place": "Bar near uni",
-        "situation": "Late night walk that ended at my place",
-        "score": 4,
-        "details": "",
-        "observations": "Great chemistry as always"
-      },
-      {
-        "id": "8476caf6",
-        "date": "2020.07.05",
-        "place": "Lounge Bar Cleo",
-        "situation": "She texted asking to come over late",
-        "score": 5,
-        "details": "",
-        "observations": "We said it was the last time but it wasn't"
-      },
-      {
-        "id": "f445aa02",
-        "date": "2020.11.12",
-        "place": "Basement flat party",
-        "situation": "We were the last two left at the house party",
-        "score": null,
-        "details": "",
-        "observations": "Things are getting complicated"
-      },
-      {
-        "id": "249223f4",
-        "date": "2020.11.30",
-        "place": "Airbnb in the city center",
-        "situation": "Met at a party and things escalated quickly",
-        "score": 2,
-        "details": "",
-        "observations": "Unexpected but great"
-      },
-      {
-        "id": "5711b2e1",
-        "date": "2021.01.13",
-        "place": "Karaoke bar",
-        "situation": "Party game that got out of hand",
-        "score": 2,
-        "details": "",
-        "observations": "She left before morning"
-      },
-      {
-        "id": "4bd21c60",
-        "date": "2021.03.15",
-        "place": "Her friend's apartment",
-        "situation": "After work drinks that turned into more",
-        "score": 3,
-        "details": "",
-        "observations": "Best night this year"
-      },
-      {
-        "id": "8239ecee",
-        "date": "2021.06.10",
-        "place": "Lake house weekend",
-        "situation": "Valentine's night out",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "0c1aa811",
-        "date": "2021.12.07",
-        "place": "Lounge Bar Cleo",
-        "situation": "After the live concert",
-        "score": 0,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "b5804c7a",
-        "date": "2021.12.31",
-        "place": "New Year's Eve rooftop bar La Vista",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 1,
-        "details": "",
-        "observations": "She stayed the whole weekend"
-      },
-      {
-        "id": "390e4fa9",
-        "date": "2022.01.22",
-        "place": "My apartment",
-        "situation": "Hot summer day at the pool",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "649b6b7d",
-        "date": "2022.01.26",
-        "place": "Marco's house party",
-        "situation": "Festival weekend, last night",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "13cd9882",
-        "date": "2022.03.13",
-        "place": "Outdoor festival area",
-        "situation": "After her friend's wedding",
-        "score": 2,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "96d5f442",
-        "date": "2022.03.15",
-        "place": "Her car after the show",
-        "situation": "After dancing all night at the club",
-        "score": 2,
-        "details": "",
-        "observations": "Been thinking about this for a while"
-      },
-      {
-        "id": "360a5d81",
-        "date": "2022.04.06",
-        "place": "Office rooftop",
-        "situation": "She stayed for the weekend without planning it",
-        "score": 1,
-        "details": "",
-        "observations": "She was upfront that she's seeing someone else too"
-      },
-      {
-        "id": "32db79a9",
-        "date": "2022.05.11",
-        "place": "Club Noir",
-        "situation": "Late night walk that ended at my place",
-        "score": null,
-        "details": "",
-        "observations": "She texted the next morning"
-      }
-    ]
-  },
-  {
-    "id": "f8bf4241",
-    "name": "Diego",
-    "age": 25,
-    "gender": "male",
+    "id": "f4x9q2m5",
+    "name": "Valentina",
+    "gender": "female",
+    "birthYear": 2001,
     "zodiacSign": "♉ Taurus (April 20 - May 20)",
-    "activity": "studies and works",
-    "howWeMet": "Through Hinge",
-    "detail": "Studies law, intern at a criminal defense firm",
-    "events": [
-      {
-        "id": "dec3b633",
-        "date": "2022.01.09",
-        "place": "Karaoke bar",
-        "situation": "First time meeting in person after matching online",
-        "score": null,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "2a4a2957",
-        "date": "2022.12.31",
-        "place": "New Year's Eve party venue",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 1,
-        "details": "",
-        "observations": "We agreed to keep it casual"
-      },
-      {
-        "id": "7349d297",
-        "date": "2023.05.03",
-        "place": "My car outside her place",
-        "situation": "After her friend's wedding",
-        "score": 4,
-        "details": "",
-        "observations": "She texted the next morning"
-      },
-      {
-        "id": "4a082c78",
-        "date": "2023.05.26",
-        "place": "Her dorm room",
-        "situation": "Met at a party and things escalated quickly",
-        "score": 5,
-        "details": "",
-        "observations": "She texted the next morning"
-      },
-      {
-        "id": "f40158fa",
-        "date": "2023.07.13",
-        "place": "Lake house weekend",
-        "situation": "Met at a party and things escalated quickly",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "1f8d08ff",
-        "date": "2024.05.02",
-        "place": "Her place",
-        "situation": "First time meeting in person after matching online",
-        "score": null,
-        "details": "",
-        "observations": "We didn't talk for a week after"
-      },
-      {
-        "id": "a8f8ac5e",
-        "date": "2025.12.06",
-        "place": "Student flat",
-        "situation": "Late night walk that ended at my place",
-        "score": 5,
-        "details": "",
-        "observations": "Not sure where this is heading"
-      },
-      {
-        "id": "131a9046",
-        "date": "2025.12.21",
-        "place": "Club Velvet",
-        "situation": "Late night walk that ended at my place",
-        "score": null,
-        "details": "",
-        "observations": "Still figuring out what we are"
-      }
-    ]
-  },
-  {
-    "id": "289e7ec4",
-    "name": "Patricio",
-    "age": 29,
-    "gender": "male",
-    "zodiacSign": "♒ Aquarius (January 20 - February 19)",
-    "activity": "works",
-    "howWeMet": "Through Instagram DMs",
-    "detail": "Primary school teacher",
-    "events": [
-      {
-        "id": "afee80c5",
-        "date": "2021.01.01",
-        "place": "Lake house weekend",
-        "situation": "Party game that got out of hand",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "320f5888",
-        "date": "2021.04.06",
-        "place": "Concert venue",
-        "situation": "We were the last two left at the house party",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "f3b3bcfa",
-        "date": "2022.09.01",
-        "place": "Her sister's place",
-        "situation": "We were the last two left at the house party",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "1ac80454",
-        "date": "2022.10.29",
-        "place": "Halloween house party",
-        "situation": "After drinks with the whole group",
-        "score": 1,
-        "details": "",
-        "observations": "Still figuring out what we are"
-      }
-    ]
-  },
-  {
-    "id": "0fcbbc8f",
-    "name": "Claudio",
-    "age": 27,
-    "gender": "male",
-    "zodiacSign": "♑ Capricorn (December 22 - January 19)",
-    "activity": "other",
-    "howWeMet": "At a university club meeting",
-    "detail": "Freelance illustrator, also does tattoos",
-    "events": [
-      {
-        "id": "9ce84419",
-        "date": "2022.12.31",
-        "place": "New Year's Eve party venue",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "451c1d68",
-        "date": "2023.03.13",
-        "place": "Club Electra",
-        "situation": "Met at a party and things escalated quickly",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      }
-    ]
-  },
-  {
-    "id": "53811483",
-    "name": "Rodrigo",
-    "age": 23,
-    "gender": "male",
-    "zodiacSign": "♋ Cancer (June 21 - July 22)",
     "activity": "studies",
-    "howWeMet": "At a bar downtown one random night",
-    "detail": "Biology — interested in marine ecosystems",
+    "detail": "Psychology — first year",
+    "howWeMet": "House party, friend of a friend",
+    "birthdayAlreadyHappened": true,
     "events": [
       {
-        "id": "ce91d403",
-        "date": "2023.12.28",
-        "place": "Garden party",
-        "situation": "Reconnected after months apart",
-        "score": null,
+        "id": "s9f05a1b",
+        "date": "2021.11.20",
+        "place": "House party",
+        "situation": "House party",
+        "score": 2,
+        "details": "",
+        "observations": "We talked in the kitchen for ages. Then it happened. Never saw her again."
+      }
+    ]
+  },
+  {
+    "id": "r8b3k7n2",
+    "name": "Nadia",
+    "gender": "female",
+    "birthYear": 1998,
+    "zodiacSign": "♑ Capricorn (December 22 - January 19)",
+    "activity": "studies and works",
+    "detail": "Part-time at a coffee shop, studying Business",
+    "howWeMet": "Same workplace for a few months",
+    "birthdayAlreadyHappened": true,
+    "events": [
+      {
+        "id": "t0a16b2c",
+        "date": "2022.03.12",
+        "place": "Bar",
+        "situation": "After-work drinks",
+        "score": 3,
         "details": "",
         "observations": ""
       },
       {
-        "id": "bfe6e8ab",
-        "date": "2024.04.10",
-        "place": "Club Noir",
-        "situation": "After dancing all night at the club",
-        "score": null,
-        "details": "",
-        "observations": "She asked not to tell anyone"
-      },
-      {
-        "id": "de555497",
-        "date": "2024.05.11",
-        "place": "Wine bar Botánico",
-        "situation": "Hot summer day at the pool",
-        "score": null,
-        "details": "",
-        "observations": "She was upfront that she's seeing someone else too"
-      },
-      {
-        "id": "ec4b9301",
-        "date": "2024.12.31",
-        "place": "New Year's Eve club night at Club Noir",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "18ee3b5b",
-        "date": "2026.01.26",
-        "place": "My car outside her place",
-        "situation": "After drinks with the whole group",
+        "id": "u1b27c3d",
+        "date": "2022.06.24",
+        "place": "Her place",
+        "situation": "She invited me over after a shift",
         "score": 4,
         "details": "",
         "observations": ""
       },
       {
-        "id": "2e2741b3",
-        "date": "2026.04.04",
-        "place": "Airbnb in the city center",
-        "situation": "Friend introduced us and chemistry was immediate",
+        "id": "v2c38d4e",
+        "date": "2022.10.15",
+        "place": "Park",
+        "situation": "Evening walk",
         "score": 3,
         "details": "",
-        "observations": "We agreed to keep it casual"
+        "observations": "Felt easy. No pressure. Just a walk that didn't really want to end."
+      },
+      {
+        "id": "w3d49e5f",
+        "date": "2023.08.03",
+        "place": "Bar",
+        "situation": "Ran into her again",
+        "score": 2,
+        "details": "",
+        "observations": "Same bar we used to go to. Some pull is just always there."
       }
     ]
   },
   {
-    "id": "6cc342f9",
+    "id": "s5w1j4h9",
+    "name": "Lena",
+    "gender": "female",
+    "birthYear": 1999,
+    "zodiacSign": "♊ Gemini (May 21 - June 20)",
+    "activity": "studies",
+    "detail": "Communications — third year",
+    "howWeMet": "At a music festival, she was with the same group as some friends",
+    "birthdayAlreadyHappened": false,
+    "events": [
+      {
+        "id": "x4e50f6a",
+        "date": "2021.07.10",
+        "place": "Festival grounds",
+        "situation": "Music festival",
+        "score": 4,
+        "details": "We'd been dancing near each other for hours before anything happened.",
+        "observations": ""
+      },
+      {
+        "id": "y5f61a7b",
+        "date": "2021.07.12",
+        "place": "Festival campsite",
+        "situation": "Last night of the festival",
+        "score": 3,
+        "details": "",
+        "observations": "Said goodbye properly. We both knew there was no point trying to keep it going."
+      }
+    ]
+  },
+  {
+    "id": "t3z6p8v2",
     "name": "Alex",
-    "age": 25,
     "gender": "other",
-    "zodiacSign": "♈ Aries (March 21 - April 19)",
-    "activity": "works",
-    "howWeMet": "At a music festival last summer",
-    "detail": "Independent music producer",
-    "events": [
-      {
-        "id": "9a3ee9a6",
-        "date": "2022.04.26",
-        "place": "My apartment",
-        "situation": "Valentine's night out",
-        "score": 2,
-        "details": "",
-        "observations": "She asked not to tell anyone"
-      },
-      {
-        "id": "5bcde7c6",
-        "date": "2022.06.18",
-        "place": "Music festival campground",
-        "situation": "Festival weekend, last night",
-        "score": 0,
-        "details": "",
-        "observations": "We said it was the last time but it wasn't"
-      },
-      {
-        "id": "98f4b82a",
-        "date": "2023.01.21",
-        "place": "Wine bar Botánico",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "9fd69b98",
-        "date": "2023.02.05",
-        "place": "Her friend's apartment",
-        "situation": "End of semester celebration",
-        "score": 4,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "a36d1422",
-        "date": "2023.08.20",
-        "place": "Bar Blackout",
-        "situation": "Road trip overnight stop",
-        "score": 3,
-        "details": "",
-        "observations": "Best night this year"
-      },
-      {
-        "id": "c3f992a2",
-        "date": "2023.10.07",
-        "place": "Summer house at the lake",
-        "situation": "Met at a party and things escalated quickly",
-        "score": 2,
-        "details": "",
-        "observations": "Been thinking about this for a while"
-      },
-      {
-        "id": "9b5df302",
-        "date": "2024.09.14",
-        "place": "Garden party at her friend's place",
-        "situation": "After a night out with the whole group",
-        "score": null,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "5943ab31",
-        "date": "2025.01.15",
-        "place": "Her car after the show",
-        "situation": "Late night walk that ended at my place",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "55e28c15",
-        "date": "2025.01.22",
-        "place": "Club Noir",
-        "situation": "Party game that got out of hand",
-        "score": 0,
-        "details": "",
-        "observations": ""
-      }
-    ]
-  },
-  {
-    "id": "abcf271f",
-    "name": "Sam",
-    "age": 28,
-    "gender": "other",
-    "zodiacSign": "♍ Virgo (August 24 - September 22)",
-    "activity": "other",
-    "howWeMet": "Through Bumble",
-    "detail": "Visual artist, mostly digital collage",
-    "events": [
-      {
-        "id": "eae4b8ed",
-        "date": "2021.01.08",
-        "place": "Outdoor festival area",
-        "situation": "End of semester celebration",
-        "score": null,
-        "details": "",
-        "observations": "Best night this year"
-      },
-      {
-        "id": "acec5599",
-        "date": "2021.04.18",
-        "place": "Club Velvet",
-        "situation": "She stayed for the weekend without planning it",
-        "score": 1,
-        "details": "",
-        "observations": "We said it was the last time but it wasn't"
-      },
-      {
-        "id": "c0e06e6e",
-        "date": "2022.12.31",
-        "place": "New Year's Eve party venue",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 3,
-        "details": "",
-        "observations": "Been thinking about this for a while"
-      },
-      {
-        "id": "c2ed5fc1",
-        "date": "2023.04.20",
-        "place": "Airbnb in the city center",
-        "situation": "End of semester celebration",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "ce2caf40",
-        "date": "2023.05.31",
-        "place": "Bar Blackout",
-        "situation": "Met at a party and things escalated quickly",
-        "score": 3,
-        "details": "",
-        "observations": "She stayed the whole weekend"
-      }
-    ]
-  },
-  {
-    "id": "086426ba",
-    "name": "Tomás",
-    "age": 22,
-    "gender": "male",
-    "zodiacSign": "♊ Gemini (May 21 - June 20)",
-    "activity": "studies",
-    "howWeMet": "At a mutual friend's birthday party",
-    "detail": "Communication sciences — radio journalism",
-    "events": [
-      {
-        "id": "426d7a4a",
-        "date": "2023.02.28",
-        "place": "Her dorm room",
-        "situation": "Road trip overnight stop",
-        "score": null,
-        "details": "",
-        "observations": "Great chemistry as always"
-      },
-      {
-        "id": "47bb94d9",
-        "date": "2023.03.04",
-        "place": "Wine bar Botánico",
-        "situation": "First time meeting in person after matching online",
-        "score": null,
-        "details": "",
-        "observations": "She texted the next morning"
-      },
-      {
-        "id": "bfe1fad0",
-        "date": "2023.05.05",
-        "place": "Wine bar Botánico",
-        "situation": "Friend introduced us and chemistry was immediate",
-        "score": 5,
-        "details": "",
-        "observations": "Unexpected but great"
-      },
-      {
-        "id": "37573601",
-        "date": "2023.08.05",
-        "place": "Lake house weekend",
-        "situation": "Hot summer day at the pool",
-        "score": 0,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "ab41aca7",
-        "date": "2024.11.15",
-        "place": "Club Electra",
-        "situation": "After the live concert",
-        "score": 5,
-        "details": "",
-        "observations": "She was upfront that she's seeing someone else too"
-      },
-      {
-        "id": "73bcd39f",
-        "date": "2025.09.30",
-        "place": "Student flat",
-        "situation": "Spontaneous late night, just the two of us",
-        "score": 1,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "7669d7af",
-        "date": "2026.01.20",
-        "place": "Birthday loft party",
-        "situation": "End of semester celebration",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      }
-    ]
-  },
-  {
-    "id": "3d7bd281",
-    "name": "Marcos",
-    "age": 30,
-    "gender": "male",
-    "zodiacSign": "♌ Leo (July 23 - August 23)",
-    "activity": "works",
-    "howWeMet": "Blind date set up by a mutual friend",
-    "detail": "Senior UX designer at a product agency",
-    "events": [
-      {
-        "id": "f55c69e2",
-        "date": "2020.05.16",
-        "place": "Her place",
-        "situation": "After the gym, went back to hers",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "26698444",
-        "date": "2020.08.19",
-        "place": "Birthday loft party",
-        "situation": "Valentine's night out",
-        "score": 4,
-        "details": "",
-        "observations": "This has been going on longer than I expected"
-      },
-      {
-        "id": "6c9d2e86",
-        "date": "2020.09.13",
-        "place": "Lake house weekend",
-        "situation": "After her friend's wedding",
-        "score": null,
-        "details": "",
-        "observations": "She texted the next morning"
-      },
-      {
-        "id": "de566c4b",
-        "date": "2020.09.22",
-        "place": "Beach house",
-        "situation": "After a night out with the whole group",
-        "score": 3,
-        "details": "",
-        "observations": "Been thinking about this for a while"
-      },
-      {
-        "id": "1e1fb60c",
-        "date": "2020.10.06",
-        "place": "Beach house",
-        "situation": "Late night walk that ended at my place",
-        "score": 3,
-        "details": "",
-        "observations": "This has been going on longer than I expected"
-      },
-      {
-        "id": "661bb69e",
-        "date": "2020.11.12",
-        "place": "Bar near uni",
-        "situation": "After her friend's wedding",
-        "score": 2,
-        "details": "",
-        "observations": "Things are getting complicated"
-      },
-      {
-        "id": "6727fc3f",
-        "date": "2022.02.08",
-        "place": "New Year's Eve party venue",
-        "situation": "Friend introduced us and chemistry was immediate",
-        "score": 0,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "6860624b",
-        "date": "2022.02.10",
-        "place": "Bar near uni",
-        "situation": "After drinks with the whole group",
-        "score": 3,
-        "details": "",
-        "observations": "Not sure where this is heading"
-      },
-      {
-        "id": "94af05dc",
-        "date": "2022.05.23",
-        "place": "Office rooftop",
-        "situation": "After the live concert",
-        "score": 5,
-        "details": "",
-        "observations": "Still figuring out what we are"
-      },
-      {
-        "id": "4dfe6d91",
-        "date": "2022.08.14",
-        "place": "Rooftop bar La Vista",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 5,
-        "details": "",
-        "observations": "Things are getting complicated"
-      },
-      {
-        "id": "2f7db9b4",
-        "date": "2022.10.29",
-        "place": "Halloween house party",
-        "situation": "After drinks with the whole group",
-        "score": 4,
-        "details": "",
-        "observations": "Things are getting complicated"
-      },
-      {
-        "id": "047d49ce",
-        "date": "2023.03.09",
-        "place": "Club Electra",
-        "situation": "After the live concert",
-        "score": 4,
-        "details": "",
-        "observations": "She was upfront that she's seeing someone else too"
-      }
-    ]
-  },
-  {
-    "id": "a78d3926",
-    "name": "Felipe",
-    "age": 24,
-    "gender": "male",
-    "zodiacSign": "♒ Aquarius (January 20 - February 19)",
-    "activity": "studies and works",
-    "howWeMet": "She's a coworker's girlfriend's friend",
-    "detail": "Studies sociology, works as event promoter",
-    "events": [
-      {
-        "id": "329d3328",
-        "date": "2022.02.03",
-        "place": "Her place",
-        "situation": "Reconnected after months apart",
-        "score": null,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "d1903066",
-        "date": "2022.12.31",
-        "place": "New Year's Eve party venue",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 1,
-        "details": "",
-        "observations": "We agreed to keep it casual"
-      },
-      {
-        "id": "61a1d185",
-        "date": "2023.02.23",
-        "place": "Summer house at the lake",
-        "situation": "She came over to 'watch a movie'",
-        "score": 5,
-        "details": "",
-        "observations": "She said it was a mistake but smiled when she left"
-      },
-      {
-        "id": "91477ef4",
-        "date": "2023.03.27",
-        "place": "Beach house",
-        "situation": "Valentine's night out",
-        "score": 4,
-        "details": "",
-        "observations": "She was upfront that she's seeing someone else too"
-      },
-      {
-        "id": "3d8df5f9",
-        "date": "2023.06.29",
-        "place": "My car outside her place",
-        "situation": "After a night out with the whole group",
-        "score": 4,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "23820715",
-        "date": "2024.12.31",
-        "place": "New Year's Eve club night at Club Noir",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 4,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "51787f9e",
-        "date": "2025.04.22",
-        "place": "Garden party",
-        "situation": "Summer house long weekend",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "cde3bea8",
-        "date": "2025.12.19",
-        "place": "Outdoor festival area",
-        "situation": "Friend introduced us and chemistry was immediate",
-        "score": 4,
-        "details": "",
-        "observations": "Not sure where this is heading"
-      }
-    ]
-  },
-  {
-    "id": "012f163f",
-    "name": "Pablo",
-    "age": 34,
-    "gender": "male",
-    "zodiacSign": "♏ Scorpio (October 23 - November 21)",
-    "activity": "works",
-    "howWeMet": "She's my roommate's friend",
-    "detail": "Dentist with his own practice",
-    "events": [
-      {
-        "id": "5e5593cb",
-        "date": "2020.06.11",
-        "place": "Airbnb in the city center",
-        "situation": "Late night walk that ended at my place",
-        "score": null,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "559c044d",
-        "date": "2020.07.25",
-        "place": "Garden party",
-        "situation": "Party game that got out of hand",
-        "score": 4,
-        "details": "",
-        "observations": "Best night this year"
-      },
-      {
-        "id": "8e1dba34",
-        "date": "2020.09.22",
-        "place": "Her sister's place",
-        "situation": "Reconnected after months apart",
-        "score": null,
-        "details": "",
-        "observations": "First time we got this far"
-      }
-    ]
-  },
-  {
-    "id": "d8f768f0",
-    "name": "Agustín",
-    "age": 21,
-    "gender": "male",
-    "zodiacSign": "♓ Pisces (February 20 - March 20)",
-    "activity": "studies",
-    "howWeMet": "At a house party three months ago",
-    "detail": "Veterinary medicine — loves cats",
-    "events": [
-      {
-        "id": "2a17ca5d",
-        "date": "2024.08.04",
-        "place": "Club Electra",
-        "situation": "After her friend's wedding",
-        "score": 3,
-        "details": "",
-        "observations": "Still figuring out what we are"
-      },
-      {
-        "id": "d4021b3e",
-        "date": "2024.09.09",
-        "place": "Wine bar Botánico",
-        "situation": "Bumped into her at the bar, one thing led to another",
-        "score": 5,
-        "details": "",
-        "observations": "This has been going on longer than I expected"
-      },
-      {
-        "id": "873d1d60",
-        "date": "2024.09.16",
-        "place": "Lake house weekend",
-        "situation": "Spontaneous late night, just the two of us",
-        "score": 1,
-        "details": "",
-        "observations": "Not sure where this is heading"
-      },
-      {
-        "id": "54b61845",
-        "date": "2024.10.29",
-        "place": "Her sister's place",
-        "situation": "First time meeting in person after matching online",
-        "score": 5,
-        "details": "",
-        "observations": "We said it was the last time but it wasn't"
-      },
-      {
-        "id": "c7dbc6be",
-        "date": "2025.04.14",
-        "place": "Marco's house party",
-        "situation": "We were the last two left at the house party",
-        "score": null,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "914129bf",
-        "date": "2025.04.16",
-        "place": "Office rooftop",
-        "situation": "After the live concert",
-        "score": 4,
-        "details": "",
-        "observations": "She stayed the whole weekend"
-      },
-      {
-        "id": "5e2a4924",
-        "date": "2025.08.21",
-        "place": "Summer house at the lake",
-        "situation": "Birthday celebration that got wild",
-        "score": null,
-        "details": "",
-        "observations": "Been thinking about this for a while"
-      },
-      {
-        "id": "9f7731d7",
-        "date": "2026.03.27",
-        "place": "Concert venue",
-        "situation": "We were the last two left at the house party",
-        "score": 4,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "9772a07d",
-        "date": "2026.04.03",
-        "place": "Lounge Bar Cleo",
-        "situation": "Birthday celebration that got wild",
-        "score": 1,
-        "details": "",
-        "observations": "We said it was the last time but it wasn't"
-      },
-      {
-        "id": "5dac7656",
-        "date": "2026.04.08",
-        "place": "Club Velvet",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 3,
-        "details": "",
-        "observations": "We said it was the last time but it wasn't"
-      },
-      {
-        "id": "741f9324",
-        "date": "2026.05.04",
-        "place": "New Year's Eve party venue",
-        "situation": "After a night out with the whole group",
-        "score": 5,
-        "details": "",
-        "observations": "She said it was a mistake but smiled when she left"
-      }
-    ]
-  },
-  {
-    "id": "5b1a49c4",
-    "name": "Facundo",
-    "age": 26,
-    "gender": "male",
+    "birthYear": 1997,
     "zodiacSign": "♎ Libra (September 23 - October 22)",
     "activity": "works",
-    "howWeMet": "We work in the same building",
-    "detail": "Social media manager for two brands",
+    "detail": "UX designer at a startup",
+    "howWeMet": "At a queer bar, introduced by a mutual friend",
+    "birthdayAlreadyHappened": false,
     "events": [
       {
-        "id": "677bc09a",
-        "date": "2022.04.03",
-        "place": "Student flat",
-        "situation": "Festival weekend, last night",
-        "score": 2,
-        "details": "",
+        "id": "z6a72b8c",
+        "date": "2021.07.10",
+        "place": "Festival grounds",
+        "situation": "Music festival",
+        "score": 3,
+        "details": "Same festival as that summer. A lot was happening that weekend.",
         "observations": ""
       },
       {
-        "id": "5c4dcab4",
-        "date": "2023.03.18",
-        "place": "Wine bar Botánico",
-        "situation": "She texted asking to come over late",
-        "score": 5,
-        "details": "",
-        "observations": "Been thinking about this for a while"
-      },
-      {
-        "id": "e63501f8",
-        "date": "2023.08.05",
-        "place": "Lake house weekend",
-        "situation": "Hot summer day at the pool",
-        "score": 2,
-        "details": "",
-        "observations": "She said it was a mistake but smiled when she left"
-      },
-      {
-        "id": "0e7aaa59",
-        "date": "2023.09.13",
-        "place": "Bar Blackout",
-        "situation": "After a date that went really well",
+        "id": "a7b83c9d",
+        "date": "2022.09.23",
+        "place": "Rooftop bar",
+        "situation": "Birthday rooftop gathering",
         "score": 3,
         "details": "",
         "observations": ""
       },
       {
-        "id": "a70c7bc6",
-        "date": "2024.05.05",
-        "place": "My car outside her place",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": null,
-        "details": "",
-        "observations": "She texted the next morning"
+        "id": "b8c94d0e",
+        "date": "2023.11.04",
+        "place": "Bar in the old quarter",
+        "situation": "Random run-in, sat for hours",
+        "score": 4,
+        "details": "We ran into each other on the street and ended up talking until closing time.",
+        "observations": "Haven't seen them since but it was one of those rare nights."
       }
     ]
   },
   {
-    "id": "ee04d571",
-    "name": "Martín",
-    "age": 23,
-    "gender": "male",
-    "zodiacSign": "♉ Taurus (April 20 - May 20)",
-    "activity": "studies",
-    "howWeMet": "In a class we shared last semester",
-    "detail": "Industrial engineering — fifth year",
-    "events": [
-      {
-        "id": "6d76de3d",
-        "date": "2024.02.17",
-        "place": "Club Noir",
-        "situation": "Spontaneous late night, just the two of us",
-        "score": 4,
-        "details": "",
-        "observations": "Still figuring out what we are"
-      },
-      {
-        "id": "5a17a04c",
-        "date": "2024.05.05",
-        "place": "Club Noir",
-        "situation": "After a night out with the whole group",
-        "score": null,
-        "details": "",
-        "observations": "Still figuring out what we are"
-      },
-      {
-        "id": "9a1f15a1",
-        "date": "2025.08.26",
-        "place": "Her place",
-        "situation": "Friend introduced us and chemistry was immediate",
-        "score": null,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "d70926b1",
-        "date": "2025.12.31",
-        "place": "New Year's Eve house party at Marco's",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 4,
-        "details": "",
-        "observations": "She said it was a mistake but smiled when she left"
-      }
-    ]
-  },
-  {
-    "id": "09e48aec",
-    "name": "Julia",
-    "age": 31,
+    "id": "m7y4d1n6",
+    "name": "Sara",
     "gender": "female",
-    "zodiacSign": "♒ Aquarius (January 20 - February 19)",
-    "activity": "other",
-    "howWeMet": "Through Tinder",
-    "detail": "Yoga instructor and wellness coach",
+    "birthYear": 2002,
+    "zodiacSign": "♌ Leo (July 23 - August 23)",
+    "activity": "studies",
+    "detail": "Fine Arts — first year",
+    "howWeMet": "At a summer festival through a common friend",
+    "birthdayAlreadyHappened": false,
     "events": [
       {
-        "id": "16b7d49d",
-        "date": "2020.06.22",
-        "place": "Club Electra",
-        "situation": "Summer house long weekend",
-        "score": 4,
-        "details": "",
-        "observations": "Still figuring out what we are"
-      },
-      {
-        "id": "6110658c",
-        "date": "2020.08.20",
-        "place": "Her dorm room",
-        "situation": "New Year's countdown kiss that didn't stop",
+        "id": "c9d05e1f",
+        "date": "2023.07.22",
+        "place": "Outdoor festival area",
+        "situation": "Music festival",
         "score": 3,
         "details": "",
-        "observations": "Still figuring out what we are"
-      },
-      {
-        "id": "4ae36483",
-        "date": "2021.01.06",
-        "place": "Club Noir",
-        "situation": "End of semester celebration",
-        "score": 2,
-        "details": "",
-        "observations": "Great chemistry as always"
-      },
-      {
-        "id": "e70fc2f8",
-        "date": "2021.10.18",
-        "place": "Club Velvet",
-        "situation": "After a date that went really well",
-        "score": 1,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "b8a4694b",
-        "date": "2022.01.24",
-        "place": "Airbnb in the city center",
-        "situation": "Summer house long weekend",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "626eb2de",
-        "date": "2022.08.02",
-        "place": "Basement flat party",
-        "situation": "We were the last two left at the house party",
-        "score": null,
-        "details": "",
-        "observations": "Still figuring out what we are"
-      },
-      {
-        "id": "c68ad023",
-        "date": "2022.11.16",
-        "place": "Karaoke bar",
-        "situation": "After the gym, went back to hers",
-        "score": null,
-        "details": "",
-        "observations": "Been thinking about this for a while"
+        "observations": "Brief and electric. She disappeared into the crowd. That was that."
       }
     ]
   },
   {
-    "id": "bf30502a",
-    "name": "Nicolás",
-    "age": 27,
+    "id": "q2x9f5b8",
+    "name": "Marco",
     "gender": "male",
+    "birthYear": 1997,
     "zodiacSign": "♐ Sagittarius (November 22 - December 21)",
     "activity": "works",
-    "howWeMet": "Through Instagram DMs",
-    "detail": "Financial analyst at an investment bank",
+    "detail": "Personal trainer",
+    "howWeMet": "Friend of a friend, same house party",
+    "birthdayAlreadyHappened": false,
     "events": [
       {
-        "id": "89bbb95f",
-        "date": "2021.04.05",
-        "place": "Student flat",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 4,
-        "details": "",
-        "observations": "Been thinking about this for a while"
-      },
-      {
-        "id": "6758f5fc",
-        "date": "2021.12.30",
-        "place": "Music festival campground",
-        "situation": "Friend introduced us and chemistry was immediate",
-        "score": 0,
-        "details": "",
-        "observations": "Great chemistry as always"
-      },
-      {
-        "id": "77838563",
-        "date": "2022.05.03",
-        "place": "Lake house weekend",
-        "situation": "Festival weekend, last night",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "98876692",
-        "date": "2022.10.29",
-        "place": "Halloween house party",
-        "situation": "After drinks with the whole group",
+        "id": "d0e16f2a",
+        "date": "2021.11.20",
+        "place": "House party",
+        "situation": "House party",
         "score": 2,
         "details": "",
-        "observations": "She was upfront that she's seeing someone else too"
-      },
-      {
-        "id": "47221bfb",
-        "date": "2023.07.20",
-        "place": "Lake house weekend",
-        "situation": "Late night walk that ended at my place",
-        "score": 5,
-        "details": "",
-        "observations": "She left before morning"
-      },
-      {
-        "id": "b920dac6",
-        "date": "2023.08.31",
-        "place": "Music festival campground",
-        "situation": "She stayed for the weekend without planning it",
-        "score": 3,
-        "details": "",
-        "observations": "Unexpected but great"
-      },
-      {
-        "id": "2b7d4e9c",
-        "date": "2023.12.10",
-        "place": "Office rooftop",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 2,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "09b1c50b",
-        "date": "2024.02.06",
-        "place": "Bar near uni",
-        "situation": "Party game that got out of hand",
-        "score": null,
-        "details": "",
-        "observations": "She said it was a mistake but smiled when she left"
-      },
-      {
-        "id": "86ca6255",
-        "date": "2025.03.08",
-        "place": "Bar Blackout after the concert",
-        "situation": "After the live concert",
-        "score": 3,
-        "details": "",
-        "observations": "She left before morning"
+        "observations": "It was a big group, everyone was in a good mood. One of those things."
       }
     ]
   },
   {
-    "id": "a7ce370f",
-    "name": "Víctor",
-    "age": 20,
-    "gender": "male",
-    "zodiacSign": "♋ Cancer (June 21 - July 22)",
-    "activity": "studies",
-    "howWeMet": "Met at the gym",
-    "detail": "Pharmacy — first year",
-    "events": [
-      {
-        "id": "8f46bb72",
-        "date": "2025.07.19",
-        "place": "Outdoor music festival",
-        "situation": "Festival weekend, last night",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      }
-    ]
-  },
-  {
-    "id": "16a2e3ed",
-    "name": "Remi",
-    "age": 29,
-    "gender": "other",
-    "zodiacSign": "♈ Aries (March 21 - April 19)",
-    "activity": "works",
-    "howWeMet": "At a bar downtown one random night",
-    "detail": "Literary translator, three published books",
-    "events": [
-      {
-        "id": "547f43ed",
-        "date": "2020.11.24",
-        "place": "Airbnb in the city center",
-        "situation": "Hot summer day at the pool",
-        "score": 3,
-        "details": "",
-        "observations": "She was upfront that she's seeing someone else too"
-      },
-      {
-        "id": "ba5047b0",
-        "date": "2020.12.05",
-        "place": "Marco's house party",
-        "situation": "After dancing all night at the club",
-        "score": 3,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "a1ed25a6",
-        "date": "2021.04.09",
-        "place": "Outdoor festival area",
-        "situation": "Valentine's night out",
-        "score": 4,
-        "details": "",
-        "observations": "Things are getting complicated"
-      },
-      {
-        "id": "0baad986",
-        "date": "2022.05.01",
-        "place": "Her sister's place",
-        "situation": "Birthday celebration that got wild",
-        "score": 3,
-        "details": "",
-        "observations": "Great chemistry as always"
-      },
-      {
-        "id": "1505efba",
-        "date": "2023.03.18",
-        "place": "Club Velvet",
-        "situation": "After drinks with the whole group",
-        "score": 5,
-        "details": "",
-        "observations": "Been thinking about this for a while"
-      },
-      {
-        "id": "aabc31f1",
-        "date": "2023.12.31",
-        "place": "New Year's Eve mega party at Club Electra",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 0,
-        "details": "",
-        "observations": ""
-      }
-    ]
-  },
-  {
-    "id": "23aabeb8",
-    "name": "Jo",
-    "age": 25,
-    "gender": "other",
-    "zodiacSign": "♊ Gemini (May 21 - June 20)",
-    "activity": "studies and works",
-    "howWeMet": "Through Hinge",
-    "detail": "Studies film theory, freelance video editor",
-    "events": [
-      {
-        "id": "6ce49621",
-        "date": "2022.08.09",
-        "place": "Lounge Bar Cleo",
-        "situation": "Birthday celebration that got wild",
-        "score": 5,
-        "details": "",
-        "observations": "She said it was a mistake but smiled when she left"
-      },
-      {
-        "id": "09479f43",
-        "date": "2022.08.25",
-        "place": "Karaoke bar",
-        "situation": "After her friend's wedding",
-        "score": 5,
-        "details": "",
-        "observations": "She said it was a mistake but smiled when she left"
-      },
-      {
-        "id": "ca0c5fc3",
-        "date": "2022.11.02",
-        "place": "Basement flat party",
-        "situation": "After the live concert",
-        "score": null,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "3d122a33",
-        "date": "2023.02.01",
-        "place": "Airbnb in the city center",
-        "situation": "After dancing all night at the club",
-        "score": 5,
-        "details": "",
-        "observations": "This has been going on longer than I expected"
-      },
-      {
-        "id": "236e1a8c",
-        "date": "2023.02.14",
-        "place": "Wine bar Botánico",
-        "situation": "Valentine's night out",
-        "score": null,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "7485794f",
-        "date": "2023.11.16",
-        "place": "Wine bar Botánico",
-        "situation": "After a date that went really well",
-        "score": 4,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "1dfd1361",
-        "date": "2024.03.03",
-        "place": "New Year's Eve party venue",
-        "situation": "She stayed for the weekend without planning it",
-        "score": 4,
-        "details": "",
-        "observations": "We said it was the last time but it wasn't"
-      },
-      {
-        "id": "63076225",
-        "date": "2024.05.26",
-        "place": "Club Velvet",
-        "situation": "End of semester celebration",
-        "score": 4,
-        "details": "",
-        "observations": "Been thinking about this for a while"
-      },
-      {
-        "id": "da6be40f",
-        "date": "2024.12.31",
-        "place": "New Year's Eve club night at Club Noir",
-        "situation": "New Year's countdown kiss that didn't stop",
-        "score": 0,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "f8634f05",
-        "date": "2025.09.12",
-        "place": "Club Velvet",
-        "situation": "Spontaneous late night, just the two of us",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      }
-    ]
-  },
-  {
-    "id": "cfc5cf62",
-    "name": "Carmen",
-    "age": 33,
+    "id": "j6r3s1k4",
+    "name": "Elena",
     "gender": "female",
+    "birthYear": 2000,
+    "zodiacSign": "♏ Scorpio (October 23 - November 21)",
+    "activity": "studies and works",
+    "detail": "Nursing student, part-time at a pharmacy",
+    "howWeMet": "Through Hinge, matched and talked for weeks before meeting",
+    "birthdayAlreadyHappened": false,
+    "events": [
+      {
+        "id": "e1f27a3b",
+        "date": "2022.02.19",
+        "place": "Coffee shop, then her place",
+        "situation": "Third date",
+        "score": 4,
+        "details": "Long time coming. Worth the wait.",
+        "observations": ""
+      },
+      {
+        "id": "f2a38b4c",
+        "date": "2022.04.30",
+        "place": "My place",
+        "situation": "She cooked dinner",
+        "score": 5,
+        "details": "",
+        "observations": ""
+      },
+      {
+        "id": "a3b49c5d",
+        "date": "2022.07.08",
+        "place": "Beach",
+        "situation": "Day trip, perfect sunset",
+        "score": 5,
+        "details": "One of those days that just works from start to finish.",
+        "observations": ""
+      },
+      {
+        "id": "b4c50d6e",
+        "date": "2022.11.03",
+        "place": "Her place",
+        "situation": "She needed company",
+        "score": 3,
+        "details": "",
+        "observations": "Something felt different. Like the good part might be ending."
+      },
+      {
+        "id": "c5d61e7f",
+        "date": "2023.01.20",
+        "place": "My place",
+        "situation": "New year, still us",
+        "score": 4,
+        "details": "",
+        "observations": ""
+      },
+      {
+        "id": "d6e72f8a",
+        "date": "2023.05.15",
+        "place": "Restaurant, then a bar",
+        "situation": "Last night before she moved cities",
+        "score": 3,
+        "details": "",
+        "observations": "We both knew. Didn't say it out loud."
+      }
+    ]
+  },
+  {
+    "id": "v9n2w8t5",
+    "name": "Zoe",
+    "gender": "female",
+    "birthYear": 1999,
+    "zodiacSign": "♉ Taurus (April 20 - May 20)",
+    "activity": "works",
+    "detail": "Yoga instructor and content creator",
+    "howWeMet": "At a music festival, we were both in the same queue",
+    "birthdayAlreadyHappened": true,
+    "events": [
+      {
+        "id": "e7f83a9b",
+        "date": "2022.08.06",
+        "place": "Festival grounds",
+        "situation": "Music festival",
+        "score": 3,
+        "details": "Instant connection at the festival bar. Hours flew by.",
+        "observations": ""
+      },
+      {
+        "id": "f8a94b0c",
+        "date": "2025.03.10",
+        "place": "Cocktail bar downtown",
+        "situation": "Reconnected after a long time",
+        "score": 4,
+        "details": "",
+        "observations": "Almost three years and it still felt exactly the same."
+      }
+    ]
+  },
+  {
+    "id": "c4m7y3h6",
+    "name": "Lucas",
+    "gender": "male",
+    "birthYear": 1996,
+    "zodiacSign": "♑ Capricorn (December 22 - January 19)",
+    "activity": "works",
+    "detail": "Architect at a firm",
+    "howWeMet": "Old friend from high school, reconnected at a New Year's party",
+    "birthdayAlreadyHappened": false,
+    "events": [
+      {
+        "id": "a9b05c1d",
+        "date": "2021.12.31",
+        "place": "Rooftop NYE party",
+        "situation": "New Year's Eve",
+        "score": 2,
+        "details": "Both a bit drunk at midnight. Old friends, new moment.",
+        "observations": ""
+      },
+      {
+        "id": "b0c16d2e",
+        "date": "2022.03.05",
+        "place": "Bar near his office",
+        "situation": "He texted after NYE",
+        "score": 3,
+        "details": "",
+        "observations": ""
+      },
+      {
+        "id": "c1d27e3f",
+        "date": "2022.06.18",
+        "place": "Club",
+        "situation": "Night out with the group",
+        "score": 3,
+        "details": "",
+        "observations": ""
+      },
+      {
+        "id": "d2e38f4a",
+        "date": "2022.10.01",
+        "place": "Rooftop bar",
+        "situation": "Goodbye drinks before he moved abroad",
+        "score": 4,
+        "details": "Knew it was the last time. Made it count.",
+        "observations": ""
+      }
+    ]
+  },
+  {
+    "id": "g1p5b9z8",
+    "name": "Isabelle",
+    "gender": "female",
+    "birthYear": 2001,
+    "zodiacSign": "♓ Pisces (February 20 - March 20)",
+    "activity": "studies",
+    "detail": "Literature — second year",
+    "howWeMet": "House party, introduced by the host",
+    "birthdayAlreadyHappened": true,
+    "events": [
+      {
+        "id": "e3f49a5b",
+        "date": "2023.02.18",
+        "place": "House party",
+        "situation": "House party",
+        "score": 2,
+        "details": "We talked in a corner for hours. Then the party thinned out.",
+        "observations": "She was interesting. Just never crossed paths again."
+      }
+    ]
+  },
+  {
+    "id": "w8k4j2n7",
+    "name": "Renata",
+    "gender": "female",
+    "birthYear": 1999,
     "zodiacSign": "♍ Virgo (August 24 - September 22)",
     "activity": "works",
-    "howWeMet": "At a university club meeting",
-    "detail": "Architect specialising in sustainable housing",
+    "detail": "Event coordinator",
+    "howWeMet": "Through Instagram, she replied to a story",
+    "birthdayAlreadyHappened": false,
     "events": [
       {
-        "id": "0a0d43ce",
-        "date": "2020.07.25",
-        "place": "Birthday loft party",
-        "situation": "After the gym, went back to hers",
+        "id": "f4a50b6c",
+        "date": "2020.03.07",
+        "place": "Her place",
+        "situation": "Met in person for the first time",
+        "score": 3,
+        "details": "We'd been talking online for a while. Finally.",
+        "observations": ""
+      },
+      {
+        "id": "a5b61c7d",
+        "date": "2020.07.14",
+        "place": "Beach",
+        "situation": "Summer afternoon",
         "score": 4,
         "details": "",
-        "observations": ""
+        "observations": "Very easy. Like we'd known each other for years."
       },
       {
-        "id": "31c9b792",
-        "date": "2020.11.22",
-        "place": "Wine bar Botánico",
-        "situation": "Spontaneous late night, just the two of us",
-        "score": null,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "17c69f61",
-        "date": "2020.12.15",
-        "place": "Her sister's place",
-        "situation": "After a date that went really well",
-        "score": 4,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "51074d56",
-        "date": "2021.02.10",
-        "place": "Office rooftop",
-        "situation": "Valentine's night out",
-        "score": 5,
-        "details": "",
-        "observations": ""
-      },
-      {
-        "id": "89922243",
-        "date": "2021.02.18",
-        "place": "Beach house",
-        "situation": "Friend introduced us and chemistry was immediate",
+        "id": "b6c72d8e",
+        "date": "2020.12.01",
+        "place": "Her place",
+        "situation": "Quiet night in",
         "score": 3,
         "details": "",
         "observations": ""
       },
       {
-        "id": "43dfef41",
-        "date": "2021.03.01",
-        "place": "Lounge Bar Cleo",
-        "situation": "Spontaneous late night, just the two of us",
-        "score": 0,
+        "id": "c7d83e9f",
+        "date": "2021.04.22",
+        "place": "Park",
+        "situation": "Spring walk",
+        "score": 4,
+        "details": "Outdoor café first, then the park. Spring felt like an excuse for everything.",
+        "observations": ""
+      },
+      {
+        "id": "d8e94f0a",
+        "date": "2021.10.30",
+        "place": "Her place",
+        "situation": "Halloween pre-party",
+        "score": 4,
         "details": "",
         "observations": ""
       },
       {
-        "id": "221c3a66",
-        "date": "2021.04.24",
-        "place": "Music festival campground",
-        "situation": "Road trip overnight stop",
-        "score": 5,
+        "id": "e9f05a1b",
+        "date": "2022.09.17",
+        "place": "Hotel bar",
+        "situation": "She was in town for a conference",
+        "score": 3,
         "details": "",
-        "observations": "Been thinking about this for a while"
+        "observations": ""
       },
       {
-        "id": "ca2d3ca7",
-        "date": "2021.05.17",
-        "place": "Lake house weekend",
-        "situation": "Birthday celebration that got wild",
+        "id": "f0a16b2c",
+        "date": "2023.07.30",
+        "place": "Her new apartment",
+        "situation": "She moved, needed help, I stayed",
+        "score": 3,
+        "details": "",
+        "observations": "Helped her unpack boxes. That's how we ended the night."
+      },
+      {
+        "id": "a1b27c3d",
+        "date": "2025.01.10",
+        "place": "Bar near her place",
+        "situation": "Unexpected text after a year of silence",
         "score": 2,
         "details": "",
-        "observations": "She was upfront that she's seeing someone else too"
+        "observations": "Still not sure why I said yes. Then again, I always do."
+      }
+    ]
+  },
+  {
+    "id": "d6t9r1v3",
+    "name": "Chris",
+    "gender": "male",
+    "birthYear": 1998,
+    "zodiacSign": "♒ Aquarius (January 20 - February 19)",
+    "activity": "works",
+    "detail": "Software developer",
+    "howWeMet": "New Year's Eve party, same countdown spot on the rooftop",
+    "birthdayAlreadyHappened": true,
+    "events": [
+      {
+        "id": "b2c38d4e",
+        "date": "2023.12.31",
+        "place": "Rooftop party",
+        "situation": "New Year's Eve",
+        "score": 2,
+        "details": "",
+        "observations": ""
       },
       {
-        "id": "673abc42",
-        "date": "2021.05.26",
-        "place": "Outdoor festival area",
-        "situation": "After drinks with the whole group",
+        "id": "c3d49e5f",
+        "date": "2024.02.10",
+        "place": "Bar",
+        "situation": "He texted after NYE, wanted to meet",
+        "score": 2,
+        "details": "",
+        "observations": "Didn't really go anywhere. Nice enough person though."
+      }
+    ]
+  },
+  {
+    "id": "n3z5w7q1",
+    "name": "Maya",
+    "gender": "female",
+    "birthYear": 2000,
+    "zodiacSign": "♌ Leo (July 23 - August 23)",
+    "activity": "studies",
+    "detail": "Sports Science — second year",
+    "howWeMet": "At the gym, kept running into each other for months",
+    "birthdayAlreadyHappened": false,
+    "events": [
+      {
+        "id": "d4e50f6a",
+        "date": "2023.04.08",
+        "place": "Bar",
+        "situation": "After-work drinks",
+        "score": 3,
+        "details": "Finally got drinks after months of chatting between sets.",
+        "observations": ""
+      },
+      {
+        "id": "e5f61a7b",
+        "date": "2023.06.03",
+        "place": "Her place",
+        "situation": "She came over to study",
+        "score": 4,
+        "details": "",
+        "observations": "We eventually stopped studying."
+      },
+      {
+        "id": "f6a72b8c",
+        "date": "2023.09.14",
+        "place": "City plaza café",
+        "situation": "Last coffee before her semester abroad",
+        "score": 2,
+        "details": "",
+        "observations": "Bittersweet. She left two days later."
+      }
+    ]
+  },
+  {
+    "id": "y8j2m4b6",
+    "name": "Pau",
+    "gender": "female",
+    "birthYear": 1997,
+    "zodiacSign": "♈ Aries (March 21 - April 19)",
+    "activity": "works",
+    "detail": "Nurse at a public hospital",
+    "howWeMet": "Through a mutual friend at a New Year's Eve party",
+    "birthdayAlreadyHappened": true,
+    "events": [
+      {
+        "id": "a7b83c9d",
+        "date": "2020.12.31",
+        "place": "Friend's apartment",
+        "situation": "New Year's Eve",
+        "score": 4,
+        "details": "We'd just met that night. The countdown ended and everything changed.",
+        "observations": ""
+      },
+      {
+        "id": "b8c94d0e",
+        "date": "2021.01.23",
+        "place": "My place",
+        "situation": "She came over after a night shift",
+        "score": 4,
+        "details": "",
+        "observations": ""
+      },
+      {
+        "id": "c9d05e1f",
+        "date": "2021.02.20",
+        "place": "Bar",
+        "situation": "Night out",
+        "score": 3,
+        "details": "",
+        "observations": ""
+      },
+      {
+        "id": "d0e16f2a",
+        "date": "2021.04.03",
+        "place": "Park",
+        "situation": "Her birthday walk",
         "score": 5,
+        "details": "Spring afternoon. Best kiss of that whole year, honestly.",
+        "observations": ""
+      },
+      {
+        "id": "e1f27a3b",
+        "date": "2021.06.12",
+        "place": "Her place",
+        "situation": "Last time we saw each other",
+        "score": 3,
+        "details": "",
+        "observations": "She got complicated. We both knew it was the last time."
+      }
+    ]
+  },
+  {
+    "id": "h5v7p3x9",
+    "name": "Lily",
+    "gender": "female",
+    "birthYear": 2002,
+    "zodiacSign": "♍ Virgo (August 24 - September 22)",
+    "activity": "studies",
+    "detail": "Pharmacy — first year",
+    "howWeMet": "Through Bumble, she swiped first",
+    "birthdayAlreadyHappened": false,
+    "events": [
+      {
+        "id": "f2a38b4c",
+        "date": "2024.04.27",
+        "place": "Cocktail bar",
+        "situation": "First date",
+        "score": 3,
+        "details": "Good vibe. She made me laugh a lot.",
+        "observations": ""
+      },
+      {
+        "id": "a3b49c5d",
+        "date": "2024.06.15",
+        "place": "Park",
+        "situation": "Second date, stayed for the evening",
+        "score": 4,
         "details": "",
         "observations": ""
       },
       {
-        "id": "ac95844d",
-        "date": "2021.09.25",
-        "place": "Karaoke bar",
-        "situation": "After her friend's wedding",
-        "score": null,
+        "id": "o7s9v5b3",
+        "date": "2026.05.03",
+        "place": "Park",
+        "situation": "She reached out after almost two years",
+        "score": 3,
+        "details": "",
+        "observations": ""
+      }
+    ]
+  },
+  {
+    "id": "q1n8s6k4",
+    "name": "Dante",
+    "gender": "male",
+    "birthYear": 1993,
+    "zodiacSign": "♏ Scorpio (October 23 - November 21)",
+    "activity": "works",
+    "detail": "Bar manager",
+    "howWeMet": "Random encounter at a bar, both waiting for friends who never showed",
+    "birthdayAlreadyHappened": false,
+    "events": [
+      {
+        "id": "b4c50d6e",
+        "date": "2022.10.31",
+        "place": "Bar downtown",
+        "situation": "Halloween night",
+        "score": 3,
+        "details": "He was managing the bar. We talked all night. Friends never showed for either of us.",
+        "observations": "Interesting person. Never saw him again."
+      }
+    ]
+  },
+  {
+    "id": "x4b2j9m7",
+    "name": "Simone",
+    "gender": "female",
+    "birthYear": 1999,
+    "zodiacSign": "♌ Leo (July 23 - August 23)",
+    "activity": "works",
+    "detail": "Journalist at a local magazine",
+    "howWeMet": "New Year's Eve party, same friend group",
+    "birthdayAlreadyHappened": false,
+    "events": [
+      {
+        "id": "c5d61e7f",
+        "date": "2023.12.31",
+        "place": "Rooftop party",
+        "situation": "New Year's Eve",
+        "score": 3,
+        "details": "Chaotic night, great energy. Midnight made it happen.",
+        "observations": ""
+      },
+      {
+        "id": "d6e72f8a",
+        "date": "2024.02.22",
+        "place": "Wine bar",
+        "situation": "She texted a week after NYE, wanted to meet",
+        "score": 4,
         "details": "",
         "observations": ""
       },
       {
-        "id": "36853ea6",
-        "date": "2021.10.03",
-        "place": "Garden party",
-        "situation": "She came over to 'watch a movie'",
+        "id": "e7f83a9b",
+        "date": "2024.05.10",
+        "place": "Her place",
+        "situation": "She cooked dinner",
+        "score": 4,
+        "details": "Easy evening. She's a very comfortable person to be around.",
+        "observations": ""
+      },
+      {
+        "id": "f8a94b0c",
+        "date": "2024.09.03",
+        "place": "Hotel rooftop",
+        "situation": "She had press passes to an event",
+        "score": 4,
+        "details": "Glamorous night. Completely out of my usual context.",
+        "observations": ""
+      },
+      {
+        "id": "n6r8u4a2",
+        "date": "2026.04.19",
+        "place": "Her place",
+        "situation": "Things are becoming more regular",
+        "score": 4,
+        "details": "",
+        "observations": ""
+      }
+    ]
+  },
+  {
+    "id": "f7r5c3w1",
+    "name": "Kira",
+    "gender": "female",
+    "birthYear": 2001,
+    "zodiacSign": "♑ Capricorn (December 22 - January 19)",
+    "activity": "studies",
+    "detail": "Economics — third year",
+    "howWeMet": "Study group, same elective",
+    "birthdayAlreadyHappened": true,
+    "events": [
+      {
+        "id": "a9b05c1d",
+        "date": "2023.03.18",
+        "place": "Library café",
+        "situation": "Study session that went sideways",
+        "score": 3,
+        "details": "We were supposed to prep for an exam. Didn't.",
+        "observations": ""
+      },
+      {
+        "id": "b0c16d2e",
+        "date": "2023.11.25",
+        "place": "House party",
+        "situation": "House party",
+        "score": 3,
+        "details": "",
+        "observations": "Months since the library. Same spark, no explanation."
+      },
+      {
+        "id": "c1d27e3f",
+        "date": "2024.03.02",
+        "place": "Bar",
+        "situation": "She texted out of nowhere",
+        "score": 3,
+        "details": "",
+        "observations": ""
+      }
+    ]
+  },
+  {
+    "id": "p9z6v4h2",
+    "name": "Noah",
+    "gender": "male",
+    "birthYear": 1998,
+    "zodiacSign": "♉ Taurus (April 20 - May 20)",
+    "activity": "works",
+    "detail": "Music producer",
+    "howWeMet": "House party, he was DJing for the night",
+    "birthdayAlreadyHappened": true,
+    "events": [
+      {
+        "id": "d2e38f4a",
+        "date": "2023.02.18",
+        "place": "House party",
+        "situation": "House party",
+        "score": 3,
+        "details": "He finished his set around 1am. We found a quiet corner.",
+        "observations": ""
+      },
+      {
+        "id": "e3f49a5b",
+        "date": "2023.08.20",
+        "place": "Recording studio",
+        "situation": "He invited me to hear something he was working on",
+        "score": 3,
+        "details": "",
+        "observations": "Cool space. Good music. Good night."
+      }
+    ]
+  },
+  {
+    "id": "t2d8n5q7",
+    "name": "Bianca",
+    "gender": "female",
+    "birthYear": 1995,
+    "zodiacSign": "♌ Leo (July 23 - August 23)",
+    "activity": "works",
+    "detail": "Brand strategist at an agency",
+    "howWeMet": "Friend of a colleague, met at an after-work gathering",
+    "birthdayAlreadyHappened": false,
+    "events": [
+      {
+        "id": "f4a50b6c",
+        "date": "2021.09.23",
+        "place": "Rooftop bar",
+        "situation": "After-work drinks",
+        "score": 3,
+        "details": "She was sharp and funny. A lot older than my usual crowd.",
+        "observations": "Never followed up. Think she was with someone."
+      }
+    ]
+  },
+  {
+    "id": "m6y1s9b3",
+    "name": "Andrea",
+    "gender": "female",
+    "birthYear": 2000,
+    "zodiacSign": "♎ Libra (September 23 - October 22)",
+    "activity": "studies",
+    "detail": "Sociology — second year",
+    "howWeMet": "University, she came to an event I helped organize",
+    "birthdayAlreadyHappened": false,
+    "events": [
+      {
+        "id": "a5b61c7d",
+        "date": "2021.03.25",
+        "place": "University garden",
+        "situation": "Evening campus event",
+        "score": 3,
+        "details": "Everyone else left. We kept talking.",
+        "observations": ""
+      },
+      {
+        "id": "b6c72d8e",
+        "date": "2021.06.18",
+        "place": "Her dorm",
+        "situation": "She invited me over to study",
+        "score": 4,
+        "details": "",
+        "observations": ""
+      },
+      {
+        "id": "c7d83e9f",
+        "date": "2021.09.11",
+        "place": "Bar near campus",
+        "situation": "Night out",
+        "score": 3,
+        "details": "Back from summer. Picked up right where we left off.",
+        "observations": ""
+      },
+      {
+        "id": "d8e94f0a",
+        "date": "2022.01.29",
+        "place": "Her place",
+        "situation": "New semester, she invited me over",
+        "score": 4,
+        "details": "",
+        "observations": ""
+      },
+      {
+        "id": "e9f05a1b",
+        "date": "2022.05.07",
+        "place": "Park",
+        "situation": "Slow spring walk",
+        "score": 3,
+        "details": "",
+        "observations": ""
+      },
+      {
+        "id": "f0a16b2c",
+        "date": "2023.02.04",
+        "place": "Café",
+        "situation": "Coffee to catch up",
         "score": 1,
         "details": "",
+        "observations": "She was with someone. We kept it brief. Just a hello at the door."
+      }
+    ]
+  },
+  {
+    "id": "k9w4j7p5",
+    "name": "Mateo",
+    "gender": "male",
+    "birthYear": 1996,
+    "zodiacSign": "♉ Taurus (April 20 - May 20)",
+    "activity": "works",
+    "detail": "Physiotherapist",
+    "howWeMet": "Pickup basketball game, we were on opposing teams",
+    "birthdayAlreadyHappened": true,
+    "events": [
+      {
+        "id": "a1b27c3d",
+        "date": "2022.05.14",
+        "place": "Sports bar",
+        "situation": "After-work drinks",
+        "score": 2,
+        "details": "Drinks after a rematch. Unexpected.",
         "observations": ""
       },
       {
-        "id": "a970250a",
-        "date": "2021.10.27",
-        "place": "Beach house",
-        "situation": "First time meeting in person after matching online",
-        "score": null,
-        "details": "",
-        "observations": "She texted the next morning"
-      },
-      {
-        "id": "f0404cf6",
-        "date": "2021.12.13",
-        "place": "Birthday loft party",
-        "situation": "After a date that went really well",
-        "score": 5,
+        "id": "b2c38d4e",
+        "date": "2022.07.30",
+        "place": "Club",
+        "situation": "Night out",
+        "score": 2,
         "details": "",
         "observations": ""
       },
       {
-        "id": "4662b154",
-        "date": "2022.06.16",
-        "place": "New Year's Eve party venue",
-        "situation": "Valentine's night out",
-        "score": 5,
+        "id": "c3d49e5f",
+        "date": "2022.12.10",
+        "place": "His place",
+        "situation": "Holiday gathering at his flat",
+        "score": 3,
         "details": "",
-        "observations": "Unexpected but great"
+        "observations": "Good group of people. He pulled me aside near the end of the night."
+      }
+    ]
+  },
+  {
+    "id": "z3h6t1n8",
+    "name": "Ines",
+    "gender": "female",
+    "birthYear": 1999,
+    "zodiacSign": "♐ Sagittarius (November 22 - December 21)",
+    "activity": "studies and works",
+    "detail": "Law student, intern at a firm",
+    "howWeMet": "House party, she was a friend of the host's partner",
+    "birthdayAlreadyHappened": false,
+    "events": [
+      {
+        "id": "d4e50f6a",
+        "date": "2023.02.18",
+        "place": "House party",
+        "situation": "House party",
+        "score": 3,
+        "details": "Intense conversation. She was interesting in a way that caught me off guard.",
+        "observations": ""
+      },
+      {
+        "id": "e5f61a7b",
+        "date": "2023.10.14",
+        "place": "Rooftop bar",
+        "situation": "She texted months later",
+        "score": 4,
+        "details": "",
+        "observations": "Same pull as that night in February. Some things don't need explaining."
+      }
+    ]
+  },
+  {
+    "id": "v7x2m5r4",
+    "name": "Cleo",
+    "gender": "other",
+    "birthYear": 2000,
+    "zodiacSign": "♒ Aquarius (January 20 - February 19)",
+    "activity": "works",
+    "detail": "Tattoo artist",
+    "howWeMet": "At an exhibition opening, we were both staring at the same piece",
+    "birthdayAlreadyHappened": true,
+    "events": [
+      {
+        "id": "f6a72b8c",
+        "date": "2022.04.16",
+        "place": "Gallery bar",
+        "situation": "After the exhibition opening",
+        "score": 4,
+        "details": "We left together before the show ended. Neither of us mentioned it.",
+        "observations": ""
+      },
+      {
+        "id": "a7b83c9d",
+        "date": "2022.11.19",
+        "place": "Their studio",
+        "situation": "Went in for a tattoo consult",
+        "score": 3,
+        "details": "",
+        "observations": "Left with a design appointment and something else too."
+      },
+      {
+        "id": "b8c94d0e",
+        "date": "2023.06.24",
+        "place": "Bar",
+        "situation": "Summer night, same place as always",
+        "score": 3,
+        "details": "",
+        "observations": ""
+      },
+      {
+        "id": "c9d05e1f",
+        "date": "2024.01.12",
+        "place": "Their place",
+        "situation": "They texted first, new year energy",
+        "score": 4,
+        "details": "",
+        "observations": ""
+      }
+    ]
+  },
+  {
+    "id": "b1n9q6k3",
+    "name": "Vera",
+    "gender": "female",
+    "birthYear": 1997,
+    "zodiacSign": "♎ Libra (September 23 - October 22)",
+    "activity": "works",
+    "detail": "Primary school teacher",
+    "howWeMet": "At a summer festival, near the same stage",
+    "birthdayAlreadyHappened": false,
+    "events": [
+      {
+        "id": "d0e16f2a",
+        "date": "2023.07.22",
+        "place": "Outdoor festival area",
+        "situation": "Music festival",
+        "score": 3,
+        "details": "Brief but memorable. She was fully in the moment.",
+        "observations": "Never got her number. Didn't feel like the right thing to do."
+      }
+    ]
+  },
+  {
+    "id": "s8z4w7d2",
+    "name": "Remi",
+    "gender": "female",
+    "birthYear": 1998,
+    "zodiacSign": "♍ Virgo (August 24 - September 22)",
+    "activity": "works",
+    "detail": "Copywriter and illustrator",
+    "howWeMet": "Through Tinder, we texted for weeks before actually meeting",
+    "birthdayAlreadyHappened": false,
+    "events": [
+      {
+        "id": "e1f27a3b",
+        "date": "2020.05.16",
+        "place": "Park, then my place",
+        "situation": "Finally met after weeks of talking",
+        "score": 4,
+        "details": "Walk in the park first. Neither of us wanted it to end.",
+        "observations": ""
+      },
+      {
+        "id": "f2a38b4c",
+        "date": "2020.09.12",
+        "place": "Her place",
+        "situation": "End of summer, one more time",
+        "score": 3,
+        "details": "",
+        "observations": ""
+      },
+      {
+        "id": "a3b49c5d",
+        "date": "2021.03.14",
+        "place": "Bar",
+        "situation": "She texted after months of silence",
+        "score": 3,
+        "details": "",
+        "observations": "Couldn't say no. Never can."
+      },
+      {
+        "id": "b4c50d6e",
+        "date": "2021.11.07",
+        "place": "My place",
+        "situation": "Late night, she just showed up",
+        "score": 4,
+        "details": "",
+        "observations": "Back again. Always back again."
+      },
+      {
+        "id": "c5d61e7f",
+        "date": "2022.06.11",
+        "place": "Her place",
+        "situation": "She moved, invited me to see the new flat",
+        "score": 4,
+        "details": "",
+        "observations": ""
+      },
+      {
+        "id": "d6e72f8a",
+        "date": "2023.02.28",
+        "place": "Bar",
+        "situation": "3am text in February",
+        "score": 3,
+        "details": "",
+        "observations": "Cold season ritual at this point."
+      },
+      {
+        "id": "e7f83a9b",
+        "date": "2023.10.20",
+        "place": "Concert venue",
+        "situation": "She had a spare ticket",
+        "score": 4,
+        "details": "Great band. We barely watched the second half.",
+        "observations": ""
+      },
+      {
+        "id": "f8a94b0c",
+        "date": "2024.07.04",
+        "place": "Her place",
+        "situation": "We keep finding our way back",
+        "score": 4,
+        "details": "",
+        "observations": ""
+      },
+      {
+        "id": "a9b05c1d",
+        "date": "2025.09.22",
+        "place": "My place",
+        "situation": "Years later and nothing's really changed",
+        "score": 3,
+        "details": "",
+        "observations": "Didn't even try to explain it. We just don't."
+      },
+      {
+        "id": "m5q7t3z1",
+        "date": "2026.02.14",
+        "place": "Her place",
+        "situation": "Valentine's Day text at midnight",
+        "score": 3,
+        "details": "",
+        "observations": "Of course she did. Of course I went."
+      }
+    ]
+  },
+  {
+    "id": "j5p3b1y9",
+    "name": "Oscar",
+    "gender": "male",
+    "birthYear": 1994,
+    "zodiacSign": "♏ Scorpio (October 23 - November 21)",
+    "activity": "works",
+    "detail": "Documentary filmmaker",
+    "howWeMet": "At a gallery opening, friend of a friend",
+    "birthdayAlreadyHappened": false,
+    "events": [
+      {
+        "id": "b0c16d2e",
+        "date": "2023.04.29",
+        "place": "Bar after the gallery",
+        "situation": "End of the night, impulsive",
+        "score": 2,
+        "details": "",
+        "observations": "He seemed surprised. So was I."
+      }
+    ]
+  },
+  {
+    "id": "r6m8n4v7",
+    "name": "Talia",
+    "gender": "female",
+    "birthYear": 2003,
+    "zodiacSign": "♋ Cancer (June 21 - July 22)",
+    "activity": "studies",
+    "detail": "Biology — first year",
+    "howWeMet": "Through Hinge, she messaged first",
+    "birthdayAlreadyHappened": false,
+    "events": [
+      {
+        "id": "c1d27e3f",
+        "date": "2024.05.18",
+        "place": "Park",
+        "situation": "First meet, afternoon walk",
+        "score": 3,
+        "details": "She suggested the park. Good call. Very easy conversation.",
+        "observations": ""
+      },
+      {
+        "id": "d2e38f4a",
+        "date": "2024.07.19",
+        "place": "Concert venue",
+        "situation": "She got tickets to a show",
+        "score": 4,
+        "details": "",
+        "observations": ""
+      }
+    ]
+  },
+  {
+    "id": "g4k1z9s6",
+    "name": "Nat",
+    "gender": "female",
+    "birthYear": 1999,
+    "zodiacSign": "♑ Capricorn (December 22 - January 19)",
+    "activity": "works",
+    "detail": "Product manager at a tech startup",
+    "howWeMet": "Work conference, both stuck at the same panel",
+    "birthdayAlreadyHappened": false,
+    "events": [
+      {
+        "id": "e3f49a5b",
+        "date": "2023.09.30",
+        "place": "Conference bar",
+        "situation": "After the panel, drinks that went long",
+        "score": 3,
+        "details": "We stayed talking until the bar closed.",
+        "observations": ""
+      },
+      {
+        "id": "f4a50b6c",
+        "date": "2024.04.13",
+        "place": "My place",
+        "situation": "She was in town for work",
+        "score": 4,
+        "details": "",
+        "observations": ""
+      },
+      {
+        "id": "a5b61c7d",
+        "date": "2025.06.07",
+        "place": "Rooftop bar",
+        "situation": "She moved to the city, felt right to try something",
+        "score": 4,
+        "details": "Nice to have things feel like more than a passing thing for once.",
+        "observations": ""
+      }
+    ]
+  },
+  {
+    "id": "s1w3z9f7",
+    "name": "Lucie",
+    "gender": "female",
+    "birthYear": 1997,
+    "zodiacSign": "♓ Pisces (February 20 - March 20)",
+    "activity": "studies",
+    "detail": "Fine Arts — third year",
+    "howWeMet": "Met through a mutual friend while visiting another city that summer",
+    "birthdayAlreadyHappened": true,
+    "events": [
+      {
+        "id": "p8t0w6c4",
+        "date": "2019.04.20",
+        "place": "Art school bar",
+        "situation": "After a student exhibition",
+        "score": 3,
+        "details": "I was visiting for a few weeks. She was showing her work. We ended up closing the bar.",
+        "observations": ""
+      },
+      {
+        "id": "q9u1x7d5",
+        "date": "2019.05.18",
+        "place": "Park",
+        "situation": "She offered to show me around the city",
+        "score": 4,
+        "details": "",
+        "observations": ""
+      },
+      {
+        "id": "r0v2y8e6",
+        "date": "2019.07.05",
+        "place": "Bar",
+        "situation": "Last night before I left",
+        "score": 4,
+        "details": "",
+        "observations": "We didn't exchange numbers. It felt like the right way to leave it."
       }
     ]
   }

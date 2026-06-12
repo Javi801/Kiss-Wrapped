@@ -119,13 +119,17 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring/50 select-none;
+    -webkit-tap-highlight-color: transparent;
     }
   body {
     @apply bg-background text-foreground;
     }
   html {
     @apply font-sans;
+    }
+  input, textarea, [contenteditable="true"] {
+    @apply select-text;
     }
 }
 
