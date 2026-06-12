@@ -6,16 +6,16 @@ import FullscreenChartWrapper from "./FullscreenChartWrapper";
 import { useFullscreen } from "./FullscreenContext";
 
 const MARGIN_TOP = 40;
-const MARGIN_RIGHT = 8;
+const PADDING_RIGHT = 15;
 const MARGIN_BOTTOM = 8;
 const MARGIN_HORIZONTAL = 5;
+const PADDING_LEFT = PADDING_RIGHT - MARGIN_HORIZONTAL;
 const APPROX_CHAR_PX = 6;
 const NAMES_W = 80;
 const MIN_COL_W = 36;
 const ROW_H = 36;
 const GAP = 3;
 const MAX_VISIBLE_ROWS = 10;
-const DATA_LEFT_PAD = 8;
 
 function cellColor(count, maxCount, cardSoft, heatmapRgb, alphaBase = 0.15, exponent = 1) {
   if (!count || !maxCount) return cardSoft;
@@ -54,8 +54,8 @@ export default function HeatmapChartCard({ title, subtitle, data, allYears, empt
   const numYears = allYears.length;
   const availableW = Math.max(containerWidth - marginLeft, 0);
   const dataW = numYears > 0 ? Math.max(availableW, numYears * MIN_COL_W) : availableW;
-  // Reserve DATA_LEFT_PAD on the left so columns start away from the names border.
-  const colW = numYears > 0 ? (dataW - DATA_LEFT_PAD) / numYears : 0;
+  // Reserve PADDING_LEFT on the left so columns start away from the names border.
+  const colW = numYears > 0 ? (dataW - PADDING_LEFT) / numYears : 0;
 
   const chartH = data.length * ROW_H;
   // Cap visible rows so vertical scroll activates inside the card instead of the page.
@@ -74,7 +74,7 @@ export default function HeatmapChartCard({ title, subtitle, data, allYears, empt
   const cardStyle = { borderColor: PALETTE.cardBorder, backgroundColor: PALETTE.cardBg };
   const emptyStyle = { borderColor: PALETTE.inputBorder, color: PALETTE.textSoft };
 
-  const totalW = marginLeft + dataW + MARGIN_RIGHT;
+  const totalW = marginLeft + dataW + PADDING_RIGHT;
   const totalH = MARGIN_TOP + chartH + MARGIN_BOTTOM;
   const labelContentW = Math.max(
     marginLeft,
@@ -112,7 +112,7 @@ export default function HeatmapChartCard({ title, subtitle, data, allYears, empt
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: `${marginLeft}px ${MARGIN_HORIZONTAL + 1}px ${dataW + MARGIN_RIGHT}px`,
+                  gridTemplateColumns: `${marginLeft}px ${MARGIN_HORIZONTAL + 1}px ${dataW + PADDING_RIGHT}px`,
                   gridTemplateRows: `${MARGIN_TOP}px ${chartH + MARGIN_BOTTOM}px`,
                   width: totalW,
                   height: totalH,
@@ -156,13 +156,13 @@ export default function HeatmapChartCard({ title, subtitle, data, allYears, empt
                   }}
                 >
                   <svg
-                    width={dataW + MARGIN_RIGHT}
+                    width={dataW + PADDING_RIGHT}
                     height={MARGIN_TOP}
                     aria-hidden="true"
                     style={{ display: "block" }}
                   >
                     {allYears.map((year, j) => {
-                      const cx = DATA_LEFT_PAD + j * colW + colW / 2;
+                      const cx = PADDING_LEFT + j * colW + colW / 2;
                       const cy = MARGIN_TOP - 6;
                       return (
                         <text
@@ -241,7 +241,7 @@ export default function HeatmapChartCard({ title, subtitle, data, allYears, empt
 
                 {/* Data cells */}
                 <svg
-                  width={dataW + MARGIN_RIGHT}
+                  width={dataW + PADDING_RIGHT}
                   height={chartH + MARGIN_BOTTOM}
                   aria-hidden="true"
                   style={{ display: "block" }}
@@ -252,7 +252,7 @@ export default function HeatmapChartCard({ title, subtitle, data, allYears, empt
                       <g key={person.label}>
                         {allYears.map((year, j) => {
                           const count = person.yearCounts[year] || 0;
-                          const cellX = DATA_LEFT_PAD + j * colW + GAP / 2;
+                          const cellX = PADDING_LEFT + j * colW + GAP / 2;
                           const cellW = colW - GAP;
                           const cellH = ROW_H - GAP;
                           const useDarkText = maxCount > 0 && count / maxCount > 0.55;
