@@ -196,9 +196,16 @@ export default function HeatmapChartCard({ title, subtitle, data, allYears, empt
                       left: 0,
                       zIndex: 1,
                       backgroundColor: PALETTE.cardSoft,
+                    }}
+                  >
+                    <div
+                      style={{
+                        zIndex: 1,
                         overflowX: 'auto',
                         overflowY: 'hidden',
                         WebkitOverflowScrolling: 'touch',
+                        marginLeft: MARGIN_HORIZONTAL,
+                        marginRight: MARGIN_HORIZONTAL,
                       }}
                     >
                       <svg
@@ -220,6 +227,7 @@ export default function HeatmapChartCard({ title, subtitle, data, allYears, empt
                           </text>
                         ))}
                       </svg>
+                    </div>
                   </div>
 
                   <div
