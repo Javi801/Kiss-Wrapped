@@ -32,7 +32,7 @@ async function shareImage(dataUrl, filename) {
   })
   const { uri } = await Filesystem.getUri({ path: filename, directory: Directory.Cache })
   await Share.share({ files: [uri] })
-  Filesystem.deleteFile({ path: filename, directory: Directory.Cache }).catch(() => {})
+  Filesystem.deleteFile({ path: filename, directory: Directory.Cache }).catch(() => { })
 }
 
 function IconButton({ onClick, disabled, children, palette, title }) {
@@ -101,7 +101,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
       })
       const { uri } = await Filesystem.getUri({ path: fileName, directory: Directory.Cache })
       await Share.share({ files: [uri] })
-      Filesystem.deleteFile({ path: fileName, directory: Directory.Cache }).catch(() => {})
+      Filesystem.deleteFile({ path: fileName, directory: Directory.Cache }).catch(() => { })
     } catch {
       // sharing failed silently
     } finally {
@@ -210,14 +210,20 @@ export default function FullscreenChartWrapper({ children, centerContent = false
             backgroundColor: PALETTE.bg,
             overflowY: 'auto',
             overflowX: 'hidden',
+
+            paddingTop: 'env(safe-area-inset-top)',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+            paddingLeft: 'env(safe-area-inset-left)',
+            paddingRight: 'env(safe-area-inset-right)',
+            boxSizing: 'border-box',
           }}
         >
           {/* Floating controls */}
           <div
             style={{
               position: 'fixed',
-              top: 14,
-              right: 14,
+              top: 'calc(env(safe-area-inset-top) + 14px)',
+              right: 'calc(env(safe-area-inset-right) + 14px)',
               zIndex: 10001,
               display: 'flex',
               gap: 8,

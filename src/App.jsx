@@ -375,16 +375,16 @@ export default function KissRecorderApp() {
       prev.map((person) =>
         person.id === personId
           ? {
-              ...person,
-              events: [
-                {
-                  id: uid(),
-                  ...values,
-                  score: hasScore(values.score) ? values.score : null,
-                },
-                ...(person.events || []),
-              ],
-            }
+            ...person,
+            events: [
+              {
+                id: uid(),
+                ...values,
+                score: hasScore(values.score) ? values.score : null,
+              },
+              ...(person.events || []),
+            ],
+          }
           : person
       )
     )
@@ -396,17 +396,17 @@ export default function KissRecorderApp() {
       prev.map((person) =>
         person.id === personId
           ? {
-              ...person,
-              events: (person.events || []).map((event) =>
-                event.id === eventId
-                  ? {
-                      ...event,
-                      ...values,
-                      score: hasScore(values.score) ? values.score : null,
-                    }
-                  : event
-              ),
-            }
+            ...person,
+            events: (person.events || []).map((event) =>
+              event.id === eventId
+                ? {
+                  ...event,
+                  ...values,
+                  score: hasScore(values.score) ? values.score : null,
+                }
+                : event
+            ),
+          }
           : person
       )
     )
@@ -418,9 +418,9 @@ export default function KissRecorderApp() {
       prev.map((person) =>
         person.id === personId
           ? {
-              ...person,
-              events: (person.events || []).filter((event) => event.id !== eventId),
-            }
+            ...person,
+            events: (person.events || []).filter((event) => event.id !== eventId),
+          }
           : person
       )
     )
@@ -462,9 +462,15 @@ export default function KissRecorderApp() {
     <ThemeProvider theme={theme}>
       <div
         style={{
-          height: '100vh',
+          height: '100dvh',
           color: palette.text,
           background: `linear-gradient(180deg, ${palette.bgGradientFrom}, ${palette.bgSoft}, ${palette.gradientEnd})`,
+
+          paddingTop: 'env(safe-area-inset-top)',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          paddingLeft: 'env(safe-area-inset-left)',
+          paddingRight: 'env(safe-area-inset-right)',
+          boxSizing: 'border-box',
         }}
       >
         <div
