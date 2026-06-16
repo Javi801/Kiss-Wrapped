@@ -44,7 +44,7 @@ export default function IntroScreen({ onOpenMain, t }) {
         aria-label={t.hiddenAccess}
         style={{
           position: 'absolute',
-          top: '1rem',
+          top: 'calc(env(safe-area-inset-top, 0px) + 1rem)',
           left: '1rem',
           zIndex: 10,
           padding: '0.25rem',
