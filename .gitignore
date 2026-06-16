@@ -63,6 +63,7 @@ android/app/build
 # =========================
 # iOS (Capacitor)
 # =========================
+ios
 ios/build
 ios/Pods
 
