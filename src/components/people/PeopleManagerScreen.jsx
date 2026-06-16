@@ -44,6 +44,7 @@ export default function PeopleManagerScreen({
     zodiacSign: [],
     eventDateFrom: '',
     eventDateTo: '',
+    howWeMet: [],
   })
 
   const [groupBy, setGroupBy] = useState('name')
@@ -99,6 +100,9 @@ export default function PeopleManagerScreen({
           return true
         })
       })()
+      const matchesHowWeMet =
+        filters.howWeMet.length === 0 ||
+        filters.howWeMet.includes(person.howWeMet)
 
       return (
         matchesQuery &&
@@ -106,7 +110,8 @@ export default function PeopleManagerScreen({
         matchesMaxAge &&
         matchesActivity &&
         matchesZodiac &&
-        matchesEventDate
+        matchesEventDate &&
+        matchesHowWeMet
       )
     })
 
@@ -276,6 +281,7 @@ export default function PeopleManagerScreen({
                 sortBy={sortBy}
                 setSortBy={setSortBy}
                 peopleCount={filteredPeople.length}
+                howWeMetTags={howWeMetTags}
                 t={t}
                 language={language}
               />
@@ -472,6 +478,7 @@ export default function PeopleManagerScreen({
                   zodiacSign: [],
                   eventDateFrom: '',
                   eventDateTo: '',
+                  howWeMet: [],
                 })
               }}
             >
