@@ -43,7 +43,7 @@ At a glance:
 - People profiles with zodiac-aware age tracking
 - Event log with place, situation, and optional score
 - Rich analytics dashboard with fullscreen charts and PNG export
-- Kiss Wrapped PDF slide deck and JSON backup export
+- JSON backup export and import
 
 ## Features
 
@@ -72,8 +72,8 @@ At a glance:
     <td width="50%" valign="top">
       <picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/feature-export-dark.svg"><img src="assets/readme/feature-export-light.svg" width="55" alt="Export icon"></picture><br>
       <strong>Export and share</strong><br>
-      Export your data as a JSON backup or as a Kiss Wrapped PDF slide deck — a landscape-format presentation with themed styling and slide numbers. Charts can be exported individually as PNG images. All sharing uses the device's native share sheet.<br><br>
-      <code>JSON backup</code> <code>Kiss Wrapped PDF</code> <code>Chart PNG</code> <code>Native share</code>
+      Export and re-import your data as a JSON backup, and export any chart individually as a PNG image. All sharing uses the device's native share sheet. A Kiss Wrapped PDF slide deck is planned but temporarily disabled pending a fix.<br><br>
+      <code>JSON backup</code> <code>Chart PNG</code> <code>Native share</code>
     </td>
   </tr>
   <tr>
