@@ -6,6 +6,7 @@ import { Filesystem, Directory, Encoding } from '@capacitor/filesystem'
 import { Share } from '@capacitor/share'
 import { Capacitor } from '@capacitor/core'
 import { usePalette } from '@/lib/theme'
+import { useCopy } from '@/lib/copy'
 import { TEXT } from '@/lib/constants'
 import { FullscreenContext } from './FullscreenContext'
 
@@ -74,6 +75,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
   const [hovered, setHovered] = useState(false)
   const captureRef = useRef(null)
   const PALETTE = usePalette()
+  const t = useCopy()
 
   const shareDownloadLog = useCallback(async () => {
     if (!downloadErrorObj) return
@@ -227,11 +229,11 @@ export default function FullscreenChartWrapper({ children, centerContent = false
               onClick={download}
               disabled={downloading}
               palette={PALETTE}
-              title="Descargar imagen"
+              title={t.chartDownloadImage}
             >
               <Download size={15} />
             </IconButton>
-            <IconButton onClick={close} palette={PALETTE} title="Cerrar">
+            <IconButton onClick={close} palette={PALETTE} title={t.close}>
               <X size={15} />
             </IconButton>
           </div>
@@ -356,7 +358,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
                     flexShrink: 0,
                   }}
                 >
-                  {sharingLog ? '…' : 'Compartir log'}
+                  {sharingLog ? '…' : t.chartShareLog}
                 </button>
               </div>
             ) : null}
@@ -392,7 +394,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
       {children}
       <button
         onClick={open}
-        title="Pantalla completa"
+        title={t.chartFullscreen}
         style={{
           position: 'absolute',
           top: 12,

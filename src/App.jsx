@@ -6,6 +6,7 @@ import { Capacitor } from '@capacitor/core'
 
 import { PALETTES, TEXT, COPY, ONBOARDING_VERSION, detectDeviceLanguage } from '@/lib/constants'
 import { ThemeProvider } from '@/lib/theme'
+import { CopyProvider } from '@/lib/copy'
 import { setAppIconColor } from '@/plugins/appicon'
 import { todayString } from '@/lib/date'
 import { uid, normalizePeople, mergeEventTagsFromPeople, mergePeopleFieldTags } from '@/lib/helpers'
@@ -460,174 +461,176 @@ export default function KissWrappedApp() {
 
   return (
     <ThemeProvider theme={theme}>
-      <div
-        style={{
-          height: '100vh',
-          color: palette.text,
-          background: `linear-gradient(180deg, ${palette.bgGradientFrom}, ${palette.bgSoft}, ${palette.gradientEnd})`,
-        }}
-      >
+      <CopyProvider language={language}>
         <div
           style={{
-            margin: '0 auto',
-            display: 'flex',
-            height: '100%',
-            width: '100%',
-            maxWidth: '28rem',
-            flexDirection: 'column',
-            paddingLeft: '1rem',
-            paddingRight: '1rem',
+            height: '100vh',
+            color: palette.text,
+            background: `linear-gradient(180deg, ${palette.bgGradientFrom}, ${palette.bgSoft}, ${palette.gradientEnd})`,
           }}
         >
-          {/* Main animated content area */}
-          <motion.div
-            ref={scrollRef}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25 }}
+          <div
             style={{
-              flex: '1 1 0%',
-              overflowY: 'scroll',
-              paddingTop: '1.5rem',
-              paddingBottom: '5.5rem',
-              scrollPaddingTop: '1rem',
-              scrollPaddingBottom: '1.5rem',
-              WebkitOverflowScrolling: 'touch',
-              maskImage:
-                'linear-gradient(to bottom, transparent 0px, black 20px, black calc(100% - 20px), transparent 100%)',
-              WebkitMaskImage:
-                'linear-gradient(to bottom, transparent 0px, black 20px, black calc(100% - 20px), transparent 100%)',
+              margin: '0 auto',
+              display: 'flex',
+              height: '100%',
+              width: '100%',
+              maxWidth: '28rem',
+              flexDirection: 'column',
+              paddingLeft: '1rem',
+              paddingRight: '1rem',
             }}
           >
-            {/* Main dashboard */}
-            {screen === 'main' ? (
-              <HomeScreen
-                onNavigate={navigateTo}
-                onClearData={clearAllAppData}
-                onImportData={importAppData}
-                people={people}
-                t={t}
-                language={language}
-                setLanguage={setLanguage}
-                iconColor={iconColor}
-                setIconColor={changeIconColor}
-                theme={theme}
-                setTheme={changeTheme}
-                statsVisible={statsVisible}
-                setStatsVisible={setStatsVisible}
-                modalBackRef={modalBackRef}
-              />
-            ) : null}
-
-            {/* Add person flow */}
-            {screen === 'add' ? (
-              <AddPersonScreen
-                onSave={addPerson}
-                onBack={() => setScreen('intro')}
-                t={t}
-                language={language}
-              />
-            ) : null}
-
-            {/* People management screen */}
-            {screen === 'people' ? (
-              <PeopleManagerScreen
-                people={people}
-                onUpdatePerson={updatePerson}
-                onDeletePerson={deletePerson}
-                onAddEvent={addEvent}
-                onUpdateEvent={updateEvent}
-                onDeleteEvent={deleteEvent}
-                onDeleteAllEvents={deleteAllEvents}
-                t={t}
-                language={language}
-                modalBackRef={modalBackRef}
-                situationTags={situationTags}
-                onAddSituationTag={addSituationTag}
-                placeTags={placeTags}
-                onAddPlaceTag={addPlaceTag}
-                howWeMetTags={howWeMetTags}
-                onAddHowWeMetTag={addHowWeMetTag}
-              />
-            ) : null}
-
-            {/* Statistics screen */}
-            {screen === 'stats' ? (
-              <StatsScreen people={people} t={t} modalBackRef={modalBackRef} />
-            ) : null}
-          </motion.div>
-
-          {/* Bottom navigation */}
-          {!hideBottomBar ? (
-            <div
+            {/* Main animated content area */}
+            <motion.div
+              ref={scrollRef}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
               style={{
-                position: 'fixed',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                zIndex: 50,
-                backdropFilter: 'blur(8px)',
-                borderTop: `1px solid ${palette.inputBorder}`,
-                backgroundColor: palette.navBarBg,
+                flex: '1 1 0%',
+                overflowY: 'scroll',
+                paddingTop: '1.5rem',
+                paddingBottom: '5.5rem',
+                scrollPaddingTop: '1rem',
+                scrollPaddingBottom: '1.5rem',
+                WebkitOverflowScrolling: 'touch',
+                maskImage:
+                  'linear-gradient(to bottom, transparent 0px, black 20px, black calc(100% - 20px), transparent 100%)',
+                WebkitMaskImage:
+                  'linear-gradient(to bottom, transparent 0px, black 20px, black calc(100% - 20px), transparent 100%)',
               }}
             >
+              {/* Main dashboard */}
+              {screen === 'main' ? (
+                <HomeScreen
+                  onNavigate={navigateTo}
+                  onClearData={clearAllAppData}
+                  onImportData={importAppData}
+                  people={people}
+                  t={t}
+                  language={language}
+                  setLanguage={setLanguage}
+                  iconColor={iconColor}
+                  setIconColor={changeIconColor}
+                  theme={theme}
+                  setTheme={changeTheme}
+                  statsVisible={statsVisible}
+                  setStatsVisible={setStatsVisible}
+                  modalBackRef={modalBackRef}
+                />
+              ) : null}
+
+              {/* Add person flow */}
+              {screen === 'add' ? (
+                <AddPersonScreen
+                  onSave={addPerson}
+                  onBack={() => setScreen('intro')}
+                  t={t}
+                  language={language}
+                />
+              ) : null}
+
+              {/* People management screen */}
+              {screen === 'people' ? (
+                <PeopleManagerScreen
+                  people={people}
+                  onUpdatePerson={updatePerson}
+                  onDeletePerson={deletePerson}
+                  onAddEvent={addEvent}
+                  onUpdateEvent={updateEvent}
+                  onDeleteEvent={deleteEvent}
+                  onDeleteAllEvents={deleteAllEvents}
+                  t={t}
+                  language={language}
+                  modalBackRef={modalBackRef}
+                  situationTags={situationTags}
+                  onAddSituationTag={addSituationTag}
+                  placeTags={placeTags}
+                  onAddPlaceTag={addPlaceTag}
+                  howWeMetTags={howWeMetTags}
+                  onAddHowWeMetTag={addHowWeMetTag}
+                />
+              ) : null}
+
+              {/* Statistics screen */}
+              {screen === 'stats' ? (
+                <StatsScreen people={people} t={t} modalBackRef={modalBackRef} />
+              ) : null}
+            </motion.div>
+
+            {/* Bottom navigation */}
+            {!hideBottomBar ? (
               <div
                 style={{
-                  margin: '0 auto',
-                  display: 'grid',
-                  maxWidth: '28rem',
-                  gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-                  gap: '0.25rem',
-                  paddingLeft: '0.75rem',
-                  paddingRight: '0.75rem',
-                  paddingTop: '0.75rem',
-                  paddingBottom: '0.75rem',
+                  position: 'fixed',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  zIndex: 50,
+                  backdropFilter: 'blur(8px)',
+                  borderTop: `1px solid ${palette.inputBorder}`,
+                  backgroundColor: palette.navBarBg,
                 }}
               >
-                {navItems.map((item) => {
-                  const Icon = item.icon
-                  const active = screen === item.key
+                <div
+                  style={{
+                    margin: '0 auto',
+                    display: 'grid',
+                    maxWidth: '28rem',
+                    gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+                    gap: '0.25rem',
+                    paddingLeft: '0.75rem',
+                    paddingRight: '0.75rem',
+                    paddingTop: '0.75rem',
+                    paddingBottom: '0.75rem',
+                  }}
+                >
+                  {navItems.map((item) => {
+                    const Icon = item.icon
+                    const active = screen === item.key
 
-                  return (
-                    <button
-                      key={item.key}
-                      onClick={() => navigateTo(item.key)}
-                      className="rounded-2xl"
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.25rem',
-                        paddingLeft: '0.5rem',
-                        paddingRight: '0.5rem',
-                        paddingTop: '0.5rem',
-                        paddingBottom: '0.5rem',
-                        ...TEXT.caption,
-                        fontWeight: '500',
-                        transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
-                        background: active
-                          ? `linear-gradient(90deg, ${palette.accent}, ${palette.accentSoft})`
-                          : 'transparent',
-                        color: active ? '#ffffff' : palette.textSoft,
-                      }}
-                    >
-                      <Icon style={{ height: '1rem', width: '1rem' }} />
-                      {item.label}
-                    </button>
-                  )
-                })}
+                    return (
+                      <button
+                        key={item.key}
+                        onClick={() => navigateTo(item.key)}
+                        className="rounded-2xl"
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.25rem',
+                          paddingLeft: '0.5rem',
+                          paddingRight: '0.5rem',
+                          paddingTop: '0.5rem',
+                          paddingBottom: '0.5rem',
+                          ...TEXT.caption,
+                          fontWeight: '500',
+                          transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+                          background: active
+                            ? `linear-gradient(90deg, ${palette.accent}, ${palette.accentSoft})`
+                            : 'transparent',
+                          color: active ? '#ffffff' : palette.textSoft,
+                        }}
+                      >
+                        <Icon style={{ height: '1rem', width: '1rem' }} />
+                        {item.label}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
         </div>
-      </div>
-      {/* Full-screen overlays rendered outside the masked scroll area */}
-      {screen === 'onboarding' ? (
-        <OnboardingScreen t={t} onComplete={handleOnboardingComplete} />
-      ) : null}
-      {screen === 'intro' ? <IntroScreen onOpenMain={() => navigateTo('main')} t={t} /> : null}
-      <AnimatePresence>{isPrivate && <PrivacyScreen key="privacy" />}</AnimatePresence>
+        {/* Full-screen overlays rendered outside the masked scroll area */}
+        {screen === 'onboarding' ? (
+          <OnboardingScreen t={t} onComplete={handleOnboardingComplete} />
+        ) : null}
+        {screen === 'intro' ? <IntroScreen onOpenMain={() => navigateTo('main')} t={t} /> : null}
+        <AnimatePresence>{isPrivate && <PrivacyScreen key="privacy" />}</AnimatePresence>
+      </CopyProvider>
     </ThemeProvider>
   )
 }
