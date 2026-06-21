@@ -20,10 +20,10 @@ if (hasReleaseSigning) {
 }
 
 android {
-    namespace = "io.kissrecorder"
+    namespace = "io.kisswrapped"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "io.kissrecorder"
+        applicationId "io.kisswrapped"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 2

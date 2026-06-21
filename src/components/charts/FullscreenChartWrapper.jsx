@@ -10,7 +10,7 @@ import { TEXT } from '@/lib/constants'
 import { FullscreenContext } from './FullscreenContext'
 
 function getChartFilename() {
-  return `kiss-recorder-chart-${new Date().toISOString().slice(0, 10)}.png`
+  return `kiss-wrapped-chart-${new Date().toISOString().slice(0, 10)}.png`
 }
 
 function getCaptureSize(el) {
@@ -82,7 +82,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
       const timestamp = new Date().toISOString()
       const platform = Capacitor.getPlatform?.() ?? 'unknown'
       const content = [
-        'KissRecorder Chart Export Error',
+        'Kiss Wrapped Chart Export Error',
         `Timestamp: ${timestamp}`,
         `Platform: ${platform}`,
         `Error: ${downloadErrorObj?.message || String(downloadErrorObj)}`,
@@ -91,7 +91,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
         downloadErrorObj?.stack || '(no stack trace available)',
       ].join('\n')
 
-      const fileName = `kiss-recorder-export-error-${timestamp.slice(0, 10)}.txt`
+      const fileName = `kiss-wrapped-export-error-${timestamp.slice(0, 10)}.txt`
       await Filesystem.writeFile({
         path: fileName,
         directory: Directory.Cache,
@@ -374,7 +374,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
                 userSelect: 'none',
               }}
             >
-              KissRecorder
+              Kiss Wrapped
             </div>
           </div>
         </div>

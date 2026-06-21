@@ -1,4 +1,4 @@
-package io.kissrecorder;
+package io.kisswrapped;
 
 import android.os.Bundle;
 import android.view.WindowManager;
