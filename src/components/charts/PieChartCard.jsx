@@ -5,35 +5,13 @@ import { usePalette } from '@/lib/theme'
 import FullscreenChartWrapper from './FullscreenChartWrapper'
 import { useFullscreen } from './FullscreenContext'
 import { useResponsivePieRadius } from './useResponsivePieRadius'
+import ChartTooltip from './ChartTooltip'
 import { getColorForCategory } from '@/lib/format'
 
 /**
  * Renders a reusable pie chart with legend.
  * It supports automatic color assignment and category-based colors.
  */
-function ChartTooltip({ active, payload, tooltipUnit }) {
-  const PALETTE = usePalette()
-  if (!active || !payload?.length) return null
-  const value = payload[0].value
-  const label = payload[0].name
-  const unit = value === 1 ? tooltipUnit.one : tooltipUnit.many
-  return (
-    <div
-      style={{
-        background: PALETTE.card,
-        border: `1px solid ${PALETTE.line}`,
-        color: PALETTE.text,
-        borderRadius: '0.5rem',
-        padding: '0.5rem 0.75rem',
-        fontSize: 13,
-      }}
-    >
-      <p style={{ marginBottom: '0.2rem', fontWeight: 500 }}>{label}</p>
-      <p>{`${value} ${unit}`}</p>
-    </div>
-  )
-}
-
 export default function PieChartCard({ title, subtitle, data, emptyText, tooltipUnit = null }) {
   const PALETTE = usePalette()
   const isFullscreen = useFullscreen()

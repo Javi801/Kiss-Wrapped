@@ -14,6 +14,7 @@ import { CHART_COLORS, TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
 import FullscreenChartWrapper from './FullscreenChartWrapper'
 import { useFullscreen } from './FullscreenContext'
+import ChartTooltip from './ChartTooltip'
 
 const H_LABEL_VIEWPORT_W = 80
 const H_LABEL_CHAR_W = 7
@@ -70,28 +71,6 @@ function niceStepTicks(data, maxTicks) {
  * Renders a reusable bar chart card.
  * Supports optional label rotation and custom color mapping.
  */
-function ChartTooltip({ active, payload, label, tooltipUnit }) {
-  const PALETTE = usePalette()
-  if (!active || !payload?.length) return null
-  const value = payload[0].value
-  const unit = value === 1 ? tooltipUnit.one : tooltipUnit.many
-  return (
-    <div
-      style={{
-        background: PALETTE.card,
-        border: `1px solid ${PALETTE.line}`,
-        color: PALETTE.text,
-        borderRadius: '0.5rem',
-        padding: '0.5rem 0.75rem',
-        fontSize: 13,
-      }}
-    >
-      <p style={{ marginBottom: '0.2rem', fontWeight: 500 }}>{label}</p>
-      <p>{`${value} ${unit}`}</p>
-    </div>
-  )
-}
-
 export default function BarChartCard({
   title,
   subtitle,
