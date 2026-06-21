@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
-import { calculateAge } from '@/lib/date'
+import { effectiveAge } from '@/lib/date'
 import FullscreenChartWrapper from '@/components/charts/FullscreenChartWrapper'
 
 /**
@@ -15,7 +15,7 @@ export default function AgeRangeBox({ title, subtitle, people, emptyText, bare =
   const ages = useMemo(
     () =>
       people
-        .map((p) => calculateAge(p.birthYear, p.zodiacSign) ?? p.age)
+        .map((p) => effectiveAge(p))
         .filter((age) => Number.isFinite(age))
         .sort((a, b) => a - b),
     [people]

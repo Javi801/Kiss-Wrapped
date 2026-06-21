@@ -190,3 +190,28 @@ export function calculateAgeAtEvent(birthYear, zodiacSign, eventDateStr) {
   const [y, m, d] = eventDateStr.split('.').map(Number)
   return ageAtDate(birthYear, endDate, new Date(y, m - 1, d))
 }
+
+// Resolves a person's current age, preferring the zodiac-aware calculation and
+// falling back to the legacy static `age` field for records that predate
+// birthYear (e.g. imported backups that bypass the load-time migration).
+export function effectiveAge(person) {
+  return calculateAge(person.birthYear, person.zodiacSign) ?? person.age ?? null
+}
+
+// Like effectiveAge but for the person's age at a specific event date, with the
+// same legacy `age` fallback.
+export function effectiveAgeAtEvent(person, eventDateStr) {
+  return (
+    calculateAgeAtEvent(person.birthYear, person.zodiacSign, eventDateStr) ?? person.age ?? null
+  )
+}
+
+// Like effectiveAge but uses the birthday-adjusted display age (for profile UI),
+// with the same legacy `age` fallback.
+export function effectiveDisplayAge(person) {
+  return (
+    calculateDisplayAge(person.birthYear, person.zodiacSign, person.birthdayAlreadyHappened) ??
+    person.age ??
+    null
+  )
+}

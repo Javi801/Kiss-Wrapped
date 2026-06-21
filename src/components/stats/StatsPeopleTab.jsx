@@ -8,7 +8,7 @@ import {
 } from '@/lib/format'
 import { ZODIAC_OPTIONS } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
-import { calculateAge, calculateAgeAtEvent } from '@/lib/date'
+import { effectiveAge, effectiveAgeAtEvent } from '@/lib/date'
 
 import BarChartCard from '@/components/charts/BarChartCard'
 import AreaChartCard from '@/components/charts/AreaChartCard'
@@ -103,7 +103,7 @@ export default function StatsPeopleTab({ people, t }) {
   const personsByAge = useMemo(() => {
     const ageMap = new Map()
     for (const person of people) {
-      const age = calculateAge(person.birthYear, person.zodiacSign) ?? person.age
+      const age = effectiveAge(person)
       if (Number.isFinite(age)) ageMap.set(age, (ageMap.get(age) || 0) + 1)
     }
     if (!ageMap.size) return []
@@ -122,8 +122,7 @@ export default function StatsPeopleTab({ people, t }) {
     for (const person of people) {
       const seenAges = new Set()
       for (const event of person.events || []) {
-        const age =
-          calculateAgeAtEvent(person.birthYear, person.zodiacSign, event.date) ?? person.age
+        const age = effectiveAgeAtEvent(person, event.date)
         if (Number.isFinite(age)) seenAges.add(age)
       }
       for (const age of seenAges) ageMap.set(age, (ageMap.get(age) || 0) + 1)

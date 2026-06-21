@@ -14,6 +14,9 @@ import {
   calculateDisplayAge,
   calculateAgeAtEvent,
   deriveBirthYear,
+  effectiveAge,
+  effectiveAgeAtEvent,
+  effectiveDisplayAge,
 } from '@/lib/date'
 
 describe('isValidDateString', () => {
@@ -396,5 +399,81 @@ describe('calculateDisplayAge', () => {
   it('is equivalent to calculateAge when birthdayAlreadyHappened is false outside the period', () => {
     vi.setSystemTime(new Date('2026-03-15T12:00:00')) // before Aries
     expect(calculateDisplayAge(2000, ARIES_EN, false)).toBe(calculateAge(2000, ARIES_EN))
+  })
+})
+
+describe('effectiveAge', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-04-20T12:00:00')) // day after Aries ends
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('uses the zodiac-aware calculation when birthYear and zodiacSign are present', () => {
+    expect(effectiveAge({ birthYear: 2000, zodiacSign: ARIES_EN })).toBe(26)
+  })
+
+  it('falls back to the legacy age field when no birthYear (e.g. imported legacy data)', () => {
+    expect(effectiveAge({ age: 30, zodiacSign: ARIES_EN })).toBe(30)
+  })
+
+  it('falls back to the legacy age field when zodiacSign is missing', () => {
+    expect(effectiveAge({ birthYear: 2000, age: 30 })).toBe(30)
+  })
+
+  it('prefers the computed age over the legacy field when both are available', () => {
+    expect(effectiveAge({ birthYear: 2000, zodiacSign: ARIES_EN, age: 99 })).toBe(26)
+  })
+
+  it('returns null when neither a computable age nor a legacy age exists', () => {
+    expect(effectiveAge({ birthYear: 2000 })).toBeNull()
+    expect(effectiveAge({})).toBeNull()
+  })
+})
+
+describe('effectiveAgeAtEvent', () => {
+  it('uses the age at the event date when birthYear is present', () => {
+    expect(effectiveAgeAtEvent({ birthYear: 2000, zodiacSign: ARIES_EN }, '2026.04.19')).toBe(26)
+    expect(effectiveAgeAtEvent({ birthYear: 2000, zodiacSign: ARIES_EN }, '2026.04.18')).toBe(25)
+  })
+
+  it('falls back to the legacy age field when no birthYear', () => {
+    expect(effectiveAgeAtEvent({ age: 30 }, '2026.04.19')).toBe(30)
+  })
+
+  it('returns null when neither a computable age nor a legacy age exists', () => {
+    expect(effectiveAgeAtEvent({ birthYear: 2000 }, '')).toBeNull()
+    expect(effectiveAgeAtEvent({}, '2026.04.19')).toBeNull()
+  })
+})
+
+describe('effectiveDisplayAge', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('applies the birthday adjustment inside the zodiac period', () => {
+    vi.setSystemTime(new Date('2026-04-05T12:00:00')) // within Aries
+    expect(
+      effectiveDisplayAge({ birthYear: 2000, zodiacSign: ARIES_EN, birthdayAlreadyHappened: true })
+    ).toBe(26)
+    expect(
+      effectiveDisplayAge({ birthYear: 2000, zodiacSign: ARIES_EN, birthdayAlreadyHappened: false })
+    ).toBe(25)
+  })
+
+  it('falls back to the legacy age field when the display age cannot be computed', () => {
+    vi.setSystemTime(new Date('2026-04-20T12:00:00'))
+    expect(effectiveDisplayAge({ age: 30 })).toBe(30)
+  })
+
+  it('returns null when neither a computable age nor a legacy age exists', () => {
+    vi.setSystemTime(new Date('2026-04-20T12:00:00'))
+    expect(effectiveDisplayAge({ birthYear: 2000 })).toBeNull()
   })
 })

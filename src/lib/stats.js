@@ -7,7 +7,7 @@ import {
   translateActivity,
   translateGender,
 } from '@/lib/format'
-import { getMonthKey, getYearKey, calculateAge } from '@/lib/date'
+import { getMonthKey, getYearKey, effectiveAge } from '@/lib/date'
 
 /**
  * Returns the earliest event date for a person.
@@ -157,7 +157,7 @@ export function getStatsData(people, t) {
   const personsByAge = (() => {
     const map = new Map()
     for (const person of people) {
-      const age = calculateAge(person.birthYear, person.zodiacSign) ?? person.age
+      const age = effectiveAge(person)
       if (age == null) continue
       map.set(String(age), (map.get(String(age)) || 0) + 1)
     }

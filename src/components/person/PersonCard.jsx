@@ -26,7 +26,7 @@ import {
 
 import { TEXT, abbreviateZodiacMonths } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
-import { formatShortDate, calculateDisplayAge } from '@/lib/date'
+import { formatShortDate, effectiveDisplayAge } from '@/lib/date'
 import {
   translateActivity,
   translateGender,
@@ -171,12 +171,7 @@ export default function PersonCard({
                   }}
                 >
                   <span>
-                    {calculateDisplayAge(
-                      person.birthYear,
-                      person.zodiacSign,
-                      person.birthdayAlreadyHappened
-                    ) ?? person.age}{' '}
-                    {t.years}
+                    {effectiveDisplayAge(person)} {t.years}
                   </span>
                   <span>•</span>
                   <span>{translateGender(person.gender, t)}</span>
