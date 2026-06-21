@@ -176,9 +176,9 @@ describe('exportPeopleJson — return shape', () => {
     expect(isNative).toBe(true)
   })
 
-  it('returns a fileName matching kiss-recorder-data-YYYY-MM-DD.json', async () => {
+  it('returns a fileName matching kiss-wrapped-data-YYYY-MM-DD.json', async () => {
     const { fileName } = await exportPeopleJson([])
-    expect(fileName).toMatch(/^kiss-recorder-data-\d{4}-\d{2}-\d{2}\.json$/)
+    expect(fileName).toMatch(/^kiss-wrapped-data-\d{4}-\d{2}-\d{2}\.json$/)
   })
 
   it('writes to Cache directory and opens Share sheet', async () => {

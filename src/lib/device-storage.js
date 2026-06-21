@@ -256,7 +256,7 @@ function normalizeForExport(people) {
 // Exports people data as a JSON file to external storage (native) or browser download (web).
 // Exports people data as a JSON file via the native share sheet so the user can pick the save location.
 export async function exportPeopleJson(people) {
-  const fileName = `kiss-recorder-data-${new Date().toISOString().slice(0, 10)}.json`
+  const fileName = `kiss-wrapped-data-${new Date().toISOString().slice(0, 10)}.json`
   const { normalized, hadMissingFields } = normalizeForExport(people)
   const content = JSON.stringify(normalized, null, 2)
 

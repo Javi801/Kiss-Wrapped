@@ -30,7 +30,7 @@ import StatsScreen from '@/components/stats/StatsScreen'
  * Main app container.
  * It manages global app state, persistence, navigation, and data mutations.
  */
-export default function KissRecorderApp() {
+export default function KissWrappedApp() {
   // Main people dataset used across the whole app.
   const [people, setPeople] = useState([])
 

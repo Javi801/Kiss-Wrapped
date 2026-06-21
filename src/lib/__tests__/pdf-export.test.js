@@ -179,7 +179,7 @@ describe('saveErrorLog', () => {
   it('uses a date-based file name ending in .txt', async () => {
     await saveErrorLog(new Error('x'))
     const path = mockFilesystem.writeFile.mock.calls[0][0].path
-    expect(path).toMatch(/^kiss-recorder-error-\d{4}-\d{2}-\d{2}\.txt$/)
+    expect(path).toMatch(/^kiss-wrapped-error-\d{4}-\d{2}-\d{2}\.txt$/)
   })
 
   it('opens the Share sheet with the file URI', async () => {

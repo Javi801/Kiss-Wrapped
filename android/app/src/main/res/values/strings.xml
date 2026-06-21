@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">KissRecorder</string>
-    <string name="title_activity_main">KissRecorder</string>
-    <string name="package_name">io.kissrecorder</string>
-    <string name="custom_url_scheme">io.kissrecorder</string>
+    <string name="app_name">Kiss Wrapped</string>
+    <string name="title_activity_main">Kiss Wrapped</string>
+    <string name="package_name">io.kisswrapped</string>
+    <string name="custom_url_scheme">io.kisswrapped</string>
 </resources>

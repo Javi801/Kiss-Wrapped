@@ -1,4 +1,4 @@
-<h1 align="center">KissRecorder</h1>
+<h1 align="center">Kiss Wrapped</h1>
 
 <p align="center">
   A private, offline-first app to log your interactions, track patterns, and understand your social life. No account, no server, no cloud.
@@ -21,7 +21,7 @@
 <br>
 
 <p align="center">
-  <a href="https://github.com/Javi801/KissRecorder/releases">
+  <a href="https://github.com/Javi801/Kiss-Wrapped/releases">
     <img src="https://img.shields.io/badge/Version-1.1.0-6366f1?style=for-the-badge&logo=github" alt="Version 1.1.0">
   </a>
 </p>
@@ -30,7 +30,7 @@
 
 ## Overview
 
-KissRecorder is a cross-platform mobile tracker for logging events with the people in your life. You record who, when, where, and how it went, and the app turns that data into charts, patterns, and insights without sending a single byte to a server.
+Kiss Wrapped is a cross-platform mobile tracker for logging events with the people in your life. You record who, when, where, and how it went, and the app turns that data into charts, patterns, and insights without sending a single byte to a server.
 
 Everything lives on your device. There is no backend, no account, and no sync service. The app runs natively on Android, iOS, and EMUI via Capacitor.
 
@@ -43,7 +43,7 @@ At a glance:
 - People profiles with zodiac-aware age tracking
 - Event log with place, situation, and optional score
 - Rich analytics dashboard with fullscreen charts and PNG export
-- KissWrapped PDF slide deck and JSON backup export
+- Kiss Wrapped PDF slide deck and JSON backup export
 
 ## Features
 
@@ -72,8 +72,8 @@ At a glance:
     <td width="50%" valign="top">
       <picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/feature-export-dark.svg"><img src="assets/readme/feature-export-light.svg" width="55" alt="Export icon"></picture><br>
       <strong>Export and share</strong><br>
-      Export your data as a JSON backup or as a KissWrapped PDF slide deck — a landscape-format presentation with themed styling and slide numbers. Charts can be exported individually as PNG images. All sharing uses the device's native share sheet.<br><br>
-      <code>JSON backup</code> <code>KissWrapped PDF</code> <code>Chart PNG</code> <code>Native share</code>
+      Export your data as a JSON backup or as a Kiss Wrapped PDF slide deck — a landscape-format presentation with themed styling and slide numbers. Charts can be exported individually as PNG images. All sharing uses the device's native share sheet.<br><br>
+      <code>JSON backup</code> <code>Kiss Wrapped PDF</code> <code>Chart PNG</code> <code>Native share</code>
     </td>
   </tr>
   <tr>
@@ -255,7 +255,7 @@ Age is computed at runtime via `calculateAge` and never stored on the person.
 
 ## Download
 
-Releases are published on the [GitHub Releases page](https://github.com/Javi801/KissRecorder/releases).
+Releases are published on the [GitHub Releases page](https://github.com/Javi801/Kiss-Wrapped/releases).
 
 | Platform | How to install |
 |----------|---------------|
