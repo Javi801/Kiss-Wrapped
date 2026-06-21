@@ -216,10 +216,10 @@ function topLabel(data) {
 function buildWrappedCopy(t) {
   const es = t.langCode === 'es'
   return {
-    title: 'kisswrapped',
+    title: 'Kiss Wrapped',
     subtitle: es
-      ? 'Una presentación privada para hablar de tus estadísticas de KissRecorder.'
-      : 'A private deck for talking through your KissRecorder statistics.',
+      ? 'Una presentación privada para hablar de tus estadísticas de Kiss Wrapped.'
+      : 'A private deck for talking through your Kiss Wrapped statistics.',
     yearLabel: es ? 'Tu recorrido en números' : 'Your story in numbers',
     headline: es ? 'Tu resumen ya está listo' : 'Your recap is ready',
     peopleSlide: es ? 'Las personas que marcaron el ritmo' : 'The people who set the rhythm',
@@ -376,8 +376,8 @@ export async function exportStatsPdf(people, t) {
  */
 export async function saveErrorLog(error) {
   const timestamp = new Date().toISOString()
-  const content = `KissRecorder PDF Export Error\n${timestamp}\n\n${error?.message || String(error)}`
-  const fileName = `kiss-recorder-error-${timestamp.slice(0, 10)}.txt`
+  const content = `Kiss Wrapped PDF Export Error\n${timestamp}\n\n${error?.message || String(error)}`
+  const fileName = `kiss-wrapped-error-${timestamp.slice(0, 10)}.txt`
 
   await Filesystem.writeFile({
     path: fileName,

@@ -3,24 +3,21 @@
  * Keep these values unchanged to preserve compatibility
  * with existing saved data across app versions.
  */
-export const STORAGE_KEY = 'kiss-recorder-local-v3'
-export const LANGUAGE_KEY = 'kiss-recorder-language-local-v3'
-export const ICON_COLOR_KEY = 'kiss-recorder-icon-color-v1'
-export const THEME_KEY = 'kiss-recorder-theme-v1'
-export const STATS_VISIBLE_KEY = 'kiss-recorder-stats-visible-v1'
-export const SITUATION_TAGS_KEY = 'kiss-recorder-situation-tags-v1'
-export const PLACE_TAGS_KEY = 'kiss-recorder-place-tags-v1'
-export const ONBOARDING_DONE_KEY = 'kiss-recorder-onboarding-done-v1'
-export const ONBOARDING_VERSION_KEY = 'kiss-recorder-onboarding-version-v1'
+export const STORAGE_KEY = 'kiss-wrapped-local-v3'
+export const LANGUAGE_KEY = 'kiss-wrapped-language-local-v3'
+export const ICON_COLOR_KEY = 'kiss-wrapped-icon-color-v1'
+export const THEME_KEY = 'kiss-wrapped-theme-v1'
+export const STATS_VISIBLE_KEY = 'kiss-wrapped-stats-visible-v1'
+export const SITUATION_TAGS_KEY = 'kiss-wrapped-situation-tags-v1'
+export const PLACE_TAGS_KEY = 'kiss-wrapped-place-tags-v1'
+export const ONBOARDING_DONE_KEY = 'kiss-wrapped-onboarding-done-v1'
+export const ONBOARDING_VERSION_KEY = 'kiss-wrapped-onboarding-version-v1'
 export const ONBOARDING_VERSION = 2
 export const APP_VERSION = '1.0'
 export const APP_GITHUB_USER = 'Javi801'
-export const APP_GITHUB_REPO = 'https://github.com/Javi801/kiss-recorder-app'
-export const PEOPLE_FILE_NAME = 'kiss-recorder-people.json'
-export const SETTINGS_FILE_NAME = 'kiss-recorder-settings.json'
-
-// Main decorative asset displayed on the intro screen
-export const MAIN_VISUAL_ASSET = '/assets/kiss-recorder-icon.png'
+export const APP_GITHUB_REPO = 'https://github.com/Javi801/Kiss-Wrapped'
+export const PEOPLE_FILE_NAME = 'kiss-wrapped-people.json'
+export const SETTINGS_FILE_NAME = 'kiss-wrapped-settings.json'
 
 // Reusable option lists used across forms and analytics.
 export const GENDERS = ['male', 'female', 'other']
@@ -312,8 +309,8 @@ export function detectDeviceLanguage() {
 // List of texts in the app, organized by language.
 export const COPY = {
   en: {
-    appTitle: 'KissRecorder',
-    heroTitle: 'KissRecorder',
+    appTitle: 'Kiss Wrapped',
+    heroTitle: 'Kiss Wrapped',
     peopleSaved: 'People saved',
     totalEvents: 'Total events',
     addNewPerson: 'Add new person',
@@ -339,7 +336,7 @@ export const COPY = {
     importJsonErrorTypeDesc: 'Please select a .json file.',
     importJsonErrorFormatTitle: 'Invalid data format',
     importJsonErrorFormatDesc:
-      'The file does not match the expected format. Make sure it was exported from KissRecorder.',
+      'The file does not match the expected format. Make sure it was exported from Kiss Wrapped.',
     exportJsonSuccessTitle: 'Data exported',
     exportJsonSuccessWithWarningsTitle: 'Exported with missing fields',
     exportJsonSuccessWithWarningsDesc:
@@ -574,7 +571,7 @@ export const COPY = {
     statsGroupProfiles: 'Profile and activity breakdowns',
     statsGroupScores: 'Ratings',
     noScore: 'No rating',
-    reportGenerated: 'Generated from KissRecorder',
+    reportGenerated: 'Generated from Kiss Wrapped',
     clearDataConfirmTitle: 'Delete all data?',
     clearDataConfirmDesc:
       'This will permanently delete all saved people and events. This action cannot be undone.',
@@ -635,8 +632,8 @@ export const COPY = {
     ],
   },
   es: {
-    appTitle: 'KissRecorder',
-    heroTitle: 'KissRecorder',
+    appTitle: 'Kiss Wrapped',
+    heroTitle: 'Kiss Wrapped',
     peopleSaved: 'Personas guardadas',
     totalEvents: 'Eventos totales',
     addNewPerson: 'Agregar persona',
@@ -662,7 +659,7 @@ export const COPY = {
     importJsonErrorTypeDesc: 'Selecciona un archivo .json.',
     importJsonErrorFormatTitle: 'Formato de datos inválido',
     importJsonErrorFormatDesc:
-      'El archivo no coincide con el formato esperado. Asegúrate de que fue exportado desde KissRecorder.',
+      'El archivo no coincide con el formato esperado. Asegúrate de que fue exportado desde Kiss Wrapped.',
     exportJsonSuccessTitle: 'Datos exportados',
     exportJsonSuccessWithWarningsTitle: 'Exportado con campos faltantes',
     exportJsonSuccessWithWarningsDesc:
@@ -897,7 +894,7 @@ export const COPY = {
     statsGroupProfiles: 'Distribuciones por perfil y actividad',
     statsGroupScores: 'Calificaciones',
     noScore: 'Sin calificación',
-    reportGenerated: 'Generado desde KissRecorder',
+    reportGenerated: 'Generado desde Kiss Wrapped',
     clearDataConfirmTitle: '¿Eliminar todos los datos?',
     clearDataConfirmDesc:
       'Se eliminarán definitivamente todas las personas y eventos guardados. Esta acción no se puede deshacer.',
