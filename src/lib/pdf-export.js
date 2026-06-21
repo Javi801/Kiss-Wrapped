@@ -209,8 +209,11 @@ function addSlide(doc, pageW, pageH, index, draw) {
   draw()
 }
 
+// Returns the label of the busiest entry (highest value). Ties keep the earliest.
 function topLabel(data) {
-  return data.find((item) => item.value > 0)?.label || '-'
+  if (!data || data.length === 0) return '-'
+  const top = data.reduce((max, item) => (item.value > max.value ? item : max))
+  return top.value > 0 ? top.label : '-'
 }
 
 function buildWrappedCopy(t) {
