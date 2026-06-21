@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
-import FullscreenChartWrapper from './FullscreenChartWrapper'
+import FullscreenChartWrapper from '@/components/charts/FullscreenChartWrapper'
 import TimelineCalendarPopup from '@/components/charts/TimelineCalendarPopup'
 
 const GRANS = ['week', 'month', 'year', 'historic']

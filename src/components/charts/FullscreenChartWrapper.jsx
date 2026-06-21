@@ -8,7 +8,7 @@ import { Capacitor } from '@capacitor/core'
 import { usePalette } from '@/lib/theme'
 import { useCopy } from '@/lib/copy'
 import { TEXT } from '@/lib/constants'
-import { FullscreenContext } from './FullscreenContext'
+import { FullscreenContext } from '@/components/charts/FullscreenContext'
 
 function getChartFilename() {
   return `kiss-wrapped-chart-${new Date().toISOString().slice(0, 10)}.png`

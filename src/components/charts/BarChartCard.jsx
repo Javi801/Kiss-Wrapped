@@ -12,9 +12,9 @@ import { useRef, useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { CHART_COLORS, TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
-import FullscreenChartWrapper from './FullscreenChartWrapper'
-import { useFullscreen } from './FullscreenContext'
-import ChartTooltip from './ChartTooltip'
+import FullscreenChartWrapper from '@/components/charts/FullscreenChartWrapper'
+import { useFullscreen } from '@/components/charts/FullscreenContext'
+import ChartTooltip from '@/components/charts/ChartTooltip'
 
 const H_LABEL_VIEWPORT_W = 80
 const H_LABEL_CHAR_W = 7

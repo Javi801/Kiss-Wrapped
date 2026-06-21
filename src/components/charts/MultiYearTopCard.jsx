@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
-import FullscreenChartWrapper from './FullscreenChartWrapper'
+import FullscreenChartWrapper from '@/components/charts/FullscreenChartWrapper'
 
 const TROPHIES = ['🥇', '🥈', '🥉']
 

@@ -3,10 +3,10 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { CHART_COLORS, TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
-import FullscreenChartWrapper from './FullscreenChartWrapper'
-import { useFullscreen } from './FullscreenContext'
-import { useResponsivePieRadius } from './useResponsivePieRadius'
-import ChartTooltip from './ChartTooltip'
+import FullscreenChartWrapper from '@/components/charts/FullscreenChartWrapper'
+import { useFullscreen } from '@/components/charts/FullscreenContext'
+import { useResponsivePieRadius } from '@/components/charts/useResponsivePieRadius'
+import ChartTooltip from '@/components/charts/ChartTooltip'
 
 /**
  * Generic donut chart card with a persons/events mode toggle and legend.
