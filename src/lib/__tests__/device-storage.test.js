@@ -35,12 +35,15 @@ import {
   ICON_COLOR_KEY,
   LANGUAGE_KEY,
   THEME_KEY,
+  STATS_VISIBLE_KEY,
   SITUATION_TAGS_KEY,
   PLACE_TAGS_KEY,
+  HOW_WE_MET_TAGS_KEY,
   ONBOARDING_VERSION_KEY,
   PEOPLE_FILE_NAME,
   SETTINGS_FILE_NAME,
 } from '@/lib/constants'
+import { DEFAULT_SETTINGS, LANGUAGES, THEMES, ICON_COLORS } from '@/lib/config'
 
 // ---------------------------------------------------------------------------
 // loadPeopleFromDevice
@@ -176,9 +179,9 @@ describe('exportPeopleJson — return shape', () => {
     expect(isNative).toBe(true)
   })
 
-  it('returns a fileName matching kiss-recorder-data-YYYY-MM-DD.json', async () => {
+  it('returns a fileName matching kiss-wrapped-data-YYYY-MM-DD.json', async () => {
     const { fileName } = await exportPeopleJson([])
-    expect(fileName).toMatch(/^kiss-recorder-data-\d{4}-\d{2}-\d{2}\.json$/)
+    expect(fileName).toMatch(/^kiss-wrapped-data-\d{4}-\d{2}-\d{2}\.json$/)
   })
 
   it('writes to Cache directory and opens Share sheet', async () => {
@@ -300,12 +303,13 @@ describe('loadSettings (web path)', () => {
 
   it('returns defaults when no settings are saved', async () => {
     expect(await loadSettings()).toEqual({
-      iconColor: 'yellow',
-      language: 'en',
-      theme: 'pink',
-      statsVisible: true,
+      iconColor: DEFAULT_SETTINGS.iconColor,
+      language: DEFAULT_SETTINGS.language,
+      theme: DEFAULT_SETTINGS.theme,
+      statsVisible: DEFAULT_SETTINGS.statsVisible,
       situationTags: [],
       placeTags: [],
+      howWeMetTags: [],
       onboardingDone: false,
       onboardingVersion: 0,
     })
@@ -329,17 +333,17 @@ describe('loadSettings (web path)', () => {
   it('falls back to default iconColor when only language is saved', async () => {
     localStorage.setItem(LANGUAGE_KEY, 'es')
     const settings = await loadSettings()
-    expect(settings.iconColor).toBe('yellow')
+    expect(settings.iconColor).toBe(DEFAULT_SETTINGS.iconColor)
     expect(settings.language).toBe('es')
-    expect(settings.theme).toBe('pink')
+    expect(settings.theme).toBe(DEFAULT_SETTINGS.theme)
   })
 
   it('falls back to default language when only iconColor is saved', async () => {
     localStorage.setItem(ICON_COLOR_KEY, 'pink')
     const settings = await loadSettings()
     expect(settings.iconColor).toBe('pink')
-    expect(settings.language).toBe('en')
-    expect(settings.theme).toBe('pink')
+    expect(settings.language).toBe(DEFAULT_SETTINGS.language)
+    expect(settings.theme).toBe(DEFAULT_SETTINGS.theme)
   })
 
   it('returns saved situationTags', async () => {
@@ -358,6 +362,15 @@ describe('loadSettings (web path)', () => {
 
   it('returns empty placeTags when none are saved', async () => {
     expect((await loadSettings()).placeTags).toEqual([])
+  })
+
+  it('returns saved howWeMetTags', async () => {
+    localStorage.setItem(HOW_WE_MET_TAGS_KEY, JSON.stringify(['School', 'Work']))
+    expect((await loadSettings()).howWeMetTags).toEqual(['School', 'Work'])
+  })
+
+  it('returns empty howWeMetTags when none are saved', async () => {
+    expect((await loadSettings()).howWeMetTags).toEqual([])
   })
 })
 
@@ -424,6 +437,17 @@ describe('saveSettings (web path)', () => {
     expect(JSON.parse(localStorage.getItem(PLACE_TAGS_KEY))).toEqual(['Existing'])
   })
 
+  it('saves howWeMetTags to localStorage', async () => {
+    await saveSettings({ howWeMetTags: ['School', 'Work'] })
+    expect(JSON.parse(localStorage.getItem(HOW_WE_MET_TAGS_KEY))).toEqual(['School', 'Work'])
+  })
+
+  it('does not overwrite howWeMetTags when it is undefined', async () => {
+    localStorage.setItem(HOW_WE_MET_TAGS_KEY, JSON.stringify(['Existing']))
+    await saveSettings({ iconColor: 'pink' })
+    expect(JSON.parse(localStorage.getItem(HOW_WE_MET_TAGS_KEY))).toEqual(['Existing'])
+  })
+
   it('round-trips correctly through save and load', async () => {
     await saveSettings({
       iconColor: 'blue',
@@ -432,6 +456,7 @@ describe('saveSettings (web path)', () => {
       statsVisible: true,
       situationTags: ['Date', 'Party'],
       placeTags: ['Café', 'Home'],
+      howWeMetTags: ['School', 'Work'],
       onboardingDone: true,
       onboardingVersion: 2,
     })
@@ -442,6 +467,7 @@ describe('saveSettings (web path)', () => {
       statsVisible: true,
       situationTags: ['Date', 'Party'],
       placeTags: ['Café', 'Home'],
+      howWeMetTags: ['School', 'Work'],
       onboardingDone: true,
       onboardingVersion: 2,
     })
@@ -484,20 +510,28 @@ describe('loadSettings (native path — migration from localStorage)', () => {
     expect((await loadSettings()).placeTags).toEqual(['Café', 'Home'])
   })
 
+  it('migrates howWeMetTags from localStorage', async () => {
+    localStorage.setItem(HOW_WE_MET_TAGS_KEY, JSON.stringify(['School', 'Work']))
+    expect((await loadSettings()).howWeMetTags).toEqual(['School', 'Work'])
+  })
+
   it('returns empty tag arrays when localStorage has none', async () => {
     const settings = await loadSettings()
     expect(settings.situationTags).toEqual([])
     expect(settings.placeTags).toEqual([])
+    expect(settings.howWeMetTags).toEqual([])
   })
 
   it('persists migrated tags to the native settings file', async () => {
     localStorage.setItem(SITUATION_TAGS_KEY, JSON.stringify(['Date']))
     localStorage.setItem(PLACE_TAGS_KEY, JSON.stringify(['Home']))
+    localStorage.setItem(HOW_WE_MET_TAGS_KEY, JSON.stringify(['School']))
     await loadSettings()
     expect(mockFilesystem.writeFile).toHaveBeenCalledOnce()
     const written = JSON.parse(mockFilesystem.writeFile.mock.calls[0][0].data)
     expect(written.situationTags).toEqual(['Date'])
     expect(written.placeTags).toEqual(['Home'])
+    expect(written.howWeMetTags).toEqual(['School'])
   })
 })
 
@@ -522,6 +556,7 @@ describe('loadSettings (native path — reads existing file)', () => {
       statsVisible: true,
       situationTags: [],
       placeTags: [],
+      howWeMetTags: ['School'],
       onboardingDone: true,
       onboardingVersion: 2,
     }
@@ -567,9 +602,19 @@ describe('loadSettings (native path — reads existing file)', () => {
   it('fills missing fields with SETTINGS_DEFAULTS', async () => {
     mockFilesystem.readFile.mockResolvedValueOnce({ data: JSON.stringify({ language: 'es' }) })
     const settings = await loadSettings()
-    expect(settings.iconColor).toBe('yellow')
-    expect(settings.theme).toBe('pink')
-    expect(settings.statsVisible).toBe(true)
+    expect(settings.iconColor).toBe(DEFAULT_SETTINGS.iconColor)
+    expect(settings.theme).toBe(DEFAULT_SETTINGS.theme)
+    expect(settings.statsVisible).toBe(DEFAULT_SETTINGS.statsVisible)
+  })
+
+  it('returns empty howWeMetTags when the settings file predates the field', async () => {
+    mockFilesystem.readFile.mockResolvedValueOnce({
+      data: JSON.stringify({ situationTags: ['Date'], placeTags: ['Home'] }),
+    })
+    const settings = await loadSettings()
+    expect(settings.howWeMetTags).toEqual([])
+    expect(settings.situationTags).toEqual(['Date'])
+    expect(settings.placeTags).toEqual(['Home'])
   })
 })
 
@@ -708,6 +753,7 @@ describe('saveSettings (native path)', () => {
       statsVisible: false,
       situationTags: ['Date'],
       placeTags: ['Café'],
+      howWeMetTags: ['School'],
       onboardingDone: true,
       onboardingVersion: 2,
     }
@@ -721,4 +767,118 @@ describe('saveSettings (native path)', () => {
     await saveSettings({ iconColor: 'blue' })
     expect(localStorage.getItem(ICON_COLOR_KEY)).toBeNull()
   })
+})
+
+// ---------------------------------------------------------------------------
+// Persisted user choices vs. config defaults
+// ---------------------------------------------------------------------------
+// A setting the user changed must survive a reload: DEFAULT_SETTINGS from
+// config.js may only fill in values that were never saved.
+const USER_CHOICES = {
+  language: LANGUAGES.find((value) => value !== DEFAULT_SETTINGS.language),
+  theme: THEMES.find((value) => value !== DEFAULT_SETTINGS.theme),
+  iconColor: ICON_COLORS.find((value) => value !== DEFAULT_SETTINGS.iconColor),
+  statsVisible: !DEFAULT_SETTINGS.statsVisible,
+}
+const SETTING_NAMES = Object.keys(USER_CHOICES)
+
+describe('persisted settings override config defaults (web path)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
+  it('has a non-default value available for every setting', () => {
+    for (const name of SETTING_NAMES) {
+      expect(USER_CHOICES[name], name).toBeDefined()
+      expect(USER_CHOICES[name], name).not.toBe(DEFAULT_SETTINGS[name])
+    }
+  })
+
+  it.each(SETTING_NAMES)('keeps the saved %s after a reload', async (name) => {
+    await saveSettings({ [name]: USER_CHOICES[name] })
+    expect((await loadSettings())[name]).toBe(USER_CHOICES[name])
+  })
+
+  it.each(SETTING_NAMES)(
+    'leaves the other settings on their defaults when only %s is saved',
+    async (name) => {
+      await saveSettings({ [name]: USER_CHOICES[name] })
+      const settings = await loadSettings()
+      for (const other of SETTING_NAMES.filter((item) => item !== name)) {
+        expect(settings[other], other).toBe(DEFAULT_SETTINGS[other])
+      }
+    }
+  )
+
+  it('keeps every saved setting together after a reload', async () => {
+    await saveSettings(USER_CHOICES)
+    expect(await loadSettings()).toMatchObject(USER_CHOICES)
+  })
+
+  it('keeps a saved value that equals the default once it is stored', async () => {
+    await saveSettings({ theme: DEFAULT_SETTINGS.theme })
+    expect(localStorage.getItem(THEME_KEY)).toBe(DEFAULT_SETTINGS.theme)
+  })
+})
+
+describe('persisted settings override config defaults (native path)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockNative.isNative = true
+    vi.clearAllMocks()
+    mockFilesystem.writeFile.mockResolvedValue(undefined)
+  })
+  afterEach(() => {
+    mockNative.isNative = false
+  })
+
+  it.each(SETTING_NAMES)('keeps the %s stored in the settings file', async (name) => {
+    mockFilesystem.readFile.mockResolvedValueOnce({
+      data: JSON.stringify({ [name]: USER_CHOICES[name] }),
+    })
+    expect((await loadSettings())[name]).toBe(USER_CHOICES[name])
+  })
+
+  it('reads back exactly what saveSettings wrote', async () => {
+    await saveSettings({
+      ...USER_CHOICES,
+      situationTags: [],
+      placeTags: [],
+      onboardingDone: true,
+      onboardingVersion: 1,
+    })
+    const written = mockFilesystem.writeFile.mock.calls[0][0].data
+    mockFilesystem.readFile.mockResolvedValueOnce({ data: written })
+    expect(await loadSettings()).toMatchObject(USER_CHOICES)
+  })
+
+  it('reads back the tag lists saveSettings wrote', async () => {
+    const tags = {
+      situationTags: ['Date', 'Party'],
+      placeTags: ['Café', 'Home'],
+      howWeMetTags: ['School', 'Work'],
+    }
+    await saveSettings({ ...USER_CHOICES, ...tags, onboardingDone: true, onboardingVersion: 1 })
+    const written = mockFilesystem.writeFile.mock.calls[0][0].data
+    mockFilesystem.readFile.mockResolvedValueOnce({ data: written })
+    expect(await loadSettings()).toMatchObject(tags)
+  })
+
+  it.each(SETTING_NAMES)(
+    'migrates the %s saved in localStorage instead of using the default',
+    async (name) => {
+      const keys = {
+        language: LANGUAGE_KEY,
+        theme: THEME_KEY,
+        iconColor: ICON_COLOR_KEY,
+        statsVisible: STATS_VISIBLE_KEY,
+      }
+      localStorage.setItem(keys[name], String(USER_CHOICES[name]))
+      mockFilesystem.readFile.mockRejectedValueOnce(new Error('File not found'))
+
+      expect((await loadSettings())[name]).toBe(USER_CHOICES[name])
+      const written = JSON.parse(mockFilesystem.writeFile.mock.calls[0][0].data)
+      expect(written[name]).toBe(USER_CHOICES[name])
+    }
+  )
 })

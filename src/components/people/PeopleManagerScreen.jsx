@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
-import { formatDisplayDate, calculateAge } from '@/lib/date'
+import { formatDisplayDate, effectiveAge } from '@/lib/date'
 import { getFirstEventDate, getLastEventDate } from '@/lib/stats'
 
 import EmptyState from '@/components/people/EmptyState'
@@ -82,7 +82,7 @@ export default function PeopleManagerScreen({
         .toLowerCase()
 
       const matchesQuery = !q || searchable.includes(q)
-      const age = calculateAge(person.birthYear, person.zodiacSign) ?? person.age
+      const age = effectiveAge(person)
       const matchesMinAge = !filters.minAge || age >= Number(filters.minAge)
       const matchesMaxAge = !filters.maxAge || age <= Number(filters.maxAge)
       const matchesActivity =

@@ -8,7 +8,8 @@ import {
 
 import { TEXT, PALETTES } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
-import { SPARKLE_PALETTES, PALETTE_SWATCHES } from '@/components/shared/SparkleIcon'
+import { ICON_COLORS } from '@/lib/config'
+import { PALETTE_SWATCHES } from '@/components/shared/SparkleIcon'
 
 const THEMES = Object.keys(PALETTES).map((key) => ({
   key,
@@ -117,7 +118,7 @@ export default function ColorSelector({
           </SelectTrigger>
 
           <SelectContent>
-            {SPARKLE_PALETTES.map((p) => (
+            {ICON_COLORS.map((p) => (
               <SelectItem key={p} value={p}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <span

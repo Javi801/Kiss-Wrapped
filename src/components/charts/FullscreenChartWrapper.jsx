@@ -6,11 +6,12 @@ import { Filesystem, Directory, Encoding } from '@capacitor/filesystem'
 import { Share } from '@capacitor/share'
 import { Capacitor } from '@capacitor/core'
 import { usePalette } from '@/lib/theme'
+import { useCopy } from '@/lib/copy'
 import { TEXT } from '@/lib/constants'
-import { FullscreenContext } from './FullscreenContext'
+import { FullscreenContext } from '@/components/charts/FullscreenContext'
 
 function getChartFilename() {
-  return `kiss-recorder-chart-${new Date().toISOString().slice(0, 10)}.png`
+  return `kiss-wrapped-chart-${new Date().toISOString().slice(0, 10)}.png`
 }
 
 function getCaptureSize(el) {
@@ -74,6 +75,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
   const [hovered, setHovered] = useState(false)
   const captureRef = useRef(null)
   const PALETTE = usePalette()
+  const t = useCopy()
 
   const shareDownloadLog = useCallback(async () => {
     if (!downloadErrorObj) return
@@ -82,7 +84,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
       const timestamp = new Date().toISOString()
       const platform = Capacitor.getPlatform?.() ?? 'unknown'
       const content = [
-        'KissRecorder Chart Export Error',
+        'Kiss Wrapped Chart Export Error',
         `Timestamp: ${timestamp}`,
         `Platform: ${platform}`,
         `Error: ${downloadErrorObj?.message || String(downloadErrorObj)}`,
@@ -91,7 +93,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
         downloadErrorObj?.stack || '(no stack trace available)',
       ].join('\n')
 
-      const fileName = `kiss-recorder-export-error-${timestamp.slice(0, 10)}.txt`
+      const fileName = `kiss-wrapped-export-error-${timestamp.slice(0, 10)}.txt`
       await Filesystem.writeFile({
         path: fileName,
         directory: Directory.Cache,
@@ -227,11 +229,11 @@ export default function FullscreenChartWrapper({ children, centerContent = false
               onClick={download}
               disabled={downloading}
               palette={PALETTE}
-              title="Descargar imagen"
+              title={t.chartDownloadImage}
             >
               <Download size={15} />
             </IconButton>
-            <IconButton onClick={close} palette={PALETTE} title="Cerrar">
+            <IconButton onClick={close} palette={PALETTE} title={t.close}>
               <X size={15} />
             </IconButton>
           </div>
@@ -356,7 +358,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
                     flexShrink: 0,
                   }}
                 >
-                  {sharingLog ? '…' : 'Compartir log'}
+                  {sharingLog ? '…' : t.chartShareLog}
                 </button>
               </div>
             ) : null}
@@ -374,7 +376,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
                 userSelect: 'none',
               }}
             >
-              KissRecorder
+              Kiss Wrapped
             </div>
           </div>
         </div>
@@ -392,7 +394,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
       {children}
       <button
         onClick={open}
-        title="Pantalla completa"
+        title={t.chartFullscreen}
         style={{
           position: 'absolute',
           top: 12,

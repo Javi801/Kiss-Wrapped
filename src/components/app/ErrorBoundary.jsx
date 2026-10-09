@@ -29,7 +29,7 @@ export default class ErrorBoundary extends React.Component {
       const timestamp = new Date().toISOString()
       const platform = Capacitor.getPlatform?.() ?? 'unknown'
       const content = [
-        'KissRecorder Crash Report',
+        'Kiss Wrapped Crash Report',
         `Timestamp: ${timestamp}`,
         `Platform: ${platform}`,
         `Error: ${error?.message || String(error)}`,
@@ -41,7 +41,7 @@ export default class ErrorBoundary extends React.Component {
         errorInfo?.componentStack || '(not available)',
       ].join('\n')
 
-      const fileName = `kiss-recorder-crash-${timestamp.slice(0, 10)}.txt`
+      const fileName = `kiss-wrapped-crash-${timestamp.slice(0, 10)}.txt`
       await Filesystem.writeFile({
         path: fileName,
         directory: Directory.Cache,

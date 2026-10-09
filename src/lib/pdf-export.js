@@ -2,6 +2,7 @@ import jsPDF from 'jspdf'
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem'
 import { Share } from '@capacitor/share'
 import { CHART_COLORS, PALETTE } from '@/lib/constants'
+import { DEFAULT_SETTINGS } from '@/lib/config'
 import { hexToRgb } from '@/lib/helpers'
 import { getStatsData } from '@/lib/stats'
 import { getColorForCategory } from '@/lib/format'
@@ -209,17 +210,20 @@ function addSlide(doc, pageW, pageH, index, draw) {
   draw()
 }
 
+// Returns the label of the busiest entry (highest value). Ties keep the earliest.
 function topLabel(data) {
-  return data.find((item) => item.value > 0)?.label || '-'
+  if (!data || data.length === 0) return '-'
+  const top = data.reduce((max, item) => (item.value > max.value ? item : max))
+  return top.value > 0 ? top.label : '-'
 }
 
-function buildWrappedCopy(t) {
-  const es = t.langCode === 'es'
+function buildWrappedCopy(language) {
+  const es = language === 'es'
   return {
-    title: 'kisswrapped',
+    title: 'Kiss Wrapped',
     subtitle: es
-      ? 'Una presentación privada para hablar de tus estadísticas de KissRecorder.'
-      : 'A private deck for talking through your KissRecorder statistics.',
+      ? 'Una presentación privada para hablar de tus estadísticas de Kiss Wrapped.'
+      : 'A private deck for talking through your Kiss Wrapped statistics.',
     yearLabel: es ? 'Tu recorrido en números' : 'Your story in numbers',
     headline: es ? 'Tu resumen ya está listo' : 'Your recap is ready',
     peopleSlide: es ? 'Las personas que marcaron el ritmo' : 'The people who set the rhythm',
@@ -244,9 +248,9 @@ function buildScoreLabels(scoresByKisses, t) {
  * Exports the statistics as a KissWrapped deck: a landscape, slide-like PDF.
  * On native platforms the file is saved to cache and shared through the system sheet.
  */
-export async function exportStatsPdf(people, t) {
-  const stats = getStatsData(people, t)
-  const copy = buildWrappedCopy(t)
+export async function exportStatsPdf(people, t, language = DEFAULT_SETTINGS.language) {
+  const stats = getStatsData(people, t, language)
+  const copy = buildWrappedCopy(language)
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })
   const pageW = doc.internal.pageSize.getWidth()
   const pageH = doc.internal.pageSize.getHeight()
@@ -376,8 +380,8 @@ export async function exportStatsPdf(people, t) {
  */
 export async function saveErrorLog(error) {
   const timestamp = new Date().toISOString()
-  const content = `KissRecorder PDF Export Error\n${timestamp}\n\n${error?.message || String(error)}`
-  const fileName = `kiss-recorder-error-${timestamp.slice(0, 10)}.txt`
+  const content = `Kiss Wrapped PDF Export Error\n${timestamp}\n\n${error?.message || String(error)}`
+  const fileName = `kiss-wrapped-error-${timestamp.slice(0, 10)}.txt`
 
   await Filesystem.writeFile({
     path: fileName,

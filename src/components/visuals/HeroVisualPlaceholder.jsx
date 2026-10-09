@@ -60,7 +60,7 @@ export default function HeroVisualPlaceholder() {
         {hasImage ? (
           <img
             src={mainBackground}
-            alt="KissRecorder visual"
+            alt="Kiss Wrapped visual"
             style={{ height: '100%', width: '100%', objectFit: 'contain' }}
             onError={() => setHasImage(false)}
           />

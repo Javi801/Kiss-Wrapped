@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Pencil, Plus, Trash2, Calendar, ChevronDown, ChevronUp } from 'lucide-react'
+import { Pencil, Plus, Trash2, Calendar, ChevronDown, ChevronUp, Heart } from 'lucide-react'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -26,7 +26,7 @@ import {
 
 import { TEXT, abbreviateZodiacMonths } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
-import { formatShortDate, calculateDisplayAge } from '@/lib/date'
+import { formatShortDate, effectiveDisplayAge } from '@/lib/date'
 import {
   translateActivity,
   translateGender,
@@ -145,6 +145,23 @@ export default function PersonCard({
                     {person.name}
                   </h3>
 
+                  {(person.partnerStatus === 'current' || person.partnerStatus === 'past') && (
+                    <Badge
+                      className="rounded-full"
+                      style={{
+                        border: 'none',
+                        backgroundColor: PALETTE.accentMuted,
+                        color:
+                          person.partnerStatus === 'current' ? PALETTE.accent : PALETTE.textSoft,
+                      }}
+                    >
+                      <Heart
+                        style={{ marginRight: '0.25rem', height: '0.75rem', width: '0.75rem' }}
+                      />
+                      {person.partnerStatus === 'current' ? t.partnerBadge : t.exPartnerBadge}
+                    </Badge>
+                  )}
+
                   {hasIncompleteEvent && (
                     <Badge
                       className="rounded-full"
@@ -171,12 +188,7 @@ export default function PersonCard({
                   }}
                 >
                   <span>
-                    {calculateDisplayAge(
-                      person.birthYear,
-                      person.zodiacSign,
-                      person.birthdayAlreadyHappened
-                    ) ?? person.age}{' '}
-                    {t.years}
+                    {effectiveDisplayAge(person)} {t.years}
                   </span>
                   <span>•</span>
                   <span>{translateGender(person.gender, t)}</span>
@@ -222,8 +234,26 @@ export default function PersonCard({
                     }}
                   >
                     {/* Extra info */}
-                    {(person.realName || person.howWeMet || person.detail) && (
+                    {(person.realName ||
+                      person.howWeMet ||
+                      person.detail ||
+                      person.partnerStatus === 'current' ||
+                      person.partnerStatus === 'past') && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                        {person.partnerStatus === 'current' && person.partnerFrom && (
+                          <p style={{ ...TEXT.body, color: PALETTE.text }}>
+                            {t.partnerBadge}: {t.partnerSinceWord}{' '}
+                            {formatShortDate(person.partnerFrom, language)}
+                          </p>
+                        )}
+                        {person.partnerStatus === 'past' && person.partnerTo && (
+                          <p style={{ ...TEXT.body, color: PALETTE.text }}>
+                            {t.partnerBadge}:{' '}
+                            {person.partnerFrom
+                              ? `${formatShortDate(person.partnerFrom, language)} – ${formatShortDate(person.partnerTo, language)}`
+                              : `${t.partnerUntilWord} ${formatShortDate(person.partnerTo, language)}`}
+                          </p>
+                        )}
                         {person.realName && (
                           <p style={{ ...TEXT.body, color: PALETTE.text }}>
                             {t.realName}: {person.realName}

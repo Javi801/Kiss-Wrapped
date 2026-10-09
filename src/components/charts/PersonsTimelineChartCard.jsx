@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
-import FullscreenChartWrapper from './FullscreenChartWrapper'
+import FullscreenChartWrapper from '@/components/charts/FullscreenChartWrapper'
 import TimelineCalendarPopup from '@/components/charts/TimelineCalendarPopup'
 
 const GRANS = ['week', 'month', 'year', 'historic']
@@ -50,12 +50,12 @@ function TooltipContent({ active, payload, tooltipUnit, noPersonsLabel, onLabel 
   )
 }
 
-export default function PersonsTimelineChartCard({ people, t }) {
+export default function PersonsTimelineChartCard({ people, t, language }) {
   const P = usePalette()
   const [gran, setGran] = useState('week')
   const [offset, setOffset] = useState(0)
 
-  const locale = t.langCode === 'es' ? 'es-ES' : 'en-GB'
+  const locale = language === 'es' ? 'es-ES' : 'en-GB'
 
   const fmtWeekday = useMemo(() => new Intl.DateTimeFormat(locale, { weekday: 'short' }), [locale])
   const fmtDayMonth = useMemo(

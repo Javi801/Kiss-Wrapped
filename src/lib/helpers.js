@@ -5,20 +5,35 @@ export function uid() {
   return Math.random().toString(36).slice(2, 10)
 }
 
-// Normalizes people data ensuring events array and valid scores
+// Normalizes people data ensuring events array, valid scores, and partner fields.
+// Legacy boolean isPartner records migrate to a "current" partner with an open period.
 export function normalizePeople(rawPeople) {
-  return Array.isArray(rawPeople)
-    ? rawPeople.map((person) => ({
-        ...person,
-        realName: person.realName || '',
-        events: Array.isArray(person.events)
-          ? person.events.map((event) => ({
-              ...event,
-              score: hasScore(event.score) ? event.score : null,
-            }))
-          : [],
-      }))
-    : []
+  if (!Array.isArray(rawPeople)) return []
+  return rawPeople.map((rawPerson) => {
+    const { isPartner, ...person } = rawPerson
+    const partnerStatus = ['never', 'current', 'past'].includes(person.partnerStatus)
+      ? person.partnerStatus
+      : isPartner === true
+        ? 'current'
+        : 'never'
+    return {
+      ...person,
+      realName: person.realName || '',
+      partnerStatus,
+      partnerFrom:
+        partnerStatus !== 'never' && typeof person.partnerFrom === 'string'
+          ? person.partnerFrom
+          : '',
+      partnerTo:
+        partnerStatus === 'past' && typeof person.partnerTo === 'string' ? person.partnerTo : '',
+      events: Array.isArray(person.events)
+        ? person.events.map((event) => ({
+            ...event,
+            score: hasScore(event.score) ? event.score : null,
+          }))
+        : [],
+    }
+  })
 }
 
 // Merges event field values from existing people data into a tag list.

@@ -1,4 +1,4 @@
-package io.kissrecorder;
+package io.kisswrapped;
 
 import android.content.ComponentName;
 import android.content.pm.PackageManager;

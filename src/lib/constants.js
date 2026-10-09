@@ -3,24 +3,18 @@
  * Keep these values unchanged to preserve compatibility
  * with existing saved data across app versions.
  */
-export const STORAGE_KEY = 'kiss-recorder-local-v3'
-export const LANGUAGE_KEY = 'kiss-recorder-language-local-v3'
-export const ICON_COLOR_KEY = 'kiss-recorder-icon-color-v1'
-export const THEME_KEY = 'kiss-recorder-theme-v1'
-export const STATS_VISIBLE_KEY = 'kiss-recorder-stats-visible-v1'
-export const SITUATION_TAGS_KEY = 'kiss-recorder-situation-tags-v1'
-export const PLACE_TAGS_KEY = 'kiss-recorder-place-tags-v1'
-export const ONBOARDING_DONE_KEY = 'kiss-recorder-onboarding-done-v1'
-export const ONBOARDING_VERSION_KEY = 'kiss-recorder-onboarding-version-v1'
-export const ONBOARDING_VERSION = 2
-export const APP_VERSION = '1.0'
-export const APP_GITHUB_USER = 'Javi801'
-export const APP_GITHUB_REPO = 'https://github.com/Javi801/kiss-recorder-app'
-export const PEOPLE_FILE_NAME = 'kiss-recorder-people.json'
-export const SETTINGS_FILE_NAME = 'kiss-recorder-settings.json'
-
-// Main decorative asset displayed on the intro screen
-export const MAIN_VISUAL_ASSET = '/assets/kiss-recorder-icon.png'
+export const STORAGE_KEY = 'kiss-wrapped-local-v3'
+export const LANGUAGE_KEY = 'kiss-wrapped-language-local-v3'
+export const ICON_COLOR_KEY = 'kiss-wrapped-icon-color-v1'
+export const THEME_KEY = 'kiss-wrapped-theme-v1'
+export const STATS_VISIBLE_KEY = 'kiss-wrapped-stats-visible-v1'
+export const SITUATION_TAGS_KEY = 'kiss-wrapped-situation-tags-v1'
+export const PLACE_TAGS_KEY = 'kiss-wrapped-place-tags-v1'
+export const HOW_WE_MET_TAGS_KEY = 'kiss-wrapped-how-we-met-tags-v1'
+export const ONBOARDING_DONE_KEY = 'kiss-wrapped-onboarding-done-v1'
+export const ONBOARDING_VERSION_KEY = 'kiss-wrapped-onboarding-version-v1'
+export const PEOPLE_FILE_NAME = 'kiss-wrapped-people.json'
+export const SETTINGS_FILE_NAME = 'kiss-wrapped-settings.json'
 
 // Reusable option lists used across forms and analytics.
 export const GENDERS = ['male', 'female', 'other']
@@ -312,8 +306,8 @@ export function detectDeviceLanguage() {
 // List of texts in the app, organized by language.
 export const COPY = {
   en: {
-    appTitle: 'KissRecorder',
-    heroTitle: 'KissRecorder',
+    appTitle: 'Kiss Wrapped',
+    heroTitle: 'Kiss Wrapped',
     peopleSaved: 'People saved',
     totalEvents: 'Total events',
     addNewPerson: 'Add new person',
@@ -339,7 +333,7 @@ export const COPY = {
     importJsonErrorTypeDesc: 'Please select a .json file.',
     importJsonErrorFormatTitle: 'Invalid data format',
     importJsonErrorFormatDesc:
-      'The file does not match the expected format. Make sure it was exported from KissRecorder.',
+      'The file does not match the expected format. Make sure it was exported from Kiss Wrapped.',
     exportJsonSuccessTitle: 'Data exported',
     exportJsonSuccessWithWarningsTitle: 'Exported with missing fields',
     exportJsonSuccessWithWarningsDesc:
@@ -492,7 +486,9 @@ export const COPY = {
     chartPerson: 'Person',
     chartPersons: 'People',
     chartYear: 'Year',
-    langCode: 'en',
+    chartDownloadImage: 'Download image',
+    chartFullscreen: 'Fullscreen',
+    chartShareLog: 'Share log',
     timelineTitle: 'Events over time',
     personsTimelineTitle: 'Persons over time',
     timelineAvg: 'on average',
@@ -574,7 +570,7 @@ export const COPY = {
     statsGroupProfiles: 'Profile and activity breakdowns',
     statsGroupScores: 'Ratings',
     noScore: 'No rating',
-    reportGenerated: 'Generated from KissRecorder',
+    reportGenerated: 'Generated from Kiss Wrapped',
     clearDataConfirmTitle: 'Delete all data?',
     clearDataConfirmDesc:
       'This will permanently delete all saved people and events. This action cannot be undone.',
@@ -591,6 +587,22 @@ export const COPY = {
     birthdayAlreadyHappenedThird: 'Has their birthday already happened this year?',
     birthdayYes: 'Yes',
     birthdayNo: 'Not yet',
+    partnerLabel: 'Partner',
+    partnerNever: 'Never',
+    partnerCurrent: 'Current',
+    partnerPast: 'Past',
+    partnerSince: 'Since (optional)',
+    partnerFromLabel: 'From (optional)',
+    partnerToLabel: 'Until',
+    partnerDatePlaceholder: 'yyyy.MM.dd',
+    requiredPartnerTo: 'The end date is required for a past partner.',
+    partnerRangeError: 'The start date must be on or before the end date.',
+    partnerHint:
+      'Events during the partner period are left out of event statistics; the person still counts in people statistics.',
+    partnerBadge: 'Partner',
+    exPartnerBadge: 'Ex-partner',
+    partnerSinceWord: 'since',
+    partnerUntilWord: 'until',
     about: 'About',
     aboutVersion: 'Version',
     aboutDeveloper: 'Developer',
@@ -635,8 +647,8 @@ export const COPY = {
     ],
   },
   es: {
-    appTitle: 'KissRecorder',
-    heroTitle: 'KissRecorder',
+    appTitle: 'Kiss Wrapped',
+    heroTitle: 'Kiss Wrapped',
     peopleSaved: 'Personas guardadas',
     totalEvents: 'Eventos totales',
     addNewPerson: 'Agregar persona',
@@ -662,7 +674,7 @@ export const COPY = {
     importJsonErrorTypeDesc: 'Selecciona un archivo .json.',
     importJsonErrorFormatTitle: 'Formato de datos inválido',
     importJsonErrorFormatDesc:
-      'El archivo no coincide con el formato esperado. Asegúrate de que fue exportado desde KissRecorder.',
+      'El archivo no coincide con el formato esperado. Asegúrate de que fue exportado desde Kiss Wrapped.',
     exportJsonSuccessTitle: 'Datos exportados',
     exportJsonSuccessWithWarningsTitle: 'Exportado con campos faltantes',
     exportJsonSuccessWithWarningsDesc:
@@ -815,7 +827,9 @@ export const COPY = {
     chartPerson: 'Persona',
     chartPersons: 'Personas',
     chartYear: 'Año',
-    langCode: 'es',
+    chartDownloadImage: 'Descargar imagen',
+    chartFullscreen: 'Pantalla completa',
+    chartShareLog: 'Compartir log',
     timelineTitle: 'Eventos a lo largo del tiempo',
     personsTimelineTitle: 'Personas a lo largo del tiempo',
     timelineAvg: 'en promedio',
@@ -897,7 +911,7 @@ export const COPY = {
     statsGroupProfiles: 'Distribuciones por perfil y actividad',
     statsGroupScores: 'Calificaciones',
     noScore: 'Sin calificación',
-    reportGenerated: 'Generado desde KissRecorder',
+    reportGenerated: 'Generado desde Kiss Wrapped',
     clearDataConfirmTitle: '¿Eliminar todos los datos?',
     clearDataConfirmDesc:
       'Se eliminarán definitivamente todas las personas y eventos guardados. Esta acción no se puede deshacer.',
@@ -914,6 +928,22 @@ export const COPY = {
     birthdayAlreadyHappenedThird: '¿Ya estuvo de cumpleaños este año?',
     birthdayYes: 'Sí',
     birthdayNo: 'Todavía no',
+    partnerLabel: 'Pareja',
+    partnerNever: 'Nunca',
+    partnerCurrent: 'Actual',
+    partnerPast: 'Anterior',
+    partnerSince: 'Desde (opcional)',
+    partnerFromLabel: 'Desde (opcional)',
+    partnerToLabel: 'Hasta',
+    partnerDatePlaceholder: 'yyyy.MM.dd',
+    requiredPartnerTo: 'La fecha de término es obligatoria para una pareja anterior.',
+    partnerRangeError: 'La fecha de inicio debe ser anterior o igual a la de término.',
+    partnerHint:
+      'Los eventos durante el período de pareja quedan fuera de las estadísticas de eventos; la persona sí cuenta en las estadísticas de personas.',
+    partnerBadge: 'Pareja',
+    exPartnerBadge: 'Expareja',
+    partnerSinceWord: 'desde',
+    partnerUntilWord: 'hasta',
     about: 'Acerca de',
     aboutVersion: 'Versión',
     aboutDeveloper: 'Desarrollador',

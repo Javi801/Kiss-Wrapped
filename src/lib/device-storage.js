@@ -11,9 +11,11 @@ import {
   STATS_VISIBLE_KEY,
   SITUATION_TAGS_KEY,
   PLACE_TAGS_KEY,
+  HOW_WE_MET_TAGS_KEY,
   ONBOARDING_DONE_KEY,
   ONBOARDING_VERSION_KEY,
 } from '@/lib/constants'
+import { DEFAULT_SETTINGS } from '@/lib/config'
 
 // Returns localStorage only when it is safely available
 export function getSafeStorage() {
@@ -96,12 +98,10 @@ export async function savePeopleToDevice(people) {
 }
 
 const SETTINGS_DEFAULTS = {
-  iconColor: 'yellow',
-  language: 'en',
-  theme: 'pink',
-  statsVisible: true,
+  ...DEFAULT_SETTINGS,
   situationTags: [],
   placeTags: [],
+  howWeMetTags: [],
   onboardingDone: false,
   onboardingVersion: 0,
 }
@@ -131,6 +131,7 @@ export async function loadSettings() {
       const rawVisible = storage?.getItem(STATS_VISIBLE_KEY)
       const rawSituationTags = storage?.getItem(SITUATION_TAGS_KEY)
       const rawPlaceTags = storage?.getItem(PLACE_TAGS_KEY)
+      const rawHowWeMetTags = storage?.getItem(HOW_WE_MET_TAGS_KEY)
       const rawOnboardingVersion = storage?.getItem(ONBOARDING_VERSION_KEY)
       const migrated = {
         iconColor: storage?.getItem(ICON_COLOR_KEY) || SETTINGS_DEFAULTS.iconColor,
@@ -139,6 +140,7 @@ export async function loadSettings() {
         statsVisible: rawVisible === null ? SETTINGS_DEFAULTS.statsVisible : rawVisible !== 'false',
         situationTags: rawSituationTags ? JSON.parse(rawSituationTags) : [],
         placeTags: rawPlaceTags ? JSON.parse(rawPlaceTags) : [],
+        howWeMetTags: rawHowWeMetTags ? JSON.parse(rawHowWeMetTags) : [],
         onboardingDone: storage?.getItem(ONBOARDING_DONE_KEY) === 'true',
         onboardingVersion: rawOnboardingVersion ? Number(rawOnboardingVersion) || 0 : 0,
       }
@@ -152,6 +154,7 @@ export async function loadSettings() {
   const rawVisible = storage.getItem(STATS_VISIBLE_KEY)
   const rawSituationTags = storage.getItem(SITUATION_TAGS_KEY)
   const rawPlaceTags = storage.getItem(PLACE_TAGS_KEY)
+  const rawHowWeMetTags = storage.getItem(HOW_WE_MET_TAGS_KEY)
   const rawOnboardingDone = storage.getItem(ONBOARDING_DONE_KEY)
   const rawOnboardingVersion = storage.getItem(ONBOARDING_VERSION_KEY)
   return {
@@ -161,6 +164,7 @@ export async function loadSettings() {
     statsVisible: rawVisible === null ? SETTINGS_DEFAULTS.statsVisible : rawVisible !== 'false',
     situationTags: rawSituationTags ? JSON.parse(rawSituationTags) : [],
     placeTags: rawPlaceTags ? JSON.parse(rawPlaceTags) : [],
+    howWeMetTags: rawHowWeMetTags ? JSON.parse(rawHowWeMetTags) : [],
     onboardingDone: rawOnboardingDone === 'true',
     onboardingVersion: rawOnboardingVersion ? Number(rawOnboardingVersion) || 0 : 0,
   }
@@ -174,6 +178,7 @@ export async function saveSettings({
   statsVisible,
   situationTags,
   placeTags,
+  howWeMetTags,
   onboardingDone,
   onboardingVersion,
 }) {
@@ -188,6 +193,7 @@ export async function saveSettings({
         statsVisible,
         situationTags,
         placeTags,
+        howWeMetTags,
         onboardingDone,
         onboardingVersion,
       }),
@@ -205,6 +211,7 @@ export async function saveSettings({
   if (situationTags !== undefined)
     storage.setItem(SITUATION_TAGS_KEY, JSON.stringify(situationTags))
   if (placeTags !== undefined) storage.setItem(PLACE_TAGS_KEY, JSON.stringify(placeTags))
+  if (howWeMetTags !== undefined) storage.setItem(HOW_WE_MET_TAGS_KEY, JSON.stringify(howWeMetTags))
   if (onboardingDone !== undefined) storage.setItem(ONBOARDING_DONE_KEY, String(onboardingDone))
   if (onboardingVersion !== undefined)
     storage.setItem(ONBOARDING_VERSION_KEY, String(onboardingVersion))
@@ -256,7 +263,7 @@ function normalizeForExport(people) {
 // Exports people data as a JSON file to external storage (native) or browser download (web).
 // Exports people data as a JSON file via the native share sheet so the user can pick the save location.
 export async function exportPeopleJson(people) {
-  const fileName = `kiss-recorder-data-${new Date().toISOString().slice(0, 10)}.json`
+  const fileName = `kiss-wrapped-data-${new Date().toISOString().slice(0, 10)}.json`
   const { normalized, hadMissingFields } = normalizeForExport(people)
   const content = JSON.stringify(normalized, null, 2)
 

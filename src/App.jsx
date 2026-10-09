@@ -4,8 +4,17 @@ import { Search, Users, BarChart3, UserPlus } from 'lucide-react'
 import { App as CapacitorApp } from '@capacitor/app'
 import { Capacitor } from '@capacitor/core'
 
-import { PALETTES, TEXT, COPY, ONBOARDING_VERSION, detectDeviceLanguage } from '@/lib/constants'
+import { PALETTES, TEXT, COPY, detectDeviceLanguage } from '@/lib/constants'
+import {
+  FEATURES,
+  ONBOARDING_VERSION,
+  LANGUAGES,
+  THEMES,
+  ICON_COLORS,
+  DEFAULT_SETTINGS,
+} from '@/lib/config'
 import { ThemeProvider } from '@/lib/theme'
+import { CopyProvider } from '@/lib/copy'
 import { setAppIconColor } from '@/plugins/appicon'
 import { todayString } from '@/lib/date'
 import { uid, normalizePeople, mergeEventTagsFromPeople, mergePeopleFieldTags } from '@/lib/helpers'
@@ -30,7 +39,7 @@ import StatsScreen from '@/components/stats/StatsScreen'
  * Main app container.
  * It manages global app state, persistence, navigation, and data mutations.
  */
-export default function KissRecorderApp() {
+export default function KissWrappedApp() {
   // Main people dataset used across the whole app.
   const [people, setPeople] = useState([])
 
@@ -47,16 +56,16 @@ export default function KissRecorderApp() {
   const screenRef = useRef('boot')
 
   // Current UI language.
-  const [language, setLanguage] = useState('en')
+  const [language, setLanguage] = useState(DEFAULT_SETTINGS.language)
 
   // Icon color palette selected by the user.
-  const [iconColor, setIconColor] = useState('yellow')
+  const [iconColor, setIconColor] = useState(DEFAULT_SETTINGS.iconColor)
 
   // Active UI theme.
-  const [theme, setTheme] = useState('pink')
+  const [theme, setTheme] = useState(DEFAULT_SETTINGS.theme)
 
   // Whether the stats tiles on the home screen are visible.
-  const [statsVisible, setStatsVisible] = useState(true)
+  const [statsVisible, setStatsVisible] = useState(DEFAULT_SETTINGS.statsVisible)
 
   // User-defined situation tags shared across all event forms.
   const [situationTags, setSituationTags] = useState([])
@@ -179,26 +188,25 @@ export default function KissRecorderApp() {
         // Restore saved settings (language + icon color).
         const settings = await loadSettings()
         if (isMounted) {
-          if (settings.language === 'en' || settings.language === 'es')
-            setLanguage(settings.language)
+          if (LANGUAGES.includes(settings.language)) setLanguage(settings.language)
 
-          // const needsOnboarding =
-          //   !settings.onboardingDone || settings.onboardingVersion !== ONBOARDING_VERSION
-          // if (needsOnboarding) {
-          //   // First launch or updated tutorial: show onboarding.
-          //   if (!settings.onboardingDone) setLanguage(detectDeviceLanguage())
-          //   setOnboardingDone(false)
-          //   setOnboardingVersion(settings.onboardingVersion || 0)
-          //   setScreen('onboarding')
-          // } else {
-          setOnboardingDone(true)
-          setOnboardingVersion(settings.onboardingVersion)
-          setScreen('intro')
-          // }
+          const needsOnboarding =
+            FEATURES.onboarding &&
+            (!settings.onboardingDone || settings.onboardingVersion !== ONBOARDING_VERSION)
+          if (needsOnboarding) {
+            // First launch or updated tutorial: show onboarding.
+            if (!settings.onboardingDone) setLanguage(detectDeviceLanguage())
+            setOnboardingDone(false)
+            setOnboardingVersion(settings.onboardingVersion || 0)
+            setScreen('onboarding')
+          } else {
+            setOnboardingDone(true)
+            setOnboardingVersion(settings.onboardingVersion)
+            setScreen('intro')
+          }
 
-          if (['yellow', 'blue', 'pink', 'purple'].includes(settings.iconColor))
-            setIconColor(settings.iconColor)
-          if (['pink', 'green', 'dark'].includes(settings.theme)) setTheme(settings.theme)
+          if (ICON_COLORS.includes(settings.iconColor)) setIconColor(settings.iconColor)
+          if (THEMES.includes(settings.theme)) setTheme(settings.theme)
           setStatsVisible(settings.statsVisible)
 
           const savedTags = Array.isArray(settings.situationTags) ? settings.situationTags : []
@@ -221,7 +229,7 @@ export default function KissRecorderApp() {
           setOnboardingDone(false)
           setOnboardingVersion(0)
           setLanguage(detectDeviceLanguage())
-          setScreen('intro') // was: 'onboarding'
+          setScreen(FEATURES.onboarding ? 'onboarding' : 'intro')
         }
       } finally {
         // Mark app as loaded only if the component is still mounted.
@@ -460,174 +468,181 @@ export default function KissRecorderApp() {
 
   return (
     <ThemeProvider theme={theme}>
-      <div
-        style={{
-          height: '100vh',
-          color: palette.text,
-          background: `linear-gradient(180deg, ${palette.bgGradientFrom}, ${palette.bgSoft}, ${palette.gradientEnd})`,
-        }}
-      >
+      <CopyProvider language={language}>
         <div
           style={{
-            margin: '0 auto',
-            display: 'flex',
-            height: '100%',
-            width: '100%',
-            maxWidth: '28rem',
-            flexDirection: 'column',
-            paddingLeft: '1rem',
-            paddingRight: '1rem',
+            height: '100vh',
+            color: palette.text,
+            background: `linear-gradient(180deg, ${palette.bgGradientFrom}, ${palette.bgSoft}, ${palette.gradientEnd})`,
           }}
         >
-          {/* Main animated content area */}
-          <motion.div
-            ref={scrollRef}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25 }}
+          <div
             style={{
-              flex: '1 1 0%',
-              overflowY: 'scroll',
-              paddingTop: '1.5rem',
-              paddingBottom: '5.5rem',
-              scrollPaddingTop: '1rem',
-              scrollPaddingBottom: '1.5rem',
-              WebkitOverflowScrolling: 'touch',
-              maskImage:
-                'linear-gradient(to bottom, transparent 0px, black 20px, black calc(100% - 20px), transparent 100%)',
-              WebkitMaskImage:
-                'linear-gradient(to bottom, transparent 0px, black 20px, black calc(100% - 20px), transparent 100%)',
+              margin: '0 auto',
+              display: 'flex',
+              height: '100%',
+              width: '100%',
+              maxWidth: '28rem',
+              flexDirection: 'column',
+              paddingLeft: '1rem',
+              paddingRight: '1rem',
             }}
           >
-            {/* Main dashboard */}
-            {screen === 'main' ? (
-              <HomeScreen
-                onNavigate={navigateTo}
-                onClearData={clearAllAppData}
-                onImportData={importAppData}
-                people={people}
-                t={t}
-                language={language}
-                setLanguage={setLanguage}
-                iconColor={iconColor}
-                setIconColor={changeIconColor}
-                theme={theme}
-                setTheme={changeTheme}
-                statsVisible={statsVisible}
-                setStatsVisible={setStatsVisible}
-                modalBackRef={modalBackRef}
-              />
-            ) : null}
-
-            {/* Add person flow */}
-            {screen === 'add' ? (
-              <AddPersonScreen
-                onSave={addPerson}
-                onBack={() => setScreen('intro')}
-                t={t}
-                language={language}
-              />
-            ) : null}
-
-            {/* People management screen */}
-            {screen === 'people' ? (
-              <PeopleManagerScreen
-                people={people}
-                onUpdatePerson={updatePerson}
-                onDeletePerson={deletePerson}
-                onAddEvent={addEvent}
-                onUpdateEvent={updateEvent}
-                onDeleteEvent={deleteEvent}
-                onDeleteAllEvents={deleteAllEvents}
-                t={t}
-                language={language}
-                modalBackRef={modalBackRef}
-                situationTags={situationTags}
-                onAddSituationTag={addSituationTag}
-                placeTags={placeTags}
-                onAddPlaceTag={addPlaceTag}
-                howWeMetTags={howWeMetTags}
-                onAddHowWeMetTag={addHowWeMetTag}
-              />
-            ) : null}
-
-            {/* Statistics screen */}
-            {screen === 'stats' ? (
-              <StatsScreen people={people} t={t} modalBackRef={modalBackRef} />
-            ) : null}
-          </motion.div>
-
-          {/* Bottom navigation */}
-          {!hideBottomBar ? (
-            <div
+            {/* Main animated content area */}
+            <motion.div
+              ref={scrollRef}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
               style={{
-                position: 'fixed',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                zIndex: 50,
-                backdropFilter: 'blur(8px)',
-                borderTop: `1px solid ${palette.inputBorder}`,
-                backgroundColor: palette.navBarBg,
+                flex: '1 1 0%',
+                overflowY: 'scroll',
+                paddingTop: '1.5rem',
+                paddingBottom: '5.5rem',
+                scrollPaddingTop: '1rem',
+                scrollPaddingBottom: '1.5rem',
+                WebkitOverflowScrolling: 'touch',
+                maskImage:
+                  'linear-gradient(to bottom, transparent 0px, black 20px, black calc(100% - 20px), transparent 100%)',
+                WebkitMaskImage:
+                  'linear-gradient(to bottom, transparent 0px, black 20px, black calc(100% - 20px), transparent 100%)',
               }}
             >
+              {/* Main dashboard */}
+              {screen === 'main' ? (
+                <HomeScreen
+                  onNavigate={navigateTo}
+                  onClearData={clearAllAppData}
+                  onImportData={importAppData}
+                  people={people}
+                  t={t}
+                  language={language}
+                  setLanguage={setLanguage}
+                  iconColor={iconColor}
+                  setIconColor={changeIconColor}
+                  theme={theme}
+                  setTheme={changeTheme}
+                  statsVisible={statsVisible}
+                  setStatsVisible={setStatsVisible}
+                  modalBackRef={modalBackRef}
+                />
+              ) : null}
+
+              {/* Add person flow */}
+              {screen === 'add' ? (
+                <AddPersonScreen
+                  onSave={addPerson}
+                  onBack={() => setScreen('intro')}
+                  t={t}
+                  language={language}
+                />
+              ) : null}
+
+              {/* People management screen */}
+              {screen === 'people' ? (
+                <PeopleManagerScreen
+                  people={people}
+                  onUpdatePerson={updatePerson}
+                  onDeletePerson={deletePerson}
+                  onAddEvent={addEvent}
+                  onUpdateEvent={updateEvent}
+                  onDeleteEvent={deleteEvent}
+                  onDeleteAllEvents={deleteAllEvents}
+                  t={t}
+                  language={language}
+                  modalBackRef={modalBackRef}
+                  situationTags={situationTags}
+                  onAddSituationTag={addSituationTag}
+                  placeTags={placeTags}
+                  onAddPlaceTag={addPlaceTag}
+                  howWeMetTags={howWeMetTags}
+                  onAddHowWeMetTag={addHowWeMetTag}
+                />
+              ) : null}
+
+              {/* Statistics screen */}
+              {screen === 'stats' ? (
+                <StatsScreen
+                  people={people}
+                  t={t}
+                  language={language}
+                  modalBackRef={modalBackRef}
+                />
+              ) : null}
+            </motion.div>
+
+            {/* Bottom navigation */}
+            {!hideBottomBar ? (
               <div
                 style={{
-                  margin: '0 auto',
-                  display: 'grid',
-                  maxWidth: '28rem',
-                  gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-                  gap: '0.25rem',
-                  paddingLeft: '0.75rem',
-                  paddingRight: '0.75rem',
-                  paddingTop: '0.75rem',
-                  paddingBottom: '0.75rem',
+                  position: 'fixed',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  zIndex: 50,
+                  backdropFilter: 'blur(8px)',
+                  borderTop: `1px solid ${palette.inputBorder}`,
+                  backgroundColor: palette.navBarBg,
                 }}
               >
-                {navItems.map((item) => {
-                  const Icon = item.icon
-                  const active = screen === item.key
+                <div
+                  style={{
+                    margin: '0 auto',
+                    display: 'grid',
+                    maxWidth: '28rem',
+                    gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+                    gap: '0.25rem',
+                    paddingLeft: '0.75rem',
+                    paddingRight: '0.75rem',
+                    paddingTop: '0.75rem',
+                    paddingBottom: '0.75rem',
+                  }}
+                >
+                  {navItems.map((item) => {
+                    const Icon = item.icon
+                    const active = screen === item.key
 
-                  return (
-                    <button
-                      key={item.key}
-                      onClick={() => navigateTo(item.key)}
-                      className="rounded-2xl"
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.25rem',
-                        paddingLeft: '0.5rem',
-                        paddingRight: '0.5rem',
-                        paddingTop: '0.5rem',
-                        paddingBottom: '0.5rem',
-                        ...TEXT.caption,
-                        fontWeight: '500',
-                        transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
-                        background: active
-                          ? `linear-gradient(90deg, ${palette.accent}, ${palette.accentSoft})`
-                          : 'transparent',
-                        color: active ? '#ffffff' : palette.textSoft,
-                      }}
-                    >
-                      <Icon style={{ height: '1rem', width: '1rem' }} />
-                      {item.label}
-                    </button>
-                  )
-                })}
+                    return (
+                      <button
+                        key={item.key}
+                        onClick={() => navigateTo(item.key)}
+                        className="rounded-2xl"
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.25rem',
+                          paddingLeft: '0.5rem',
+                          paddingRight: '0.5rem',
+                          paddingTop: '0.5rem',
+                          paddingBottom: '0.5rem',
+                          ...TEXT.caption,
+                          fontWeight: '500',
+                          transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+                          background: active
+                            ? `linear-gradient(90deg, ${palette.accent}, ${palette.accentSoft})`
+                            : 'transparent',
+                          color: active ? '#ffffff' : palette.textSoft,
+                        }}
+                      >
+                        <Icon style={{ height: '1rem', width: '1rem' }} />
+                        {item.label}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
         </div>
-      </div>
-      {/* Full-screen overlays rendered outside the masked scroll area */}
-      {screen === 'onboarding' ? (
-        <OnboardingScreen t={t} onComplete={handleOnboardingComplete} />
-      ) : null}
-      {screen === 'intro' ? <IntroScreen onOpenMain={() => navigateTo('main')} t={t} /> : null}
-      <AnimatePresence>{isPrivate && <PrivacyScreen key="privacy" />}</AnimatePresence>
+        {/* Full-screen overlays rendered outside the masked scroll area */}
+        {screen === 'onboarding' ? (
+          <OnboardingScreen t={t} onComplete={handleOnboardingComplete} />
+        ) : null}
+        {screen === 'intro' ? <IntroScreen onOpenMain={() => navigateTo('main')} t={t} /> : null}
+        <AnimatePresence>{isPrivate && <PrivacyScreen key="privacy" />}</AnimatePresence>
+      </CopyProvider>
     </ThemeProvider>
   )
 }

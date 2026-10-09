@@ -15,9 +15,19 @@ import {
 } from '@/components/ui/select'
 
 import { GENDERS, ZODIAC_OPTIONS, TEXT } from '@/lib/constants'
+import { LIMITS } from '@/lib/config'
 import { usePalette } from '@/lib/theme'
 import { translateGender, getZodiacForLanguage } from '@/lib/format'
-import { calculateDisplayAge, deriveBirthYear, isWithinZodiacPeriod } from '@/lib/date'
+import {
+  calculateDisplayAge,
+  deriveBirthYear,
+  isWithinZodiacPeriod,
+  isValidDateString,
+  isFutureDate,
+} from '@/lib/date'
+import { DatePicker } from '@/components/ui/date-picker'
+
+const PARTNER_STATUSES = ['never', 'current', 'past']
 
 /**
  * Form used for creating or editing a person.
@@ -50,6 +60,9 @@ export default function PersonForm({
         zodiacSign: '',
         activity: '',
         detail: '',
+        partnerStatus: 'never',
+        partnerFrom: '',
+        partnerTo: '',
       }
     }
     const zodiacSign = getZodiacForLanguage(initialValues.zodiacSign, language)
@@ -69,6 +82,11 @@ export default function PersonForm({
       realName: initialValues.realName ?? '',
       howWeMet: initialValues.howWeMet ?? '',
       detail: initialValues.detail ?? '',
+      partnerStatus: PARTNER_STATUSES.includes(initialValues.partnerStatus)
+        ? initialValues.partnerStatus
+        : 'never',
+      partnerFrom: initialValues.partnerFrom ?? '',
+      partnerTo: initialValues.partnerTo ?? '',
     }
   })
 
@@ -91,7 +109,11 @@ export default function PersonForm({
     if (!form.name.trim()) next.name = t.requiredName
 
     if (!String(form.age).trim()) next.age = t.requiredAge
-    else if (!Number.isInteger(Number(form.age)) || Number(form.age) <= 0 || Number(form.age) > 120)
+    else if (
+      !Number.isInteger(Number(form.age)) ||
+      Number(form.age) <= 0 ||
+      Number(form.age) > LIMITS.maxAge
+    )
       next.age = t.validAge
 
     if (!form.gender) next.gender = t.requiredGender
@@ -101,6 +123,20 @@ export default function PersonForm({
     if (!form.zodiacSign) next.zodiacSign = t.requiredZodiac
 
     if (!form.activity) next.activity = t.requiredActivity
+
+    // Partner period: optional start; a past partner needs a valid end after the start.
+    const from = form.partnerFrom.trim()
+    const to = form.partnerTo.trim()
+    if (form.partnerStatus !== 'never' && from) {
+      if (!isValidDateString(from)) next.partnerFrom = t.validDateMsg
+      else if (isFutureDate(from)) next.partnerFrom = t.futureDateMsg
+    }
+    if (form.partnerStatus === 'past') {
+      if (!to) next.partnerTo = t.requiredPartnerTo
+      else if (!isValidDateString(to)) next.partnerTo = t.validDateMsg
+      else if (isFutureDate(to)) next.partnerTo = t.futureDateMsg
+      else if (from && !next.partnerFrom && from > to) next.partnerTo = t.partnerRangeError
+    }
 
     setErrors(next)
 
@@ -116,6 +152,9 @@ export default function PersonForm({
     const { age, ...rest } = form
     onSave({
       ...rest,
+      partnerStatus: form.partnerStatus,
+      partnerFrom: form.partnerStatus !== 'never' ? form.partnerFrom.trim() : '',
+      partnerTo: form.partnerStatus === 'past' ? form.partnerTo.trim() : '',
       birthYear: deriveBirthYear(
         Number(age),
         form.zodiacSign,
@@ -147,12 +186,12 @@ export default function PersonForm({
             <Input
               value={form.name}
               onChange={(e) => update('name', e.target.value)}
-              maxLength={100}
+              maxLength={LIMITS.nameLength}
               className="rounded-2xl"
               style={{ ...inputStyle }}
             />
             <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-              {form.name.length}/100
+              {form.name.length}/{LIMITS.nameLength}
             </p>
             {errors.name && <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.name}</p>}
           </div>
@@ -163,13 +202,13 @@ export default function PersonForm({
               <Input
                 value={form.realName}
                 onChange={(e) => update('realName', e.target.value)}
-                maxLength={100}
+                maxLength={LIMITS.nameLength}
                 className="rounded-2xl"
                 placeholder={t.realNamePlaceholder}
                 style={{ ...inputStyle }}
               />
               <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-                {form.realName.length}/100
+                {form.realName.length}/{LIMITS.nameLength}
               </p>
             </div>
           )}
@@ -186,7 +225,7 @@ export default function PersonForm({
               value={form.age}
               onChange={(e) => update('age', e.target.value)}
               min={1}
-              max={120}
+              max={LIMITS.maxAge}
               className="rounded-2xl"
               style={{ ...inputStyle }}
             />
@@ -254,6 +293,92 @@ export default function PersonForm({
           </div>
         </div>
 
+        {/* Partner marker + period */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+          <Label>{t.partnerLabel}</Label>
+          <div
+            style={{
+              display: 'flex',
+              borderRadius: '0.75rem',
+              overflow: 'hidden',
+              border: `1px solid ${PALETTE.inputBorder}`,
+              width: 'fit-content',
+              backgroundColor: PALETTE.inputBg,
+            }}
+          >
+            {PARTNER_STATUSES.map((status) => (
+              <button
+                key={status}
+                type="button"
+                onClick={() => update('partnerStatus', status)}
+                style={{
+                  padding: '0.25rem 1rem',
+                  ...TEXT.caption,
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  border: 'none',
+                  backgroundColor: form.partnerStatus === status ? PALETTE.accent : 'transparent',
+                  color: form.partnerStatus === status ? PALETTE.textOnAccent : PALETTE.text,
+                  transition: 'background-color 0.15s, color 0.15s',
+                }}
+              >
+                {status === 'never'
+                  ? t.partnerNever
+                  : status === 'current'
+                    ? t.partnerCurrent
+                    : t.partnerPast}
+              </button>
+            ))}
+          </div>
+
+          {form.partnerStatus !== 'never' && (
+            <>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns:
+                    form.partnerStatus === 'past' ? 'repeat(2, minmax(0, 1fr))' : '1fr',
+                  gap: '1rem',
+                  marginTop: '0.25rem',
+                }}
+              >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <Label>
+                    {form.partnerStatus === 'current' ? t.partnerSince : t.partnerFromLabel}
+                  </Label>
+                  <DatePicker
+                    value={form.partnerFrom}
+                    onChange={(val) => update('partnerFrom', val)}
+                    placeholder={t.partnerDatePlaceholder}
+                    className="rounded-2xl"
+                    style={{ ...inputStyle }}
+                  />
+                  {errors.partnerFrom && (
+                    <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.partnerFrom}</p>
+                  )}
+                </div>
+
+                {form.partnerStatus === 'past' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <Label>{t.partnerToLabel} *</Label>
+                    <DatePicker
+                      value={form.partnerTo}
+                      onChange={(val) => update('partnerTo', val)}
+                      placeholder={t.partnerDatePlaceholder}
+                      className="rounded-2xl"
+                      style={{ ...inputStyle }}
+                    />
+                    {errors.partnerTo && (
+                      <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.partnerTo}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+              <p style={{ ...TEXT.caption, color: PALETTE.textSoft }}>{t.partnerHint}</p>
+            </>
+          )}
+        </div>
+
         {/* How we met */}
         {includeHowWeMet && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -263,14 +388,14 @@ export default function PersonForm({
               onChange={(val) => update('howWeMet', val)}
               tags={howWeMetTags}
               onAddTag={onAddHowWeMetTag}
-              maxLength={200}
+              maxLength={LIMITS.tagLength}
               className="rounded-2xl"
               style={{ ...inputStyle }}
               addTagLabel={t.addTag}
               isParentOpen={isParentOpen}
             />
             <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-              {form.howWeMet.length}/200
+              {form.howWeMet.length}/{LIMITS.tagLength}
             </p>
             {errors.howWeMet && (
               <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.howWeMet}</p>
@@ -339,12 +464,12 @@ export default function PersonForm({
                       ? t.specificStudiesWorks
                       : ''
               }
-              maxLength={500}
+              maxLength={LIMITS.personDetailLength}
               className="rounded-2xl"
               style={{ ...inputStyle }}
             />
             <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-              {form.detail.length}/500
+              {form.detail.length}/{LIMITS.personDetailLength}
             </p>
           </div>
         )}

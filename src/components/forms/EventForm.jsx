@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/alert-dialog'
 
 import { SCORE_OPTIONS, TEXT } from '@/lib/constants'
+import { LIMITS } from '@/lib/config'
 import { usePalette } from '@/lib/theme'
 import { todayString, isValidDateString, isFutureDate } from '@/lib/date'
 import { hasScore, renderKisses } from '@/lib/format'
@@ -127,13 +128,13 @@ export default function EventForm({
           tags={placeTags}
           onAddTag={onAddPlaceTag}
           placeholder={t.eventPlacePlaceholder}
-          maxLength={200}
+          maxLength={LIMITS.tagLength}
           style={{ ...inputStyle }}
           addTagLabel={t.addTag}
           isParentOpen={isParentOpen}
         />
         <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-          {place.length}/200
+          {place.length}/{LIMITS.tagLength}
         </p>
         {errors.place && <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.place}</p>}
       </div>
@@ -147,13 +148,13 @@ export default function EventForm({
           tags={situationTags}
           onAddTag={onAddSituationTag}
           placeholder={t.eventSituationPlaceholder}
-          maxLength={200}
+          maxLength={LIMITS.tagLength}
           style={{ ...inputStyle }}
           addTagLabel={t.addTag}
           isParentOpen={isParentOpen}
         />
         <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-          {situation.length}/200
+          {situation.length}/{LIMITS.tagLength}
         </p>
         {errors.situation && (
           <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.situation}</p>
@@ -167,12 +168,12 @@ export default function EventForm({
           value={details}
           onChange={(e) => setDetails(e.target.value)}
           placeholder={t.eventDetailsPlaceholder}
-          maxLength={1000}
+          maxLength={LIMITS.eventNotesLength}
           className="rounded-2xl"
           style={{ ...inputStyle }}
         />
         <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-          {details.length}/1000
+          {details.length}/{LIMITS.eventNotesLength}
         </p>
       </div>
 
@@ -183,12 +184,12 @@ export default function EventForm({
           value={observations}
           onChange={(e) => setObservations(e.target.value)}
           placeholder={t.eventObservationsPlaceholder}
-          maxLength={1000}
+          maxLength={LIMITS.eventNotesLength}
           className="rounded-2xl"
           style={{ ...inputStyle }}
         />
         <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-          {observations.length}/1000
+          {observations.length}/{LIMITS.eventNotesLength}
         </p>
       </div>
 

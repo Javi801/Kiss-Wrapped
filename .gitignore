@@ -78,6 +78,12 @@ ios/Pods
 !.vscode/extensions.json
 .idea
 .claude/settings.local.json
+CLAUDE.md
+graphify-out/
+.claude/settings.json
+.gitattributes
+.husky/post-checkout
+.husky/post-commit
 *.iml
 
 # =========================
@@ -96,4 +102,8 @@ ios/Pods
 # =========================
 # Temporary files
 # =========================
-*.sw?
+
+# =========================
+# Others files
+# =========================
+mockups

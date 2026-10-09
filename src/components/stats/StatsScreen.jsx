@@ -5,6 +5,7 @@ import {
   UserRound,
   BadgePercent,
   CheckCircle2,
+  Download,
   TriangleAlert,
 } from 'lucide-react'
 
@@ -18,8 +19,10 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { TEXT } from '@/lib/constants'
+import { FEATURES } from '@/lib/config'
 import { usePalette } from '@/lib/theme'
 import { exportStatsPdf, saveErrorLog } from '@/lib/pdf-export'
+import { excludePartnerEvents, flattenEvents } from '@/lib/stats'
 
 import StatsOverviewTab from '@/components/stats/StatsOverviewTab'
 import StatsTimeTab from '@/components/stats/StatsTimeTab'
@@ -30,7 +33,7 @@ import StatsScoresTab from '@/components/stats/StatsScoresTab'
  * Renders the full statistics screen with tab navigation.
  * It prepares shared data and delegates each section to a dedicated tab component.
  */
-export default function StatsScreen({ people, t, modalBackRef }) {
+export default function StatsScreen({ people, t, language, modalBackRef }) {
   const PALETTE = usePalette()
   const [tab, setTab] = useState('overview')
   const [, startTransition] = useTransition()
@@ -42,7 +45,6 @@ export default function StatsScreen({ people, t, modalBackRef }) {
     modalBackRef.current = pdfStatus !== null ? () => setPdfStatus(null) : null
   }, [pdfStatus, modalBackRef])
 
-  // eslint-disable-next-line no-unused-vars -- re-enable once PDF export bug is fixed
   async function handleExport() {
     const hasEvents = people.some((p) => p.events?.length > 0)
     if (people.length === 0 || !hasEvents) {
@@ -50,21 +52,21 @@ export default function StatsScreen({ people, t, modalBackRef }) {
       return
     }
     try {
-      await exportStatsPdf(people, t)
+      await exportStatsPdf(people, t, language)
       setPdfStatus('success')
     } catch (err) {
       setPdfStatus(err instanceof Error ? err : new Error(String(err)))
     }
   }
 
+  // People counted in event-based statistics, with partner-period events removed.
+  const eventPeople = useMemo(() => excludePartnerEvents(people), [people])
+
   /**
    * Flatten all events and preserve their parent person.
    * This shared dataset is reused across multiple stats tabs.
    */
-  const allEvents = useMemo(
-    () => people.flatMap((person) => (person.events || []).map((event) => ({ ...event, person }))),
-    [people]
-  )
+  const allEvents = useMemo(() => flattenEvents(eventPeople), [eventPeople])
 
   // Define the available tab options and their labels.
   const statTabs = [
@@ -116,17 +118,17 @@ export default function StatsScreen({ people, t, modalBackRef }) {
           </p>
         </div>
 
-        {/* TODO: fix PDF export bug before re-enabling
-        <Button
-          variant="outline"
-          className="rounded-2xl bg-white/85"
+        {FEATURES.pdfExport ? (
+          <Button
+            variant="outline"
+            className="rounded-2xl bg-white/85"
             style={{ borderColor: PALETTE.inputBorder }}
-          onClick={handleExport}
-        >
-          <Download className="mr-2 h-4 w-4" />
-          {t.exportPdf}
-        </Button>
-        */}
+            onClick={handleExport}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            {t.exportPdf}
+          </Button>
+        ) : null}
       </div>
 
       <div
@@ -166,11 +168,17 @@ export default function StatsScreen({ people, t, modalBackRef }) {
         })}
       </div>
 
-      {tab === 'overview' ? <StatsOverviewTab people={people} allEvents={allEvents} t={t} /> : null}
+      {tab === 'overview' ? (
+        <StatsOverviewTab people={eventPeople} allEvents={allEvents} t={t} />
+      ) : null}
 
-      {tab === 'time' ? <StatsTimeTab people={people} allEvents={allEvents} t={t} /> : null}
+      {tab === 'time' ? (
+        <StatsTimeTab people={eventPeople} allEvents={allEvents} t={t} language={language} />
+      ) : null}
 
-      {tab === 'people' ? <StatsPeopleTab people={people} t={t} /> : null}
+      {tab === 'people' ? (
+        <StatsPeopleTab people={people} eventPeople={eventPeople} t={t} language={language} />
+      ) : null}
 
       {tab === 'scores' ? <StatsScoresTab allEvents={allEvents} t={t} /> : null}
 

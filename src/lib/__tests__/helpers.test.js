@@ -153,6 +153,60 @@ describe('normalizePeople', () => {
     const people = [{ name: 'Ana', realName: 'Ana García', events: [] }]
     expect(normalizePeople(people)[0].realName).toBe('Ana García')
   })
+  it('defaults missing partner fields to never', () => {
+    const result = normalizePeople([{ name: 'Ana', events: [] }])[0]
+    expect(result.partnerStatus).toBe('never')
+    expect(result.partnerFrom).toBe('')
+    expect(result.partnerTo).toBe('')
+  })
+  it('normalizes an invalid partnerStatus to never', () => {
+    const people = [{ name: 'Ana', partnerStatus: 'maybe', events: [] }]
+    expect(normalizePeople(people)[0].partnerStatus).toBe('never')
+  })
+  it('migrates legacy isPartner true to a current partner with an open period', () => {
+    const result = normalizePeople([{ name: 'Ana', isPartner: true, events: [] }])[0]
+    expect(result.partnerStatus).toBe('current')
+    expect(result.partnerFrom).toBe('')
+    expect(result.isPartner).toBeUndefined()
+  })
+  it('preserves partner period fields for a past partner', () => {
+    const people = [
+      {
+        name: 'Ana',
+        partnerStatus: 'past',
+        partnerFrom: '2023.01.01',
+        partnerTo: '2023.12.31',
+        events: [],
+      },
+    ]
+    const result = normalizePeople(people)[0]
+    expect(result.partnerStatus).toBe('past')
+    expect(result.partnerFrom).toBe('2023.01.01')
+    expect(result.partnerTo).toBe('2023.12.31')
+  })
+  it('clears partnerTo for a current partner and dates for never', () => {
+    const people = [
+      {
+        name: 'Ana',
+        partnerStatus: 'current',
+        partnerFrom: '2023.01.01',
+        partnerTo: '2024.01.01',
+        events: [],
+      },
+      {
+        name: 'Bob',
+        partnerStatus: 'never',
+        partnerFrom: '2023.01.01',
+        partnerTo: '2024.01.01',
+        events: [],
+      },
+    ]
+    const [ana, bob] = normalizePeople(people)
+    expect(ana.partnerFrom).toBe('2023.01.01')
+    expect(ana.partnerTo).toBe('')
+    expect(bob.partnerFrom).toBe('')
+    expect(bob.partnerTo).toBe('')
+  })
   it('replaces a missing events field with an empty array', () => {
     const people = [{ name: 'Ana' }]
     expect(normalizePeople(people)[0].events).toEqual([])

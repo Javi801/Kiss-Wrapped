@@ -1,7 +1,7 @@
 {
-  "name": "kissrecorder",
+  "name": "kiss-wrapped",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,6 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "ci": "npm run lint && prettier --check \"src/**/*.{js,jsx}\" && npm run test:coverage && npm run build",
     "prepare": "husky"
   },
   "dependencies": {
