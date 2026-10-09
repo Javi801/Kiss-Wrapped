@@ -38,6 +38,7 @@ import {
   STATS_VISIBLE_KEY,
   SITUATION_TAGS_KEY,
   PLACE_TAGS_KEY,
+  HOW_WE_MET_TAGS_KEY,
   ONBOARDING_VERSION_KEY,
   PEOPLE_FILE_NAME,
   SETTINGS_FILE_NAME,
@@ -308,6 +309,7 @@ describe('loadSettings (web path)', () => {
       statsVisible: DEFAULT_SETTINGS.statsVisible,
       situationTags: [],
       placeTags: [],
+      howWeMetTags: [],
       onboardingDone: false,
       onboardingVersion: 0,
     })
@@ -360,6 +362,15 @@ describe('loadSettings (web path)', () => {
 
   it('returns empty placeTags when none are saved', async () => {
     expect((await loadSettings()).placeTags).toEqual([])
+  })
+
+  it('returns saved howWeMetTags', async () => {
+    localStorage.setItem(HOW_WE_MET_TAGS_KEY, JSON.stringify(['School', 'Work']))
+    expect((await loadSettings()).howWeMetTags).toEqual(['School', 'Work'])
+  })
+
+  it('returns empty howWeMetTags when none are saved', async () => {
+    expect((await loadSettings()).howWeMetTags).toEqual([])
   })
 })
 
@@ -426,6 +437,17 @@ describe('saveSettings (web path)', () => {
     expect(JSON.parse(localStorage.getItem(PLACE_TAGS_KEY))).toEqual(['Existing'])
   })
 
+  it('saves howWeMetTags to localStorage', async () => {
+    await saveSettings({ howWeMetTags: ['School', 'Work'] })
+    expect(JSON.parse(localStorage.getItem(HOW_WE_MET_TAGS_KEY))).toEqual(['School', 'Work'])
+  })
+
+  it('does not overwrite howWeMetTags when it is undefined', async () => {
+    localStorage.setItem(HOW_WE_MET_TAGS_KEY, JSON.stringify(['Existing']))
+    await saveSettings({ iconColor: 'pink' })
+    expect(JSON.parse(localStorage.getItem(HOW_WE_MET_TAGS_KEY))).toEqual(['Existing'])
+  })
+
   it('round-trips correctly through save and load', async () => {
     await saveSettings({
       iconColor: 'blue',
@@ -434,6 +456,7 @@ describe('saveSettings (web path)', () => {
       statsVisible: true,
       situationTags: ['Date', 'Party'],
       placeTags: ['Café', 'Home'],
+      howWeMetTags: ['School', 'Work'],
       onboardingDone: true,
       onboardingVersion: 2,
     })
@@ -444,6 +467,7 @@ describe('saveSettings (web path)', () => {
       statsVisible: true,
       situationTags: ['Date', 'Party'],
       placeTags: ['Café', 'Home'],
+      howWeMetTags: ['School', 'Work'],
       onboardingDone: true,
       onboardingVersion: 2,
     })
@@ -486,20 +510,28 @@ describe('loadSettings (native path — migration from localStorage)', () => {
     expect((await loadSettings()).placeTags).toEqual(['Café', 'Home'])
   })
 
+  it('migrates howWeMetTags from localStorage', async () => {
+    localStorage.setItem(HOW_WE_MET_TAGS_KEY, JSON.stringify(['School', 'Work']))
+    expect((await loadSettings()).howWeMetTags).toEqual(['School', 'Work'])
+  })
+
   it('returns empty tag arrays when localStorage has none', async () => {
     const settings = await loadSettings()
     expect(settings.situationTags).toEqual([])
     expect(settings.placeTags).toEqual([])
+    expect(settings.howWeMetTags).toEqual([])
   })
 
   it('persists migrated tags to the native settings file', async () => {
     localStorage.setItem(SITUATION_TAGS_KEY, JSON.stringify(['Date']))
     localStorage.setItem(PLACE_TAGS_KEY, JSON.stringify(['Home']))
+    localStorage.setItem(HOW_WE_MET_TAGS_KEY, JSON.stringify(['School']))
     await loadSettings()
     expect(mockFilesystem.writeFile).toHaveBeenCalledOnce()
     const written = JSON.parse(mockFilesystem.writeFile.mock.calls[0][0].data)
     expect(written.situationTags).toEqual(['Date'])
     expect(written.placeTags).toEqual(['Home'])
+    expect(written.howWeMetTags).toEqual(['School'])
   })
 })
 
@@ -524,6 +556,7 @@ describe('loadSettings (native path — reads existing file)', () => {
       statsVisible: true,
       situationTags: [],
       placeTags: [],
+      howWeMetTags: ['School'],
       onboardingDone: true,
       onboardingVersion: 2,
     }
@@ -572,6 +605,16 @@ describe('loadSettings (native path — reads existing file)', () => {
     expect(settings.iconColor).toBe(DEFAULT_SETTINGS.iconColor)
     expect(settings.theme).toBe(DEFAULT_SETTINGS.theme)
     expect(settings.statsVisible).toBe(DEFAULT_SETTINGS.statsVisible)
+  })
+
+  it('returns empty howWeMetTags when the settings file predates the field', async () => {
+    mockFilesystem.readFile.mockResolvedValueOnce({
+      data: JSON.stringify({ situationTags: ['Date'], placeTags: ['Home'] }),
+    })
+    const settings = await loadSettings()
+    expect(settings.howWeMetTags).toEqual([])
+    expect(settings.situationTags).toEqual(['Date'])
+    expect(settings.placeTags).toEqual(['Home'])
   })
 })
 
@@ -710,6 +753,7 @@ describe('saveSettings (native path)', () => {
       statsVisible: false,
       situationTags: ['Date'],
       placeTags: ['Café'],
+      howWeMetTags: ['School'],
       onboardingDone: true,
       onboardingVersion: 2,
     }
@@ -806,6 +850,18 @@ describe('persisted settings override config defaults (native path)', () => {
     const written = mockFilesystem.writeFile.mock.calls[0][0].data
     mockFilesystem.readFile.mockResolvedValueOnce({ data: written })
     expect(await loadSettings()).toMatchObject(USER_CHOICES)
+  })
+
+  it('reads back the tag lists saveSettings wrote', async () => {
+    const tags = {
+      situationTags: ['Date', 'Party'],
+      placeTags: ['Café', 'Home'],
+      howWeMetTags: ['School', 'Work'],
+    }
+    await saveSettings({ ...USER_CHOICES, ...tags, onboardingDone: true, onboardingVersion: 1 })
+    const written = mockFilesystem.writeFile.mock.calls[0][0].data
+    mockFilesystem.readFile.mockResolvedValueOnce({ data: written })
+    expect(await loadSettings()).toMatchObject(tags)
   })
 
   it.each(SETTING_NAMES)(

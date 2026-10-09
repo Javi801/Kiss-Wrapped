@@ -248,6 +248,7 @@ Settings {
   statsVisible:     boolean
   situationTags:    string[]
   placeTags:        string[]
+  howWeMetTags:     string[]
 }
 ```
 
