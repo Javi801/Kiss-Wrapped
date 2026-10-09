@@ -58,7 +58,7 @@ At a glance:
     <td width="50%" valign="top">
       <picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/feature-events-dark.svg"><img src="assets/readme/feature-events-light.svg" width="55" alt="Events icon"></picture><br>
       <strong>Event log</strong><br>
-      Record each interaction with a date, place, situation, and an optional score from 1 to 5. Events are tied to a person and editable or deletable at any time.<br><br>
+      Record each interaction with a date, place, situation, and an optional score from 0 to 5. Events are tied to a person and editable or deletable at any time.<br><br>
       <code>Dated entries</code> <code>Place + situation tags</code> <code>Scores</code>
     </td>
   </tr>
@@ -247,12 +247,12 @@ Event {
   date:      string           // "yyyy.MM.dd"
   place:     string
   situation: string
-  score:     number | null    // 1 to 5, or null
+  score:     number | null    // 0 to 5, or null
 }
 
 Settings {
   language:         string    // en or es
-  theme:            string    // light, green, or dark
+  theme:            string    // pink, green, or dark
   iconColor:        string
   statsVisible:     boolean
   situationTags:    string[]
