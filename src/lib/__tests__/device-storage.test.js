@@ -35,12 +35,14 @@ import {
   ICON_COLOR_KEY,
   LANGUAGE_KEY,
   THEME_KEY,
+  STATS_VISIBLE_KEY,
   SITUATION_TAGS_KEY,
   PLACE_TAGS_KEY,
   ONBOARDING_VERSION_KEY,
   PEOPLE_FILE_NAME,
   SETTINGS_FILE_NAME,
 } from '@/lib/constants'
+import { DEFAULT_SETTINGS, LANGUAGES, THEMES, ICON_COLORS } from '@/lib/config'
 
 // ---------------------------------------------------------------------------
 // loadPeopleFromDevice
@@ -300,10 +302,10 @@ describe('loadSettings (web path)', () => {
 
   it('returns defaults when no settings are saved', async () => {
     expect(await loadSettings()).toEqual({
-      iconColor: 'yellow',
-      language: 'en',
-      theme: 'pink',
-      statsVisible: true,
+      iconColor: DEFAULT_SETTINGS.iconColor,
+      language: DEFAULT_SETTINGS.language,
+      theme: DEFAULT_SETTINGS.theme,
+      statsVisible: DEFAULT_SETTINGS.statsVisible,
       situationTags: [],
       placeTags: [],
       onboardingDone: false,
@@ -329,17 +331,17 @@ describe('loadSettings (web path)', () => {
   it('falls back to default iconColor when only language is saved', async () => {
     localStorage.setItem(LANGUAGE_KEY, 'es')
     const settings = await loadSettings()
-    expect(settings.iconColor).toBe('yellow')
+    expect(settings.iconColor).toBe(DEFAULT_SETTINGS.iconColor)
     expect(settings.language).toBe('es')
-    expect(settings.theme).toBe('pink')
+    expect(settings.theme).toBe(DEFAULT_SETTINGS.theme)
   })
 
   it('falls back to default language when only iconColor is saved', async () => {
     localStorage.setItem(ICON_COLOR_KEY, 'pink')
     const settings = await loadSettings()
     expect(settings.iconColor).toBe('pink')
-    expect(settings.language).toBe('en')
-    expect(settings.theme).toBe('pink')
+    expect(settings.language).toBe(DEFAULT_SETTINGS.language)
+    expect(settings.theme).toBe(DEFAULT_SETTINGS.theme)
   })
 
   it('returns saved situationTags', async () => {
@@ -567,9 +569,9 @@ describe('loadSettings (native path — reads existing file)', () => {
   it('fills missing fields with SETTINGS_DEFAULTS', async () => {
     mockFilesystem.readFile.mockResolvedValueOnce({ data: JSON.stringify({ language: 'es' }) })
     const settings = await loadSettings()
-    expect(settings.iconColor).toBe('yellow')
-    expect(settings.theme).toBe('pink')
-    expect(settings.statsVisible).toBe(true)
+    expect(settings.iconColor).toBe(DEFAULT_SETTINGS.iconColor)
+    expect(settings.theme).toBe(DEFAULT_SETTINGS.theme)
+    expect(settings.statsVisible).toBe(DEFAULT_SETTINGS.statsVisible)
   })
 })
 
@@ -721,4 +723,106 @@ describe('saveSettings (native path)', () => {
     await saveSettings({ iconColor: 'blue' })
     expect(localStorage.getItem(ICON_COLOR_KEY)).toBeNull()
   })
+})
+
+// ---------------------------------------------------------------------------
+// Persisted user choices vs. config defaults
+// ---------------------------------------------------------------------------
+// A setting the user changed must survive a reload: DEFAULT_SETTINGS from
+// config.js may only fill in values that were never saved.
+const USER_CHOICES = {
+  language: LANGUAGES.find((value) => value !== DEFAULT_SETTINGS.language),
+  theme: THEMES.find((value) => value !== DEFAULT_SETTINGS.theme),
+  iconColor: ICON_COLORS.find((value) => value !== DEFAULT_SETTINGS.iconColor),
+  statsVisible: !DEFAULT_SETTINGS.statsVisible,
+}
+const SETTING_NAMES = Object.keys(USER_CHOICES)
+
+describe('persisted settings override config defaults (web path)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
+  it('has a non-default value available for every setting', () => {
+    for (const name of SETTING_NAMES) {
+      expect(USER_CHOICES[name], name).toBeDefined()
+      expect(USER_CHOICES[name], name).not.toBe(DEFAULT_SETTINGS[name])
+    }
+  })
+
+  it.each(SETTING_NAMES)('keeps the saved %s after a reload', async (name) => {
+    await saveSettings({ [name]: USER_CHOICES[name] })
+    expect((await loadSettings())[name]).toBe(USER_CHOICES[name])
+  })
+
+  it.each(SETTING_NAMES)(
+    'leaves the other settings on their defaults when only %s is saved',
+    async (name) => {
+      await saveSettings({ [name]: USER_CHOICES[name] })
+      const settings = await loadSettings()
+      for (const other of SETTING_NAMES.filter((item) => item !== name)) {
+        expect(settings[other], other).toBe(DEFAULT_SETTINGS[other])
+      }
+    }
+  )
+
+  it('keeps every saved setting together after a reload', async () => {
+    await saveSettings(USER_CHOICES)
+    expect(await loadSettings()).toMatchObject(USER_CHOICES)
+  })
+
+  it('keeps a saved value that equals the default once it is stored', async () => {
+    await saveSettings({ theme: DEFAULT_SETTINGS.theme })
+    expect(localStorage.getItem(THEME_KEY)).toBe(DEFAULT_SETTINGS.theme)
+  })
+})
+
+describe('persisted settings override config defaults (native path)', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    mockNative.isNative = true
+    vi.clearAllMocks()
+    mockFilesystem.writeFile.mockResolvedValue(undefined)
+  })
+  afterEach(() => {
+    mockNative.isNative = false
+  })
+
+  it.each(SETTING_NAMES)('keeps the %s stored in the settings file', async (name) => {
+    mockFilesystem.readFile.mockResolvedValueOnce({
+      data: JSON.stringify({ [name]: USER_CHOICES[name] }),
+    })
+    expect((await loadSettings())[name]).toBe(USER_CHOICES[name])
+  })
+
+  it('reads back exactly what saveSettings wrote', async () => {
+    await saveSettings({
+      ...USER_CHOICES,
+      situationTags: [],
+      placeTags: [],
+      onboardingDone: true,
+      onboardingVersion: 1,
+    })
+    const written = mockFilesystem.writeFile.mock.calls[0][0].data
+    mockFilesystem.readFile.mockResolvedValueOnce({ data: written })
+    expect(await loadSettings()).toMatchObject(USER_CHOICES)
+  })
+
+  it.each(SETTING_NAMES)(
+    'migrates the %s saved in localStorage instead of using the default',
+    async (name) => {
+      const keys = {
+        language: LANGUAGE_KEY,
+        theme: THEME_KEY,
+        iconColor: ICON_COLOR_KEY,
+        statsVisible: STATS_VISIBLE_KEY,
+      }
+      localStorage.setItem(keys[name], String(USER_CHOICES[name]))
+      mockFilesystem.readFile.mockRejectedValueOnce(new Error('File not found'))
+
+      expect((await loadSettings())[name]).toBe(USER_CHOICES[name])
+      const written = JSON.parse(mockFilesystem.writeFile.mock.calls[0][0].data)
+      expect(written[name]).toBe(USER_CHOICES[name])
+    }
+  )
 })

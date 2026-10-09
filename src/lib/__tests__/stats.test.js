@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { COPY } from '@/lib/constants'
+import { LIMITS } from '@/lib/config'
 import { getFirstEventDate, getLastEventDate, getStatsData } from '@/lib/stats'
 
 const t = COPY.en
@@ -231,11 +232,11 @@ describe('getStatsData', () => {
     expect(eventsByGender.find((d) => d.label === t.male).value).toBe(1)
   })
 
-  it('limits peopleMostEvents to 8 entries', () => {
-    const people = Array.from({ length: 12 }, (_, i) =>
+  it('limits peopleMostEvents to the configured top count', () => {
+    const people = Array.from({ length: LIMITS.topPeopleCount + 4 }, (_, i) =>
       makePerson(`Person${i}`, [makeEvent('2024.01.01')])
     )
-    expect(getStatsData(people, t).peopleMostEvents).toHaveLength(8)
+    expect(getStatsData(people, t).peopleMostEvents).toHaveLength(LIMITS.topPeopleCount)
   })
 
   it('groups people by first letter alphabetically', () => {

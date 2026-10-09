@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/select'
 
 import { GENDERS, ZODIAC_OPTIONS, TEXT } from '@/lib/constants'
+import { LIMITS } from '@/lib/config'
 import { usePalette } from '@/lib/theme'
 import { translateGender, getZodiacForLanguage } from '@/lib/format'
 import { calculateDisplayAge, deriveBirthYear, isWithinZodiacPeriod } from '@/lib/date'
@@ -91,7 +92,11 @@ export default function PersonForm({
     if (!form.name.trim()) next.name = t.requiredName
 
     if (!String(form.age).trim()) next.age = t.requiredAge
-    else if (!Number.isInteger(Number(form.age)) || Number(form.age) <= 0 || Number(form.age) > 120)
+    else if (
+      !Number.isInteger(Number(form.age)) ||
+      Number(form.age) <= 0 ||
+      Number(form.age) > LIMITS.maxAge
+    )
       next.age = t.validAge
 
     if (!form.gender) next.gender = t.requiredGender
@@ -147,12 +152,12 @@ export default function PersonForm({
             <Input
               value={form.name}
               onChange={(e) => update('name', e.target.value)}
-              maxLength={100}
+              maxLength={LIMITS.nameLength}
               className="rounded-2xl"
               style={{ ...inputStyle }}
             />
             <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-              {form.name.length}/100
+              {form.name.length}/{LIMITS.nameLength}
             </p>
             {errors.name && <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.name}</p>}
           </div>
@@ -163,13 +168,13 @@ export default function PersonForm({
               <Input
                 value={form.realName}
                 onChange={(e) => update('realName', e.target.value)}
-                maxLength={100}
+                maxLength={LIMITS.nameLength}
                 className="rounded-2xl"
                 placeholder={t.realNamePlaceholder}
                 style={{ ...inputStyle }}
               />
               <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-                {form.realName.length}/100
+                {form.realName.length}/{LIMITS.nameLength}
               </p>
             </div>
           )}
@@ -186,7 +191,7 @@ export default function PersonForm({
               value={form.age}
               onChange={(e) => update('age', e.target.value)}
               min={1}
-              max={120}
+              max={LIMITS.maxAge}
               className="rounded-2xl"
               style={{ ...inputStyle }}
             />
@@ -263,14 +268,14 @@ export default function PersonForm({
               onChange={(val) => update('howWeMet', val)}
               tags={howWeMetTags}
               onAddTag={onAddHowWeMetTag}
-              maxLength={200}
+              maxLength={LIMITS.tagLength}
               className="rounded-2xl"
               style={{ ...inputStyle }}
               addTagLabel={t.addTag}
               isParentOpen={isParentOpen}
             />
             <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-              {form.howWeMet.length}/200
+              {form.howWeMet.length}/{LIMITS.tagLength}
             </p>
             {errors.howWeMet && (
               <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.howWeMet}</p>
@@ -339,12 +344,12 @@ export default function PersonForm({
                       ? t.specificStudiesWorks
                       : ''
               }
-              maxLength={500}
+              maxLength={LIMITS.personDetailLength}
               className="rounded-2xl"
               style={{ ...inputStyle }}
             />
             <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-              {form.detail.length}/500
+              {form.detail.length}/{LIMITS.personDetailLength}
             </p>
           </div>
         )}

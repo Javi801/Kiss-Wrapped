@@ -4,6 +4,7 @@ import StatTile from '@/components/shared/StatTile'
 import TopPersonTile from '@/components/shared/TopPersonTile'
 import BarChartCard from '@/components/charts/BarChartCard'
 import { hasScore } from '@/lib/format'
+import { LIMITS } from '@/lib/config'
 
 /**
  * Renders the overview tab for the stats screen.
@@ -12,7 +13,7 @@ import { hasScore } from '@/lib/format'
 export default function StatsOverviewTab({ people, allEvents, t }) {
   /**
    * Build the ranking of people with the most events.
-   * Only the top 8 entries are shown in the chart.
+   * Only the top entries (LIMITS.topPeopleCount) are shown in the chart.
    */
   const peopleMostEvents = useMemo(
     () =>
@@ -22,7 +23,7 @@ export default function StatsOverviewTab({ people, allEvents, t }) {
           value: person.events?.length || 0,
         }))
         .sort((a, b) => b.value - a.value)
-        .slice(0, 8),
+        .slice(0, LIMITS.topPeopleCount),
     [people]
   )
 

@@ -14,6 +14,7 @@ import {
   ONBOARDING_DONE_KEY,
   ONBOARDING_VERSION_KEY,
 } from '@/lib/constants'
+import { DEFAULT_SETTINGS } from '@/lib/config'
 
 // Returns localStorage only when it is safely available
 export function getSafeStorage() {
@@ -96,10 +97,7 @@ export async function savePeopleToDevice(people) {
 }
 
 const SETTINGS_DEFAULTS = {
-  iconColor: 'yellow',
-  language: 'en',
-  theme: 'pink',
-  statsVisible: true,
+  ...DEFAULT_SETTINGS,
   situationTags: [],
   placeTags: [],
   onboardingDone: false,

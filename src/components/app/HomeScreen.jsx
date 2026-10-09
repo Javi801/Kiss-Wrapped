@@ -28,7 +28,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 
-import { TEXT, APP_VERSION, APP_GITHUB_USER, APP_GITHUB_REPO } from '@/lib/constants'
+import { TEXT } from '@/lib/constants'
+import { APP_VERSION, APP_GITHUB_USER, APP_GITHUB_REPO } from '@/lib/config'
 import { usePalette } from '@/lib/theme'
 import { exportPeopleJson } from '@/lib/device-storage'
 import { saveErrorLog } from '@/lib/pdf-export'

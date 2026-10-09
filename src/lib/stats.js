@@ -1,4 +1,5 @@
 import { SCORE_OPTIONS } from '@/lib/constants'
+import { LIMITS } from '@/lib/config'
 import {
   hasScore,
   renderKisses,
@@ -50,7 +51,7 @@ export function getStatsData(people, t) {
       value: person.events?.length || 0,
     }))
     .sort((a, b) => b.value - a.value)
-    .slice(0, 8)
+    .slice(0, LIMITS.topPeopleCount)
 
   // Calculate average events per saved person.
   const averageEventsPerPerson = people.length
