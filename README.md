@@ -207,7 +207,7 @@ npm run test:watch      # watch mode
 npm run test:coverage   # generate coverage report
 ```
 
-Coverage is scoped to `src/lib/` with these minimum thresholds enforced by CI:
+Coverage is collected for `src/lib/` with these minimum thresholds enforced by CI:
 
 | Metric | Threshold |
 |--------|-----------|
@@ -216,7 +216,16 @@ Coverage is scoped to `src/lib/` with these minimum thresholds enforced by CI:
 | Functions | 95% |
 | Lines | 95% |
 
-Unit tests in `src/lib/__tests__/` cover: `date.js`, `calendar.js`, `format.js`, `helpers.js`, `stats.js`, `constants.js`, `device-storage.js`, `pdf-export.js`, and `utils.js`. `device-storage.js` and `utils.js` are excluded from threshold enforcement since they depend on native plugins or external APIs.
+Tests live in a `__tests__/` folder next to the code they cover, and all of them are unit tests:
+
+| Location | Covers |
+|----------|--------|
+| `src/lib/__tests__/` | `date.js`, `calendar.js`, `format.js`, `helpers.js`, `stats.js`, `constants.js`, `config.js`, `device-storage.js`, `pdf-export.js`, `utils.js`, and the theme and copy providers |
+| `src/plugins/__tests__/` | The app icon plugin wrapper |
+| `src/__tests__/` | `App.jsx`: boot, persistence, navigation, back button, and data mutations |
+| `src/components/*/__tests__/` | Forms, stats screen and tabs, selectors, shared tiles, `ErrorBoundary`, and partner behavior of the people screens |
+
+`device-storage.js` and `utils.js` are excluded from threshold enforcement since they depend on native plugins or external APIs. Tests outside `src/lib/` run in the suite but do not count towards the thresholds. Chart cards and decorative visuals have no tests.
 
 ## Data model
 
