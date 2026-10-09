@@ -84,7 +84,7 @@ Rules that hold today and should be preserved:
 Rules:
 
 - **Defaults never override a saved choice.** `DEFAULT_SETTINGS` only seeds the initial React state and fills settings that were never saved. Once a setting is persisted, changing its default in `config.js` does not affect existing installs. `device-storage.test.js` covers this for the web path, the native settings file, and the first-run migration.
-- **Supported lists must match their sources.** `THEMES` must equal the keys of `PALETTES`, `LANGUAGES` the keys of `COPY` and `ZODIAC_OPTIONS`, and `ICON_COLORS` the palettes in `SparkleIcon.constants.js`. `config.test.js` enforces this. `ICON_COLORS` must also match the colors in `AppIconPlugin.java` and the `activity-alias` entries, which no test checks.
+- **Supported lists must match their sources.** `THEMES` must equal the keys of `PALETTES`, `LANGUAGES` the keys of `COPY` and `ZODIAC_OPTIONS`, and `ICON_COLORS` the keys of `SPARKLE_PALETTES` and `PALETTE_SWATCHES` in `SparkleIcon.constants.js`, the colors in `AppIconPlugin.java`, and the `activity-alias` entries in `AndroidManifest.xml`. `config.test.js` enforces all of this.
 - **A new feature flag wraps working code.** Gate the entry point with `FEATURES.<name>` and keep the code compiled and linted, so the flag is the only thing to flip.
 - **Storage keys and file names are not configuration.** They are a data contract and stay in `lib/constants.js`.
 
@@ -229,7 +229,7 @@ Android (`android/app/src/main/`):
 - `MainActivity` sets `FLAG_SECURE` (blank app-switcher thumbnail, no screenshots) and registers `AppIconPlugin`.
 - `AppIconPlugin` (`AppIcon.setColor`) switches the launcher icon by enabling one of four `activity-alias` entries (`AliasYellow`, `AliasPink`, `AliasBlue`, `AliasPurple`) declared in `AndroidManifest.xml`. It is called from JS through `plugins/appicon.js`, which silently no-ops where the plugin is unavailable. Call it only from a direct user action, because changing aliases can make Android kill the app.
 - `android:allowBackup="false"` keeps app data out of system backups.
-- `scripts/generate-icon.mjs` (`npm run gen:icon`) generates the launcher PNGs for all four colors. Its pixel grids and palettes mirror `components/shared/SparkleIcon.jsx`; change both together.
+- `scripts/generate-icon.mjs` (`npm run gen:icon`) generates the launcher PNGs for all four colors. It imports its palettes, pixel grids and layer placements from `components/shared/SparkleIcon.constants.js`, the same module `SparkleIcon.jsx` draws from, so that file must stay importable by plain Node (no JSX, no `@/` imports).
 
 Privacy mechanisms, in addition to the above:
 
