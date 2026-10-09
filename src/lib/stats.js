@@ -34,6 +34,49 @@ export function getLastEventDate(person) {
   return sorted[0]?.date || null
 }
 
+/**
+ * Returns the partner period of a person, or null when they were never a partner.
+ * Bounds are yyyy.MM.dd strings; a null bound is open (current partners have no end).
+ */
+export function getPartnerPeriod(person) {
+  if (person.partnerStatus === 'current') return { from: person.partnerFrom || null, to: null }
+  if (person.partnerStatus === 'past')
+    return { from: person.partnerFrom || null, to: person.partnerTo || null }
+  return null
+}
+
+/**
+ * Whether an event date falls inside a partner period (inclusive bounds).
+ * Dates are yyyy.MM.dd strings, so string comparison is safe.
+ */
+export function isInPartnerPeriod(date, period) {
+  if (!period) return false
+  if (period.from && (!date || date < period.from)) return false
+  if (period.to && (!date || date > period.to)) return false
+  return true
+}
+
+/**
+ * Returns the people that count towards event-based statistics.
+ * Events inside a partner period are removed; events outside it still count.
+ * People whose partner period covers all of their events are dropped entirely,
+ * so they don't dilute averages or show up as zero-event entries.
+ * Partners always stay in person-based statistics (use the unfiltered list there).
+ */
+export function excludePartnerEvents(people) {
+  const result = []
+  for (const person of people) {
+    const period = getPartnerPeriod(person)
+    if (!period) {
+      result.push(person)
+      continue
+    }
+    const events = (person.events || []).filter((event) => !isInPartnerPeriod(event.date, period))
+    if (events.length > 0) result.push({ ...person, events })
+  }
+  return result
+}
+
 // Weights for the group* helpers: count each person once, or by their number of events.
 export const countPeople = () => 1
 export const countEvents = (person) => person.events?.length || 0
@@ -263,14 +306,17 @@ export function getScoredVsUnscored(allEvents, t) {
 /**
  * Builds the derived statistics used by the PDF export.
  * It composes the same aggregation helpers the stats tabs call.
+ * Event-based aggregations skip events inside partner periods; person-based
+ * aggregations (gender, age, first letter) use everyone.
  */
 export function getStatsData(people, t, language = DEFAULT_SETTINGS.language) {
-  const allEvents = flattenEvents(people)
-  const peopleMostEvents = getPeopleMostEvents(people)
+  const eventPeople = excludePartnerEvents(people)
+  const allEvents = flattenEvents(eventPeople)
+  const peopleMostEvents = getPeopleMostEvents(eventPeople)
 
   return {
     allEvents,
-    averageEventsPerPerson: getAverageEventsPerPerson(people, allEvents),
+    averageEventsPerPerson: getAverageEventsPerPerson(eventPeople, allEvents),
     mostActivePerson: peopleMostEvents[0]?.label || '—',
     mostActiveCount: peopleMostEvents[0]?.value || 0,
     averageScore: getAverageScore(allEvents),
@@ -278,15 +324,15 @@ export function getStatsData(people, t, language = DEFAULT_SETTINGS.language) {
     // Month keys are yyyy-MM and year keys yyyy, so sorting by label is chronological.
     eventsPerMonth: toRows(tally(allEvents, (event) => getMonthKey(event.date))).sort(byLabel),
     eventsPerYear: toRows(tally(allEvents, (event) => getYearKey(event.date))).sort(byLabel),
-    personsWithEventsInMultipleYears: getPeopleInMultipleYears(people),
-    eventsByZodiac: groupByZodiac(people, language, countEvents),
-    eventsByActivity: groupByActivity(people, t, countEvents),
+    personsWithEventsInMultipleYears: getPeopleInMultipleYears(eventPeople),
+    eventsByZodiac: groupByZodiac(eventPeople, language, countEvents),
+    eventsByActivity: groupByActivity(eventPeople, t, countEvents),
     personsByGender: groupByGender(people, t),
-    eventsByGender: groupByGender(people, t, countEvents),
+    eventsByGender: groupByGender(eventPeople, t, countEvents),
     personsByAge: getPersonsByAge(people),
     personsByFirstLetter: getPersonsByFirstLetter(people),
     scoresByKisses: getScoresByKisses(allEvents, t),
-    numberOfEventsByNumberOfPersons: getEventCountDistribution(people),
+    numberOfEventsByNumberOfPersons: getEventCountDistribution(eventPeople),
     scoredVsUnscored: getScoredVsUnscored(allEvents, t),
   }
 }

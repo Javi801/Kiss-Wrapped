@@ -482,6 +482,124 @@ describe('getStatsData', () => {
     const works = eventsByActivity.find((d) => d.label === t.works)
     expect(works.value).toBe(2)
   })
+
+  describe('partner exclusion', () => {
+    // Mia is a current partner with no start date: every event is inside the period.
+    const partnerPeople = () => [
+      makePerson('Ana', [makeEvent('2024.01.01', 2), makeEvent('2024.02.01', 4)]),
+      makePerson(
+        'Mia',
+        [makeEvent('2023.01.01', 5), makeEvent('2024.03.01', 5), makeEvent('2025.04.01', 5)],
+        { partnerStatus: 'current', partnerFrom: '', partnerTo: '', gender: 'female' }
+      ),
+    ]
+
+    it('excludes partner events from allEvents and totals', () => {
+      const stats = getStatsData(partnerPeople(), t)
+      expect(stats.allEvents).toHaveLength(2)
+      expect(stats.allEvents.every((event) => event.person.name === 'Ana')).toBe(true)
+    })
+
+    it('excludes the partner from event rankings and averages', () => {
+      const stats = getStatsData(partnerPeople(), t)
+      expect(stats.mostActivePerson).toBe('Ana')
+      expect(stats.peopleMostEvents.map((p) => p.label)).not.toContain('Mia')
+      // 2 events / 1 non-partner person
+      expect(stats.averageEventsPerPerson).toBe('2.0')
+      // (2 + 4) / 2 — partner scores ignored
+      expect(stats.averageScore).toBe('3.0')
+    })
+
+    it('excludes partner events from time and event groupings', () => {
+      const stats = getStatsData(partnerPeople(), t)
+      expect(stats.eventsPerYear).toEqual([{ label: '2024', value: 2 }])
+      expect(stats.personsWithEventsInMultipleYears).toHaveLength(0)
+      expect(stats.eventsByGender.find((d) => d.label === t.female).value).toBe(2)
+      expect(stats.numberOfEventsByNumberOfPersons.find((d) => d.label === '3')).toBeUndefined()
+    })
+
+    it('keeps the partner in person-based groupings', () => {
+      const stats = getStatsData(partnerPeople(), t)
+      expect(stats.personsByGender.find((d) => d.label === t.female).value).toBe(2)
+      expect(stats.personsByFirstLetter.find((d) => d.label === 'M').value).toBe(1)
+    })
+
+    it('only excludes events after the start of a current partner period', () => {
+      const people = [
+        makePerson(
+          'Mia',
+          [makeEvent('2022.05.01', 1), makeEvent('2023.06.01', 5), makeEvent('2024.01.01', 5)],
+          { partnerStatus: 'current', partnerFrom: '2023.01.01' }
+        ),
+      ]
+      const stats = getStatsData(people, t)
+      // Only the 2022 event predates the relationship.
+      expect(stats.allEvents).toHaveLength(1)
+      expect(stats.allEvents[0].date).toBe('2022.05.01')
+      expect(stats.mostActivePerson).toBe('Mia')
+      expect(stats.averageScore).toBe('1.0')
+    })
+
+    it('only excludes events inside a past partner period', () => {
+      const people = [
+        makePerson(
+          'Mia',
+          [
+            makeEvent('2022.05.01'), // before the relationship
+            makeEvent('2023.02.01'), // inside
+            makeEvent('2023.12.31'), // inside (inclusive end)
+            makeEvent('2024.06.01'), // after the breakup
+          ],
+          { partnerStatus: 'past', partnerFrom: '2023.01.01', partnerTo: '2023.12.31' }
+        ),
+      ]
+      const stats = getStatsData(people, t)
+      expect(stats.allEvents.map((e) => e.date)).toEqual(['2022.05.01', '2024.06.01'])
+      expect(stats.eventsPerYear).toEqual([
+        { label: '2022', value: 1 },
+        { label: '2024', value: 1 },
+      ])
+    })
+
+    it('treats a past partner with no start date as partner since the beginning', () => {
+      const people = [
+        makePerson('Mia', [makeEvent('2020.01.01'), makeEvent('2024.06.01')], {
+          partnerStatus: 'past',
+          partnerFrom: '',
+          partnerTo: '2023.12.31',
+        }),
+      ]
+      const stats = getStatsData(people, t)
+      expect(stats.allEvents.map((e) => e.date)).toEqual(['2024.06.01'])
+    })
+
+    it('drops a partner whose period covers every event from people-level event stats', () => {
+      const people = [
+        makePerson('Ana', [makeEvent('2024.01.01')]),
+        makePerson('Mia', [makeEvent('2023.06.01')], {
+          partnerStatus: 'past',
+          partnerFrom: '2023.01.01',
+          partnerTo: '2023.12.31',
+        }),
+      ]
+      const stats = getStatsData(people, t)
+      // Mia contributes nothing outside the relationship: not a zero-event entry.
+      expect(stats.averageEventsPerPerson).toBe('1.0')
+      expect(stats.numberOfEventsByNumberOfPersons.find((d) => d.label === '0')).toBeUndefined()
+      expect(stats.personsByFirstLetter.find((d) => d.label === 'M').value).toBe(1)
+    })
+
+    it('ignores partner dates when the status is never', () => {
+      const people = [
+        makePerson('Ana', [makeEvent('2023.06.01')], {
+          partnerStatus: 'never',
+          partnerFrom: '2023.01.01',
+          partnerTo: '2023.12.31',
+        }),
+      ]
+      expect(getStatsData(people, t).allEvents).toHaveLength(1)
+    })
+  })
 })
 
 describe('getTopPeople', () => {

@@ -22,7 +22,7 @@ import { TEXT } from '@/lib/constants'
 import { FEATURES } from '@/lib/config'
 import { usePalette } from '@/lib/theme'
 import { exportStatsPdf, saveErrorLog } from '@/lib/pdf-export'
-import { flattenEvents } from '@/lib/stats'
+import { excludePartnerEvents, flattenEvents } from '@/lib/stats'
 
 import StatsOverviewTab from '@/components/stats/StatsOverviewTab'
 import StatsTimeTab from '@/components/stats/StatsTimeTab'
@@ -59,11 +59,14 @@ export default function StatsScreen({ people, t, language, modalBackRef }) {
     }
   }
 
+  // People counted in event-based statistics, with partner-period events removed.
+  const eventPeople = useMemo(() => excludePartnerEvents(people), [people])
+
   /**
    * Flatten all events and preserve their parent person.
    * This shared dataset is reused across multiple stats tabs.
    */
-  const allEvents = useMemo(() => flattenEvents(people), [people])
+  const allEvents = useMemo(() => flattenEvents(eventPeople), [eventPeople])
 
   // Define the available tab options and their labels.
   const statTabs = [
@@ -165,13 +168,17 @@ export default function StatsScreen({ people, t, language, modalBackRef }) {
         })}
       </div>
 
-      {tab === 'overview' ? <StatsOverviewTab people={people} allEvents={allEvents} t={t} /> : null}
-
-      {tab === 'time' ? (
-        <StatsTimeTab people={people} allEvents={allEvents} t={t} language={language} />
+      {tab === 'overview' ? (
+        <StatsOverviewTab people={eventPeople} allEvents={allEvents} t={t} />
       ) : null}
 
-      {tab === 'people' ? <StatsPeopleTab people={people} t={t} language={language} /> : null}
+      {tab === 'time' ? (
+        <StatsTimeTab people={eventPeople} allEvents={allEvents} t={t} language={language} />
+      ) : null}
+
+      {tab === 'people' ? (
+        <StatsPeopleTab people={people} eventPeople={eventPeople} t={t} language={language} />
+      ) : null}
 
       {tab === 'scores' ? <StatsScoresTab allEvents={allEvents} t={t} /> : null}
 

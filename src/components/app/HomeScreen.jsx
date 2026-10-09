@@ -33,6 +33,7 @@ import { APP_VERSION, APP_GITHUB_USER, APP_GITHUB_REPO } from '@/lib/config'
 import { usePalette } from '@/lib/theme'
 import { exportPeopleJson } from '@/lib/device-storage'
 import { saveErrorLog } from '@/lib/pdf-export'
+import { excludePartnerEvents } from '@/lib/stats'
 import StatTile from '@/components/shared/StatTile'
 import ColorSelector from '@/components/app/ColorSelector'
 
@@ -148,8 +149,11 @@ export default function MainScreen({
     }
   }
 
-  // Count all events across every saved person.
-  const totalEvents = people.reduce((sum, person) => sum + (person.events?.length || 0), 0)
+  // Count all events across every saved person. Partner-period events don't count.
+  const totalEvents = excludePartnerEvents(people).reduce(
+    (sum, person) => sum + (person.events?.length || 0),
+    0
+  )
 
   const frostedButtonStyle = {
     height: '3.5rem',

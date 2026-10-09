@@ -23,8 +23,9 @@ import ZodiacRadarCard from '@/components/stats/ZodiacRadarCard'
 /**
  * Renders the people-focused statistics tab.
  * It groups event and person data by zodiac, activity, gender, age, and name initials.
+ * Person counts include everyone; event sums only use `eventPeople` (partners excluded).
  */
-export default function StatsPeopleTab({ people, t, language }) {
+export default function StatsPeopleTab({ people, eventPeople = people, t, language }) {
   const PALETTE = usePalette()
   const [ageAtEvent, setAgeAtEvent] = useState(false)
 
@@ -39,18 +40,21 @@ export default function StatsPeopleTab({ people, t, language }) {
 
   // Sums total events by zodiac sign keeping all 12 signs in zodiac order (for radar chart).
   const eventsByZodiacOrdered = useMemo(
-    () => groupByZodiac(people, language, countEvents, { allSigns: true }),
-    [people, language]
+    () => groupByZodiac(eventPeople, language, countEvents, { allSigns: true }),
+    [eventPeople, language]
   )
 
   // Sums total events by translated activity label.
-  const eventsByActivity = useMemo(() => groupByActivity(people, t, countEvents), [people, t])
+  const eventsByActivity = useMemo(
+    () => groupByActivity(eventPeople, t, countEvents),
+    [eventPeople, t]
+  )
 
   // Counts how many people belong to each gender.
   const personsByGender = useMemo(() => groupByGender(people, t), [people, t])
 
   // Sums total events by gender.
-  const eventsByGender = useMemo(() => groupByGender(people, t, countEvents), [people, t])
+  const eventsByGender = useMemo(() => groupByGender(eventPeople, t, countEvents), [eventPeople, t])
 
   // Counts how many people exist for each age (current age).
   const personsByAge = useMemo(() => getPersonsByAge(people), [people])
@@ -63,8 +67,8 @@ export default function StatsPeopleTab({ people, t, language }) {
 
   // Groups people by how many events they have.
   const numberOfEventsByNumberOfPersons = useMemo(
-    () => getEventCountDistribution(people, { fillGaps: true }),
-    [people]
+    () => getEventCountDistribution(eventPeople, { fillGaps: true }),
+    [eventPeople]
   )
 
   return (
