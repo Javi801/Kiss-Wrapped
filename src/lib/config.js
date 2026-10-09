@@ -7,6 +7,8 @@
  * they stay in constants.js.
  */
 
+import { version } from '../../package.json'
+
 // Feature flags. Set to true to enable a feature.
 export const FEATURES = {
   // Kiss Wrapped PDF deck export on the stats screen. Off until the export bug is fixed.
@@ -15,8 +17,8 @@ export const FEATURES = {
   onboarding: false,
 }
 
-// App metadata shown in the UI.
-export const APP_VERSION = '1.0'
+// App metadata shown in the UI. The version has a single source: package.json.
+export const APP_VERSION = version
 export const APP_GITHUB_USER = 'Javi801'
 export const APP_GITHUB_REPO = 'https://github.com/Javi801/Kiss-Wrapped'
 
