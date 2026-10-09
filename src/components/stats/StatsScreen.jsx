@@ -22,6 +22,7 @@ import { TEXT } from '@/lib/constants'
 import { FEATURES } from '@/lib/config'
 import { usePalette } from '@/lib/theme'
 import { exportStatsPdf, saveErrorLog } from '@/lib/pdf-export'
+import { flattenEvents } from '@/lib/stats'
 
 import StatsOverviewTab from '@/components/stats/StatsOverviewTab'
 import StatsTimeTab from '@/components/stats/StatsTimeTab'
@@ -32,7 +33,7 @@ import StatsScoresTab from '@/components/stats/StatsScoresTab'
  * Renders the full statistics screen with tab navigation.
  * It prepares shared data and delegates each section to a dedicated tab component.
  */
-export default function StatsScreen({ people, t, modalBackRef }) {
+export default function StatsScreen({ people, t, language, modalBackRef }) {
   const PALETTE = usePalette()
   const [tab, setTab] = useState('overview')
   const [, startTransition] = useTransition()
@@ -51,7 +52,7 @@ export default function StatsScreen({ people, t, modalBackRef }) {
       return
     }
     try {
-      await exportStatsPdf(people, t)
+      await exportStatsPdf(people, t, language)
       setPdfStatus('success')
     } catch (err) {
       setPdfStatus(err instanceof Error ? err : new Error(String(err)))
@@ -62,10 +63,7 @@ export default function StatsScreen({ people, t, modalBackRef }) {
    * Flatten all events and preserve their parent person.
    * This shared dataset is reused across multiple stats tabs.
    */
-  const allEvents = useMemo(
-    () => people.flatMap((person) => (person.events || []).map((event) => ({ ...event, person }))),
-    [people]
-  )
+  const allEvents = useMemo(() => flattenEvents(people), [people])
 
   // Define the available tab options and their labels.
   const statTabs = [
@@ -169,9 +167,11 @@ export default function StatsScreen({ people, t, modalBackRef }) {
 
       {tab === 'overview' ? <StatsOverviewTab people={people} allEvents={allEvents} t={t} /> : null}
 
-      {tab === 'time' ? <StatsTimeTab people={people} allEvents={allEvents} t={t} /> : null}
+      {tab === 'time' ? (
+        <StatsTimeTab people={people} allEvents={allEvents} t={t} language={language} />
+      ) : null}
 
-      {tab === 'people' ? <StatsPeopleTab people={people} t={t} /> : null}
+      {tab === 'people' ? <StatsPeopleTab people={people} t={t} language={language} /> : null}
 
       {tab === 'scores' ? <StatsScoresTab allEvents={allEvents} t={t} /> : null}
 

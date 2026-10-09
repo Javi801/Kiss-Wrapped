@@ -50,12 +50,12 @@ function TooltipContent({ active, payload, tooltipUnit, noPersonsLabel, onLabel 
   )
 }
 
-export default function PersonsTimelineChartCard({ people, t }) {
+export default function PersonsTimelineChartCard({ people, t, language }) {
   const P = usePalette()
   const [gran, setGran] = useState('week')
   const [offset, setOffset] = useState(0)
 
-  const locale = t.langCode === 'es' ? 'es-ES' : 'en-GB'
+  const locale = language === 'es' ? 'es-ES' : 'en-GB'
 
   const fmtWeekday = useMemo(() => new Intl.DateTimeFormat(locale, { weekday: 'short' }), [locale])
   const fmtDayMonth = useMemo(

@@ -238,9 +238,45 @@ describe('exportStatsPdf — slide rendering with data', () => {
     expect(textArgs.some((a) => typeof a === 'string' && a.includes('Alice'))).toBe(true)
   })
 
-  it('uses Spanish slide copy when langCode is es', async () => {
+  it('uses Spanish slide copy when language is es', async () => {
+    await exportStatsPdf([], COPY.es, 'es')
+    const textArgs = mockDoc.text.mock.calls.map((c) => c[0])
+    expect(textArgs).toContain('Tu resumen ya está listo')
+    expect(textArgs).toContain('Fin de kisswrapped')
+    expect(textArgs).not.toContain('Your recap is ready')
+  })
+
+  it('uses English slide copy when language is en', async () => {
+    await exportStatsPdf([], t, 'en')
+    const textArgs = mockDoc.text.mock.calls.map((c) => c[0])
+    expect(textArgs).toContain('Your recap is ready')
+    expect(textArgs).toContain('End of kisswrapped')
+    expect(textArgs).not.toContain('Tu resumen ya está listo')
+  })
+
+  it('takes the slide copy language from the argument, not from the dictionary', async () => {
+    await exportStatsPdf([], t, 'es')
+    const textArgs = mockDoc.text.mock.calls.map((c) => c[0])
+    expect(textArgs).toContain('Tu resumen ya está listo')
+  })
+
+  it('falls back to the default language when none is passed', async () => {
     await exportStatsPdf([], COPY.es)
-    expect(mockFilesystem.writeFile).toHaveBeenCalled()
+    const textArgs = mockDoc.text.mock.calls.map((c) => c[0])
+    expect(textArgs).toContain('Your recap is ready')
+  })
+
+  it('translates zodiac labels to the given language', async () => {
+    const people = [
+      {
+        ...peopleTwoYears[0],
+        zodiacSign: '♒ Aquarius (January 20 - February 19)',
+      },
+    ]
+    await exportStatsPdf(people, COPY.es, 'es')
+    const textArgs = mockDoc.text.mock.calls.map((c) => c[0])
+    expect(textArgs).toContain('Acuario')
+    expect(textArgs).not.toContain('Aquarius')
   })
 
   it('skips subtitle line in drawTitle when subtitle is empty', async () => {

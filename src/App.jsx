@@ -562,7 +562,12 @@ export default function KissWrappedApp() {
 
               {/* Statistics screen */}
               {screen === 'stats' ? (
-                <StatsScreen people={people} t={t} modalBackRef={modalBackRef} />
+                <StatsScreen
+                  people={people}
+                  t={t}
+                  language={language}
+                  modalBackRef={modalBackRef}
+                />
               ) : null}
             </motion.div>
 

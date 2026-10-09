@@ -204,8 +204,8 @@ All of these follow the same sequence: write to `Directory.Cache` → `Filesyste
 ## Statistics
 
 - `StatsScreen` derives two shared datasets with `useMemo`: `eventPeople` (partner-period events removed) and `allEvents` (flattened events, each with a `person` reference). It passes them to the tabs.
-- Each tab (`StatsOverviewTab`, `StatsTimeTab`, `StatsPeopleTab`, `StatsScoresTab`) computes its own aggregations with `useMemo` and renders chart cards.
-- `getStatsData` in `lib/stats.js` computes a similar full set of aggregations in one call. It is used only by the PDF export (`FEATURES.pdfExport`). A statistic shown in both places must be changed in both.
+- Aggregations are pure functions exported from `lib/stats.js` (`groupByZodiac`, `getTopPeople`, `getScoresByKisses`, …). Each tab (`StatsOverviewTab`, `StatsTimeTab`, `StatsPeopleTab`, `StatsScoresTab`) calls the ones it needs inside `useMemo` and renders chart cards.
+- `getStatsData` in `lib/stats.js` composes those same functions into one object. It is used only by the PDF export (`FEATURES.pdfExport`). Where screen and PDF present a statistic differently (all 12 zodiac signs vs. a ranking, the zero-kiss score, zero-filled ranges), the difference is an explicit option of the shared function.
 - Any chart wrapped in `FullscreenChartWrapper` gets fullscreen and PNG export. Charts read `useFullscreen()` to adapt their layout when expanded.
 
 ## Theming and styling
@@ -257,7 +257,7 @@ Privacy mechanisms, in addition to the above:
 | Add a theme or a language | `PALETTES` or `COPY` + `ZODIAC_OPTIONS` in `lib/constants.js`, and the matching list in `lib/config.js` |
 | Add a field to Person or Event | The form (`PersonForm` / `EventForm`), `normalizePeople` for defaults and migration, `normalizeForExport` if it is required, display in `PersonCard`, tests in `lib/__tests__/` |
 | Add a persisted setting | Default in `DEFAULT_SETTINGS` (`lib/config.js`), state in `App.jsx`, boot validation, the save effect, and `loadSettings` + `saveSettings` (both native and web branches) in `lib/device-storage.js` |
-| Add a statistic | Aggregation in the relevant stats tab (and `getStatsData` if the PDF should show it); choose `people` vs `eventPeople` deliberately |
+| Add a statistic | Aggregation function in `lib/stats.js` with unit tests, called from the relevant stats tab (and from `getStatsData` if the PDF should show it); choose `people` vs `eventPeople` deliberately |
 | Add a chart type | New generic card in `components/charts/`, wrapped in `FullscreenChartWrapper` |
 | Add a screen | New key in the `screen` conditional in `App.jsx`, `navItems` and `hideBottomBar` if relevant |
 | Add a dialog or sheet | Register a close callback on `modalBackRef` while open |

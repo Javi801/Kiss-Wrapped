@@ -50,12 +50,12 @@ function TooltipContent({ active, payload, tooltipUnit, noEventsLabel, onLabel }
   )
 }
 
-export default function EventsTimelineChartCard({ allEvents, t }) {
+export default function EventsTimelineChartCard({ allEvents, t, language }) {
   const P = usePalette()
   const [gran, setGran] = useState('week')
   const [offset, setOffset] = useState(0)
 
-  const locale = t.langCode === 'es' ? 'es-ES' : 'en-GB'
+  const locale = language === 'es' ? 'es-ES' : 'en-GB'
 
   // Intl formatters cached per locale — constructing them is expensive
   const fmtWeekday = useMemo(() => new Intl.DateTimeFormat(locale, { weekday: 'short' }), [locale])

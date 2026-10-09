@@ -1,7 +1,20 @@
 import { describe, it, expect, vi } from 'vitest'
 import { COPY } from '@/lib/constants'
-import { LIMITS } from '@/lib/config'
-import { getFirstEventDate, getLastEventDate, getStatsData } from '@/lib/stats'
+import { DEFAULT_SETTINGS, LIMITS } from '@/lib/config'
+import {
+  countEvents,
+  getEventCountDistribution,
+  getFirstEventDate,
+  getLastEventDate,
+  getPeopleInMultipleYears,
+  getPersonsByAge,
+  getPersonsByAgeAtEvent,
+  getPersonsByFirstLetter,
+  getScoresByKisses,
+  getStatsData,
+  getTopPeople,
+  groupByZodiac,
+} from '@/lib/stats'
 
 const t = COPY.en
 
@@ -347,6 +360,35 @@ describe('getStatsData', () => {
     expect(eventsByZodiac.find((d) => d.label === 'Acuario')).toBeUndefined()
   })
 
+  it('labels eventsByZodiac in the given language', () => {
+    const people = [
+      makePerson('Ana', [makeEvent('2024.01.01'), makeEvent('2024.02.01')], {
+        zodiacSign: '♒ Aquarius (January 20 - February 19)',
+      }),
+      makePerson('Bob', [makeEvent('2024.01.01')], {
+        zodiacSign: '♒ Acuario (20 enero - 19 febrero)',
+      }),
+    ]
+    const { eventsByZodiac } = getStatsData(people, COPY.es, 'es')
+    expect(eventsByZodiac).toEqual([{ label: 'Acuario', value: 3 }])
+  })
+
+  it('takes the zodiac language from the argument, not from the dictionary', () => {
+    const people = [makePerson('Ana', [makeEvent('2024.01.01')])]
+    expect(getStatsData(people, COPY.es, 'en').eventsByZodiac[0].label).toBe('Aquarius')
+    expect(getStatsData(people, COPY.en, 'es').eventsByZodiac[0].label).toBe('Acuario')
+  })
+
+  it('falls back to the default language for zodiac labels when none is passed', () => {
+    const people = [
+      makePerson('Ana', [makeEvent('2024.01.01')], {
+        zodiacSign: '♒ Acuario (20 enero - 19 febrero)',
+      }),
+    ]
+    const expected = DEFAULT_SETTINGS.language === 'es' ? 'Acuario' : 'Aquarius'
+    expect(getStatsData(people, COPY.es).eventsByZodiac[0].label).toBe(expected)
+  })
+
   it('sorts eventsByZodiac by event count descending', () => {
     const people = [
       makePerson('Ana', [makeEvent('2024.01.01'), makeEvent('2024.02.01')], {
@@ -439,5 +481,168 @@ describe('getStatsData', () => {
     const { eventsByActivity } = getStatsData(people, t)
     const works = eventsByActivity.find((d) => d.label === t.works)
     expect(works.value).toBe(2)
+  })
+})
+
+describe('getTopPeople', () => {
+  it('returns everyone tied for the most events', () => {
+    const people = [
+      makePerson('Ana', [makeEvent('2024.01.01'), makeEvent('2024.02.01')]),
+      makePerson('Bob', [makeEvent('2024.01.01'), makeEvent('2024.03.01')]),
+      makePerson('Sam', [makeEvent('2024.01.01')]),
+    ]
+    expect(getTopPeople(people)).toEqual([
+      { label: 'Ana', value: 2 },
+      { label: 'Bob', value: 2 },
+    ])
+  })
+
+  it('returns nothing when nobody has events', () => {
+    expect(getTopPeople([makePerson('Ana'), makePerson('Bob')])).toEqual([])
+  })
+})
+
+describe('getPeopleInMultipleYears', () => {
+  it('reports the years, events per year and total events of each person', () => {
+    const people = [
+      makePerson('Ana', [
+        makeEvent('2024.05.01'),
+        makeEvent('2022.01.01'),
+        makeEvent('2024.01.01'),
+        makeEvent('not a date'),
+      ]),
+    ]
+    expect(getPeopleInMultipleYears(people)).toEqual([
+      {
+        label: 'Ana',
+        value: 2,
+        years: ['2022', '2024'],
+        yearCounts: { 2022: 1, 2024: 2 },
+        totalEvents: 4,
+      },
+    ])
+  })
+})
+
+describe('groupByZodiac', () => {
+  const AQUARIUS = '♒ Aquarius (January 20 - February 19)'
+  const people = [
+    makePerson('Ana', [makeEvent('2024.01.01'), makeEvent('2024.02.01')], {
+      zodiacSign: AQUARIUS,
+    }),
+    makePerson('Bob', [], { zodiacSign: AQUARIUS }),
+    makePerson('Sam', [makeEvent('2024.01.01')], { zodiacSign: 'unknown sign' }),
+  ]
+
+  it('returns the 12 signs in zodiac order with zeros when allSigns is set', () => {
+    const rows = groupByZodiac(people, 'en', undefined, { allSigns: true })
+    expect(rows).toHaveLength(12)
+    expect(rows[0]).toEqual({ label: 'Aquarius', value: 2 })
+    expect(rows[1]).toEqual({ label: 'Pisces', value: 0 })
+    // Signs outside the zodiac list are left out.
+    expect(rows.reduce((sum, row) => sum + row.value, 0)).toBe(2)
+  })
+
+  it('weights each person by their events', () => {
+    const rows = groupByZodiac(people, 'en', countEvents, { allSigns: true })
+    expect(rows[0]).toEqual({ label: 'Aquarius', value: 2 })
+  })
+
+  it('labels the signs in the requested language', () => {
+    expect(groupByZodiac(people, 'es', undefined, { allSigns: true })[0].label).toBe('Acuario')
+  })
+})
+
+describe('getPersonsByAge', () => {
+  it('fills zeros for the ages between the youngest and the oldest', () => {
+    const people = [
+      makePerson('Ana', [], { age: 25 }),
+      makePerson('Bob', [], { age: 27 }),
+      makePerson('Sam', [], { age: 25 }),
+    ]
+    expect(getPersonsByAge(people)).toEqual([
+      { label: '25', value: 2 },
+      { label: '26', value: 0 },
+      { label: '27', value: 1 },
+    ])
+  })
+
+  it('returns nothing when no age can be resolved', () => {
+    expect(getPersonsByAge([makePerson('Ana', [], { age: undefined })])).toEqual([])
+  })
+})
+
+describe('getPersonsByAgeAtEvent', () => {
+  it('counts each person once per distinct age across their events', () => {
+    const people = [
+      makePerson(
+        'Ana',
+        [makeEvent('2020.03.01'), makeEvent('2020.06.01'), makeEvent('2022.03.01')],
+        {
+          birthYear: 2000,
+          zodiacSign: null,
+        }
+      ),
+      makePerson('Bob', [makeEvent('2022.03.01')], { birthYear: 2000, zodiacSign: null }),
+      makePerson('Sam', [], { birthYear: 2000, zodiacSign: null }),
+    ]
+    expect(getPersonsByAgeAtEvent(people)).toEqual([
+      { label: '20', value: 1 },
+      { label: '21', value: 0 },
+      { label: '22', value: 2 },
+    ])
+  })
+})
+
+describe('getPersonsByFirstLetter', () => {
+  it('orders by the Spanish alphabet and sends other characters to #', () => {
+    const people = [
+      makePerson('Óscar'),
+      makePerson('Zoe'),
+      makePerson('ñandú'),
+      makePerson('Nora'),
+      makePerson('7up'),
+    ]
+    expect(getPersonsByFirstLetter(people)).toEqual([
+      { label: 'N', value: 1 },
+      { label: 'Ñ', value: 1 },
+      { label: 'Z', value: 1 },
+      { label: '#', value: 2 },
+    ])
+  })
+})
+
+describe('getEventCountDistribution', () => {
+  const people = [
+    makePerson('Ana', [makeEvent('2024.01.01'), makeEvent('2024.02.01'), makeEvent('2024.03.01')]),
+    makePerson('Bob', [makeEvent('2024.01.01')]),
+  ]
+
+  it('returns only the event counts that occur by default', () => {
+    expect(getEventCountDistribution(people)).toEqual([
+      { label: '1', value: 1 },
+      { label: '3', value: 1 },
+    ])
+  })
+
+  it('fills every count from 0 to the maximum with fillGaps', () => {
+    expect(getEventCountDistribution(people, { fillGaps: true })).toEqual([
+      { label: '0', value: 0 },
+      { label: '1', value: 1 },
+      { label: '2', value: 0 },
+      { label: '3', value: 1 },
+    ])
+    expect(getEventCountDistribution([], { fillGaps: true })).toEqual([])
+  })
+})
+
+describe('getScoresByKisses', () => {
+  it('leaves the zero-kiss score out when includeZero is false', () => {
+    const events = [makeEvent('2024.01.01', 0), makeEvent('2024.02.01', 2), makeEvent('2024.03.01')]
+    const rows = getScoresByKisses(events, t, { includeZero: false })
+    expect(rows).toHaveLength(5) // 1–5
+    expect(rows.find((d) => d.label === t.noScore)).toBeUndefined()
+    expect(rows.find((d) => d.label === '💋💋').value).toBe(1)
+    expect(rows.reduce((sum, row) => sum + row.value, 0)).toBe(1)
   })
 })

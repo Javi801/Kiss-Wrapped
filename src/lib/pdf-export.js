@@ -2,6 +2,7 @@ import jsPDF from 'jspdf'
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem'
 import { Share } from '@capacitor/share'
 import { CHART_COLORS, PALETTE } from '@/lib/constants'
+import { DEFAULT_SETTINGS } from '@/lib/config'
 import { hexToRgb } from '@/lib/helpers'
 import { getStatsData } from '@/lib/stats'
 import { getColorForCategory } from '@/lib/format'
@@ -216,8 +217,8 @@ function topLabel(data) {
   return top.value > 0 ? top.label : '-'
 }
 
-function buildWrappedCopy(t) {
-  const es = t.langCode === 'es'
+function buildWrappedCopy(language) {
+  const es = language === 'es'
   return {
     title: 'Kiss Wrapped',
     subtitle: es
@@ -247,9 +248,9 @@ function buildScoreLabels(scoresByKisses, t) {
  * Exports the statistics as a KissWrapped deck: a landscape, slide-like PDF.
  * On native platforms the file is saved to cache and shared through the system sheet.
  */
-export async function exportStatsPdf(people, t) {
-  const stats = getStatsData(people, t)
-  const copy = buildWrappedCopy(t)
+export async function exportStatsPdf(people, t, language = DEFAULT_SETTINGS.language) {
+  const stats = getStatsData(people, t, language)
+  const copy = buildWrappedCopy(language)
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })
   const pageW = doc.internal.pageSize.getWidth()
   const pageH = doc.internal.pageSize.getHeight()
