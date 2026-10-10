@@ -28,8 +28,10 @@ src/
   shadcn-tailwind.css   Vendored copy of shadcn's `tailwind.css`, imported by index.css
   components/
     app/                Top-level screens and app-level widgets (Home, AddPerson, Intro,
-                        Onboarding, Privacy, ErrorBoundary, Language/Theme/Color selectors,
-                        ImportPartnerDialogs)
+                        Onboarding, Privacy, ErrorBoundary, Language/Theme/Color selectors),
+                        plus the sections and dialogs of the Home screen (HomeHeroCard,
+                        HomeActions, HomeSettingsDialogs, AboutDialog, JsonExportDialogs,
+                        ImportDialogs, ImportPartnerDialogs)
     people/             People list screen (search, filters, sorting)
     person/             PersonCard: one person's profile and event list
     forms/              PersonForm, PartnerFields, EventForm, FiltersPanel, TagInput
@@ -203,8 +205,8 @@ Storage keys and file names in `lib/constants.js` are part of the on-device data
 ### Import, export, and sharing
 
 - **JSON backup export**: `exportPeopleJson` fills missing required fields, writes to `Directory.Cache`, opens the native share sheet, then deletes the temp file.
-- **JSON import** (`HomeScreen`): parses the file, requires an array of objects, skips persons whose `id` already exists, asks for confirmation, then calls `importAppData`, which normalizes and appends.
-- **Invalid partner data on import**: `hasPartnerIssues` (`lib/partner.js`) is run on the new people only. It flags an unknown `partnerStatus` and anything `validatePartnerFields` rejects, including future dates. When at least one person is flagged, `ImportPartnerDialogs` replaces the confirmation with a notice that offers to cancel, to import only the valid people, or to fix the flagged ones. The fix table has one row per flagged person, prefilled by `prefillPartnerFields`, where each row is corrected or discarded; importing is allowed once every row is valid or discarded. The rows are kept in `HomeScreen`'s `importStatus` (types `partner_issues` and `partner_resolve`), so going back from the table to the notice keeps the edits. The boot path never shows these dialogs.
+- **JSON import**: `HomeScreen` reads and parses the file and keeps the flow in its `importStatus` state. `buildImportStatus` (`lib/import-people.js`) requires an array of objects and skips persons whose `id` already exists. `ImportDialogs` renders one dialog per status type and asks for confirmation; `HomeScreen` then calls `importAppData`, which normalizes and appends.
+- **Invalid partner data on import**: `buildImportStatus` runs `hasPartnerIssues` (`lib/partner.js`) on the new people only. It flags an unknown `partnerStatus` and anything `validatePartnerFields` rejects, including future dates. When at least one person is flagged, `ImportPartnerDialogs` replaces the confirmation with a notice that offers to cancel, to import only the valid people, or to fix the flagged ones. The fix table has one row per flagged person, prefilled by `prefillPartnerFields`, where each row is corrected or discarded; importing is allowed once every row is valid or discarded. `skipPartnerIssues` and `resolvePartnerIssues` (`lib/import-people.js`) build the list of people that is finally imported in each case. The rows are kept in `HomeScreen`'s `importStatus` (types `partner_issues` and `partner_resolve`), so going back from the table to the notice keeps the edits. The boot path never shows these dialogs.
 - **Chart PNG export**: `FullscreenChartWrapper` renders the chart with `html-to-image` and shares it the same way.
 - **Crash and error logs**: `ErrorBoundary`, `FullscreenChartWrapper`, and `saveErrorLog` write a text file to cache and share it. Nothing is sent automatically.
 
