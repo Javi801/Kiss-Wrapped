@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 
 import { usePalette } from '@/lib/theme'
+import { useScrollFade } from '@/hooks/useScrollFade'
 
 import FiltersPanel from '@/components/forms/FiltersPanel'
 
@@ -26,6 +27,7 @@ export default function PeopleToolbar({
 }) {
   const PALETTE = usePalette()
   const [filterOpen, setFilterOpen] = useState(false)
+  const scrollFadeRef = useScrollFade()
 
   function handleFilterOpenChange(open) {
     setFilterOpen(open)
@@ -118,7 +120,7 @@ export default function PeopleToolbar({
           </SheetHeader>
 
           <div
-            className="scroll-fade-y"
+            ref={scrollFadeRef}
             style={{
               flex: 1,
               minHeight: 0,

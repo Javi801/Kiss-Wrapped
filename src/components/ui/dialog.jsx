@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 
 import { cn } from '@/lib/utils'
+import { useScrollFade } from '@/hooks/useScrollFade'
 import { Button } from '@/components/ui/button'
 import { XIcon } from 'lucide-react'
 
@@ -35,6 +36,8 @@ function DialogOverlay({ className, ...props }) {
 }
 
 function DialogContent({ className, children, showCloseButton = true, ...props }) {
+  const scrollFadeRef = useScrollFade()
+
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -47,8 +50,9 @@ function DialogContent({ className, children, showCloseButton = true, ...props }
         {...props}
       >
         <div
+          ref={scrollFadeRef}
           data-slot="dialog-body"
-          className="grid min-h-0 gap-6 overflow-y-auto p-6 scroll-fade-y"
+          className="grid min-h-0 gap-6 overflow-y-auto p-6"
         >
           {children}
         </div>
