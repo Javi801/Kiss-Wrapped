@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import TagInput from '@/components/forms/TagInput'
 import PartnerFields from '@/components/forms/PartnerFields'
+import SpeechBubble from '@/components/forms/SpeechBubble'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -25,11 +26,16 @@ import { PARTNER_STATUSES, validatePartnerFields } from '@/lib/partner'
 /**
  * Form used for creating or editing a person.
  * Handles validation and normalization before submit.
+ * `onSkip` adds a second action that receives the current values without validating them.
+ * `zodiacHint` shows a speech bubble under the zodiac select.
  */
 export default function PersonForm({
   initialValues,
   onSave,
   onCancel,
+  onSkip,
+  skipLabel,
+  zodiacHint,
   t,
   language,
   includeHowWeMet = true,
@@ -336,6 +342,8 @@ export default function PersonForm({
             </SelectContent>
           </Select>
 
+          {zodiacHint && <SpeechBubble>{zodiacHint}</SpeechBubble>}
+
           {errors.zodiacSign && (
             <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.zodiacSign}</p>
           )}
@@ -401,6 +409,8 @@ export default function PersonForm({
             color: PALETTE.textOnAccent,
             boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
             background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
+            // The gradient would repeat under the default transparent border.
+            border: 'none',
           }}
         >
           <Save style={{ marginRight: '0.5rem', height: '1rem', width: '1rem' }} />
@@ -416,6 +426,23 @@ export default function PersonForm({
             onClick={onCancel}
           >
             {t.cancel}
+          </Button>
+        )}
+
+        {onSkip && (
+          <Button
+            type="button"
+            variant="outline"
+            className="rounded-2xl"
+            style={{ ...inputStyle }}
+            onClick={() =>
+              onSkip({
+                ...form,
+                birthdayAlreadyHappened: showBirthdayCheckbox && birthdayAlreadyHappened,
+              })
+            }
+          >
+            {skipLabel}
           </Button>
         )}
       </div>

@@ -13,6 +13,10 @@ const openDialogs = vi.hoisted(() => ({ current: [] }))
 const actions = vi.hoisted(() => ({ props: null }))
 
 vi.mock('@/lib/theme', () => ({ usePalette: () => ({}) }))
+vi.mock('@/components/visuals/TapGuide', async () => {
+  const { createElement } = await import('react')
+  return { default: () => createElement('i', { 'data-tap-guide': '' }) }
+})
 vi.mock('@/components/forms/PersonForm', () => ({
   default: (props) => {
     forms.person = props
@@ -466,5 +470,51 @@ describe('PersonCard — hardware back button', () => {
     click(t.addEvent)
     act(() => root.render(null))
     expect(modalBackRef.current).toBeNull()
+  })
+})
+
+describe('PersonCard — onboarding guide', () => {
+  const tapGuide = () => container.querySelector('[data-tap-guide]')
+  const notes = () =>
+    [...container.querySelectorAll('[role="note"]')].map((item) => item.textContent)
+
+  it('shows no guide by default', () => {
+    renderCard({ events: [complete()] })
+    toggle()
+    expect(tapGuide()).toBeNull()
+    expect(notes()).toEqual([])
+  })
+
+  it('stays collapsed and points at the card', () => {
+    renderCard({}, { guide: { expanded: false, tapTarget: 'card' } })
+    expect(tapGuide().closest('button')).toBe(container.querySelector('button'))
+    toggle()
+    expect(actions.props).toBeNull()
+  })
+
+  it('opens expanded without a tap, with both hints and the add-event guide', () => {
+    renderCard(
+      { events: [complete(), complete({ id: 'e2', date: '2023.05.01' })] },
+      {
+        guide: {
+          expanded: true,
+          tapTarget: 'addEvent',
+          editHint: 'About editing',
+          eventHint: 'About events',
+        },
+      }
+    )
+    expect(notes()).toEqual(['About editing', 'About events'])
+    expect(tapGuide().closest('button').textContent).toContain(t.addEvent)
+    // The event hint sits right above the first event.
+    expect(eventRows()[0].previousElementSibling.textContent).toBe('About events')
+  })
+
+  it('hands the add-event tap to the guide instead of opening the form', () => {
+    const onAddEvent = vi.fn()
+    renderCard({}, { guide: { expanded: true, tapTarget: 'addEvent', onAddEvent } })
+    click(t.addEvent)
+    expect(onAddEvent).toHaveBeenCalledOnce()
+    expect(dialog()).toBeNull()
   })
 })

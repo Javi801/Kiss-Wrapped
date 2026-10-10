@@ -338,3 +338,43 @@ describe('EventForm — actions and wiring', () => {
     expect(situation().tags).toEqual([])
   })
 })
+
+describe('EventForm — skip action and tags hint', () => {
+  const labels = () => [...container.querySelectorAll('button')].map((item) => item.textContent)
+
+  it('has no skip button and no hint by default', () => {
+    render()
+    expect(labels()).toEqual([t.saveEvent, t.cancel])
+    expect(container.querySelector('[role="note"]')).toBeNull()
+  })
+
+  it('has no cancel button unless it can be cancelled', () => {
+    render({ onCancel: undefined })
+    expect(labels()).toEqual([t.saveEvent])
+  })
+
+  it('skips with the current values, without validating or saving', () => {
+    const onSkip = vi.fn()
+    const onSave = render({ onSkip, skipLabel: 'Skip' })
+    setPlace('Park')
+    setScore('3')
+    typeInto(textareas()[0], 'walk')
+    clickButton('Skip')
+    expect(onSkip).toHaveBeenCalledOnce()
+    expect(onSkip).toHaveBeenCalledWith({
+      date: '2024.06.15',
+      details: 'walk',
+      score: '3',
+      place: 'Park',
+      situation: '',
+      observations: '',
+    })
+    expect(onSave).not.toHaveBeenCalled()
+    expect(container.textContent).not.toContain(t.requiredSituation)
+  })
+
+  it('shows the tags hint as a note', () => {
+    render({ tagsHint: 'About the tags' })
+    expect(container.querySelector('[role="note"]').textContent).toBe('About the tags')
+  })
+})

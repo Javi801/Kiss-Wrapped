@@ -5,7 +5,6 @@ import {
   APP_VERSION,
   APP_GITHUB_USER,
   APP_GITHUB_REPO,
-  ONBOARDING_VERSION,
   LANGUAGES,
   THEMES,
   ICON_COLORS,
@@ -30,8 +29,8 @@ describe('FEATURES', () => {
     expect(FEATURES.pdfExport).toBe(false)
   })
 
-  it('keeps onboarding disabled', () => {
-    expect(FEATURES.onboarding).toBe(false)
+  it('keeps onboarding enabled', () => {
+    expect(FEATURES.onboarding).toBe(true)
   })
 })
 
@@ -45,11 +44,6 @@ describe('app metadata', () => {
 
   it('points the repo link to the GitHub user over https', () => {
     expect(APP_GITHUB_REPO.startsWith(`https://github.com/${APP_GITHUB_USER}/`)).toBe(true)
-  })
-
-  it('defines the onboarding version as a positive integer', () => {
-    expect(Number.isInteger(ONBOARDING_VERSION)).toBe(true)
-    expect(ONBOARDING_VERSION).toBeGreaterThan(0)
   })
 })
 

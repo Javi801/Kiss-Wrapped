@@ -206,7 +206,6 @@ export const en = {
   granHistoric: 'Historic',
   language: 'Language',
   settings: 'Settings',
-  viewOnboarding: 'View tutorial',
   hideStats: 'Hide stats',
   showStats: 'Show stats',
   english: 'English',
@@ -325,32 +324,66 @@ export const en = {
   crashReload: 'Reload app',
   onboardingSkip: 'Skip',
   onboardingNext: 'Next',
-  onboardingDone: 'Get started',
-  onboardingSlides: [
-    {
-      emoji: '💋',
-      title: 'Welcome',
-      description: 'Your private space to save and remember your most meaningful connections.',
-    },
-    {
-      emoji: '👤',
-      title: 'Add people',
-      description: 'Save the name and a few details about each person that matters to you.',
-    },
-    {
-      emoji: '📅',
-      title: 'Track moments',
-      description: 'Log the date, notes, and a score from 1 to 5 for each encounter.',
-    },
-    {
-      emoji: '🔒',
-      title: 'Your privacy, always',
-      description: 'Everything stays on your device. No accounts, no cloud, no tracking.',
-    },
-    {
-      type: 'mockup',
-      title: "Here's how to enter",
-      description: 'Tap the ♡ in the corner to open your space.',
-    },
-  ],
+  onboardingFinish: 'Finish tutorial',
+  onboardingStepCount: 'Step {current} of {total}',
+  onboardingWelcomeTitle: 'Welcome to Kiss Wrapped',
+  onboardingWelcomeLead: 'Log your dates and encounters, and discover your stats.',
+  onboardingWelcomePrivacy:
+    'Everything stays on this device only: no account, no cloud, and no tracking.',
+  onboardingPersonTitle: 'This form is for your date',
+  onboardingPersonBody:
+    'Hand them the phone so they fill it in with their details, or complete it yourself. This is only practice: what you save is deleted when the tutorial ends.',
+  onboardingZodiacHint:
+    'The age updates on its own based on the sign. If the sign is the current one, a question about the birthday appears above to get it right.',
+  onboardingPracticeName: 'Example person',
+  onboardingTourHomeNote: 'This is how you get to your people',
+  onboardingTourListNote: 'Here are the people you save',
+  onboardingTourPersonNote: 'Tap Add event to continue',
+  onboardingEditPersonHint:
+    'Edit their details here. A new person starts incomplete: some details are yours to fill in, like how you met.',
+  onboardingEventHint:
+    'Tap an event to edit it. The first one starts empty: the place and the situation are yours to fill in.',
+  onboardingEventTitle: 'Log an encounter',
+  onboardingEventBody: 'Fill in the encounter, or skip it to use an example one.',
+  onboardingTagsHint:
+    'Place and situation are saved as tags, so you can reuse them in other events.',
+  onboardingPracticePlace: 'Café',
+  onboardingPracticeSituation: 'Date',
+  onboardingTourSavedNote: 'The event is saved. Now, back to the home screen',
+  onboardingDataHintTitle: 'No automatic backup',
+  onboardingDataHintBody:
+    'Everything stays on this device. Use Export to save a copy and Import to bring it back.',
+  onboardingSettingsHintTitle: 'Make it yours',
+  onboardingSettingsHintBody:
+    'In Settings you change the theme and the icon color. From there you can also restart this tutorial and open the app guide.',
+  restartTutorial: 'Restart the tutorial',
+  tutorialDoneTitle: 'Tutorial finished',
+  tutorialDoneBody: 'There is more on how to use the app in Settings, under "App guide".',
+  tutorialDoneAction: 'Got it',
+  appGuide: 'App guide',
+  appGuideIntro: 'What the tutorial does not get to show.',
+  guideEntryTitle: 'Hidden entrance',
+  guideEntryDecoy: 'The first screen shows none of your data.',
+  guideEntryHeart: 'To get in, tap the heart in the corner.',
+  guideEntryReturn: 'After you save a new person, the app goes back to that screen.',
+  guideStatsTitle: 'Statistics',
+  guideStatsSource:
+    'They are computed from your people and events: the more you log, the more they show.',
+  guideStatsScores: 'Scores only consider the events that have one.',
+  guideStatsCharts: 'Any chart can be expanded to full screen and saved as an image.',
+  guidePartnerTitle: 'Partner events',
+  guidePartnerMark:
+    'When you edit a person you can mark them as a current or past partner, with the dates.',
+  guidePartnerEvents:
+    'Events inside that period do not count in the event statistics, unless you turn on "Include partner events" on the statistics screen.',
+  guideDataTitle: 'Data',
+  guideDataExport: 'Export creates a file with all your people and events.',
+  guideDataImport:
+    'Import adds the people from an exported file and skips the ones you already have.',
+  guideDataClear: 'Clear permanently removes everything that is saved.',
+  guidePrivacyTitle: 'Privacy screen',
+  guidePrivacyCover:
+    'When you leave the app or switch to another one, a neutral screen covers the content.',
+  entryGuideTitle: "The app's real entrance",
+  entryGuideBody: 'Tap the subtle heart in the corner to open your space.',
 }

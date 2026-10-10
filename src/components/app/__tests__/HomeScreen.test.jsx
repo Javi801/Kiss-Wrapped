@@ -485,3 +485,137 @@ describe('HomeScreen — hardware back button and dismissal', () => {
     expect(dialog()).not.toBeNull()
   })
 })
+
+describe('HomeScreen — onboarding guide', () => {
+  it('shows no tap guide by default', () => {
+    render()
+    expect(container.textContent).not.toContain('👆')
+  })
+
+  it('puts the tap guide on the people button', () => {
+    render({ guideTarget: 'people' })
+    expect(find(t.viewEditPeople).textContent).toContain('👆')
+    expect(find(t.viewEditPeople).style.position).toBe('relative')
+    expect(find(t.addNewPerson).textContent).not.toContain('👆')
+  })
+})
+
+describe('HomeScreen — app guide and tutorial', () => {
+  it('moves from settings to the app guide', async () => {
+    render()
+    await click(t.settings)
+    await click(t.appGuide, dialog())
+    expect(container.querySelectorAll('[data-dialog]')).toHaveLength(1)
+    expect(dialog().textContent).toContain(t.appGuideIntro)
+    expect(dialog().textContent).toContain(t.guideDataExport)
+  })
+
+  it('closes the app guide from its button and from the back button', async () => {
+    render()
+    await click(t.settings)
+    await click(t.appGuide, dialog())
+    await click(t.close, dialog())
+    expect(dialog()).toBeNull()
+
+    await click(t.settings)
+    await click(t.appGuide, dialog())
+    act(() => modalBackRef.current())
+    expect(dialog()).toBeNull()
+    expect(modalBackRef.current).toBeNull()
+  })
+
+  it('offers no tutorial restart unless it can be restarted', async () => {
+    render()
+    await click(t.settings)
+    expect(find(t.restartTutorial, dialog())).toBeUndefined()
+  })
+
+  it('restarts the tutorial from settings and closes them', async () => {
+    const onRestartOnboarding = vi.fn()
+    render({ onRestartOnboarding })
+    await click(t.settings)
+    await click(t.restartTutorial, dialog())
+    expect(onRestartOnboarding).toHaveBeenCalledOnce()
+    expect(dialog()).toBeNull()
+  })
+})
+
+describe('HomeScreen — onboarding hints', () => {
+  const hint = { title: 'Hint title', body: 'Hint body' }
+  const notes = () => [...container.querySelectorAll('[role="note"]')]
+
+  it('shows no hint by default, even with a hint text', () => {
+    render({ guideHint: hint })
+    expect(notes()).toHaveLength(0)
+  })
+
+  it('shows the data hint right above the data buttons', () => {
+    render({ guideTarget: 'data', guideHint: hint })
+    expect(notes()).toHaveLength(1)
+    expect(notes()[0].textContent).toBe('Hint titleHint body')
+    expect(notes()[0].nextElementSibling.contains(find(t.exportJsonLabel))).toBe(true)
+  })
+
+  it('shows the settings hint inside the hero card, pointing at its right side', () => {
+    render({ guideTarget: 'settings', guideHint: hint })
+    expect(notes()).toHaveLength(1)
+    expect(notes()[0].textContent).toBe('Hint titleHint body')
+    expect(notes()[0].querySelector('[aria-hidden="true"]').style.right).not.toBe('')
+    expect(
+      notes()[0].compareDocumentPosition(find(t.settings)) & Node.DOCUMENT_POSITION_PRECEDING
+    ).toBeTruthy()
+  })
+})
+
+describe('HomeScreen — onboarding spotlight', () => {
+  const hint = { title: 'Hint title', body: 'Hint body' }
+  const lifted = (node) => node.style.zIndex === '2'
+
+  it('lifts nothing by default', () => {
+    render()
+    expect([...container.querySelectorAll('button')].some(lifted)).toBe(false)
+  })
+
+  it('lifts the data hint with export and import, but not clear', () => {
+    render({ guideTarget: 'data', guideHint: hint })
+    expect(lifted(container.querySelector('[role="note"]'))).toBe(true)
+    expect(lifted(find(t.exportJsonLabel))).toBe(true)
+    expect(lifted(find(t.importJsonLabel))).toBe(true)
+    expect(lifted(find(t.clearLocalDataLabel))).toBe(false)
+    expect(lifted(find(t.settings))).toBe(false)
+  })
+
+  it('lifts the settings hint with the settings button only', () => {
+    render({ guideTarget: 'settings', guideHint: hint })
+    expect(lifted(container.querySelector('[role="note"]'))).toBe(true)
+    expect(lifted(find(t.settings))).toBe(true)
+    expect(lifted(find(t.language))).toBe(false)
+    expect(lifted(find(t.exportJsonLabel))).toBe(false)
+  })
+})
+
+describe('HomeScreen — tutorial done notice', () => {
+  it('stays hidden by default', () => {
+    render()
+    expect(dialog()).toBeNull()
+  })
+
+  it('shows the notice and closes it from its button', async () => {
+    const onCloseTutorialDone = vi.fn()
+    render({ tutorialDoneOpen: true, onCloseTutorialDone })
+    expect(dialog().textContent).toContain(t.tutorialDoneTitle)
+    expect(dialog().textContent).toContain(t.tutorialDoneBody)
+    await click(t.tutorialDoneAction, dialog())
+    expect(onCloseTutorialDone).toHaveBeenCalledOnce()
+  })
+
+  it('closes the notice when it is dismissed or from the back button', () => {
+    const onCloseTutorialDone = vi.fn()
+    render({ tutorialDoneOpen: true, onCloseTutorialDone })
+    act(() => seen.openDialogs.at(-1)(true))
+    expect(onCloseTutorialDone).not.toHaveBeenCalled()
+    act(() => seen.openDialogs.at(-1)(false))
+    act(() => modalBackRef.current())
+    expect(onCloseTutorialDone).toHaveBeenCalledTimes(2)
+  })
+})

@@ -35,15 +35,15 @@ src/
     app/                Top-level screens and app-level widgets (Home, AddPerson, Intro,
                         Onboarding, Privacy, ErrorBoundary, Color selector),
                         plus the sections and dialogs of the Home screen (HomeHeroCard,
-                        HomeActions, HomeSettingsDialogs, AboutDialog, JsonExportDialogs,
-                        ImportDialogs, ImportPartnerDialogs)
+                        HomeActions, HomeSettingsDialogs, AboutDialog, AppGuideDialog, TutorialDoneDialog,
+                        BottomNav, JsonExportDialogs, ImportDialogs, ImportPartnerDialogs)
     people/             People list screen (PeopleManagerScreen) and its parts: PeopleToolbar
-                        (search, filter sheet), AlphabetIndex, PeopleGroupList, the
+                        (search, filter sheet), AlphabetIndex, PeopleGroupList, EmptyState, the
                         usePeopleList hook, and the pure filter/sort/group helpers (peopleList.js)
     person/             PersonCard: one person's profile and event list, split into
                         PersonCardHeader, PersonCardDetails, PersonCardActions,
                         PersonEventList, PersonCardDialogs, and the usePersonCardModals hook
-    forms/              PersonForm, PartnerFields, EventForm, FiltersPanel, TagInput
+    forms/              PersonForm, PartnerFields, EventForm, FiltersPanel, TagInput, SpeechBubble
     stats/              Stats screen, its four tabs, and stat-specific cards
     charts/             Generic, data-agnostic chart cards and fullscreen/export wrapper.
       timeline/         The persons and events timeline cards, the TimelineChartCard they
@@ -98,9 +98,8 @@ Rules that hold today and should be preserved:
 
 | Export | Purpose |
 |---|---|
-| `FEATURES` | Feature flags. `pdfExport` gates the PDF button in `StatsScreen`; `onboarding` gates the onboarding routing in the `usePersistedAppState` boot. Both are currently `false` |
+| `FEATURES` | Feature flags. `pdfExport` gates the PDF button in `StatsScreen`; `onboarding` gates the onboarding wizard for new installs, decided in the `usePersistedAppState` boot, and its restart from the settings. `pdfExport` is currently `false` and `onboarding` is `true` |
 | `APP_VERSION`, `APP_GITHUB_USER`, `APP_GITHUB_REPO` | Metadata shown in the UI |
-| `ONBOARDING_VERSION` | Bump to show the onboarding again to users who completed an older version |
 | `LANGUAGES`, `THEMES`, `ICON_COLORS` | Supported setting values. A persisted value outside these lists is ignored at boot |
 | `DEFAULT_SETTINGS` | Initial `language`, `theme`, `iconColor`, `statsVisible`, `includePartnerEvents` |
 | `LIMITS` | Input lengths, maximum age, and the size of the top-people ranking |
@@ -122,11 +121,11 @@ There is no state library. All global state is `useState` inside three hooks in 
 | `screen` | Current screen key |
 | `language`, `theme`, `iconColor`, `statsVisible`, `includePartnerEvents` | User settings |
 | `situationTags`, `placeTags`, `howWeMetTags` | Tag suggestions for form inputs |
-| `onboardingDone`, `onboardingVersion` | Onboarding progress |
+| `onboardingDone` | Whether the onboarding was completed or does not apply |
 | `isLoaded` | Guards persistence until the initial load has finished |
 | `isPrivate` | App is backgrounded; shows the privacy overlay |
 
-`screen` lives in `useAppNavigation`, `isPrivate` in `usePrivacyOverlay`, and everything else in `usePersistedAppState`. `isLoaded`, `onboardingDone`, and `onboardingVersion` are internal to `usePersistedAppState`, which exposes `completeOnboarding()` instead of their setters.
+`screen` lives in `useAppNavigation`, `isPrivate` in `usePrivacyOverlay`, and everything else in `usePersistedAppState`. `isLoaded` and `onboardingDone` are internal to `usePersistedAppState`, which exposes the derived `onboardingPending` and `completeOnboarding()` instead of their setters.
 
 All mutations (`addPerson`, `updatePerson`, `deletePerson`, `addEvent`, `updateEvent`, `deleteEvent`, `deleteAllEvents`, `importAppData`, `clearAllAppData`) are defined in `App.jsx` and passed down as callback props. Children never mutate `people` directly, and updates are always immutable.
 
@@ -144,12 +143,12 @@ There is no router. `screen` is a string and `App.jsx` conditionally renders one
 | Key | Screen | Notes |
 |---|---|---|
 | `boot` | blank | Until settings are read |
-| `intro` | `IntroScreen` | Neutral entry screen shown on every launch; acts as a privacy decoy |
+| `intro` | `IntroScreen` | Neutral entry screen shown on every launch; acts as a privacy decoy. While the onboarding is pending it renders `IntroEntryGuide`, which points out the hidden heart |
 | `main` | `HomeScreen` | Dashboard, settings, import/export |
 | `add` | `AddPersonScreen` | Focused layout, no bottom bar |
 | `people` | `PeopleManagerScreen` | List, filters, person cards, event editing |
 | `stats` | `StatsScreen` | Four tabs: overview, time, people, scores |
-| `onboarding` | `OnboardingScreen` | Reached only when `FEATURES.onboarding` is on |
+| `onboarding` | `OnboardingWizard` | Opened by the intro heart, instead of `main`, while the onboarding is pending, and from the settings to repeat it. Cannot be skipped; finishing it goes to `main` and opens `TutorialDoneDialog`. See [Onboarding](#onboarding) |
 
 - `useAppNavigation` (`hooks/useAppNavigation.js`) owns `screen`, the history stack, and `modalBackRef`.
 - `StatsScreen` is the only screen loaded on demand (`React.lazy` in `App.jsx`), which keeps the charting libraries out of the initial chunk. `App.jsx` fetches its chunk after the first render and renders a spinner as the `Suspense` fallback when the screen is opened before the chunk arrives.
@@ -161,6 +160,17 @@ There is no router. `screen` is a string and `App.jsx` conditionally renders one
   4. Otherwise pop the history stack; with an empty stack go to `main`, or exit if already there.
 - **Modal contract:** any component that opens a dialog, sheet, or overlay must set `modalBackRef.current` to a close callback while it is open and reset it to `null` when closed, so the back button closes the overlay instead of navigating. See `HomeScreen`, `usePersonCardModals` (for `PersonCard`), `PeopleToolbar` (for `PeopleManagerScreen`), and `StatsScreen` for the pattern.
 - Saving a new person and clearing data both reset the history and return to `intro` by design.
+
+### Onboarding
+
+`OnboardingWizard` is a sandbox: it never reads or writes the saved people, so it can run on a new install and be repeated from the settings with real data present.
+
+- **Steps** are listed in `ONBOARDING_STEPS` and the step counter total follows that list. A step marked `ownsActions` renders its own buttons and advances through `onNext`; otherwise the wizard shows its next/finish button. The steps are the welcome (`OnboardingWelcomeStep`), the person form (`OnboardingPersonStep`), the tour to the person card (`OnboardingTourStep`), the event form (`OnboardingEventStep`), and the return to the home screen (`OnboardingHomeStep`).
+- **Practice data** lives only in the wizard state and is discarded when the wizard unmounts. The person and event steps reuse `PersonForm` and `EventForm` with a skip action; skipping completes what was typed through `completePracticePerson` and `completePracticeEvent` (`lib/onboarding.js`).
+- **Tours** (`OnboardingTour`) play a list of scenes over the real `HomeScreen` and `PeopleManagerScreen`, fed with the practice person. The screens are out of reach: taps are disabled and `setInertExcept` (`lib/inert.js`) makes everything inert per scene, except the speech bubbles and the control marked `data-tour-target`. A scene moves on by itself, from its own button, or from the add-event button of the person card. The screens take optional guide props (`guideTarget` and `guideHint` on `HomeScreen`, `cardGuide` on `PeopleManagerScreen`, `guide` on `PersonCard`, `guideTarget` on `BottomNav`) that show the tap guide (`visuals/TapGuide`) and speech bubbles (`forms/SpeechBubble`). None of them has any effect when it is not passed.
+- **Finish.** `handleOnboardingComplete` in `App.jsx` calls `completeOnboarding()`, resets the history to `main`, and opens `TutorialDoneDialog` on `HomeScreen` (`tutorialDoneOpen` / `onCloseTutorialDone`), a notice that points to the app guide in the settings. It runs on the first run and after a restart alike.
+- **Restart.** `HomeScreen` receives `onRestartOnboarding` only while `FEATURES.onboarding` is on; it navigates to `onboarding` without touching `onboardingDone`, so the hardware back button returns to `main`.
+- **App guide.** `AppGuideDialog`, opened from the settings, renders `APP_GUIDE_SECTIONS` (`components/app/appGuideSections.js`): each entry is an icon plus translation keys for a title and its texts.
 
 ## Data model
 
@@ -216,7 +226,7 @@ Invariants:
 
 Lifecycle:
 
-1. **Boot** (`hooks/usePersistedAppState.js`): `loadPeopleFromDevice()` → `normalizePeople()` → `setPeople`; then `loadSettings()` → validate each value against the supported lists in `lib/config.js` → set state. Values that were never saved fall back to `DEFAULT_SETTINGS`. Tag lists are merged with values already present in the data (`mergeEventTagsFromPeople`, `mergePeopleFieldTags`). The hook receives `setScreen` and picks the first screen (`onboarding` or `intro`). Then `isLoaded = true`.
+1. **Boot** (`hooks/usePersistedAppState.js`): `loadPeopleFromDevice()` → `normalizePeople()` → `setPeople`; then `loadSettings()` → validate each value against the supported lists in `lib/config.js` → set state. Values that were never saved fall back to `DEFAULT_SETTINGS`. Tag lists are merged with values already present in the data (`mergeEventTagsFromPeople`, `mergePeopleFieldTags`). The hook receives `setScreen` and always opens `intro`. It also decides whether the onboarding is pending: only when `FEATURES.onboarding` is on, `onboardingDone` was never saved as `true`, and there are no saved people, so updating users never see it. While it is pending the language is the device language (`detectDeviceLanguage`) instead of the saved one or the default. Otherwise `onboardingDone` is saved as `true`. When loading throws, the boot falls back to an empty dataset in the device language and the onboarding is not pending: a failed load is not treated as a new install. Then `isLoaded = true`.
 2. **Save**: two effects in the same hook write the full people array and the full settings object whenever they change, only after `isLoaded` is true. This guard prevents overwriting stored data with the initial empty state; keep it for any new persisted state.
 3. **Partner data is sanitized on load** without asking the user. `normalizePeople` calls `sanitizePartnerFields` (`lib/partner.js`): a date that is not a valid `yyyy.MM.dd` string becomes `''`, an inverted range drops `partnerFrom`, `past` without a valid `partnerTo` becomes `never`, and an unknown status becomes `current` when the record has `isPartner: true` and `never` otherwise. Future dates are kept, so the result does not depend on the day it runs.
 4. **Migrations run on load**, not as a separate step: legacy `age` → `birthYear` (`migrateLegacyAge`), legacy `isPartner` → `partnerStatus` (`resolvePartnerStatus`, called from `normalizePeople`), and `localStorage` settings → native settings file (first native run).
@@ -253,7 +263,7 @@ All of these follow the same sequence: write to `Directory.Cache` → `Filesyste
 
 - All UI strings live in one file per language, `lib/translations/en.js` and `lib/translations/es.js`. `COPY` in `lib/constants.js` groups them under `en` and `es`. Every key must exist in both languages; `constants.test.js` enforces it.
 - No user-facing string is hardcoded in components.
-- `detectDeviceLanguage()` maps the device locale to `en` or `es` and is used as a fallback (for example in `ErrorBoundary`, which renders outside the providers).
+- `detectDeviceLanguage()` maps the device locale to `en` or `es` and is used as a fallback (for example in `ErrorBoundary`, which renders outside the providers) and as the language of a new install while the onboarding is pending.
 
 ## Native layer
 
@@ -271,14 +281,14 @@ Privacy mechanisms, in addition to the above:
 
 ## Testing and quality gates
 
-- Tests live in a `__tests__/` folder next to the code they cover: `src/lib/__tests__/`, `src/plugins/__tests__/`, `src/components/<area>/__tests__/`, and `src/__tests__/` for `App.jsx` and `src/hooks/`. The hooks `App.jsx` composes are tested through it; `useScrollFade` has its own file. All of them are unit tests.
-- `lib/` is fully covered. Component coverage is broad: the app shell, the screens (`HomeScreen`, `PeopleManagerScreen`, `AddPersonScreen`, `IntroScreen`, `OnboardingScreen`, `StatsScreen` and its tabs), forms (`PersonForm`, `PartnerFields`, `EventForm`, `TagInput`, `FiltersPanel`), `PersonCard` with its `PersonCardActions` row, the chart cards and `FullscreenChartWrapper`, selectors, shared tiles, the `ui/` dialog, sheet and select wrappers, and `ErrorBoundary` have tests; `visuals/` has none. Logic still belongs in `lib/`, where it is cheapest to test.
+- Tests live in a `__tests__/` folder next to the code they cover: `src/lib/__tests__/`, `src/plugins/__tests__/`, `src/components/<area>/__tests__/`, and `src/__tests__/` for `App.jsx` and `src/hooks/`. The hooks `App.jsx` composes are tested through it; `useScrollFade` has its own file. All of them are unit tests except `components/app/__tests__/onboarding-tour.integration.test.jsx`, which plays the onboarding tours over the real `HomeScreen` and `PeopleManagerScreen` with only the palette mocked.
+- `lib/` is fully covered. Component coverage is broad: the app shell, the screens (`HomeScreen`, `PeopleManagerScreen`, `AddPersonScreen`, `IntroScreen` with its `IntroEntryGuide`, `OnboardingWizard`, `StatsScreen` and its tabs), forms (`PersonForm`, `PartnerFields`, `EventForm`, `TagInput`, `FiltersPanel`), `PersonCard` with its `PersonCardActions` row, the chart cards and `FullscreenChartWrapper`, selectors, shared tiles, the `ui/` dialog, sheet and select wrappers, and `ErrorBoundary` have tests; `visuals/` has none. Logic still belongs in `lib/`, where it is cheapest to test.
 - Component tests mock their children and the palette (`vi.mock('@/lib/theme')`) and assert on the props handed to those children or on the rendered output. Static components render with `renderToStaticMarkup`; components with state, effects, or event handlers render with `createRoot` + `act` under jsdom. There is no testing-library dependency.
 - `config.test.js` checks that the configuration is consistent with the code it describes (supported lists, defaults, limits) and pins the current feature flag values, so releasing a feature means updating the flag and its test together.
 - The default Vitest environment is `node`. Files that need the DOM opt in with a `// @vitest-environment jsdom` pragma.
 - Coverage is collected for `src/lib/**/*.js` only, excluding `device-storage.js` and `utils.js`, and the thresholds (statements 95, branches 90, functions 95, lines 95) apply to that scope. Tests for components, `App.jsx`, `hooks/`, `plugins/`, and the `.jsx` files in `lib/` run in the suite but do not count towards the thresholds.
-- Pre-commit hook (husky): `lint-staged` runs Prettier on staged `src/**/*.{js,jsx}`, then the full test suite runs.
-- CI (`.github/workflows/ci.yml`) runs lint, tests, and coverage on pushes and pull requests to `main`.
+- Pre-push hook (husky, `.husky/pre-push`): Prettier checks `src/**/*.{js,jsx}`, then the full test suite runs. There is no pre-commit hook.
+- CI (`.github/workflows/ci.yml`) runs on pushes and pull requests to `main` and `dev`: lint, `knip` (unused code and dependencies), the Prettier check, tests with coverage, and the build. A second job audits the production dependencies (`npm audit`), and pull requests also get a dependency review.
 - Formatting: Prettier with no semicolons, single quotes, width 100. ESLint flat config with React, hooks, and react-refresh rules.
 
 ## Where to make common changes
@@ -296,6 +306,8 @@ Privacy mechanisms, in addition to the above:
 | Add a statistic | Aggregation function in `lib/stats.js` with unit tests, called from the relevant stats tab (and from `getStatsData` if the PDF should show it); choose `people` vs `eventPeople` deliberately |
 | Add a chart type | New generic card in `components/charts/`, wrapped in `FullscreenChartWrapper` |
 | Add a screen | New key in the `screen` conditional in `App.jsx`, `navItems` and `hideBottomBar` if relevant |
+| Add an onboarding step | A step component in `components/app/`, added to `ONBOARDING_STEPS` in `OnboardingWizard.jsx`; a tour step is a scene list handed to `OnboardingTour` |
+| Add a section to the app guide | An entry in `APP_GUIDE_SECTIONS` and its texts in every file of `lib/translations/` |
 | Add a dialog or sheet | Register a close callback on `modalBackRef` while open |
 | Add date or age logic | `lib/date.js` with unit tests; never inline date parsing in components |
 
@@ -304,5 +316,4 @@ Privacy mechanisms, in addition to the above:
 These are current facts about the code, listed so they are not mistaken for intended design:
 
 - **PDF export is off.** `FEATURES.pdfExport` is `false` pending a fix to the export; the button in `StatsScreen` is hidden.
-- **Onboarding is off.** `FEATURES.onboarding` is `false`, so the boot never routes to `OnboardingScreen`.
 

@@ -1,4 +1,4 @@
-import { Check, Info, Languages, Settings } from 'lucide-react'
+import { BookOpen, Check, Info, Languages, RotateCcw, Settings } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -14,9 +14,42 @@ const headerStyle = {
   gap: '0.75rem',
 }
 
+// Row button of the settings dialog that leads somewhere else.
+function SettingsAction({ icon: Icon, label, onClick }) {
+  const PALETTE = usePalette()
+
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      className="rounded-2xl"
+      style={{
+        height: '3rem',
+        justifyContent: 'flex-start',
+        ...TEXT.body,
+        borderColor: PALETTE.inputBorder,
+        backgroundColor: PALETTE.controlBg,
+        color: PALETTE.text,
+      }}
+      onClick={onClick}
+    >
+      <Icon
+        style={{
+          marginRight: '0.75rem',
+          height: '1rem',
+          width: '1rem',
+          color: PALETTE.accent,
+        }}
+      />
+      {label}
+    </Button>
+  )
+}
+
 /**
  * Dialogs opened from the hero card of the main screen: the language picker and
- * the settings, which also lead to the about dialog.
+ * the settings, which also lead to the app guide, the about dialog and, when
+ * `onRestartOnboarding` is given, the tutorial.
  */
 export default function HomeSettingsDialogs({
   t,
@@ -31,6 +64,8 @@ export default function HomeSettingsDialogs({
   settingsOpen,
   setSettingsOpen,
   onOpenAbout,
+  onOpenGuide,
+  onRestartOnboarding,
 }) {
   const PALETTE = usePalette()
 
@@ -136,33 +171,32 @@ export default function HomeSettingsDialogs({
               t={t}
               accent={false}
             />
-            <Button
-              type="button"
-              variant="outline"
-              className="rounded-2xl"
-              style={{
-                height: '3rem',
-                justifyContent: 'flex-start',
-                ...TEXT.body,
-                borderColor: PALETTE.inputBorder,
-                backgroundColor: PALETTE.controlBg,
-                color: PALETTE.text,
+            <SettingsAction
+              icon={BookOpen}
+              label={t.appGuide}
+              onClick={() => {
+                setSettingsOpen(false)
+                onOpenGuide()
               }}
+            />
+            {onRestartOnboarding && (
+              <SettingsAction
+                icon={RotateCcw}
+                label={t.restartTutorial}
+                onClick={() => {
+                  setSettingsOpen(false)
+                  onRestartOnboarding()
+                }}
+              />
+            )}
+            <SettingsAction
+              icon={Info}
+              label={t.about}
               onClick={() => {
                 setSettingsOpen(false)
                 onOpenAbout()
               }}
-            >
-              <Info
-                style={{
-                  marginRight: '0.75rem',
-                  height: '1rem',
-                  width: '1rem',
-                  color: PALETTE.accent,
-                }}
-              />
-              {t.about}
-            </Button>
+            />
           </section>
         </DialogContent>
       </Dialog>

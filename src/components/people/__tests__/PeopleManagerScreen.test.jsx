@@ -448,11 +448,32 @@ describe('PeopleManagerScreen — filter sheet', () => {
     expect(seen.sheet.open).toBe(false)
   })
 
+  it('opens and closes the sheet without a back button to register on', () => {
+    render([person('Ana')], { modalBackRef: undefined })
+    expect(() => act(() => seen.sheet.onOpenChange(true))).not.toThrow()
+    expect(seen.sheet.open).toBe(true)
+    expect(() => act(() => seen.sheet.onOpenChange(false))).not.toThrow()
+    expect(seen.sheet.open).toBe(false)
+  })
+
   it('releases the back button when the sheet is closed', () => {
     render([person('Ana')])
     act(() => seen.sheet.onOpenChange(true))
     act(() => seen.sheet.onOpenChange(false))
     expect(seen.sheet.open).toBe(false)
     expect(modalBackRef.current).toBeNull()
+  })
+})
+
+describe('PeopleManagerScreen — onboarding guide', () => {
+  it('passes no guide to the cards by default', () => {
+    render([person('Ana')])
+    expect(Object.values(seen.cards)[0].guide).toBeUndefined()
+  })
+
+  it('passes the card guide to the cards', () => {
+    const cardGuide = { expanded: true }
+    render([person('Ana')], { cardGuide })
+    expect(Object.values(seen.cards)[0].guide).toBe(cardGuide)
   })
 })

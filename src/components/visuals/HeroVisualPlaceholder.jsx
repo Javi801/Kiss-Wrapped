@@ -6,20 +6,23 @@ import mainBackground from '@/assets/main-background.png'
 /**
  * Displays the main circular hero visual.
  * Falls back gracefully if the image fails to load.
+ * `size` is the diameter in rem; the inner layers scale with it.
  */
-export default function HeroVisualPlaceholder() {
+export default function HeroVisualPlaceholder({ size = 18 }) {
   const PALETTE = usePalette()
   const heroSurfaceBg = PALETTE.isDark ? 'rgba(255,255,255,0.16)' : PALETTE.surfaceBg
   // Track if the image loads correctly.
   const [hasImage, setHasImage] = useState(true)
+  const ringInset = `${size / 12}rem`
+  const imageSize = `${(size * 2) / 3}rem`
 
   return (
     <div
       style={{
         position: 'relative',
         display: 'flex',
-        height: '18rem',
-        width: '18rem',
+        height: `${size}rem`,
+        width: `${size}rem`,
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: '9999px',
@@ -31,10 +34,10 @@ export default function HeroVisualPlaceholder() {
       <div
         style={{
           position: 'absolute',
-          top: '1.5rem',
-          right: '1.5rem',
-          bottom: '1.5rem',
-          left: '1.5rem',
+          top: ringInset,
+          right: ringInset,
+          bottom: ringInset,
+          left: ringInset,
           borderRadius: '9999px',
           background: `linear-gradient(135deg, ${PALETTE.accentMuted}, ${PALETTE.cardSoft}, ${PALETTE.gradientEnd})`,
         }}
@@ -48,8 +51,8 @@ export default function HeroVisualPlaceholder() {
           position: 'relative',
           zIndex: 10,
           display: 'flex',
-          height: '12rem',
-          width: '12rem',
+          height: imageSize,
+          width: imageSize,
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'hidden',

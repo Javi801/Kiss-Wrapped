@@ -6,12 +6,14 @@ import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
 import { formatShortDate } from '@/lib/date'
 import { hasScore, renderKisses, eventIsMissingRequired } from '@/lib/format'
+import SpeechBubble from '@/components/forms/SpeechBubble'
 
 /**
  * Event history of a person card. Each event is a button that opens it for
  * editing; shows an empty-state message when there are no events.
+ * `hint` adds a speech bubble above the first event.
  */
-export default function PersonEventList({ events, onSelectEvent, t, language }) {
+export default function PersonEventList({ events, onSelectEvent, hint, t, language }) {
   const PALETTE = usePalette()
 
   if (!events.length) {
@@ -20,6 +22,7 @@ export default function PersonEventList({ events, onSelectEvent, t, language }) 
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+      {hint && <SpeechBubble tailSide="bottom">{hint}</SpeechBubble>}
       {events.map((event) => (
         <button
           key={event.id}

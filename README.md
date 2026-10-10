@@ -86,8 +86,8 @@ At a glance:
     <td width="50%" valign="top">
       <picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/feature-themes-dark.svg"><img src="assets/readme/feature-themes-light.svg" width="55" alt="Themes icon"></picture><br>
       <strong>Themes and localization</strong><br>
-      Three color palettes: light, green, and dark, driven by shared tokens and persisted across sessions. UI available in English and Spanish.<br><br>
-      <code>Light / Green / Dark</code> <code>EN / ES</code> <code>Persisted</code>
+      Three color palettes: pink, green, and dark, driven by shared tokens and persisted across sessions. UI available in English and Spanish.<br><br>
+      <code>Pink / Green / Dark</code> <code>EN / ES</code> <code>Persisted</code>
     </td>
   </tr>
 </table>
@@ -119,7 +119,11 @@ At a glance:
   </tr>
   <tr>
     <td><code>App.jsx</code></td>
-    <td>Application shell, screen routing, theme context, and settings initialization</td>
+    <td>Application shell: screen routing, theme and copy contexts, and the data mutations</td>
+  </tr>
+  <tr>
+    <td><code>hooks/</code></td>
+    <td>Stateful logic of the shell: persisted people and settings, navigation and back button, and the privacy overlay</td>
   </tr>
   <tr>
     <td><code>components/app/</code></td>
@@ -131,7 +135,15 @@ At a glance:
   </tr>
   <tr>
     <td><code>components/forms/</code></td>
-    <td>PersonForm, EventForm, FiltersPanel, and TagInput</td>
+    <td>PersonForm, PartnerFields, EventForm, FiltersPanel, TagInput, and SpeechBubble</td>
+  </tr>
+  <tr>
+    <td><code>components/people/</code></td>
+    <td>People list screen with its search, filters, and alphabet index</td>
+  </tr>
+  <tr>
+    <td><code>components/person/</code></td>
+    <td>PersonCard: one person's profile and event list</td>
   </tr>
   <tr>
     <td><code>components/charts/</code></td>
@@ -216,11 +228,11 @@ Coverage is collected for `src/lib/` with these minimum thresholds enforced by C
 | Functions | 95% |
 | Lines | 95% |
 
-Tests live in a `__tests__/` folder next to the code they cover, and all of them are unit tests:
+Tests live in a `__tests__/` folder next to the code they cover. All of them are unit tests except `onboarding-tour.integration.test.jsx`, which plays the onboarding tours over the real screens:
 
 | Location | Covers |
 |----------|--------|
-| `src/lib/__tests__/` | `date.js`, `calendar.js`, `format.js`, `helpers.js`, `stats.js`, `constants.js`, `config.js`, `partner.js`, `import-people.js`, `device-storage.js`, `pdf-export.js`, `open-selects.js`, `utils.js`, and the theme and copy providers |
+| `src/lib/__tests__/` | `date.js`, `calendar.js`, `format.js`, `helpers.js`, `stats.js`, `constants.js`, `config.js`, `partner.js`, `import-people.js`, `onboarding.js`, `inert.js`, `device-storage.js`, `pdf-export.js`, `open-selects.js`, `utils.js`, and the theme and copy providers |
 | `src/plugins/__tests__/` | The app icon plugin wrapper |
 | `src/__tests__/` | `App.jsx`: boot, persistence, navigation, back button, and data mutations; and the `useScrollFade` hook |
 | `src/components/*/__tests__/` | Screens, forms, the person card, stats screen and tabs, chart cards and the fullscreen wrapper, selectors, shared tiles, the `ui/` dialog, sheet and select wrappers, and `ErrorBoundary` |
@@ -235,19 +247,26 @@ Person {
   name:       string
   realName:   string          // optional
   birthYear:  number
-  zodiacSign: string          // e.g. "Aries"
-  gender:     string
+  birthdayAlreadyHappened: boolean
+  zodiacSign: string          // full localized option, e.g. "♍ Virgo (August 24 - September 22)"
+  gender:     string          // male, female, or other
   activity:   string
+  detail:     string          // free text
   howWeMet:   string          // tag-based
+  partnerStatus: string       // never, current, or past
+  partnerFrom:   string       // "yyyy.MM.dd" or ''
+  partnerTo:     string       // "yyyy.MM.dd" or ''
   events:     Event[]
 }
 
 Event {
-  id:        string
-  date:      string           // "yyyy.MM.dd"
-  place:     string
-  situation: string
-  score:     number | null    // 0 to 5, or null
+  id:           string
+  date:         string        // "yyyy.MM.dd"
+  place:        string
+  situation:    string
+  details:      string
+  observations: string
+  score:        number | null // 0 to 5, or null
 }
 
 Settings {
@@ -259,6 +278,7 @@ Settings {
   situationTags:        string[]
   placeTags:            string[]
   howWeMetTags:         string[]
+  onboardingDone:       boolean   // the onboarding was completed or does not apply
 }
 ```
 

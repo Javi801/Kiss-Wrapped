@@ -13,17 +13,14 @@ import { version } from '../../package.json'
 export const FEATURES = {
   // Kiss Wrapped PDF deck export on the stats screen. Off until the export bug is fixed.
   pdfExport: false,
-  // First-launch onboarding flow. Off until the tutorial is ready.
-  onboarding: false,
+  // Onboarding tutorial: shown to new installs and restartable from the settings.
+  onboarding: true,
 }
 
 // App metadata shown in the UI. The version has a single source: package.json.
 export const APP_VERSION = version
 export const APP_GITHUB_USER = 'Javi801'
 export const APP_GITHUB_REPO = 'https://github.com/Javi801/Kiss-Wrapped'
-
-// Bump to show the onboarding again to users who already completed an older version.
-export const ONBOARDING_VERSION = 2
 
 // Supported values for user settings. Persisted values outside these lists are ignored.
 export const LANGUAGES = ['en', 'es']

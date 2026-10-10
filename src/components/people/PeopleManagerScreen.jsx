@@ -28,6 +28,7 @@ export default function PeopleManagerScreen({
   onAddPlaceTag,
   howWeMetTags,
   onAddHowWeMetTag,
+  cardGuide,
 }) {
   const PALETTE = usePalette()
   const list = usePeopleList(people, t)
@@ -83,6 +84,7 @@ export default function PeopleManagerScreen({
               onAddPlaceTag,
               howWeMetTags,
               onAddHowWeMetTag,
+              guide: cardGuide,
             }}
           />
         </div>

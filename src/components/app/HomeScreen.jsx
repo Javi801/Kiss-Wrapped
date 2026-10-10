@@ -20,10 +20,16 @@ import HomeActions from '@/components/app/HomeActions'
 import JsonExportDialogs from '@/components/app/JsonExportDialogs'
 import ImportDialogs from '@/components/app/ImportDialogs'
 import AboutDialog from '@/components/app/AboutDialog'
+import AppGuideDialog from '@/components/app/AppGuideDialog'
+import TutorialDoneDialog from '@/components/app/TutorialDoneDialog'
 
 /**
  * Renders the main dashboard screen.
  * It shows summary metrics, primary actions, and app-level settings.
+ * `onRestartOnboarding` adds the restart-tutorial action to the settings.
+ * `tutorialDoneOpen` shows the notice that follows the tutorial; `onCloseTutorialDone` closes it.
+ * For the onboarding tour, `guideTarget` names what it points at (`'people'`, `'data'`
+ * or `'settings'`) and `guideHint` (`{ title, body }`) is the text for the last two.
  */
 export default function MainScreen({
   onNavigate,
@@ -41,12 +47,18 @@ export default function MainScreen({
   setStatsVisible,
   includePartnerEvents,
   modalBackRef,
+  onRestartOnboarding,
+  tutorialDoneOpen = false,
+  onCloseTutorialDone,
+  guideTarget,
+  guideHint,
 }) {
   const PALETTE = usePalette()
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [languageOpen, setLanguageOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
+  const [guideOpen, setGuideOpen] = useState(false)
   // null = idle | { fileName, isNative, hadMissingFields } = success | Error = failed
   const [jsonExportStatus, setJsonExportStatus] = useState(null)
   // null = idle | { type: "confirm", count, data } | { type: "success", count } | { type: "error_type" | "error_format" }
@@ -58,7 +70,9 @@ export default function MainScreen({
   useEffect(() => {
     if (!modalBackRef) return
     const anyOpen =
+      tutorialDoneOpen ||
       aboutOpen ||
+      guideOpen ||
       languageOpen ||
       settingsOpen ||
       confirmOpen ||
@@ -66,7 +80,9 @@ export default function MainScreen({
       importStatus !== null
     modalBackRef.current = anyOpen
       ? () => {
-          if (aboutOpen) setAboutOpen(false)
+          if (tutorialDoneOpen) onCloseTutorialDone()
+          else if (aboutOpen) setAboutOpen(false)
+          else if (guideOpen) setGuideOpen(false)
           else if (languageOpen) setLanguageOpen(false)
           else if (settingsOpen) setSettingsOpen(false)
           else if (confirmOpen) setConfirmOpen(false)
@@ -77,7 +93,10 @@ export default function MainScreen({
         }
       : null
   }, [
+    tutorialDoneOpen,
+    onCloseTutorialDone,
     aboutOpen,
+    guideOpen,
     languageOpen,
     settingsOpen,
     confirmOpen,
@@ -162,6 +181,7 @@ export default function MainScreen({
         includePartnerEvents={includePartnerEvents}
         onOpenLanguage={() => setLanguageOpen(true)}
         onOpenSettings={() => setSettingsOpen(true)}
+        settingsHint={guideTarget === 'settings' ? guideHint : undefined}
       />
 
       <HomeSettingsDialogs
@@ -177,6 +197,8 @@ export default function MainScreen({
         settingsOpen={settingsOpen}
         setSettingsOpen={setSettingsOpen}
         onOpenAbout={() => setAboutOpen(true)}
+        onOpenGuide={() => setGuideOpen(true)}
+        onRestartOnboarding={onRestartOnboarding}
       />
 
       {/* Main action buttons */}
@@ -186,6 +208,8 @@ export default function MainScreen({
         onExportJson={handleExportJson}
         onImportJson={() => fileInputRef.current?.click()}
         onClearData={() => setConfirmOpen(true)}
+        guideTarget={guideTarget}
+        dataHint={guideTarget === 'data' ? guideHint : undefined}
       />
 
       <JsonExportDialogs
@@ -207,6 +231,10 @@ export default function MainScreen({
       />
 
       <AboutDialog open={aboutOpen} onOpenChange={setAboutOpen} t={t} />
+
+      <AppGuideDialog open={guideOpen} onOpenChange={setGuideOpen} t={t} />
+
+      <TutorialDoneDialog open={tutorialDoneOpen} onClose={onCloseTutorialDone} t={t} />
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent showCloseButton={false}>
