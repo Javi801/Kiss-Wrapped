@@ -325,4 +325,6 @@ export const es = {
   onboardingSkip: 'Omitir',
   onboardingNext: 'Siguiente',
   onboardingFinish: 'Terminar tutorial',
+  entryGuideTitle: 'Entrada real de la app',
+  entryGuideBody: 'Toca el corazón sutil de la esquina para abrir tu espacio.',
 }

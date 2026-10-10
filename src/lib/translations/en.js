@@ -325,4 +325,6 @@ export const en = {
   onboardingSkip: 'Skip',
   onboardingNext: 'Next',
   onboardingFinish: 'Finish tutorial',
+  entryGuideTitle: "The app's real entrance",
+  entryGuideBody: 'Tap the subtle heart in the corner to open your space.',
 }
