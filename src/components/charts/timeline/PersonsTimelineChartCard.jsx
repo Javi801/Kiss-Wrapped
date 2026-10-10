@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import TimelineChartCard from '@/components/charts/TimelineChartCard'
+import TimelineChartCard from '@/components/charts/timeline/TimelineChartCard'
 
 export default function PersonsTimelineChartCard({ people, t, language }) {
   // Unique person count per date key (yyyy.MM.dd → n)

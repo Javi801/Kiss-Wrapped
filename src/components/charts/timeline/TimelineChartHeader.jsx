@@ -1,8 +1,8 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
-import { GRANS } from '@/components/charts/TimelineChartSeries'
-import TimelineCalendarPopup from '@/components/charts/TimelineCalendarPopup'
+import { GRANS } from '@/components/charts/timeline/TimelineChartSeries'
+import TimelineCalendarPopup from '@/components/charts/timeline/TimelineCalendarPopup'
 
 /** Granularity selector, period navigation and average line of a timeline chart card. */
 export default function TimelineChartHeader({ timeline, t, unit }) {

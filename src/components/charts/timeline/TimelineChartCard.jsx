@@ -3,8 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
 import FullscreenChartWrapper from '@/components/charts/FullscreenChartWrapper'
-import TimelineChartHeader from '@/components/charts/TimelineChartHeader'
-import useTimelineChart from '@/components/charts/useTimelineChart'
+import TimelineChartHeader from '@/components/charts/timeline/TimelineChartHeader'
+import useTimelineChart from '@/components/charts/timeline/useTimelineChart'
 
 function TooltipContent({ active, payload, tooltipUnit, emptyLabel, onLabel }) {
   const P = usePalette()

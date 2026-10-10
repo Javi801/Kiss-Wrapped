@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
-import { navBtnStyle } from '@/components/charts/TimelineCalendarHelpers'
+import { navBtnStyle } from '@/components/charts/timeline/TimelineCalendarHelpers'
 
 // Prev / title / next row of the calendar dropdown.
 export default function TimelineCalendarHeader({

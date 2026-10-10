@@ -2,13 +2,13 @@ import { useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
-import TimelineCalendarHeader from '@/components/charts/TimelineCalendarHeader'
+import TimelineCalendarHeader from '@/components/charts/timeline/TimelineCalendarHeader'
 import {
   TimelineCalendarDayGrid,
   TimelineCalendarMonthGrid,
   TimelineCalendarYearGrid,
-} from '@/components/charts/TimelineCalendarGrids'
-import { useTimelineCalendar } from '@/components/charts/useTimelineCalendar'
+} from '@/components/charts/timeline/TimelineCalendarGrids'
+import { useTimelineCalendar } from '@/components/charts/timeline/useTimelineCalendar'
 
 // Clickable period title with calendar dropdown for week/month/year granularities.
 // Uses a portal so the dropdown always renders above the Recharts SVG.

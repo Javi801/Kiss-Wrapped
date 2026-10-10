@@ -6,7 +6,7 @@ import {
   initialCalViewFor,
   weekOffsetOf,
   yearPageStartFor,
-} from '@/components/charts/TimelineCalendarHelpers'
+} from '@/components/charts/timeline/TimelineCalendarHelpers'
 
 // Open state, view navigation and selection logic of the timeline calendar dropdown.
 // The refs are owned by the component that renders the trigger and the dropdown.

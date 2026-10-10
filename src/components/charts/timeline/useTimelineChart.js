@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { buildTimelineSeries } from '@/components/charts/TimelineChartSeries'
+import { buildTimelineSeries } from '@/components/charts/timeline/TimelineChartSeries'
 
 /**
  * State and derived series for a timeline bar chart: the selected granularity, the period offset

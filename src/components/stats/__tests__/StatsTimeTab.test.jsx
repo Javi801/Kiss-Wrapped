@@ -15,11 +15,11 @@ function capture(name) {
 
 vi.mock('@/components/charts/BarChartCard', () => ({ default: capture('bar') }))
 vi.mock('@/components/charts/DumbbellChartCard', () => ({ default: capture('dumbbell') }))
-vi.mock('@/components/charts/EventsTimelineChartCard', () => ({
+vi.mock('@/components/charts/timeline/EventsTimelineChartCard', () => ({
   default: capture('eventsTimeline'),
 }))
 vi.mock('@/components/charts/MultiYearTopCard', () => ({ default: capture('top') }))
-vi.mock('@/components/charts/PersonsTimelineChartCard', () => ({
+vi.mock('@/components/charts/timeline/PersonsTimelineChartCard', () => ({
   default: capture('personsTimeline'),
 }))
 vi.mock('@/components/charts/HeatmapChartCard', () => ({ default: capture('heatmap') }))

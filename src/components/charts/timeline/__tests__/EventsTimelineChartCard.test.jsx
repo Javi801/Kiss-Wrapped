@@ -12,7 +12,7 @@ vi.mock('@/lib/theme', () => ({ usePalette: () => ({}) }))
 vi.mock('@/components/charts/FullscreenChartWrapper', () => ({
   default: ({ children }) => children,
 }))
-vi.mock('@/components/charts/TimelineCalendarPopup', () => ({
+vi.mock('@/components/charts/timeline/TimelineCalendarPopup', () => ({
   default: (props) => {
     popup.props = props
     return null
@@ -40,7 +40,7 @@ vi.mock('recharts', async () => {
   }
 })
 
-import EventsTimelineChartCard from '@/components/charts/EventsTimelineChartCard'
+import EventsTimelineChartCard from '@/components/charts/timeline/EventsTimelineChartCard'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 

@@ -6,7 +6,7 @@ import {
   YEAR_PAGE_SIZE,
   capitalize,
   gridItemStyle,
-} from '@/components/charts/TimelineCalendarHelpers'
+} from '@/components/charts/timeline/TimelineCalendarHelpers'
 
 // One selectable cell (day, month or year). `state` is the per-view object from useTimelineCalendar.
 function GridItem({ value, state, style, children }) {
