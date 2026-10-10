@@ -7,12 +7,7 @@ import { ThemeProvider } from '@/lib/theme'
 import { CopyProvider } from '@/lib/copy'
 import { setAppIconColor } from '@/plugins/appicon'
 import { todayString } from '@/lib/date'
-import {
-  uid,
-  normalizePeople,
-  mergeEventTagsFromPeople,
-  mergePeopleFieldTags,
-} from '@/lib/helpers'
+import { uid, normalizePeople, mergeEventTagsFromPeople, mergePeopleFieldTags } from '@/lib/helpers'
 import { hasScore } from '@/lib/format'
 import { clearPeopleFromDevice } from '@/lib/device-storage'
 import { useAppNavigation } from '@/hooks/useAppNavigation'
