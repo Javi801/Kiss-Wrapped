@@ -357,6 +357,9 @@ export const en = {
   onboardingSettingsHintBody:
     'In Settings you change the theme and the icon color. From there you can also restart this tutorial and open the app guide.',
   restartTutorial: 'Restart the tutorial',
+  tutorialDoneTitle: 'Tutorial finished',
+  tutorialDoneBody: 'There is more on how to use the app in Settings, under "App guide".',
+  tutorialDoneAction: 'Got it',
   appGuide: 'App guide',
   appGuideIntro: 'What the tutorial does not get to show.',
   guideEntryTitle: 'Hidden entrance',

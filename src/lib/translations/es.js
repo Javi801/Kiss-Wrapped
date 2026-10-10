@@ -238,7 +238,7 @@ export const es = {
   multiYearDesc: 'Personas agrupadas por la cantidad de años distintos en los que aparecen',
   multiYearTopTitle: 'Top 3 · Más años',
   multiYearTopDesc: 'Personas con eventos en más años distintos',
-  saveAndBack: 'Guardar info',
+  saveAndBack: 'Guardar información',
   eventScore: 'Calificación',
   kiss: 'beso',
   kisses: 'besos',
@@ -357,6 +357,9 @@ export const es = {
   onboardingSettingsHintBody:
     'En Configuración cambias el tema y el color del ícono. Ahí también puedes reiniciar este tutorial y abrir la guía de la app.',
   restartTutorial: 'Reiniciar el tutorial',
+  tutorialDoneTitle: 'Tutorial terminado',
+  tutorialDoneBody: 'Hay más información de uso en Configuración, en «Guía de la app».',
+  tutorialDoneAction: 'Entendido',
   appGuide: 'Guía de la app',
   appGuideIntro: 'Lo que el tutorial no alcanza a mostrar.',
   guideEntryTitle: 'Entrada oculta',

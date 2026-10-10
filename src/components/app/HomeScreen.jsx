@@ -21,11 +21,13 @@ import JsonExportDialogs from '@/components/app/JsonExportDialogs'
 import ImportDialogs from '@/components/app/ImportDialogs'
 import AboutDialog from '@/components/app/AboutDialog'
 import AppGuideDialog from '@/components/app/AppGuideDialog'
+import TutorialDoneDialog from '@/components/app/TutorialDoneDialog'
 
 /**
  * Renders the main dashboard screen.
  * It shows summary metrics, primary actions, and app-level settings.
  * `onRestartOnboarding` adds the restart-tutorial action to the settings.
+ * `tutorialDoneOpen` shows the notice that follows the tutorial; `onCloseTutorialDone` closes it.
  * For the onboarding tour, `guideTarget` names what it points at (`'people'`, `'data'`
  * or `'settings'`) and `guideHint` (`{ title, body }`) is the text for the last two.
  */
@@ -46,6 +48,8 @@ export default function MainScreen({
   includePartnerEvents,
   modalBackRef,
   onRestartOnboarding,
+  tutorialDoneOpen = false,
+  onCloseTutorialDone,
   guideTarget,
   guideHint,
 }) {
@@ -66,6 +70,7 @@ export default function MainScreen({
   useEffect(() => {
     if (!modalBackRef) return
     const anyOpen =
+      tutorialDoneOpen ||
       aboutOpen ||
       guideOpen ||
       languageOpen ||
@@ -75,7 +80,8 @@ export default function MainScreen({
       importStatus !== null
     modalBackRef.current = anyOpen
       ? () => {
-          if (aboutOpen) setAboutOpen(false)
+          if (tutorialDoneOpen) onCloseTutorialDone()
+          else if (aboutOpen) setAboutOpen(false)
           else if (guideOpen) setGuideOpen(false)
           else if (languageOpen) setLanguageOpen(false)
           else if (settingsOpen) setSettingsOpen(false)
@@ -87,6 +93,8 @@ export default function MainScreen({
         }
       : null
   }, [
+    tutorialDoneOpen,
+    onCloseTutorialDone,
     aboutOpen,
     guideOpen,
     languageOpen,
@@ -225,6 +233,8 @@ export default function MainScreen({
       <AboutDialog open={aboutOpen} onOpenChange={setAboutOpen} t={t} />
 
       <AppGuideDialog open={guideOpen} onOpenChange={setGuideOpen} t={t} />
+
+      <TutorialDoneDialog open={tutorialDoneOpen} onClose={onCloseTutorialDone} t={t} />
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent showCloseButton={false}>

@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect, useRef } from 'react'
+import React, { Suspense, lazy, useEffect, useCallback, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 
@@ -38,6 +38,10 @@ const StatsScreen = lazy(loadStatsScreen)
  */
 export default function KissWrappedApp() {
   const { screen, setScreen, navigateTo, resetTo, modalBackRef } = useAppNavigation()
+
+  // Notice shown on the dashboard right after the tutorial ends.
+  const [tutorialDoneOpen, setTutorialDoneOpen] = useState(false)
+  const closeTutorialDone = useCallback(() => setTutorialDoneOpen(false), [])
 
   const scrollRef = useRef(null)
 
@@ -237,10 +241,12 @@ export default function KissWrappedApp() {
   /**
    * Called when the user finishes the onboarding wizard, on the first run or after
    * restarting it from the settings.
-   * Marks onboarding as done (triggers the save effect) and opens the dashboard.
+   * Marks onboarding as done (triggers the save effect) and opens the dashboard
+   * with the notice that points to the rest of the help.
    */
   function handleOnboardingComplete() {
     completeOnboarding()
+    setTutorialDoneOpen(true)
     resetTo('main')
   }
 
@@ -313,6 +319,8 @@ export default function KissWrappedApp() {
                   onRestartOnboarding={
                     FEATURES.onboarding ? () => navigateTo('onboarding') : undefined
                   }
+                  tutorialDoneOpen={tutorialDoneOpen}
+                  onCloseTutorialDone={closeTutorialDone}
                 />
               ) : null}
 
