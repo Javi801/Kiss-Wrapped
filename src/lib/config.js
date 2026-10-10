@@ -13,8 +13,8 @@ import { version } from '../../package.json'
 export const FEATURES = {
   // Kiss Wrapped PDF deck export on the stats screen. Off until the export bug is fixed.
   pdfExport: false,
-  // First-launch onboarding flow. Off until the tutorial is ready.
-  onboarding: false,
+  // Onboarding tutorial: shown to new installs and restartable from the settings.
+  onboarding: true,
 }
 
 // App metadata shown in the UI. The version has a single source: package.json.

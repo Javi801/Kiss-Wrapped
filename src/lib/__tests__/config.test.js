@@ -29,8 +29,8 @@ describe('FEATURES', () => {
     expect(FEATURES.pdfExport).toBe(false)
   })
 
-  it('keeps onboarding disabled', () => {
-    expect(FEATURES.onboarding).toBe(false)
+  it('keeps onboarding enabled', () => {
+    expect(FEATURES.onboarding).toBe(true)
   })
 })
 
