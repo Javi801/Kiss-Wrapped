@@ -25,14 +25,22 @@ export const APP_GITHUB_REPO = 'https://github.com/Javi801/Kiss-Wrapped'
 // Supported values for user settings. Persisted values outside these lists are ignored.
 export const LANGUAGES = ['en', 'es']
 export const THEMES = ['pink', 'green', 'dark']
-export const ICON_COLORS = ['yellow', 'blue', 'pink', 'purple']
+export const ICON_COLORS = [
+  'lightPurple',
+  'golden',
+  'darkPurple',
+  'darkPink',
+  'darkGreen',
+  'lightGreen',
+  'lightPink',
+]
 
 // Initial values for user settings. They apply only until the user's own
 // choice is persisted; a saved setting always takes priority over these.
 export const DEFAULT_SETTINGS = {
   language: 'en',
   theme: 'pink',
-  iconColor: 'yellow',
+  iconColor: 'lightPink',
   statsVisible: true,
   includePartnerEvents: false,
 }
