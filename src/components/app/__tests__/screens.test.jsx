@@ -19,6 +19,7 @@ vi.mock('@/components/forms/PersonForm', () => ({
 import IntroScreen from '@/components/app/IntroScreen'
 import AddPersonScreen from '@/components/app/AddPersonScreen'
 import OnboardingWizard from '@/components/app/OnboardingWizard'
+import OnboardingPersonStep from '@/components/app/OnboardingPersonStep'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
@@ -95,9 +96,11 @@ describe('IntroScreen', () => {
 })
 
 describe('OnboardingWizard', () => {
+  const step = (Component, ownsActions = false) => ({ Component, ownsActions })
+
   it('completes from the finish button', () => {
     const onComplete = vi.fn()
-    render(<OnboardingWizard t={t} onComplete={onComplete} />)
+    render(<OnboardingWizard t={t} onComplete={onComplete} steps={[step(() => null)]} />)
     const buttons = container.querySelectorAll('button')
     expect(buttons).toHaveLength(1)
     expect(buttons[0].textContent).toBe(t.onboardingFinish)
@@ -113,7 +116,7 @@ describe('OnboardingWizard', () => {
   })
 
   it('derives the step counter total from the number of steps', () => {
-    const steps = [() => <i>one</i>, () => <i>two</i>, () => <i>three</i>]
+    const steps = [step(() => <i>one</i>), step(() => <i>two</i>), step(() => <i>three</i>)]
     render(<OnboardingWizard t={t} onComplete={() => {}} steps={steps} />)
     expect(container.textContent).toContain(
       t.onboardingStepCount.replace('{current}', 1).replace('{total}', 3)
@@ -122,7 +125,7 @@ describe('OnboardingWizard', () => {
 
   it('advances with the next button and completes only on the last step', () => {
     const onComplete = vi.fn()
-    const steps = [() => <i>one</i>, () => <i>two</i>]
+    const steps = [step(() => <i>one</i>), step(() => <i>two</i>)]
     render(<OnboardingWizard t={t} onComplete={onComplete} steps={steps} />)
     const button = container.querySelector('button')
     expect(container.querySelector('i').textContent).toBe('one')
@@ -141,9 +144,125 @@ describe('OnboardingWizard', () => {
   })
 
   it('passes the translations to the current step', () => {
-    const steps = [({ t: stepT }) => <i>{stepT.onboardingNext}</i>]
+    const steps = [step(({ t: stepT }) => <i>{stepT.onboardingNext}</i>)]
     render(<OnboardingWizard t={t} onComplete={() => {}} steps={steps} />)
     expect(container.querySelector('i').textContent).toBe(t.onboardingNext)
+  })
+
+  it('passes the language to the current step', () => {
+    const steps = [step(({ language }) => <i>{language}</i>)]
+    render(<OnboardingWizard t={t} language="es" onComplete={() => {}} steps={steps} />)
+    expect(container.querySelector('i').textContent).toBe('es')
+  })
+
+  it('leaves the buttons to a step that owns its actions', () => {
+    const onComplete = vi.fn()
+    const steps = [
+      step(({ onNext }) => <button onClick={onNext}>own</button>, true),
+      step(() => <i>two</i>),
+    ]
+    render(<OnboardingWizard t={t} onComplete={onComplete} steps={steps} />)
+    const buttons = container.querySelectorAll('button')
+    expect(buttons).toHaveLength(1)
+    expect(buttons[0].textContent).toBe('own')
+
+    click(buttons[0])
+    expect(container.querySelector('i').textContent).toBe('two')
+    expect(onComplete).not.toHaveBeenCalled()
+  })
+
+  it('completes from the last step when it owns its actions', () => {
+    const onComplete = vi.fn()
+    const steps = [step(({ onNext }) => <button onClick={onNext}>own</button>, true)]
+    render(<OnboardingWizard t={t} onComplete={onComplete} steps={steps} />)
+    click(container.querySelector('button'))
+    expect(onComplete).toHaveBeenCalledOnce()
+  })
+
+  it('hands the practice person to the following steps', () => {
+    const steps = [
+      step(
+        ({ onPracticePerson, onNext }) => (
+          <button
+            onClick={() => {
+              onPracticePerson({ name: 'Mia' })
+              onNext()
+            }}
+          >
+            own
+          </button>
+        ),
+        true
+      ),
+      step(({ practicePerson }) => <i>{practicePerson.name}</i>),
+    ]
+    render(<OnboardingWizard t={t} onComplete={() => {}} steps={steps} />)
+    click(container.querySelector('button'))
+    expect(container.querySelector('i').textContent).toBe('Mia')
+  })
+
+  it('shows the person form as the second step', () => {
+    render(<OnboardingWizard t={t} language="en" onComplete={() => {}} />)
+    click(container.querySelector('button'))
+    expect(container.querySelector('h1').textContent).toBe(t.onboardingPersonTitle)
+    expect(container.querySelectorAll('button')).toHaveLength(0)
+    expect(form.props.language).toBe('en')
+  })
+})
+
+describe('OnboardingPersonStep', () => {
+  function renderStep() {
+    const onPracticePerson = vi.fn()
+    const onNext = vi.fn()
+    render(
+      <OnboardingPersonStep
+        t={t}
+        language="en"
+        onPracticePerson={onPracticePerson}
+        onNext={onNext}
+      />
+    )
+    return { onPracticePerson, onNext }
+  }
+
+  it('explains the form above it', () => {
+    renderStep()
+    expect(container.querySelector('h1').textContent).toBe(t.onboardingPersonTitle)
+    expect(container.querySelector('p').textContent).toBe(t.onboardingPersonBody)
+  })
+
+  it('shows the empty add form with the skip action and the zodiac hint', () => {
+    renderStep()
+    expect(form.props.initialValues).toBeUndefined()
+    expect(form.props.mode).toBe('add')
+    expect(form.props.includeHowWeMet).toBe(false)
+    expect(form.props.onCancel).toBeUndefined()
+    expect(form.props.saveLabel).toBe(t.saveAndBack)
+    expect(form.props.skipLabel).toBe(t.onboardingSkip)
+    expect(form.props.zodiacHint).toBe(t.onboardingZodiacHint)
+  })
+
+  it('keeps the saved person and moves on', () => {
+    const { onPracticePerson, onNext } = renderStep()
+    const person = { name: 'Mia' }
+    act(() => form.props.onSave(person))
+    expect(onPracticePerson).toHaveBeenCalledWith(person)
+    expect(onNext).toHaveBeenCalledOnce()
+  })
+
+  it('completes what was typed when it is skipped', () => {
+    const { onPracticePerson, onNext } = renderStep()
+    act(() => form.props.onSkip({ name: 'Mia', age: '', gender: 'female' }))
+    expect(onPracticePerson).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Mia',
+        gender: 'female',
+        activity: 'other',
+        birthYear: expect.any(Number),
+        zodiacSign: expect.any(String),
+      })
+    )
+    expect(onNext).toHaveBeenCalledOnce()
   })
 })
 

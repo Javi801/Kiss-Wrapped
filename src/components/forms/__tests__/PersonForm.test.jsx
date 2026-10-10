@@ -444,4 +444,57 @@ describe('PersonForm — actions', () => {
     expect(onCancel).toHaveBeenCalledOnce()
     expect(onSave).not.toHaveBeenCalled()
   })
+
+  it('has no skip button unless it can be skipped', () => {
+    render()
+    expect(labels()).toEqual([t.savePerson])
+  })
+
+  it('skips with the current values, without validating or saving', () => {
+    const onSkip = vi.fn()
+    const onSave = render({ onSkip, skipLabel: 'Skip' })
+    type(nameInput(), 'Mia')
+    press('Skip')
+    expect(onSkip).toHaveBeenCalledOnce()
+    expect(onSkip.mock.calls[0][0]).toMatchObject({
+      name: 'Mia',
+      age: '',
+      gender: '',
+      zodiacSign: '',
+      birthdayAlreadyHappened: false,
+    })
+    expect(onSave).not.toHaveBeenCalled()
+    expect(container.textContent).not.toContain(t.requiredAge)
+  })
+
+  it('skips with the birthday answer of a running sign', () => {
+    const onSkip = vi.fn()
+    render({ onSkip, skipLabel: 'Skip' })
+    act(() => zodiac().onValueChange(GEMINI))
+    press(t.birthdayYes)
+    press('Skip')
+    expect(onSkip.mock.calls[0][0].birthdayAlreadyHappened).toBe(true)
+  })
+
+  it('drops the birthday answer when the sign is no longer the running one', () => {
+    const onSkip = vi.fn()
+    render({ onSkip, skipLabel: 'Skip' })
+    act(() => zodiac().onValueChange(GEMINI))
+    press(t.birthdayYes)
+    act(() => zodiac().onValueChange(SCORPIO))
+    press('Skip')
+    expect(onSkip.mock.calls[0][0].birthdayAlreadyHappened).toBe(false)
+  })
+})
+
+describe('PersonForm — zodiac hint', () => {
+  it('has no hint by default', () => {
+    render()
+    expect(container.querySelector('[role="note"]')).toBeNull()
+  })
+
+  it('shows the hint as a note', () => {
+    render({ zodiacHint: 'About the sign' })
+    expect(container.querySelector('[role="note"]').textContent).toBe('About the sign')
+  })
 })
