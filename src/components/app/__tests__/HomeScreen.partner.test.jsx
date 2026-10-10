@@ -90,6 +90,19 @@ describe('HomeScreen — total events with partners', () => {
     expect(tileValue(t.totalEvents)).toBe(4)
   })
 
+  it('counts the events of a current partner when partner events are included', () => {
+    renderHome([ana, partner()], { includePartnerEvents: true })
+    expect(tileValue(t.totalEvents)).toBe(5)
+  })
+
+  it('counts the events inside a past partner period when partner events are included', () => {
+    renderHome(
+      [ana, partner({ partnerStatus: 'past', partnerFrom: '2023.01.01', partnerTo: '2023.12.31' })],
+      { includePartnerEvents: true }
+    )
+    expect(tileValue(t.totalEvents)).toBe(5)
+  })
+
   it('still counts partners as saved people', () => {
     renderHome([ana, partner()])
     expect(tileValue(t.peopleSaved)).toBe(2)
