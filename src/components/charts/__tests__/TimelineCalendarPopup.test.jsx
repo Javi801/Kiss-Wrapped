@@ -258,13 +258,34 @@ describe('TimelineCalendarPopup — picking a month', () => {
     expect(cell('Nov').style.backgroundColor).not.toBe('rgb(1, 2, 3)')
   })
 
-  it('zooms out to years from the heading and stays there', () => {
+  it('zooms out to years from the heading and back to months', () => {
     render('month')
     open()
     click(heading())
     expect(heading().textContent).toBe('2018 – 2029')
     click(heading())
-    expect(heading().textContent).toBe('2018 – 2029')
+    expect(heading().textContent).toBe('2024')
+    expect(grid()).toHaveLength(12)
+  })
+
+  it('returns to the year it was showing, not the one of the year page', () => {
+    render('month')
+    open()
+    click(prev())
+    click(heading())
+    click(prev())
+    expect(heading().textContent).toBe('2005 – 2016')
+    click(heading())
+    expect(heading().textContent).toBe('2023')
+  })
+
+  it('still selects a month after zooming out and back', () => {
+    render('month')
+    open()
+    click(heading())
+    click(heading())
+    click(cell('Mar'))
+    expect(onOffsetChange).toHaveBeenCalledWith(-3)
   })
 
   it('picks a year and then a month of it', () => {

@@ -151,7 +151,7 @@ export default function TimelineCalendarPopup({ gran, offset, onOffsetChange, lo
   // week: days → months → years → days
   // month: months → years → months
   // year: no cycling
-  const canCycleTitle = gran === 'week' || (gran === 'month' && calView !== 'years')
+  const canCycleTitle = gran === 'week' || gran === 'month'
 
   function handleTitleClick() {
     if (gran === 'week') {
