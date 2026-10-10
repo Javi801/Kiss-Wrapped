@@ -4,10 +4,33 @@ import * as React from 'react'
 import { Select as SelectPrimitive } from 'radix-ui'
 
 import { cn } from '@/lib/utils'
+import { registerOpenSelect } from '@/lib/open-selects'
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from 'lucide-react'
 
-function Select({ ...props }) {
-  return <SelectPrimitive.Root data-slot="select" {...props} />
+const SelectOpenContext = React.createContext(null)
+
+function Select({ open: openProp, defaultOpen = false, onOpenChange, ...props }) {
+  const [openState, setOpenState] = React.useState(defaultOpen)
+  const open = openProp ?? openState
+  const setOpen = React.useCallback(
+    (next) => {
+      setOpenState(next)
+      onOpenChange?.(next)
+    },
+    [onOpenChange]
+  )
+
+  // Lets the hardware back button close the select before any parent dialog.
+  React.useEffect(() => {
+    if (!open) return
+    return registerOpenSelect(() => setOpen(false))
+  }, [open, setOpen])
+
+  return (
+    <SelectOpenContext.Provider value={setOpen}>
+      <SelectPrimitive.Root data-slot="select" open={open} onOpenChange={setOpen} {...props} />
+    </SelectOpenContext.Provider>
+  )
 }
 
 function SelectGroup({ className, ...props }) {
@@ -24,11 +47,34 @@ function SelectValue({ ...props }) {
   return <SelectPrimitive.Value data-slot="select-value" {...props} />
 }
 
-function SelectTrigger({ className, size = 'default', children, ...props }) {
+function SelectTrigger({
+  className,
+  size = 'default',
+  children,
+  onClick,
+  onPointerDown,
+  ...props
+}) {
+  const setOpen = React.useContext(SelectOpenContext)
+  const pointerTypeRef = React.useRef('touch')
+
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       data-size={size}
+      onPointerDown={(event) => {
+        pointerTypeRef.current = event.pointerType
+        onPointerDown?.(event)
+      }}
+      onClick={(event) => {
+        onClick?.(event)
+        if (pointerTypeRef.current === 'mouse' || !setOpen) return
+        // Open without handing Radix the pointer position: it would otherwise close
+        // the select on pointerup, before a parent Dialog evaluates the outside tap.
+        event.preventDefault()
+        event.currentTarget.focus()
+        setOpen(true)
+      }}
       className={cn(
         "flex w-fit items-center justify-between gap-1.5 rounded-md border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { App as CapacitorApp } from '@capacitor/app'
 
+import { closeTopSelect } from '@/lib/open-selects'
+
 /**
  * Owns the visible screen, its history stack, and the hardware back button.
  */
@@ -44,6 +46,9 @@ export function useAppNavigation() {
    */
   useEffect(() => {
     const listenerPromise = CapacitorApp.addListener('backButton', () => {
+      // An open select sits above any modal, so it closes first.
+      if (closeTopSelect()) return
+
       if (modalBackRef.current) {
         modalBackRef.current()
         return
