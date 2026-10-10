@@ -60,7 +60,7 @@ export default function PersonCard({
           style={{
             overflow: 'hidden',
             boxShadow: hasIncompleteEvent
-              ? `0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1), 0 0 0 2px ${PALETTE.warningBorder}`
+              ? `0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1), inset 0 0 0 2px ${PALETTE.warningBorder}`
               : '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
             borderColor: hasIncompleteEvent ? PALETTE.warningBorder : PALETTE.cardBorder,
             background: `linear-gradient(180deg, ${PALETTE.cardSoft}, ${PALETTE.accentMuted})`,
