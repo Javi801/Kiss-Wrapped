@@ -566,3 +566,56 @@ describe('HomeScreen — onboarding hints', () => {
     ).toBeTruthy()
   })
 })
+
+describe('HomeScreen — onboarding spotlight', () => {
+  const hint = { title: 'Hint title', body: 'Hint body' }
+  const lifted = (node) => node.style.zIndex === '2'
+
+  it('lifts nothing by default', () => {
+    render()
+    expect([...container.querySelectorAll('button')].some(lifted)).toBe(false)
+  })
+
+  it('lifts the data hint with export and import, but not clear', () => {
+    render({ guideTarget: 'data', guideHint: hint })
+    expect(lifted(container.querySelector('[role="note"]'))).toBe(true)
+    expect(lifted(find(t.exportJsonLabel))).toBe(true)
+    expect(lifted(find(t.importJsonLabel))).toBe(true)
+    expect(lifted(find(t.clearLocalDataLabel))).toBe(false)
+    expect(lifted(find(t.settings))).toBe(false)
+  })
+
+  it('lifts the settings hint with the settings button only', () => {
+    render({ guideTarget: 'settings', guideHint: hint })
+    expect(lifted(container.querySelector('[role="note"]'))).toBe(true)
+    expect(lifted(find(t.settings))).toBe(true)
+    expect(lifted(find(t.language))).toBe(false)
+    expect(lifted(find(t.exportJsonLabel))).toBe(false)
+  })
+})
+
+describe('HomeScreen — tutorial done notice', () => {
+  it('stays hidden by default', () => {
+    render()
+    expect(dialog()).toBeNull()
+  })
+
+  it('shows the notice and closes it from its button', async () => {
+    const onCloseTutorialDone = vi.fn()
+    render({ tutorialDoneOpen: true, onCloseTutorialDone })
+    expect(dialog().textContent).toContain(t.tutorialDoneTitle)
+    expect(dialog().textContent).toContain(t.tutorialDoneBody)
+    await click(t.tutorialDoneAction, dialog())
+    expect(onCloseTutorialDone).toHaveBeenCalledOnce()
+  })
+
+  it('closes the notice when it is dismissed or from the back button', () => {
+    const onCloseTutorialDone = vi.fn()
+    render({ tutorialDoneOpen: true, onCloseTutorialDone })
+    act(() => seen.openDialogs.at(-1)(true))
+    expect(onCloseTutorialDone).not.toHaveBeenCalled()
+    act(() => seen.openDialogs.at(-1)(false))
+    act(() => modalBackRef.current())
+    expect(onCloseTutorialDone).toHaveBeenCalledTimes(2)
+  })
+})

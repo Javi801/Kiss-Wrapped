@@ -311,6 +311,22 @@ describe('App — onboarding', () => {
     expect(savedSettings()).toMatchObject({ onboardingDone: true })
   })
 
+  it('shows the tutorial notice on the dashboard only after finishing, until it is closed', async () => {
+    mockFeatures.onboarding = true
+    await boot({ settings: { onboardingDone: false } })
+    openMain()
+    await act(async () => screens.onboarding.onComplete())
+    expect(screens.main.tutorialDoneOpen).toBe(true)
+    act(() => screens.main.onCloseTutorialDone())
+    expect(screens.main.tutorialDoneOpen).toBe(false)
+  })
+
+  it('shows no tutorial notice on a normal entry', async () => {
+    await boot()
+    openMain()
+    expect(screens.main.tutorialDoneOpen).toBe(false)
+  })
+
   it('skips the onboarding when people are already saved', async () => {
     mockFeatures.onboarding = true
     await boot({ people: [ana], settings: { onboardingDone: false } })

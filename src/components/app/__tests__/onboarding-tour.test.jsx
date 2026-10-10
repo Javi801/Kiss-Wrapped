@@ -66,6 +66,8 @@ function render(element) {
 
 const screen = () => container.querySelector('[data-screen]').dataset.screen
 const note = () => container.querySelector('[role="status"]').textContent
+// The first scene of the tour step and of the home step stay longer than the default.
+const HOME_MS = 3000
 const wait = (ms = TOUR_SCENE_MS) => act(() => vi.advanceTimersByTime(ms))
 
 beforeEach(() => {
@@ -111,7 +113,7 @@ describe('OnboardingTourStep', () => {
 
   it('moves to the collapsed person card by itself', () => {
     renderStep()
-    wait(TOUR_SCENE_MS - 1)
+    wait(HOME_MS - 1)
     expect(screen()).toBe('home')
     wait(1)
     expect(screen()).toBe('people')
@@ -127,7 +129,7 @@ describe('OnboardingTourStep', () => {
 
   it('then expands the card with its hints and waits there', () => {
     const onNext = renderStep()
-    wait()
+    wait(HOME_MS)
     wait()
     expect(note()).toBe(t.onboardingTourPersonNote)
     expect(seen.people.cardGuide).toMatchObject({
@@ -143,7 +145,7 @@ describe('OnboardingTourStep', () => {
 
   it('moves on from the add-event button', () => {
     const onNext = renderStep()
-    wait()
+    wait(HOME_MS)
     wait()
     act(() => container.querySelector('button').click())
     expect(onNext).toHaveBeenCalledOnce()
@@ -161,7 +163,7 @@ describe('OnboardingTourStep', () => {
       seen.home.onClearData()
       seen.home.setTheme('dark')
     }).not.toThrow()
-    wait()
+    wait(HOME_MS)
     expect(() => {
       seen.people.onDeletePerson('mia')
       seen.people.onAddEvent('mia', {})
@@ -224,7 +226,7 @@ describe('OnboardingHomeStep', () => {
 
   it('goes back home by itself and shows the data hint with a next button', () => {
     renderStep()
-    wait()
+    wait(HOME_MS)
     expect(screen()).toBe('home')
     expect(container.querySelector('nav')).toBeNull()
     expect(container.querySelector('[role="status"]')).toBeNull()
@@ -238,9 +240,23 @@ describe('OnboardingHomeStep', () => {
     expect(seen.home.guideTarget).toBe('data')
   })
 
+  it('dims everything behind the hints, keeping the button on top', () => {
+    renderStep()
+    expect(container.querySelector('[data-tour-backdrop]')).toBeNull()
+    wait(HOME_MS)
+    const backdrop = container.querySelector('[data-tour-backdrop]')
+    expect(backdrop.style.pointerEvents).toBe('none')
+    expect(backdrop.style.position).toBe('fixed')
+    expect(Number(stepButton().parentElement.style.zIndex)).toBeGreaterThan(
+      Number(backdrop.style.zIndex)
+    )
+    act(() => stepButton().click())
+    expect(container.querySelector('[data-tour-backdrop]')).not.toBeNull()
+  })
+
   it('shows the settings hint last and finishes from its button', () => {
     const onNext = renderStep()
-    wait()
+    wait(HOME_MS)
     act(() => stepButton().click())
     expect(onNext).not.toHaveBeenCalled()
     expect(seen.home).toMatchObject({

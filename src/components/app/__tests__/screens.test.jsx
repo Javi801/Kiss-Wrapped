@@ -82,8 +82,21 @@ describe('IntroScreen', () => {
   it('keeps the animated hints out of the accessibility tree and of the way of taps', () => {
     render(<IntroScreen onOpenMain={() => {}} showEntryGuide t={t} />)
     const hints = [...container.querySelectorAll('[aria-hidden="true"]')]
-    expect(hints).toHaveLength(2)
+    expect(hints).toHaveLength(3)
     for (const hint of hints) expect(hint.style.pointerEvents).toBe('none')
+  })
+
+  it('dims the screen behind the entry guide without blocking taps', () => {
+    render(<IntroScreen onOpenMain={() => {}} t={t} />)
+    expect(container.querySelector('[data-entry-backdrop]')).toBeNull()
+    act(() => root.unmount())
+    container.remove()
+
+    render(<IntroScreen onOpenMain={() => {}} showEntryGuide t={t} />)
+    const backdrop = container.querySelector('[data-entry-backdrop]')
+    expect(backdrop.style.pointerEvents).toBe('none')
+    // Below the heart wrapper, which keeps the guide and the heart on top.
+    expect(Number(backdrop.style.zIndex)).toBeLessThan(10)
   })
 
   it('still opens the app from the heart while the entry guide is shown', () => {

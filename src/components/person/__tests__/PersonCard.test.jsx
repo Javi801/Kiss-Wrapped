@@ -506,8 +506,8 @@ describe('PersonCard — onboarding guide', () => {
     )
     expect(notes()).toEqual(['About editing', 'About events'])
     expect(tapGuide().closest('button').textContent).toContain(t.addEvent)
-    // The event hint sits right under the first event.
-    expect(eventRows()[0].nextElementSibling.textContent).toBe('About events')
+    // The event hint sits right above the first event.
+    expect(eventRows()[0].previousElementSibling.textContent).toBe('About events')
   })
 
   it('hands the add-event tap to the guide instead of opening the form', () => {
