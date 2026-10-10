@@ -1,4 +1,5 @@
 import { hasScore } from '@/lib/format'
+import { sanitizePartnerFields } from '@/lib/partner'
 
 // Generates a short unique id for entities
 export function uid() {
@@ -7,25 +8,15 @@ export function uid() {
 
 // Normalizes people data ensuring events array, valid scores, and partner fields.
 // Legacy boolean isPartner records migrate to a "current" partner with an open period.
+// Invalid partner data falls back automatically (see sanitizePartnerFields).
 export function normalizePeople(rawPeople) {
   if (!Array.isArray(rawPeople)) return []
   return rawPeople.map((rawPerson) => {
-    const { isPartner, ...person } = rawPerson
-    const partnerStatus = ['never', 'current', 'past'].includes(person.partnerStatus)
-      ? person.partnerStatus
-      : isPartner === true
-        ? 'current'
-        : 'never'
+    const { isPartner: _isPartner, ...person } = rawPerson
     return {
       ...person,
       realName: person.realName || '',
-      partnerStatus,
-      partnerFrom:
-        partnerStatus !== 'never' && typeof person.partnerFrom === 'string'
-          ? person.partnerFrom
-          : '',
-      partnerTo:
-        partnerStatus === 'past' && typeof person.partnerTo === 'string' ? person.partnerTo : '',
+      ...sanitizePartnerFields(rawPerson),
       events: Array.isArray(person.events)
         ? person.events.map((event) => ({
             ...event,
