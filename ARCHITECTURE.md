@@ -43,6 +43,7 @@ src/
     */__tests__/        Unit tests next to the components they cover
   lib/                  Framework-light logic: dates, stats, formatting, storage, constants
     config.js           Central configuration: feature flags, metadata, defaults, limits
+    translations/       UI strings, one file per language (grouped as COPY in constants.js)
     __tests__/          Unit tests for lib/
   plugins/              JS wrappers for custom Capacitor plugins
     __tests__/          Unit tests for plugins/
@@ -229,7 +230,7 @@ All of these follow the same sequence: write to `Directory.Cache` → `Filesyste
 
 ## Localization
 
-- All UI strings live in `COPY` in `lib/constants.js` under `en` and `es`. Every key must exist in both languages; `constants.test.js` enforces it.
+- All UI strings live in one file per language, `lib/translations/en.js` and `lib/translations/es.js`. `COPY` in `lib/constants.js` groups them under `en` and `es`. Every key must exist in both languages; `constants.test.js` enforces it.
 - No user-facing string is hardcoded in components.
 - `detectDeviceLanguage()` maps the device locale to `en` or `es` and is used as a fallback (for example in `ErrorBoundary`, which renders outside the providers).
 
@@ -265,9 +266,9 @@ Privacy mechanisms, in addition to the above:
 |---|---|
 | Enable, disable, or add a feature flag | `FEATURES` in `lib/config.js`, plus its pinned value in `config.test.js` |
 | Change a default setting, a length limit, or app metadata | `lib/config.js` |
-| Add or change a UI string | `COPY.en` and `COPY.es` in `lib/constants.js` |
+| Add or change a UI string | `lib/translations/en.js` and `lib/translations/es.js` |
 | Add a palette color token | Every palette in `PALETTES` |
-| Add a theme or a language | `PALETTES` or `COPY` + `ZODIAC_OPTIONS` in `lib/constants.js`, and the matching list in `lib/config.js` |
+| Add a theme or a language | `PALETTES` in `lib/constants.js`, or a new file in `lib/translations/` added to `COPY` plus `ZODIAC_OPTIONS` in `lib/constants.js`, and the matching list in `lib/config.js` |
 | Add a field to Person or Event | The form (`PersonForm` / `EventForm`), `normalizePeople` for defaults and migration, `normalizeForExport` if it is required, display in `PersonCard`, tests in `lib/__tests__/` |
 | Change a partner rule or add a partner field | `lib/partner.js` (validation, import detection, load fallback) with unit tests, `PartnerFields` for the inputs, and `translatePartnerError` plus `COPY` for a new error |
 | Add a persisted setting | Default in `DEFAULT_SETTINGS` (`lib/config.js`), state in `App.jsx`, boot validation, the save effect, and `loadSettings` + `saveSettings` (both native and web branches) in `lib/device-storage.js` |
