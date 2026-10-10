@@ -9,6 +9,7 @@ import {
   ICON_COLOR_KEY,
   THEME_KEY,
   STATS_VISIBLE_KEY,
+  INCLUDE_PARTNER_EVENTS_KEY,
   SITUATION_TAGS_KEY,
   PLACE_TAGS_KEY,
   HOW_WE_MET_TAGS_KEY,
@@ -120,6 +121,8 @@ export async function loadSettings() {
       const saved = JSON.parse(result.data || '{}')
       if (typeof saved.statsVisible === 'string')
         saved.statsVisible = saved.statsVisible !== 'false'
+      if (typeof saved.includePartnerEvents === 'string')
+        saved.includePartnerEvents = saved.includePartnerEvents === 'true'
       if (typeof saved.onboardingDone === 'string')
         saved.onboardingDone = saved.onboardingDone === 'true'
       if (typeof saved.onboardingVersion === 'string')
@@ -129,6 +132,7 @@ export async function loadSettings() {
       // Missing native settings are migrated from localStorage when possible.
       const storage = getSafeStorage()
       const rawVisible = storage?.getItem(STATS_VISIBLE_KEY)
+      const rawIncludePartnerEvents = storage?.getItem(INCLUDE_PARTNER_EVENTS_KEY)
       const rawSituationTags = storage?.getItem(SITUATION_TAGS_KEY)
       const rawPlaceTags = storage?.getItem(PLACE_TAGS_KEY)
       const rawHowWeMetTags = storage?.getItem(HOW_WE_MET_TAGS_KEY)
@@ -138,6 +142,10 @@ export async function loadSettings() {
         language: storage?.getItem(LANGUAGE_KEY) || SETTINGS_DEFAULTS.language,
         theme: storage?.getItem(THEME_KEY) || SETTINGS_DEFAULTS.theme,
         statsVisible: rawVisible === null ? SETTINGS_DEFAULTS.statsVisible : rawVisible !== 'false',
+        includePartnerEvents:
+          rawIncludePartnerEvents === null
+            ? SETTINGS_DEFAULTS.includePartnerEvents
+            : rawIncludePartnerEvents === 'true',
         situationTags: rawSituationTags ? JSON.parse(rawSituationTags) : [],
         placeTags: rawPlaceTags ? JSON.parse(rawPlaceTags) : [],
         howWeMetTags: rawHowWeMetTags ? JSON.parse(rawHowWeMetTags) : [],
@@ -152,6 +160,7 @@ export async function loadSettings() {
   const storage = getSafeStorage()
   if (!storage) return { ...SETTINGS_DEFAULTS }
   const rawVisible = storage.getItem(STATS_VISIBLE_KEY)
+  const rawIncludePartnerEvents = storage.getItem(INCLUDE_PARTNER_EVENTS_KEY)
   const rawSituationTags = storage.getItem(SITUATION_TAGS_KEY)
   const rawPlaceTags = storage.getItem(PLACE_TAGS_KEY)
   const rawHowWeMetTags = storage.getItem(HOW_WE_MET_TAGS_KEY)
@@ -162,6 +171,10 @@ export async function loadSettings() {
     language: storage.getItem(LANGUAGE_KEY) || SETTINGS_DEFAULTS.language,
     theme: storage.getItem(THEME_KEY) || SETTINGS_DEFAULTS.theme,
     statsVisible: rawVisible === null ? SETTINGS_DEFAULTS.statsVisible : rawVisible !== 'false',
+    includePartnerEvents:
+      rawIncludePartnerEvents === null
+        ? SETTINGS_DEFAULTS.includePartnerEvents
+        : rawIncludePartnerEvents === 'true',
     situationTags: rawSituationTags ? JSON.parse(rawSituationTags) : [],
     placeTags: rawPlaceTags ? JSON.parse(rawPlaceTags) : [],
     howWeMetTags: rawHowWeMetTags ? JSON.parse(rawHowWeMetTags) : [],
@@ -176,6 +189,7 @@ export async function saveSettings({
   language,
   theme,
   statsVisible,
+  includePartnerEvents,
   situationTags,
   placeTags,
   howWeMetTags,
@@ -191,6 +205,7 @@ export async function saveSettings({
         language,
         theme,
         statsVisible,
+        includePartnerEvents,
         situationTags,
         placeTags,
         howWeMetTags,
@@ -208,6 +223,8 @@ export async function saveSettings({
   if (language !== undefined) storage.setItem(LANGUAGE_KEY, language)
   if (theme !== undefined) storage.setItem(THEME_KEY, theme)
   if (statsVisible !== undefined) storage.setItem(STATS_VISIBLE_KEY, String(statsVisible))
+  if (includePartnerEvents !== undefined)
+    storage.setItem(INCLUDE_PARTNER_EVENTS_KEY, String(includePartnerEvents))
   if (situationTags !== undefined)
     storage.setItem(SITUATION_TAGS_KEY, JSON.stringify(situationTags))
   if (placeTags !== undefined) storage.setItem(PLACE_TAGS_KEY, JSON.stringify(placeTags))
