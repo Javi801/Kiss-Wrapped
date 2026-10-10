@@ -220,7 +220,7 @@ Tests live in a `__tests__/` folder next to the code they cover, and all of them
 
 | Location | Covers |
 |----------|--------|
-| `src/lib/__tests__/` | `date.js`, `calendar.js`, `format.js`, `helpers.js`, `stats.js`, `constants.js`, `config.js`, `partner.js`, `import-people.js`, `device-storage.js`, `pdf-export.js`, `open-selects.js`, `utils.js`, and the theme and copy providers |
+| `src/lib/__tests__/` | `date.js`, `calendar.js`, `format.js`, `helpers.js`, `stats.js`, `constants.js`, `config.js`, `partner.js`, `import-people.js`, `onboarding.js`, `device-storage.js`, `pdf-export.js`, `open-selects.js`, `utils.js`, and the theme and copy providers |
 | `src/plugins/__tests__/` | The app icon plugin wrapper |
 | `src/__tests__/` | `App.jsx`: boot, persistence, navigation, back button, and data mutations; and the `useScrollFade` hook |
 | `src/components/*/__tests__/` | Screens, forms, the person card, stats screen and tabs, chart cards and the fullscreen wrapper, selectors, shared tiles, the `ui/` dialog, sheet and select wrappers, and `ErrorBoundary` |
@@ -259,6 +259,7 @@ Settings {
   situationTags:        string[]
   placeTags:            string[]
   howWeMetTags:         string[]
+  onboardingDone:       boolean   // the onboarding was completed or does not apply
 }
 ```
 

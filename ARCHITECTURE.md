@@ -43,7 +43,7 @@ src/
     person/             PersonCard: one person's profile and event list, split into
                         PersonCardHeader, PersonCardDetails, PersonCardActions,
                         PersonEventList, PersonCardDialogs, and the usePersonCardModals hook
-    forms/              PersonForm, PartnerFields, EventForm, FiltersPanel, TagInput
+    forms/              PersonForm, PartnerFields, EventForm, FiltersPanel, TagInput, SpeechBubble
     stats/              Stats screen, its four tabs, and stat-specific cards
     charts/             Generic, data-agnostic chart cards and fullscreen/export wrapper.
       timeline/         The persons and events timeline cards, the TimelineChartCard they
@@ -225,7 +225,7 @@ Invariants:
 
 Lifecycle:
 
-1. **Boot** (`hooks/usePersistedAppState.js`): `loadPeopleFromDevice()` → `normalizePeople()` → `setPeople`; then `loadSettings()` → validate each value against the supported lists in `lib/config.js` → set state. Values that were never saved fall back to `DEFAULT_SETTINGS`. Tag lists are merged with values already present in the data (`mergeEventTagsFromPeople`, `mergePeopleFieldTags`). The hook receives `setScreen` and always opens `intro`. It also decides whether the onboarding is pending: only when `FEATURES.onboarding` is on, `onboardingDone` was never saved as `true`, and there are no saved people, so updating users never see it. Otherwise `onboardingDone` is saved as `true`. Then `isLoaded = true`.
+1. **Boot** (`hooks/usePersistedAppState.js`): `loadPeopleFromDevice()` → `normalizePeople()` → `setPeople`; then `loadSettings()` → validate each value against the supported lists in `lib/config.js` → set state. Values that were never saved fall back to `DEFAULT_SETTINGS`. Tag lists are merged with values already present in the data (`mergeEventTagsFromPeople`, `mergePeopleFieldTags`). The hook receives `setScreen` and always opens `intro`. It also decides whether the onboarding is pending: only when `FEATURES.onboarding` is on, `onboardingDone` was never saved as `true`, and there are no saved people, so updating users never see it. While it is pending the language is the device language (`detectDeviceLanguage`) instead of the saved one or the default. Otherwise `onboardingDone` is saved as `true`. Then `isLoaded = true`.
 2. **Save**: two effects in the same hook write the full people array and the full settings object whenever they change, only after `isLoaded` is true. This guard prevents overwriting stored data with the initial empty state; keep it for any new persisted state.
 3. **Partner data is sanitized on load** without asking the user. `normalizePeople` calls `sanitizePartnerFields` (`lib/partner.js`): a date that is not a valid `yyyy.MM.dd` string becomes `''`, an inverted range drops `partnerFrom`, `past` without a valid `partnerTo` becomes `never`, and an unknown status becomes `current` when the record has `isPartner: true` and `never` otherwise. Future dates are kept, so the result does not depend on the day it runs.
 4. **Migrations run on load**, not as a separate step: legacy `age` → `birthYear` (`migrateLegacyAge`), legacy `isPartner` → `partnerStatus` (`resolvePartnerStatus`, called from `normalizePeople`), and `localStorage` settings → native settings file (first native run).
@@ -262,7 +262,7 @@ All of these follow the same sequence: write to `Directory.Cache` → `Filesyste
 
 - All UI strings live in one file per language, `lib/translations/en.js` and `lib/translations/es.js`. `COPY` in `lib/constants.js` groups them under `en` and `es`. Every key must exist in both languages; `constants.test.js` enforces it.
 - No user-facing string is hardcoded in components.
-- `detectDeviceLanguage()` maps the device locale to `en` or `es` and is used as a fallback (for example in `ErrorBoundary`, which renders outside the providers).
+- `detectDeviceLanguage()` maps the device locale to `en` or `es` and is used as a fallback (for example in `ErrorBoundary`, which renders outside the providers) and as the language of a new install while the onboarding is pending.
 
 ## Native layer
 
