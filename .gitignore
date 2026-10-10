@@ -78,6 +78,7 @@ ios/Pods
 !.vscode/extensions.json
 .idea
 .claude/settings.local.json
+.claude/hooks/
 CLAUDE.md
 graphify-out/
 .claude/settings.json
