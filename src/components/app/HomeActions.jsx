@@ -18,7 +18,8 @@ const dataButtonLabelStyle = {
  * Action buttons of the main screen: navigation to the other screens and the
  * data section (export, import and clear). For the onboarding tour,
  * `guideTarget="people"` shows the tap guide on the people button and
- * `dataHint` (`{ title, body }`) a speech bubble over export and import.
+ * `dataHint` (`{ title, body }`) a speech bubble over export and import, which
+ * are then lifted above the tour backdrop.
  */
 export default function HomeActions({
   t,
@@ -49,6 +50,11 @@ export default function HomeActions({
     borderColor: PALETTE.inputBorder,
     backgroundColor: PALETTE.controlBg,
   }
+
+  // Solid and above the tour backdrop while the data hint points at them.
+  const hintedButtonStyle = dataHint
+    ? { ...dataButtonStyle, position: 'relative', zIndex: 2, backgroundColor: PALETTE.card }
+    : dataButtonStyle
 
   return (
     <div style={{ display: 'grid', gap: '0.75rem' }}>
@@ -124,6 +130,7 @@ export default function HomeActions({
       {dataHint && (
         <SpeechBubble
           title={dataHint.title}
+          raised
           tailSide="bottom"
           tailOffset={{ left: 'calc(33.3% - 0.3125rem)' }}
         >
@@ -135,7 +142,7 @@ export default function HomeActions({
         <Button
           variant="outline"
           className="rounded-2xl"
-          style={dataButtonStyle}
+          style={hintedButtonStyle}
           onClick={onExportJson}
         >
           <Upload style={{ height: '1.25rem', width: '1.25rem', color: PALETTE.accent2 }} />
@@ -145,7 +152,7 @@ export default function HomeActions({
         <Button
           variant="outline"
           className="rounded-2xl"
-          style={dataButtonStyle}
+          style={hintedButtonStyle}
           onClick={onImportJson}
         >
           <Download style={{ height: '1.25rem', width: '1.25rem', color: PALETTE.accent2 }} />

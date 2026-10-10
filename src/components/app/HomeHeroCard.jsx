@@ -176,7 +176,17 @@ export default function HomeHeroCard({
               type="button"
               aria-label={t.settings}
               className="rounded-full"
-              style={frostedButtonStyle}
+              style={
+                // Solid and above the tour backdrop while the settings hint points at it.
+                settingsHint
+                  ? {
+                      ...frostedButtonStyle,
+                      position: 'relative',
+                      zIndex: 2,
+                      backgroundColor: PALETTE.accent,
+                    }
+                  : frostedButtonStyle
+              }
               onClick={onOpenSettings}
             >
               <Settings
@@ -189,9 +199,10 @@ export default function HomeHeroCard({
 
         {/* The settings button is the last of three evenly spaced columns. */}
         {settingsHint && (
-          <div style={{ position: 'relative', marginTop: '0.5rem' }}>
+          <div style={{ marginTop: '0.5rem' }}>
             <SpeechBubble
               title={settingsHint.title}
+              raised
               tailOffset={{ right: 'calc(16.7% - 0.3125rem)' }}
             >
               {settingsHint.body}

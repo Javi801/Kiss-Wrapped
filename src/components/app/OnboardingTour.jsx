@@ -23,7 +23,7 @@ const noop = () => {}
  *                are translation keys. An `auto` scene moves on by itself and a scene
  *                with `button` moves on from that button; any other waits for `onAddEvent`.
  *                `guideTarget` is what the home screen points at, with `hint`
- *                (`{ title, body }`) as its text. `card` guides the person card:
+ *                (`{ title, body }`) as its text; a scene with `hint` dims everything else. `card` guides the person card:
  *                `{ expanded, tapTarget, hints }`. `nav` shows the bottom bar with the
  *                tap guide on that item.
  *  - person      Practice person shown on the screens
@@ -101,6 +101,20 @@ export default function OnboardingTour({
         </p>
       )}
 
+      {/* Spotlight: the home screen lifts the hinted controls and their bubble above it. */}
+      {scene.hint && (
+        <div
+          data-tour-backdrop=""
+          style={{
+            pointerEvents: 'none',
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1,
+            backgroundColor: 'rgba(24,14,34,0.6)',
+          }}
+        />
+      )}
+
       {/* The tour drives the screens: taps do nothing. */}
       <div style={{ pointerEvents: 'none' }}>
         {scene.screen === 'home' ? (
@@ -156,7 +170,7 @@ export default function OnboardingTour({
       </div>
 
       {scene.button && (
-        <div style={{ position: 'sticky', bottom: 0 }}>
+        <div style={{ position: 'sticky', bottom: 0, zIndex: 3 }}>
           <OnboardingButton onClick={endScene}>{t[scene.button]}</OnboardingButton>
         </div>
       )}

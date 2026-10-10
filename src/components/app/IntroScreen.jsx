@@ -73,6 +73,20 @@ export default function IntroScreen({ onOpenMain, showEntryGuide = false, t }) {
       >
         <HeroVisualPlaceholder t={t} />
       </div>
+
+      {/* Dims the bubbles and the visual so the entry guide stands out. Sits below the heart. */}
+      {showEntryGuide ? (
+        <div
+          data-entry-backdrop=""
+          style={{
+            pointerEvents: 'none',
+            position: 'absolute',
+            inset: 0,
+            zIndex: 5,
+            backgroundColor: 'rgba(24,14,34,0.6)',
+          }}
+        />
+      ) : null}
     </div>
   )
 }
