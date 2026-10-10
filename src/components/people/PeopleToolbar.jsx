@@ -80,7 +80,6 @@ export default function PeopleToolbar({
           style={{
             width: '80%',
             maxWidth: '20rem',
-            overflowY: 'auto',
             borderLeftColor: PALETTE.cardBorder,
             background: `linear-gradient(180deg, ${PALETTE.accentMuted} 0%, ${PALETTE.card} 55%)`,
           }}
@@ -118,7 +117,15 @@ export default function PeopleToolbar({
             </div>
           </SheetHeader>
 
-          <div style={{ marginTop: '0.75rem', padding: '0 1rem 1.5rem' }}>
+          <div
+            className="scroll-fade-y"
+            style={{
+              flex: 1,
+              minHeight: 0,
+              overflowY: 'auto',
+              padding: '0.75rem 1rem 1.5rem',
+            }}
+          >
             <FiltersPanel
               filters={filters}
               setFilters={setFilters}
