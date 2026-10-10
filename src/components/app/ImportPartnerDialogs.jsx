@@ -45,7 +45,7 @@ export default function ImportPartnerDialogs({
   const importCount = data.length - discardCount
 
   const primaryStyle = {
-    background: `linear-gradient(90deg, ${PALETTE.accentEmphasis2}, ${PALETTE.emphasisEnd})`,
+    background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
     color: PALETTE.textOnAccent,
     border: 'none',
   }
