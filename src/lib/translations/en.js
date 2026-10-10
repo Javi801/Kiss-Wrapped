@@ -330,6 +330,12 @@ export const en = {
   onboardingWelcomeLead: 'Log your dates and encounters, and discover your stats.',
   onboardingWelcomePrivacy:
     'Everything stays on this device only: no account, no cloud, and no tracking.',
+  onboardingPersonTitle: 'This form is for your date',
+  onboardingPersonBody:
+    'Hand them the phone so they fill it in with their details, or complete it yourself. This is only practice: what you save is deleted when the tutorial ends.',
+  onboardingZodiacHint:
+    'The age updates on its own based on the sign. If the sign is the current one, a question about the birthday appears above to get it right.',
+  onboardingPracticeName: 'Example person',
   entryGuideTitle: "The app's real entrance",
   entryGuideBody: 'Tap the subtle heart in the corner to open your space.',
 }

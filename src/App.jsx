@@ -446,7 +446,7 @@ export default function KissWrappedApp() {
         </div>
         {/* Full-screen overlays rendered outside the masked scroll area */}
         {screen === 'onboarding' ? (
-          <OnboardingWizard t={t} onComplete={handleOnboardingComplete} />
+          <OnboardingWizard t={t} language={language} onComplete={handleOnboardingComplete} />
         ) : null}
         {screen === 'intro' ? (
           <IntroScreen

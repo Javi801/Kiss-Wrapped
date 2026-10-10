@@ -2,9 +2,14 @@ import { useState } from 'react'
 import { usePalette } from '@/lib/theme'
 import { TEXT } from '@/lib/constants'
 import OnboardingWelcomeStep from '@/components/app/OnboardingWelcomeStep'
+import OnboardingPersonStep from '@/components/app/OnboardingPersonStep'
 
 // Ordered wizard steps. The step counter total comes from this list's length.
-const ONBOARDING_STEPS = [OnboardingWelcomeStep]
+// A step with `ownsActions` renders its own buttons and advances through `onNext`.
+const ONBOARDING_STEPS = [
+  { Component: OnboardingWelcomeStep },
+  { Component: OnboardingPersonStep, ownsActions: true },
+]
 
 /**
  * Full-screen onboarding wizard shown to new installs after the intro.
@@ -12,15 +17,19 @@ const ONBOARDING_STEPS = [OnboardingWelcomeStep]
  *
  * Props:
  *  - t           Active translation dictionary
+ *  - language    Active language
  *  - onComplete  Called when the user finishes the wizard
- *  - steps       Step components, rendered in order with the `t` prop
+ *  - steps       Step entries `{ Component, ownsActions }`, rendered in order
  */
-export default function OnboardingWizard({ t, onComplete, steps = ONBOARDING_STEPS }) {
+export default function OnboardingWizard({ t, language, onComplete, steps = ONBOARDING_STEPS }) {
   const PALETTE = usePalette()
   const [stepIndex, setStepIndex] = useState(0)
+  // Person created in the wizard for the later steps. It is never saved.
+  const [practicePerson, setPracticePerson] = useState(null)
 
-  const Step = steps[stepIndex]
+  const { Component: Step, ownsActions } = steps[stepIndex]
   const isLast = stepIndex === steps.length - 1
+  const goNext = isLast ? onComplete : () => setStepIndex(stepIndex + 1)
   const stepCount = t.onboardingStepCount
     .replace('{current}', stepIndex + 1)
     .replace('{total}', steps.length)
@@ -62,35 +71,44 @@ export default function OnboardingWizard({ t, onComplete, steps = ONBOARDING_STE
           minHeight: 0,
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
           overflowY: 'auto',
           padding: '1.125rem',
         }}
       >
-        <Step t={t} />
+        {/* Auto margins center a short step and let a tall one scroll from its top. */}
+        <div style={{ width: '100%', margin: 'auto 0' }}>
+          <Step
+            t={t}
+            language={language}
+            practicePerson={practicePerson}
+            onPracticePerson={setPracticePerson}
+            onNext={goNext}
+          />
+        </div>
       </div>
 
-      <div style={{ position: 'relative', padding: '0 1.125rem 1.125rem' }}>
-        <button
-          type="button"
-          onClick={isLast ? onComplete : () => setStepIndex(stepIndex + 1)}
-          style={{
-            width: '100%',
-            minHeight: '2.75rem',
-            padding: '0 0.8125rem',
-            borderRadius: '1rem',
-            border: 'none',
-            cursor: 'pointer',
-            fontSize: '0.86rem',
-            fontWeight: 750,
-            color: '#ffffff',
-            background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
-          }}
-        >
-          {isLast ? t.onboardingFinish : t.onboardingNext}
-        </button>
-      </div>
+      {ownsActions ? null : (
+        <div style={{ position: 'relative', padding: '0 1.125rem 1.125rem' }}>
+          <button
+            type="button"
+            onClick={goNext}
+            style={{
+              width: '100%',
+              minHeight: '2.75rem',
+              padding: '0 0.8125rem',
+              borderRadius: '1rem',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '0.86rem',
+              fontWeight: 750,
+              color: '#ffffff',
+              background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
+            }}
+          >
+            {isLast ? t.onboardingFinish : t.onboardingNext}
+          </button>
+        </div>
+      )}
     </div>
   )
 }

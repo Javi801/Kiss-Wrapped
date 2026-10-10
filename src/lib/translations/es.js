@@ -330,6 +330,12 @@ export const es = {
   onboardingWelcomeLead: 'Registra tus citas y encuentros, y descubre tus estadísticas.',
   onboardingWelcomePrivacy:
     'Todo queda únicamente en este dispositivo: sin cuenta, sin nube y sin rastreo.',
+  onboardingPersonTitle: 'Este formulario es para tu cita',
+  onboardingPersonBody:
+    'Pásale el teléfono para que lo llene con sus datos, o complétalo tú. Esto es solo una práctica: lo que guardes se borra al terminar el tutorial.',
+  onboardingZodiacHint:
+    'La edad se actualiza sola según el signo. Si el signo es el de estas fechas, arriba aparecerá una pregunta sobre el cumpleaños para calcularla bien.',
+  onboardingPracticeName: 'Persona de ejemplo',
   entryGuideTitle: 'Entrada real de la app',
   entryGuideBody: 'Toca el corazón sutil de la esquina para abrir tu espacio.',
 }
