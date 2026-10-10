@@ -60,6 +60,7 @@ function mockScreen(name) {
 vi.mock('@/components/app/HomeScreen', mockScreen('main'))
 vi.mock('@/components/app/AddPersonScreen', mockScreen('add'))
 vi.mock('@/components/app/IntroScreen', mockScreen('intro'))
+vi.mock('@/components/app/OnboardingWizard', mockScreen('onboarding'))
 vi.mock('@/components/app/PrivacyScreen', mockScreen('privacy'))
 vi.mock('@/components/people/PeopleManagerScreen', mockScreen('people'))
 vi.mock('@/components/stats/StatsScreen', mockScreen('stats'))
@@ -269,20 +270,63 @@ describe('App — onboarding', () => {
   it('opens on the intro and saves the onboarding as done while the feature is off', async () => {
     await boot({ settings: { onboardingDone: false } })
     expect(visibleScreens()).toEqual(['intro'])
+    expect(screens.intro.showEntryGuide).toBe(false)
     expect(savedSettings()).toMatchObject({ onboardingDone: true })
+    openMain()
+    expect(visibleScreens()).toEqual(['main'])
   })
 
-  it('opens on the intro and keeps the onboarding pending on first launch', async () => {
+  it('opens on the intro with the entry guide on first launch', async () => {
     mockFeatures.onboarding = true
     await boot({ settings: { onboardingDone: false } })
     expect(visibleScreens()).toEqual(['intro'])
+    expect(screens.intro.showEntryGuide).toBe(true)
     expect(savedSettings()).toMatchObject({ onboardingDone: false })
+  })
+
+  it('opens the wizard from the intro while the onboarding is pending', async () => {
+    mockFeatures.onboarding = true
+    await boot({ settings: { onboardingDone: false } })
+    openMain()
+    expect(visibleScreens()).toEqual(['onboarding'])
+    expect(navButtons()).toHaveLength(0)
+  })
+
+  it('returns from the wizard to the intro with the back button', async () => {
+    mockFeatures.onboarding = true
+    mockNative.isNative = true
+    await boot({ settings: { onboardingDone: false } })
+    openMain()
+    await pressBack()
+    expect(visibleScreens()).toEqual(['intro'])
+    expect(screens.intro.showEntryGuide).toBe(true)
+  })
+
+  it('remembers a completed onboarding and ends on the dashboard', async () => {
+    mockFeatures.onboarding = true
+    await boot({ settings: { onboardingDone: false } })
+    openMain()
+    await act(async () => screens.onboarding.onComplete())
+    expect(visibleScreens()).toEqual(['main'])
+    expect(savedSettings()).toMatchObject({ onboardingDone: true })
+  })
+
+  it('skips the onboarding when people are already saved', async () => {
+    mockFeatures.onboarding = true
+    await boot({ people: [ana], settings: { onboardingDone: false } })
+    expect(screens.intro.showEntryGuide).toBe(false)
+    expect(savedSettings()).toMatchObject({ onboardingDone: true })
+    openMain()
+    expect(visibleScreens()).toEqual(['main'])
   })
 
   it('goes straight to the intro once the onboarding was completed', async () => {
     mockFeatures.onboarding = true
     await boot()
     expect(visibleScreens()).toEqual(['intro'])
+    expect(screens.intro.showEntryGuide).toBe(false)
+    openMain()
+    expect(visibleScreens()).toEqual(['main'])
   })
 })
 

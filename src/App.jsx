@@ -18,6 +18,7 @@ import PeopleManagerScreen from '@/components/people/PeopleManagerScreen'
 import HomeScreen from './components/app/HomeScreen'
 import AddPersonScreen from './components/app/AddPersonScreen'
 import IntroScreen from './components/app/IntroScreen'
+import OnboardingWizard from './components/app/OnboardingWizard'
 import PrivacyScreen from './components/app/PrivacyScreen'
 
 // Loaded on demand so the charting libraries stay out of the initial chunk.
@@ -64,6 +65,8 @@ export default function KissWrappedApp() {
     setPlaceTags,
     howWeMetTags,
     setHowWeMetTags,
+    onboardingPending,
+    completeOnboarding,
   } = usePersistedAppState(setScreen)
 
   // Applies the dark class to <html> so shadcn portal components also get dark styles.
@@ -235,6 +238,15 @@ export default function KissWrappedApp() {
     setPeople((prev) =>
       prev.map((person) => (person.id === personId ? { ...person, events: [] } : person))
     )
+  }
+
+  /**
+   * Called when the user finishes the onboarding wizard.
+   * Marks onboarding as done (triggers the save effect) and opens the dashboard.
+   */
+  function handleOnboardingComplete() {
+    completeOnboarding()
+    resetTo('main')
   }
 
   // Bottom navigation configuration.
@@ -433,7 +445,16 @@ export default function KissWrappedApp() {
           </div>
         </div>
         {/* Full-screen overlays rendered outside the masked scroll area */}
-        {screen === 'intro' ? <IntroScreen onOpenMain={() => navigateTo('main')} t={t} /> : null}
+        {screen === 'onboarding' ? (
+          <OnboardingWizard t={t} onComplete={handleOnboardingComplete} />
+        ) : null}
+        {screen === 'intro' ? (
+          <IntroScreen
+            onOpenMain={() => navigateTo(onboardingPending ? 'onboarding' : 'main')}
+            showEntryGuide={onboardingPending}
+            t={t}
+          />
+        ) : null}
         <AnimatePresence>{isPrivate && <PrivacyScreen key="privacy" />}</AnimatePresence>
       </CopyProvider>
     </ThemeProvider>

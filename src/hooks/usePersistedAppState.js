@@ -74,7 +74,9 @@ export function usePersistedAppState(setScreen) {
         if (isMounted) {
           if (LANGUAGES.includes(settings.language)) setLanguage(settings.language)
 
-          const needsOnboarding = FEATURES.onboarding && !settings.onboardingDone
+          // Only a new install sees the onboarding: saved people mean an existing user.
+          const needsOnboarding =
+            FEATURES.onboarding && !settings.onboardingDone && loadedPeople.length === 0
           // First launch: start in the device language.
           if (needsOnboarding) setLanguage(detectDeviceLanguage())
           setOnboardingDone(!needsOnboarding)
@@ -185,6 +187,7 @@ export function usePersistedAppState(setScreen) {
     setPlaceTags,
     howWeMetTags,
     setHowWeMetTags,
+    onboardingPending: FEATURES.onboarding && !onboardingDone,
     completeOnboarding,
   }
 }

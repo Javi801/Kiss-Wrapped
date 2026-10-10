@@ -325,4 +325,5 @@ export const en = {
   crashReload: 'Reload app',
   onboardingSkip: 'Skip',
   onboardingNext: 'Next',
+  onboardingFinish: 'Finish tutorial',
 }

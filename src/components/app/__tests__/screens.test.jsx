@@ -18,6 +18,7 @@ vi.mock('@/components/forms/PersonForm', () => ({
 
 import IntroScreen from '@/components/app/IntroScreen'
 import AddPersonScreen from '@/components/app/AddPersonScreen'
+import OnboardingWizard from '@/components/app/OnboardingWizard'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
@@ -62,6 +63,18 @@ describe('IntroScreen', () => {
   it('exposes no other way into the app', () => {
     render(<IntroScreen onOpenMain={() => {}} t={t} />)
     expect(container.querySelectorAll('button, a')).toHaveLength(1)
+  })
+})
+
+describe('OnboardingWizard', () => {
+  it('completes from the finish button', () => {
+    const onComplete = vi.fn()
+    render(<OnboardingWizard t={t} onComplete={onComplete} />)
+    const buttons = container.querySelectorAll('button')
+    expect(buttons).toHaveLength(1)
+    expect(buttons[0].textContent).toBe(t.onboardingFinish)
+    click(buttons[0])
+    expect(onComplete).toHaveBeenCalledOnce()
   })
 })
 
