@@ -303,5 +303,5 @@ Privacy mechanisms, in addition to the above:
 These are current facts about the code, listed so they are not mistaken for intended design:
 
 - **PDF export is off.** `FEATURES.pdfExport` is `false` pending a fix to the export; the button in `StatsScreen` is hidden.
-- **Onboarding is off and unfinished.** `FEATURES.onboarding` is `false`, so the entry guide never shows and the heart never opens `OnboardingWizard`, which only has its first step, the welcome (`OnboardingWelcomeStep`). Steps are listed in `ONBOARDING_STEPS`, and the step counter total follows that list.
+- **Onboarding is off and unfinished.** `FEATURES.onboarding` is `false`, so the entry guide never shows and the heart never opens `OnboardingWizard`, which only has its first two steps: the welcome (`OnboardingWelcomeStep`) and the person form (`OnboardingPersonStep`). Steps are listed in `ONBOARDING_STEPS`, and the step counter total follows that list. A step marked `ownsActions` renders its own buttons and advances through `onNext`. The person step reuses `PersonForm` with a skip action; skipping completes what was typed through `completePracticePerson` (`lib/onboarding.js`). The resulting practice person lives only in the wizard state, is never saved, and is discarded when the wizard finishes.
 
