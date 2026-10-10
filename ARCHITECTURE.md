@@ -303,5 +303,5 @@ Privacy mechanisms, in addition to the above:
 These are current facts about the code, listed so they are not mistaken for intended design:
 
 - **PDF export is off.** `FEATURES.pdfExport` is `false` pending a fix to the export; the button in `StatsScreen` is hidden.
-- **Onboarding is off and unfinished.** `FEATURES.onboarding` is `false`, so the entry guide never shows and the heart never opens `OnboardingWizard`, which is still a shell with only a finish button.
+- **Onboarding is off and unfinished.** `FEATURES.onboarding` is `false`, so the entry guide never shows and the heart never opens `OnboardingWizard`, which only has its first step, the welcome (`OnboardingWelcomeStep`). Steps are listed in `ONBOARDING_STEPS`, and the step counter total follows that list.
 
