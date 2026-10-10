@@ -3,7 +3,9 @@ import { COPY, GENDER_COLORS } from '@/lib/constants'
 import {
   translateActivity,
   translateGender,
+  translatePartnerError,
   eventIsMissingRequired,
+  personIsMissingRequired,
   personHasIncompleteEvent,
   hasScore,
   renderKisses,
@@ -11,6 +13,7 @@ import {
   getZodiacForLanguage,
   getColorForCategory,
 } from '@/lib/format'
+import { PARTNER_ERRORS } from '@/lib/partner'
 
 const t = COPY.en
 
@@ -92,6 +95,25 @@ describe('translateGender', () => {
   })
 })
 
+describe('translatePartnerError', () => {
+  it.each([
+    [PARTNER_ERRORS.unknownStatus, 'requiredPartnerStatus'],
+    [PARTNER_ERRORS.invalidDate, 'validDateMsg'],
+    [PARTNER_ERRORS.futureDate, 'futureDateMsg'],
+    [PARTNER_ERRORS.missingEnd, 'requiredPartnerTo'],
+    [PARTNER_ERRORS.invertedRange, 'partnerRangeError'],
+  ])('translates %s', (code, key) => {
+    expect(translatePartnerError(code, t)).toBe(t[key])
+  })
+  it('has a text for every code in both languages', () => {
+    for (const copy of Object.values(COPY)) {
+      for (const code of Object.values(PARTNER_ERRORS)) {
+        expect(translatePartnerError(code, copy)).toEqual(expect.any(String))
+      }
+    }
+  })
+})
+
 const COMPLETE_PERSON = {
   name: 'Ana',
   realName: 'Ana García',
@@ -127,6 +149,29 @@ describe('eventIsMissingRequired', () => {
   })
   it('returns true when both fields are absent', () => {
     expect(eventIsMissingRequired({})).toBe(true)
+  })
+})
+
+describe('personIsMissingRequired', () => {
+  it('returns false when every profile field is filled in', () => {
+    expect(personIsMissingRequired(COMPLETE_PERSON)).toBe(false)
+  })
+  it.each([
+    ['name', ''],
+    ['name', '   '],
+    ['birthYear', null],
+    ['gender', ''],
+    ['zodiacSign', ''],
+    ['activity', ''],
+    ['howWeMet', ''],
+    ['howWeMet', '   '],
+    ['howWeMet', undefined],
+  ])('returns true when %s is %o', (field, value) => {
+    expect(personIsMissingRequired({ ...COMPLETE_PERSON, [field]: value })).toBe(true)
+  })
+  it('ignores incomplete events', () => {
+    const person = { ...COMPLETE_PERSON, events: [{ place: 'park' }] }
+    expect(personIsMissingRequired(person)).toBe(false)
   })
 })
 

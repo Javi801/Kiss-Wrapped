@@ -2,14 +2,14 @@ import { useEffect, useMemo, useState } from 'react'
 
 import BarChartCard from '@/components/charts/BarChartCard'
 import DumbbellChartCard from '@/components/charts/DumbbellChartCard'
-import EventsTimelineChartCard from '@/components/charts/EventsTimelineChartCard'
+import EventsTimelineChartCard from '@/components/charts/timeline/EventsTimelineChartCard'
 import MultiYearTopCard from '@/components/charts/MultiYearTopCard'
-import PersonsTimelineChartCard from '@/components/charts/PersonsTimelineChartCard'
+import PersonsTimelineChartCard from '@/components/charts/timeline/PersonsTimelineChartCard'
 import HeatmapChartCard from '@/components/charts/HeatmapChartCard'
-import { getYearKey } from '@/lib/date'
+import { getPeopleInMultipleYears } from '@/lib/stats'
 
 // Renders the time-based statistics tab. It shows monthly, yearly, and multi-year event patterns.
-export default function StatsTimeTab({ people, allEvents, t }) {
+export default function StatsTimeTab({ people, allEvents, t, language }) {
   // Defer the two heaviest charts (Dumbbell + Heatmap) to a subsequent frame
   // so the first paint shows the lighter charts without blocking.
   const [showDeferred, setShowDeferred] = useState(false)
@@ -18,38 +18,8 @@ export default function StatsTimeTab({ people, allEvents, t }) {
     return () => clearTimeout(id)
   }, [])
 
-  /**
-   * People whose events span two or more distinct years.
-   * yearCounts maps each year string to the number of events that year.
-   */
-  const personsWithEventsInMultipleYears = useMemo(
-    () =>
-      people
-        .map((person) => {
-          const years = [
-            ...new Set(
-              (person.events || []).map((event) => getYearKey(event.date)).filter(Boolean)
-            ),
-          ].sort()
-
-          const yearCounts = {}
-          for (const event of person.events || []) {
-            const y = getYearKey(event.date)
-            if (y) yearCounts[y] = (yearCounts[y] || 0) + 1
-          }
-
-          return {
-            label: person.name,
-            value: years.length,
-            years,
-            yearCounts,
-            totalEvents: (person.events || []).length,
-          }
-        })
-        .filter((item) => item.value >= 2)
-        .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label)),
-    [people]
-  )
+  // People whose events span two or more distinct years.
+  const personsWithEventsInMultipleYears = useMemo(() => getPeopleInMultipleYears(people), [people])
 
   // Year range with no gaps, derived only from people who appear in multiple years.
   // Using allEvents would include years that only have single-appearance people,
@@ -96,8 +66,8 @@ export default function StatsTimeTab({ people, allEvents, t }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <MultiYearTopCard top3={top3MultiYear} t={t} />
 
-      <EventsTimelineChartCard allEvents={allEvents} t={t} />
-      <PersonsTimelineChartCard people={people} t={t} />
+      <EventsTimelineChartCard allEvents={allEvents} t={t} language={language} />
+      <PersonsTimelineChartCard people={people} t={t} language={language} />
 
       <BarChartCard
         title={t.multiYearPeople}

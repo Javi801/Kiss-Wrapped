@@ -1,0 +1,2 @@
+npx prettier --check "src/**/*.{js,jsx}"
+npm test

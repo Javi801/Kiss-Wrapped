@@ -6,8 +6,10 @@ import { Filesystem, Directory, Encoding } from '@capacitor/filesystem'
 import { Share } from '@capacitor/share'
 import { Capacitor } from '@capacitor/core'
 import { usePalette } from '@/lib/theme'
+import { useCopy } from '@/lib/copy'
 import { TEXT } from '@/lib/constants'
-import { FullscreenContext } from './FullscreenContext'
+import { FullscreenContext } from '@/components/charts/FullscreenContext'
+import ChartDownloadErrorDialog from '@/components/charts/ChartDownloadErrorDialog'
 
 function getChartFilename() {
   return `kiss-wrapped-chart-${new Date().toISOString().slice(0, 10)}.png`
@@ -74,6 +76,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
   const [hovered, setHovered] = useState(false)
   const captureRef = useRef(null)
   const PALETTE = usePalette()
+  const t = useCopy()
 
   const shareDownloadLog = useCallback(async () => {
     if (!downloadErrorObj) return
@@ -115,6 +118,10 @@ export default function FullscreenChartWrapper({ children, centerContent = false
     setIsFullscreen(true)
   }, [])
   const close = useCallback(() => setIsFullscreen(false), [])
+  const dismissError = useCallback(() => {
+    setDownloadError('')
+    setDownloadErrorObj(null)
+  }, [])
 
   useEffect(() => {
     if (!isFullscreen) return
@@ -123,7 +130,8 @@ export default function FullscreenChartWrapper({ children, centerContent = false
     document.body.style.overflow = 'hidden'
 
     const onKeyDown = (event) => {
-      if (event.key === 'Escape') close()
+      // The error dialog prevents the default when Escape closes it.
+      if (event.key === 'Escape' && !event.defaultPrevented) close()
     }
     window.addEventListener('keydown', onKeyDown)
 
@@ -170,6 +178,8 @@ export default function FullscreenChartWrapper({ children, centerContent = false
       }
     })
 
+    el.setAttribute('data-capturing', '')
+
     // Give layout a tick to reflow before capture.
     await new Promise((r) => setTimeout(r, 80))
 
@@ -188,6 +198,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
       setDownloadError(`Error: ${error?.message || String(error)}`)
       setDownloadErrorObj(error)
     } finally {
+      el.removeAttribute('data-capturing')
       saved.forEach(({ el: s, overflow, overflowX, overflowY, maxHeight, height }) => {
         s.style.overflow = overflow
         s.style.overflowX = overflowX
@@ -212,7 +223,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
             overflowX: 'hidden',
           }}
         >
-          {/* Floating controls */}
+          {/* Floating controls — hidden while capturing, when the title takes their space */}
           <div
             style={{
               position: 'fixed',
@@ -221,17 +232,18 @@ export default function FullscreenChartWrapper({ children, centerContent = false
               zIndex: 10001,
               display: 'flex',
               gap: 8,
+              visibility: downloading ? 'hidden' : 'visible',
             }}
           >
             <IconButton
               onClick={download}
               disabled={downloading}
               palette={PALETTE}
-              title="Descargar imagen"
+              title={t.chartDownloadImage}
             >
               <Download size={15} />
             </IconButton>
-            <IconButton onClick={close} palette={PALETTE} title="Cerrar">
+            <IconButton onClick={close} palette={PALETTE} title={t.close}>
               <X size={15} />
             </IconButton>
           </div>
@@ -258,6 +270,12 @@ export default function FullscreenChartWrapper({ children, centerContent = false
                   border-radius: 0 !important;
                   box-shadow: none !important;
                   position: relative;
+                }
+
+                /* Keeps the title clear of the floating download and close buttons,
+                   which are not part of the exported image. */
+                [data-fullscreen-chart]:not([data-capturing]) [data-slot="card-title"] {
+                  padding-right: 4.5rem;
                 }
 
                 [data-fullscreen-chart] > [data-slot="card"] > [data-slot="card-content"] {
@@ -318,48 +336,6 @@ export default function FullscreenChartWrapper({ children, centerContent = false
               `}
             </style>
             {children}
-            {downloadError ? (
-              <div
-                role="status"
-                style={{
-                  position: 'absolute',
-                  top: '0.875rem',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  zIndex: 1,
-                  border: `1px solid ${PALETTE.inputBorder}`,
-                  borderRadius: 999,
-                  background: PALETTE.card,
-                  color: PALETTE.text,
-                  padding: '0.35rem 0.5rem 0.35rem 0.75rem',
-                  fontSize: 12,
-                  boxShadow: '0 6px 18px rgb(0 0 0 / 0.08)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {downloadError}
-                <button
-                  onClick={shareDownloadLog}
-                  disabled={sharingLog}
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: PALETTE.accent,
-                    background: 'none',
-                    border: 'none',
-                    cursor: sharingLog ? 'default' : 'pointer',
-                    opacity: sharingLog ? 0.5 : 1,
-                    padding: '0.1rem 0.25rem',
-                    flexShrink: 0,
-                  }}
-                >
-                  {sharingLog ? '…' : 'Compartir log'}
-                </button>
-              </div>
-            ) : null}
 
             {/* Watermark — included in download because it lives inside captureRef */}
             <div
@@ -377,6 +353,14 @@ export default function FullscreenChartWrapper({ children, centerContent = false
               Kiss Wrapped
             </div>
           </div>
+
+          <ChartDownloadErrorDialog
+            message={downloadError}
+            sharingLog={sharingLog}
+            t={t}
+            onShareLog={shareDownloadLog}
+            onClose={dismissError}
+          />
         </div>
       </FullscreenContext.Provider>,
       document.body
@@ -385,6 +369,8 @@ export default function FullscreenChartWrapper({ children, centerContent = false
 
   return (
     <div
+      // Keeps the title clear of the fullscreen button.
+      className="[&_[data-slot=card-title]]:pr-6"
       style={{ position: 'relative' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -392,7 +378,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
       {children}
       <button
         onClick={open}
-        title="Pantalla completa"
+        title={t.chartFullscreen}
         style={{
           position: 'absolute',
           top: 12,

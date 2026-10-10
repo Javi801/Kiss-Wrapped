@@ -1,4 +1,5 @@
 import { GENDER_COLORS, ZODIAC_OPTIONS } from '@/lib/constants'
+import { PARTNER_ERRORS } from '@/lib/partner'
 
 // Translate activity key into localized label.
 export function translateActivity(value, t) {
@@ -15,22 +16,35 @@ export function translateGender(value, t) {
   return t.other
 }
 
+// Translate a partner validation error code into localized text.
+export function translatePartnerError(code, t) {
+  if (code === PARTNER_ERRORS.unknownStatus) return t.requiredPartnerStatus
+  if (code === PARTNER_ERRORS.futureDate) return t.futureDateMsg
+  if (code === PARTNER_ERRORS.missingEnd) return t.requiredPartnerTo
+  if (code === PARTNER_ERRORS.invertedRange) return t.partnerRangeError
+  return t.validDateMsg
+}
+
 // Check if an event is missing any required field.
 export function eventIsMissingRequired(event) {
   return !event.place?.trim() || !event.situation?.trim()
 }
 
-// Check if a person or any of their events is missing required fields.
-export function personHasIncompleteEvent(person) {
-  const personMissing =
+// Check if a person's own profile is missing any required field.
+export function personIsMissingRequired(person) {
+  return (
     !person.name?.trim() ||
     !person.birthYear ||
     !person.gender ||
     !person.zodiacSign ||
     !person.activity ||
     !person.howWeMet?.trim()
+  )
+}
 
-  return personMissing || (person.events || []).some(eventIsMissingRequired)
+// Check if a person or any of their events is missing required fields.
+export function personHasIncompleteEvent(person) {
+  return personIsMissingRequired(person) || (person.events || []).some(eventIsMissingRequired)
 }
 
 // Validate score is an integer between 0 and 5.

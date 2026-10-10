@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest'
-import { abbreviateZodiacMonths, detectDeviceLanguage } from '@/lib/constants'
+import { COPY, abbreviateZodiacMonths, detectDeviceLanguage } from '@/lib/constants'
 
 describe('abbreviateZodiacMonths', () => {
   it('abbreviates all twelve English month names', () => {
@@ -116,5 +116,34 @@ describe('detectDeviceLanguage', () => {
       configurable: true,
     })
     expect(detectDeviceLanguage()).toBe('en')
+  })
+})
+
+describe('COPY', () => {
+  it('has the same keys in every language', () => {
+    const keys = Object.keys(COPY.en).sort()
+    for (const copy of Object.values(COPY)) {
+      expect(Object.keys(copy).sort()).toEqual(keys)
+    }
+  })
+
+  it.each([
+    'importJsonSuccessSkipped',
+    'importJsonSuccessDiscarded',
+    'importPartnerIssuesTitle',
+    'importPartnerIssuesCount',
+    'importPartnerFix',
+    'importPartnerSkipAction',
+    'importPartnerEventsHeader',
+    'importPartnerDiscard',
+    'importPartnerLeftToResolve',
+    'importPartnerSummaryDiscard',
+    'importPartnerNothingToImport',
+    'requiredPartnerStatus',
+  ])('has the partner import text %s in every language', (key) => {
+    for (const copy of Object.values(COPY)) {
+      expect(copy[key]).toEqual(expect.any(String))
+      expect(copy[key].trim()).not.toBe('')
+    }
   })
 })

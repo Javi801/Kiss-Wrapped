@@ -1,24 +1,49 @@
 import { hasScore } from '@/lib/format'
+import { todayString } from '@/lib/date'
+import { sanitizePartnerFields } from '@/lib/partner'
 
 // Generates a short unique id for entities
 export function uid() {
   return Math.random().toString(36).slice(2, 10)
 }
 
-// Normalizes people data ensuring events array and valid scores
+// Builds a new person from the person form values, with an initial empty event dated today.
+export function createPerson(values) {
+  return {
+    id: uid(),
+    ...values,
+    realName: values.realName || '',
+    howWeMet: values.howWeMet || '',
+    events: [
+      {
+        id: uid(),
+        date: todayString(),
+        details: '',
+        score: null,
+      },
+    ],
+  }
+}
+
+// Normalizes people data ensuring events array, valid scores, and partner fields.
+// Legacy boolean isPartner records migrate to a "current" partner with an open period.
+// Invalid partner data falls back automatically (see sanitizePartnerFields).
 export function normalizePeople(rawPeople) {
-  return Array.isArray(rawPeople)
-    ? rawPeople.map((person) => ({
-        ...person,
-        realName: person.realName || '',
-        events: Array.isArray(person.events)
-          ? person.events.map((event) => ({
-              ...event,
-              score: hasScore(event.score) ? event.score : null,
-            }))
-          : [],
-      }))
-    : []
+  if (!Array.isArray(rawPeople)) return []
+  return rawPeople.map((rawPerson) => {
+    const { isPartner: _isPartner, ...person } = rawPerson
+    return {
+      ...person,
+      realName: person.realName || '',
+      ...sanitizePartnerFields(rawPerson),
+      events: Array.isArray(person.events)
+        ? person.events.map((event) => ({
+            ...event,
+            score: hasScore(event.score) ? event.score : null,
+          }))
+        : [],
+    }
+  })
 }
 
 // Merges event field values from existing people data into a tag list.

@@ -4,6 +4,8 @@ import { Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import TagInput from '@/components/forms/TagInput'
+import PartnerFields from '@/components/forms/PartnerFields'
+import SpeechBubble from '@/components/forms/SpeechBubble'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -15,22 +17,30 @@ import {
 } from '@/components/ui/select'
 
 import { GENDERS, ZODIAC_OPTIONS, TEXT } from '@/lib/constants'
+import { LIMITS } from '@/lib/config'
 import { usePalette } from '@/lib/theme'
-import { translateGender, getZodiacForLanguage } from '@/lib/format'
+import { translateGender, translatePartnerError, getZodiacForLanguage } from '@/lib/format'
 import { calculateDisplayAge, deriveBirthYear, isWithinZodiacPeriod } from '@/lib/date'
+import { PARTNER_STATUSES, validatePartnerFields } from '@/lib/partner'
 
 /**
  * Form used for creating or editing a person.
  * Handles validation and normalization before submit.
+ * `onSkip` adds a second action that receives the current values without validating them.
+ * `zodiacHint` shows a speech bubble under the zodiac select.
  */
 export default function PersonForm({
   initialValues,
   onSave,
   onCancel,
+  onSkip,
+  skipLabel,
+  zodiacHint,
   t,
   language,
   includeHowWeMet = true,
   includeRealName = false,
+  includePartner = false,
   saveLabel,
   mode,
   howWeMetTags = [],
@@ -50,6 +60,9 @@ export default function PersonForm({
         zodiacSign: '',
         activity: '',
         detail: '',
+        partnerStatus: 'never',
+        partnerFrom: '',
+        partnerTo: '',
       }
     }
     const zodiacSign = getZodiacForLanguage(initialValues.zodiacSign, language)
@@ -69,6 +82,11 @@ export default function PersonForm({
       realName: initialValues.realName ?? '',
       howWeMet: initialValues.howWeMet ?? '',
       detail: initialValues.detail ?? '',
+      partnerStatus: PARTNER_STATUSES.includes(initialValues.partnerStatus)
+        ? initialValues.partnerStatus
+        : 'never',
+      partnerFrom: initialValues.partnerFrom ?? '',
+      partnerTo: initialValues.partnerTo ?? '',
     }
   })
 
@@ -91,7 +109,11 @@ export default function PersonForm({
     if (!form.name.trim()) next.name = t.requiredName
 
     if (!String(form.age).trim()) next.age = t.requiredAge
-    else if (!Number.isInteger(Number(form.age)) || Number(form.age) <= 0 || Number(form.age) > 120)
+    else if (
+      !Number.isInteger(Number(form.age)) ||
+      Number(form.age) <= 0 ||
+      Number(form.age) > LIMITS.maxAge
+    )
       next.age = t.validAge
 
     if (!form.gender) next.gender = t.requiredGender
@@ -101,6 +123,16 @@ export default function PersonForm({
     if (!form.zodiacSign) next.zodiacSign = t.requiredZodiac
 
     if (!form.activity) next.activity = t.requiredActivity
+
+    // Partner period: optional start; a past partner needs a valid end after the start.
+    const partnerErrors = validatePartnerFields({
+      partnerStatus: form.partnerStatus,
+      partnerFrom: form.partnerFrom.trim(),
+      partnerTo: form.partnerTo.trim(),
+    })
+    for (const [field, code] of Object.entries(partnerErrors)) {
+      next[field] = translatePartnerError(code, t)
+    }
 
     setErrors(next)
 
@@ -116,6 +148,9 @@ export default function PersonForm({
     const { age, ...rest } = form
     onSave({
       ...rest,
+      partnerStatus: form.partnerStatus,
+      partnerFrom: form.partnerStatus !== 'never' ? form.partnerFrom.trim() : '',
+      partnerTo: form.partnerStatus === 'past' ? form.partnerTo.trim() : '',
       birthYear: deriveBirthYear(
         Number(age),
         form.zodiacSign,
@@ -147,12 +182,12 @@ export default function PersonForm({
             <Input
               value={form.name}
               onChange={(e) => update('name', e.target.value)}
-              maxLength={100}
+              maxLength={LIMITS.nameLength}
               className="rounded-2xl"
               style={{ ...inputStyle }}
             />
             <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-              {form.name.length}/100
+              {form.name.length}/{LIMITS.nameLength}
             </p>
             {errors.name && <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.name}</p>}
           </div>
@@ -163,13 +198,13 @@ export default function PersonForm({
               <Input
                 value={form.realName}
                 onChange={(e) => update('realName', e.target.value)}
-                maxLength={100}
+                maxLength={LIMITS.nameLength}
                 className="rounded-2xl"
                 placeholder={t.realNamePlaceholder}
                 style={{ ...inputStyle }}
               />
               <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-                {form.realName.length}/100
+                {form.realName.length}/{LIMITS.nameLength}
               </p>
             </div>
           )}
@@ -186,7 +221,7 @@ export default function PersonForm({
               value={form.age}
               onChange={(e) => update('age', e.target.value)}
               min={1}
-              max={120}
+              max={LIMITS.maxAge}
               className="rounded-2xl"
               style={{ ...inputStyle }}
             />
@@ -254,6 +289,18 @@ export default function PersonForm({
           </div>
         </div>
 
+        {/* Partner marker + period */}
+        {includePartner && (
+          <PartnerFields
+            status={form.partnerStatus}
+            partnerFrom={form.partnerFrom}
+            partnerTo={form.partnerTo}
+            onChange={update}
+            errors={errors}
+            t={t}
+          />
+        )}
+
         {/* How we met */}
         {includeHowWeMet && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -263,14 +310,14 @@ export default function PersonForm({
               onChange={(val) => update('howWeMet', val)}
               tags={howWeMetTags}
               onAddTag={onAddHowWeMetTag}
-              maxLength={200}
+              maxLength={LIMITS.tagLength}
               className="rounded-2xl"
               style={{ ...inputStyle }}
               addTagLabel={t.addTag}
               isParentOpen={isParentOpen}
             />
             <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-              {form.howWeMet.length}/200
+              {form.howWeMet.length}/{LIMITS.tagLength}
             </p>
             {errors.howWeMet && (
               <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.howWeMet}</p>
@@ -294,6 +341,8 @@ export default function PersonForm({
               ))}
             </SelectContent>
           </Select>
+
+          {zodiacHint && <SpeechBubble>{zodiacHint}</SpeechBubble>}
 
           {errors.zodiacSign && (
             <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.zodiacSign}</p>
@@ -339,12 +388,12 @@ export default function PersonForm({
                       ? t.specificStudiesWorks
                       : ''
               }
-              maxLength={500}
+              maxLength={LIMITS.personDetailLength}
               className="rounded-2xl"
               style={{ ...inputStyle }}
             />
             <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-              {form.detail.length}/500
+              {form.detail.length}/{LIMITS.personDetailLength}
             </p>
           </div>
         )}
@@ -360,6 +409,8 @@ export default function PersonForm({
             color: PALETTE.textOnAccent,
             boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
             background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
+            // The gradient would repeat under the default transparent border.
+            border: 'none',
           }}
         >
           <Save style={{ marginRight: '0.5rem', height: '1rem', width: '1rem' }} />
@@ -375,6 +426,23 @@ export default function PersonForm({
             onClick={onCancel}
           >
             {t.cancel}
+          </Button>
+        )}
+
+        {onSkip && (
+          <Button
+            type="button"
+            variant="outline"
+            className="rounded-2xl"
+            style={{ ...inputStyle }}
+            onClick={() =>
+              onSkip({
+                ...form,
+                birthdayAlreadyHappened: showBirthdayCheckbox && birthdayAlreadyHappened,
+              })
+            }
+          >
+            {skipLabel}
           </Button>
         )}
       </div>

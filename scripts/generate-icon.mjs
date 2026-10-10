@@ -16,94 +16,15 @@ import { writeFileSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+// Palettes, pixel grids and placements are shared with the in-app icon so both stay identical.
+import {
+  SPARKLE_PALETTES,
+  SPARKLE_LAYERS,
+  SPARKLE_VIEWBOX,
+} from '../src/components/shared/SparkleIcon.constants.js'
+
 const __dir = dirname(fileURLToPath(import.meta.url))
 const RES = resolve(__dir, '../android/app/src/main/res')
-
-// ─── Palettes ────────────────────────────────────────────────────────────────
-const PALETTES = {
-  yellow: { O: '#FF8101', M: '#FFA102', I: '#FFDC00', H: '#FFFBE3' },
-  pink:   { O: '#da4496', M: '#e873a7', I: '#FABAD5', H: '#FEF1FB' },
-  blue:   { O: '#4675E1', M: '#6699fe', I: '#97BDFC', H: '#F5F5F3' },
-  purple: { O: '#8950FF', M: '#B58DFF', I: '#D3C0F8', H: '#F8F2F3' },
-}
-
-// ─── Pixel grids (mirror of SparkleIcon.jsx) ─────────────────────────────────
-const _ = null
-
-const MAIN = [
-  [_,_,_,_,_,_,_,_,_,_,_,'O',_,_,_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,_,_,_,'O',_,_,_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,_,_,'O','H','O',_,_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,_,_,'O','H','O',_,_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,_,_,'O','H','O',_,_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,_,'O','H','H','I','O',_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,_,'O','H','H','I','O',_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,_,'O','H','I','I','O',_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,'O','H','H','I','I','I','O',_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,'O','H','H','I','I','I','O',_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,'O','H','H','I','I','I','I','I','O',_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,'O','H','H','I','I','I','I','I','O',_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,'O','H','H','I','I','I','I','I','I','I','O',_,_,_,_,_,_],
-  [_,_,_,_,'O','O','H','H','I','I','I','I','I','I','I','I','I','O','O',_,_,_,_],
-  [_,_,'O','O','H','H','I','I','I','I','I','I','I','I','I','I','M','M','M','O','O',_,_],
-  ['O','O','I','I','I','I','I','I','I','I','I','I','I','I','I','M','M','M','M','M','M','O','O'],
-  [_,_,'O','O','I','I','I','I','I','I','I','I','I','I','M','M','M','M','M','O','O',_,_],
-  [_,_,_,_,'O','O','I','I','I','I','I','I','I','M','M','M','M','O','O',_,_,_,_],
-  [_,_,_,_,_,_,'O','I','I','I','I','I','I','M','M','M','O',_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,'O','I','I','I','I','M','M','M','O',_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,'O','I','I','I','M','M','O',_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,'O','I','I','M','M','M','O',_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,_,'O','I','M','M','O',_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,_,'O','M','M','M','O',_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,_,'O','M','M','M','O',_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,_,_,'O','M','O',_,_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,_,_,'O','M','O',_,_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,_,_,'O','M','O',_,_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,_,_,_,'O',_,_,_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,_,_,_,'O',_,_,_,_,_,_,_,_,_,_,_],
-]
-
-const MEDIUM = [
-  [_,_,_,_,'O',_,_,_,_],
-  [_,_,_,_,'O',_,_,_,_],
-  [_,_,_,'O','I','O',_,_,_],
-  [_,_,'O','I','I','I','O',_,_],
-  ['O','O','I','I','I','I','I','O','O'],
-  [_,_,'O','I','I','I','O',_,_],
-  [_,_,_,'O','I','O',_,_,_],
-  [_,_,_,_,'O',_,_,_,_],
-  [_,_,_,_,'O',_,_,_,_],
-]
-
-const SMALL = [
-  [_,_,_,'O',_,_,_],
-  ['O',_,_,'O',_,_,'O'],
-  [_,'O',_,'O',_,'O',_],
-  [_,_,_,_,_,_,_],
-  ['O','O',_,_,_,'O','O'],
-  [_,_,_,_,_,_,_],
-  [_,'O',_,'O',_,'O',_],
-  ['O',_,_,'O',_,_,'O'],
-  [_,_,_,'O',_,_,_],
-]
-
-const TINY = [
-  [_,'I',_],
-  [_,'I',_],
-  ['I','H','I'],
-  [_,'I',_],
-  [_,'I',_],
-]
-
-// Placements matching SparkleIcon.jsx viewBox="0 0 80 80"
-const LAYERS = [
-  { grid: MAIN,   cell: 2, ox: 16, oy: 10 },
-  { grid: MEDIUM, cell: 2, ox: 2,  oy: 2  },
-  { grid: SMALL,  cell: 2, ox: 60, oy: 60 },
-  { grid: TINY,   cell: 4, ox: 63, oy: 2  },
-  { grid: TINY,   cell: 4, ox: 10, oy: 55 },
-]
-const VIEWBOX = 80
 
 // ─── PNG encoder ─────────────────────────────────────────────────────────────
 const CRC_TABLE = (() => {
@@ -160,7 +81,7 @@ function hexToRGB(hex) {
 
 function renderIcon(P, { canvasSize, bgHex = null, iconOffsetX = 0, iconOffsetY = 0, iconSize = null }) {
   const size = iconSize ?? canvasSize
-  const scale = size / VIEWBOX
+  const scale = size / SPARKLE_VIEWBOX
   const rgba = Buffer.alloc(canvasSize * canvasSize * 4, 0)
 
   if (bgHex) {
@@ -172,7 +93,7 @@ function renderIcon(P, { canvasSize, bgHex = null, iconOffsetX = 0, iconOffsetY 
 
   const colorCache = Object.fromEntries(Object.entries(P).map(([k, v]) => [k, hexToRGB(v)]))
 
-  for (const { grid, cell, ox, oy } of LAYERS) {
+  for (const { grid, cell, ox, oy } of SPARKLE_LAYERS) {
     for (let row = 0; row < grid.length; row++) {
       for (let col = 0; col < grid[row].length; col++) {
         const key = grid[row][col]
@@ -208,7 +129,7 @@ const DENSITIES = {
 }
 
 // ─── Generate ────────────────────────────────────────────────────────────────
-for (const [colorName, P] of Object.entries(PALETTES)) {
+for (const [colorName, P] of Object.entries(SPARKLE_PALETTES)) {
   for (const [dir, { legacy, foreground }] of Object.entries(DENSITIES)) {
     const outDir = `${RES}/${dir}`
 
@@ -228,7 +149,7 @@ for (const [colorName, P] of Object.entries(PALETTES)) {
 }
 
 // Regenerate the default ic_launcher* as yellow (used by the <application> tag)
-const yellowP = PALETTES.yellow
+const yellowP = SPARKLE_PALETTES.yellow
 for (const [dir, { legacy, foreground }] of Object.entries(DENSITIES)) {
   const outDir = `${RES}/${dir}`
   const legacyRGBA = renderIcon(yellowP, { canvasSize: legacy, bgHex: '#FFFFFF' })

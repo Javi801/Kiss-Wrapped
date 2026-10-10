@@ -43,7 +43,7 @@ At a glance:
 - People profiles with zodiac-aware age tracking
 - Event log with place, situation, and optional score
 - Rich analytics dashboard with fullscreen charts and PNG export
-- Kiss Wrapped PDF slide deck and JSON backup export
+- JSON backup export and import
 
 ## Features
 
@@ -58,7 +58,7 @@ At a glance:
     <td width="50%" valign="top">
       <picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/feature-events-dark.svg"><img src="assets/readme/feature-events-light.svg" width="55" alt="Events icon"></picture><br>
       <strong>Event log</strong><br>
-      Record each interaction with a date, place, situation, and an optional score from 1 to 5. Events are tied to a person and editable or deletable at any time.<br><br>
+      Record each interaction with a date, place, situation, and an optional score from 0 to 5. Events are tied to a person and editable or deletable at any time.<br><br>
       <code>Dated entries</code> <code>Place + situation tags</code> <code>Scores</code>
     </td>
   </tr>
@@ -66,14 +66,14 @@ At a glance:
     <td width="50%" valign="top">
       <picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/feature-stats-dark.svg"><img src="assets/readme/feature-stats-light.svg" width="55" alt="Stats icon"></picture><br>
       <strong>Analytics dashboard</strong><br>
-      Four stat tabs: Overview, Time, People, and Scores. Includes heatmaps, area charts, zodiac distributions, score dumbbells, and age-range boxplots. Any chart can be expanded to fullscreen and exported as a PNG.<br><br>
+      Four stat tabs: Overview, Time, People, and Scores. Includes heatmaps, area charts, zodiac distributions, score dumbbells, and age-range boxplots. Any chart can be expanded to fullscreen and exported as a PNG. A toggle on the screen chooses whether events from a partner period count, and every chart follows it.<br><br>
       <code>Heatmap</code> <code>Distributions</code> <code>Age at event</code> <code>Fullscreen</code> <code>PNG export</code>
     </td>
     <td width="50%" valign="top">
       <picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/feature-export-dark.svg"><img src="assets/readme/feature-export-light.svg" width="55" alt="Export icon"></picture><br>
       <strong>Export and share</strong><br>
-      Export your data as a JSON backup or as a Kiss Wrapped PDF slide deck — a landscape-format presentation with themed styling and slide numbers. Charts can be exported individually as PNG images. All sharing uses the device's native share sheet.<br><br>
-      <code>JSON backup</code> <code>Kiss Wrapped PDF</code> <code>Chart PNG</code> <code>Native share</code>
+      Export and re-import your data as a JSON backup, and export any chart individually as a PNG image. All sharing uses the device's native share sheet. A Kiss Wrapped PDF slide deck is planned but temporarily disabled pending a fix.<br><br>
+      <code>JSON backup</code> <code>Chart PNG</code> <code>Native share</code>
     </td>
   </tr>
   <tr>
@@ -86,8 +86,8 @@ At a glance:
     <td width="50%" valign="top">
       <picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/feature-themes-dark.svg"><img src="assets/readme/feature-themes-light.svg" width="55" alt="Themes icon"></picture><br>
       <strong>Themes and localization</strong><br>
-      Three color palettes: light, green, and dark, driven by shared tokens and persisted across sessions. UI available in English and Spanish.<br><br>
-      <code>Light / Green / Dark</code> <code>EN / ES</code> <code>Persisted</code>
+      Three color palettes: pink, green, and dark, driven by shared tokens and persisted across sessions. UI available in English and Spanish.<br><br>
+      <code>Pink / Green / Dark</code> <code>EN / ES</code> <code>Persisted</code>
     </td>
   </tr>
 </table>
@@ -119,11 +119,15 @@ At a glance:
   </tr>
   <tr>
     <td><code>App.jsx</code></td>
-    <td>Application shell, screen routing, theme context, and settings initialization</td>
+    <td>Application shell: screen routing, theme and copy contexts, and the data mutations</td>
+  </tr>
+  <tr>
+    <td><code>hooks/</code></td>
+    <td>Stateful logic of the shell: persisted people and settings, navigation and back button, and the privacy overlay</td>
   </tr>
   <tr>
     <td><code>components/app/</code></td>
-    <td>Top-level screens: Home, AddPerson, Intro, Language, Theme, Color selectors, ErrorBoundary, and PrivacyScreen</td>
+    <td>Top-level screens: Home, AddPerson, Intro, Onboarding, the Color selector, ErrorBoundary, and PrivacyScreen</td>
   </tr>
   <tr>
     <td><code>components/stats/</code></td>
@@ -131,11 +135,19 @@ At a glance:
   </tr>
   <tr>
     <td><code>components/forms/</code></td>
-    <td>PersonForm, EventForm, FiltersPanel, and TagInput</td>
+    <td>PersonForm, PartnerFields, EventForm, FiltersPanel, TagInput, and SpeechBubble</td>
+  </tr>
+  <tr>
+    <td><code>components/people/</code></td>
+    <td>People list screen with its search, filters, and alphabet index</td>
+  </tr>
+  <tr>
+    <td><code>components/person/</code></td>
+    <td>PersonCard: one person's profile and event list</td>
   </tr>
   <tr>
     <td><code>components/charts/</code></td>
-    <td>Generic reusable chart cards: Bar, Pie, Radar, Area, Heatmap, Dumbbell. FullscreenChartWrapper and FullscreenContext enable fullscreen expansion and PNG export for any chart</td>
+    <td>Generic reusable chart cards: Bar, Pie, Donut, Area, Heatmap, Dumbbell, and the timeline cards. FullscreenChartWrapper and FullscreenContext enable fullscreen expansion and PNG export for any chart</td>
   </tr>
   <tr>
     <td><code>lib/</code></td>
@@ -207,7 +219,7 @@ npm run test:watch      # watch mode
 npm run test:coverage   # generate coverage report
 ```
 
-Coverage is scoped to `src/lib/` with these minimum thresholds enforced by CI:
+Coverage is collected for `src/lib/` with these minimum thresholds enforced by CI:
 
 | Metric | Threshold |
 |--------|-----------|
@@ -216,7 +228,16 @@ Coverage is scoped to `src/lib/` with these minimum thresholds enforced by CI:
 | Functions | 95% |
 | Lines | 95% |
 
-Unit tests in `src/lib/__tests__/` cover: `date.js`, `calendar.js`, `format.js`, `helpers.js`, `stats.js`, `constants.js`, `device-storage.js`, `pdf-export.js`, and `utils.js`. `device-storage.js` and `utils.js` are excluded from threshold enforcement since they depend on native plugins or external APIs.
+Tests live in a `__tests__/` folder next to the code they cover. All of them are unit tests except `onboarding-tour.integration.test.jsx`, which plays the onboarding tours over the real screens:
+
+| Location | Covers |
+|----------|--------|
+| `src/lib/__tests__/` | `date.js`, `calendar.js`, `format.js`, `helpers.js`, `stats.js`, `constants.js`, `config.js`, `partner.js`, `import-people.js`, `onboarding.js`, `inert.js`, `device-storage.js`, `pdf-export.js`, `open-selects.js`, `utils.js`, and the theme and copy providers |
+| `src/plugins/__tests__/` | The app icon plugin wrapper |
+| `src/__tests__/` | `App.jsx`: boot, persistence, navigation, back button, and data mutations; and the `useScrollFade` hook |
+| `src/components/*/__tests__/` | Screens, forms, the person card, stats screen and tabs, chart cards and the fullscreen wrapper, selectors, shared tiles, the `ui/` dialog, sheet and select wrappers, and `ErrorBoundary` |
+
+`device-storage.js` and `utils.js` are excluded from threshold enforcement since they depend on native plugins or external APIs. Tests outside `src/lib/` run in the suite but do not count towards the thresholds. Decorative visuals have no tests.
 
 ## Data model
 
@@ -226,28 +247,38 @@ Person {
   name:       string
   realName:   string          // optional
   birthYear:  number
-  zodiacSign: string          // e.g. "Aries"
-  gender:     string
+  birthdayAlreadyHappened: boolean
+  zodiacSign: string          // full localized option, e.g. "♍ Virgo (August 24 - September 22)"
+  gender:     string          // male, female, or other
   activity:   string
+  detail:     string          // free text
   howWeMet:   string          // tag-based
+  partnerStatus: string       // never, current, or past
+  partnerFrom:   string       // "yyyy.MM.dd" or ''
+  partnerTo:     string       // "yyyy.MM.dd" or ''
   events:     Event[]
 }
 
 Event {
-  id:        string
-  date:      string           // "yyyy.MM.dd"
-  place:     string
-  situation: string
-  score:     number | null    // 1 to 5, or null
+  id:           string
+  date:         string        // "yyyy.MM.dd"
+  place:        string
+  situation:    string
+  details:      string
+  observations: string
+  score:        number | null // 0 to 5, or null
 }
 
 Settings {
-  language:         string    // en or es
-  theme:            string    // light, green, or dark
-  iconColor:        string
-  statsVisible:     boolean
-  situationTags:    string[]
-  placeTags:        string[]
+  language:             string    // en or es
+  theme:                string    // pink, green, or dark
+  iconColor:            string
+  statsVisible:         boolean
+  includePartnerEvents: boolean   // count events inside a partner period in the stats
+  situationTags:        string[]
+  placeTags:            string[]
+  howWeMetTags:         string[]
+  onboardingDone:       boolean   // the onboarding was completed or does not apply
 }
 ```
 

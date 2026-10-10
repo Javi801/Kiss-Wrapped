@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 
 import { cn } from '@/lib/utils'
+import { useScrollFade } from '@/hooks/useScrollFade'
 import { Button } from '@/components/ui/button'
 import { XIcon } from 'lucide-react'
 
@@ -34,19 +35,40 @@ function DialogOverlay({ className, ...props }) {
   )
 }
 
-function DialogContent({ className, children, showCloseButton = true, ...props }) {
+// Focus the dialog itself on open: focusing its first field would open the on-screen keyboard.
+function focusContent(event) {
+  event.preventDefault()
+  event.currentTarget.focus()
+}
+
+function DialogContent({
+  className,
+  overlayClassName,
+  children,
+  showCloseButton = true,
+  ...props
+}) {
+  const scrollFadeRef = useScrollFade()
+
   return (
     <DialogPortal>
-      <DialogOverlay />
+      <DialogOverlay className={overlayClassName} />
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          'fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] max-h-[calc(100svh-2rem)] -translate-x-1/2 -translate-y-1/2 gap-6 rounded-xl bg-popover p-6 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none overflow-y-auto sm:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
+          'fixed top-1/2 left-1/2 z-50 flex w-full max-w-[calc(100%-2rem)] max-h-[calc(100svh-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl bg-popover text-sm text-popover-foreground ring-1 ring-foreground/10 transition-none duration-100 outline-none sm:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
           className
         )}
+        onOpenAutoFocus={focusContent}
         {...props}
       >
-        {children}
+        <div
+          ref={scrollFadeRef}
+          data-slot="dialog-body"
+          className="grid min-h-0 gap-6 overflow-y-auto p-6"
+        >
+          {children}
+        </div>
         {showCloseButton && (
           <DialogPrimitive.Close data-slot="dialog-close" asChild>
             <Button variant="ghost" className="absolute top-4 right-4" size="icon-sm">

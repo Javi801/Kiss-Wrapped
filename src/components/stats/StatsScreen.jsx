@@ -5,6 +5,7 @@ import {
   UserRound,
   BadgePercent,
   CheckCircle2,
+  Download,
   TriangleAlert,
 } from 'lucide-react'
 
@@ -18,8 +19,10 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 import { TEXT } from '@/lib/constants'
+import { FEATURES } from '@/lib/config'
 import { usePalette } from '@/lib/theme'
 import { exportStatsPdf, saveErrorLog } from '@/lib/pdf-export'
+import { flattenEvents, getEventPeople, getPartnerPeriod } from '@/lib/stats'
 
 import StatsOverviewTab from '@/components/stats/StatsOverviewTab'
 import StatsTimeTab from '@/components/stats/StatsTimeTab'
@@ -30,7 +33,14 @@ import StatsScoresTab from '@/components/stats/StatsScoresTab'
  * Renders the full statistics screen with tab navigation.
  * It prepares shared data and delegates each section to a dedicated tab component.
  */
-export default function StatsScreen({ people, t, modalBackRef }) {
+export default function StatsScreen({
+  people,
+  t,
+  language,
+  includePartnerEvents,
+  setIncludePartnerEvents,
+  modalBackRef,
+}) {
   const PALETTE = usePalette()
   const [tab, setTab] = useState('overview')
   const [, startTransition] = useTransition()
@@ -42,7 +52,6 @@ export default function StatsScreen({ people, t, modalBackRef }) {
     modalBackRef.current = pdfStatus !== null ? () => setPdfStatus(null) : null
   }, [pdfStatus, modalBackRef])
 
-  // eslint-disable-next-line no-unused-vars -- re-enable once PDF export bug is fixed
   async function handleExport() {
     const hasEvents = people.some((p) => p.events?.length > 0)
     if (people.length === 0 || !hasEvents) {
@@ -50,21 +59,31 @@ export default function StatsScreen({ people, t, modalBackRef }) {
       return
     }
     try {
-      await exportStatsPdf(people, t)
+      await exportStatsPdf(people, t, language)
       setPdfStatus('success')
     } catch (err) {
       setPdfStatus(err instanceof Error ? err : new Error(String(err)))
     }
   }
 
+  // People counted in event-based statistics. Partner-period events are removed
+  // unless the user chose to include them.
+  const eventPeople = useMemo(
+    () => getEventPeople(people, includePartnerEvents),
+    [people, includePartnerEvents]
+  )
+
+  // The partner toggle changes nothing when nobody has a partner period.
+  const hasPartners = useMemo(
+    () => people.some((person) => getPartnerPeriod(person) !== null),
+    [people]
+  )
+
   /**
    * Flatten all events and preserve their parent person.
    * This shared dataset is reused across multiple stats tabs.
    */
-  const allEvents = useMemo(
-    () => people.flatMap((person) => (person.events || []).map((event) => ({ ...event, person }))),
-    [people]
-  )
+  const allEvents = useMemo(() => flattenEvents(eventPeople), [eventPeople])
 
   // Define the available tab options and their labels.
   const statTabs = [
@@ -116,18 +135,68 @@ export default function StatsScreen({ people, t, modalBackRef }) {
           </p>
         </div>
 
-        {/* TODO: fix PDF export bug before re-enabling
-        <Button
-          variant="outline"
-          className="rounded-2xl bg-white/85"
+        {FEATURES.pdfExport ? (
+          <Button
+            variant="outline"
+            className="rounded-2xl bg-white/85"
             style={{ borderColor: PALETTE.inputBorder }}
-          onClick={handleExport}
-        >
-          <Download className="mr-2 h-4 w-4" />
-          {t.exportPdf}
-        </Button>
-        */}
+            onClick={handleExport}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            {t.exportPdf}
+          </Button>
+        ) : null}
       </div>
+
+      {hasPartners ? (
+        <button
+          type="button"
+          aria-pressed={includePartnerEvents}
+          onClick={() => setIncludePartnerEvents((included) => !included)}
+          className="rounded-2xl"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '0.75rem',
+            paddingLeft: '1rem',
+            paddingRight: '1rem',
+            paddingTop: '0.75rem',
+            paddingBottom: '0.75rem',
+            textAlign: 'left',
+            border: `1px solid ${PALETTE.inputBorder}`,
+            background: PALETTE.controlBg,
+            color: PALETTE.text,
+          }}
+        >
+          <span style={{ ...TEXT.body, fontWeight: '500' }}>{t.includePartnerEvents}</span>
+          <span
+            aria-hidden="true"
+            className="rounded-full"
+            style={{
+              position: 'relative',
+              flexShrink: 0,
+              height: '1.5rem',
+              width: '2.75rem',
+              background: includePartnerEvents ? PALETTE.accent : PALETTE.inputBorder,
+              transition: 'background 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
+          >
+            <span
+              className="rounded-full"
+              style={{
+                position: 'absolute',
+                top: '0.125rem',
+                left: includePartnerEvents ? '1.375rem' : '0.125rem',
+                height: '1.25rem',
+                width: '1.25rem',
+                background: 'white',
+                transition: 'left 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+              }}
+            />
+          </span>
+        </button>
+      ) : null}
 
       <div
         style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.5rem' }}
@@ -166,11 +235,17 @@ export default function StatsScreen({ people, t, modalBackRef }) {
         })}
       </div>
 
-      {tab === 'overview' ? <StatsOverviewTab people={people} allEvents={allEvents} t={t} /> : null}
+      {tab === 'overview' ? (
+        <StatsOverviewTab people={eventPeople} allEvents={allEvents} t={t} />
+      ) : null}
 
-      {tab === 'time' ? <StatsTimeTab people={people} allEvents={allEvents} t={t} /> : null}
+      {tab === 'time' ? (
+        <StatsTimeTab people={eventPeople} allEvents={allEvents} t={t} language={language} />
+      ) : null}
 
-      {tab === 'people' ? <StatsPeopleTab people={people} t={t} /> : null}
+      {tab === 'people' ? (
+        <StatsPeopleTab people={people} eventPeople={eventPeople} t={t} language={language} />
+      ) : null}
 
       {tab === 'scores' ? <StatsScoresTab allEvents={allEvents} t={t} /> : null}
 

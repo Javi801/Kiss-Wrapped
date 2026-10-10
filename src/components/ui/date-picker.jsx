@@ -185,6 +185,19 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
     }
   }
 
+  function gridItemHover({ isSelected, isToday, isDisabled }) {
+    const isStatic = isSelected || isDisabled
+    return {
+      onMouseEnter: (e) => {
+        if (!isStatic) e.currentTarget.style.backgroundColor = PALETTE.accentMuted
+      },
+      onMouseLeave: (e) => {
+        if (!isStatic)
+          e.currentTarget.style.backgroundColor = isToday ? PALETTE.accentMuted : 'transparent'
+      },
+    }
+  }
+
   let titleLabel
   if (calView === 'days') titleLabel = getMonthLabel(viewYear, viewMonth)
   else if (calView === 'months') titleLabel = String(viewYear)
@@ -347,16 +360,7 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
                         aspectRatio: '1',
                         borderRadius: '50%',
                       }}
-                      onMouseEnter={(e) => {
-                        if (!isSelected && !isDisabled)
-                          e.currentTarget.style.backgroundColor = PALETTE.accentMuted
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isSelected && !isDisabled)
-                          e.currentTarget.style.backgroundColor = isToday
-                            ? PALETTE.accentMuted
-                            : 'transparent'
-                      }}
+                      {...gridItemHover({ isSelected, isToday, isDisabled })}
                     >
                       {day}
                     </button>
@@ -385,16 +389,7 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
                       padding: '0.4rem 0',
                       textTransform: 'capitalize',
                     }}
-                    onMouseEnter={(e) => {
-                      if (!isSelected && !isDisabled)
-                        e.currentTarget.style.backgroundColor = PALETTE.accentMuted
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isSelected && !isDisabled)
-                        e.currentTarget.style.backgroundColor = isToday
-                          ? PALETTE.accentMuted
-                          : 'transparent'
-                    }}
+                    {...gridItemHover({ isSelected, isToday, isDisabled })}
                   >
                     {getShortMonth(m)}
                   </button>
@@ -421,16 +416,7 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
                       ...gridItemStyle({ isSelected, isToday, isActive: isToday, isDisabled }),
                       padding: '0.4rem 0',
                     }}
-                    onMouseEnter={(e) => {
-                      if (!isSelected && !isDisabled)
-                        e.currentTarget.style.backgroundColor = PALETTE.accentMuted
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isSelected && !isDisabled)
-                        e.currentTarget.style.backgroundColor = isToday
-                          ? PALETTE.accentMuted
-                          : 'transparent'
-                    }}
+                    {...gridItemHover({ isSelected, isToday, isDisabled })}
                   >
                     {yr}
                   </button>

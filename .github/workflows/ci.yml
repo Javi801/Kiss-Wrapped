@@ -2,21 +2,29 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
-    branches: [main]
+    branches: [main, dev]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
-    name: Lint & Test
+    name: Lint, Test & Build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version-file: .tool-versions
           cache: npm
 
       - name: Install dependencies
@@ -25,11 +33,17 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Test
-        run: npm test
+      - name: Unused code and dependencies
+        run: npm run knip
 
-      - name: Coverage
+      - name: Format check
+        run: npx prettier --check "src/**/*.{js,jsx}"
+
+      - name: Test with coverage
         run: npm run test:coverage
+
+      - name: Build
+        run: npm run build
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
@@ -38,3 +52,31 @@ jobs:
           name: coverage-report
           path: coverage/
           retention-days: 30
+
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .tool-versions
+
+      - name: Audit production dependencies
+        run: npm audit --audit-level=high --omit=dev
+
+  dependency-review:
+    name: Dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high

@@ -2,10 +2,10 @@ import { Card, CardContent } from '@/components/ui/card'
 import { usePalette } from '@/lib/theme'
 
 /**
- * Shared card shell used by StatTile and SettingsTile.
+ * Shared card shell used by StatTile and TopPersonTile.
  * Edit padding, rounding, shadow, or blur here to affect both.
  */
-export default function TileCard({ accent = false, children, contentStyle }) {
+export default function TileCard({ accent = false, children }) {
   const PALETTE = usePalette()
   const borderColor = accent ? 'rgba(255,255,255,0.25)' : PALETTE.cardBorder
   const background = accent ? 'rgba(255,255,255,0.22)' : PALETTE.cardBg
@@ -20,7 +20,7 @@ export default function TileCard({ accent = false, children, contentStyle }) {
         backdropFilter: 'blur(8px)',
       }}
     >
-      <CardContent style={{ padding: '1.25rem', ...contentStyle }}>{children}</CardContent>
+      <CardContent style={{ padding: '1.25rem' }}>{children}</CardContent>
     </Card>
   )
 }

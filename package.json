@@ -1,24 +1,25 @@
 {
   "name": "kiss-wrapped",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "knip": "knip",
     "format": "prettier --write \"src/**/*.{js,jsx}\"",
     "preview": "vite preview",
     "gen:icon": "node scripts/generate-icon.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "ci": "npm run lint && prettier --check \"src/**/*.{js,jsx}\" && npm run test:coverage && npm run build",
     "prepare": "husky"
   },
   "dependencies": {
     "@capacitor/android": "^8.3.0",
     "@capacitor/app": "^8.1.0",
-    "@capacitor/cli": "^8.3.0",
     "@capacitor/core": "^8.3.0",
     "@capacitor/filesystem": "^8.1.2",
     "@capacitor/share": "^8.0.1",
@@ -33,14 +34,16 @@
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "recharts": "^3.8.1",
-    "shadcn": "^4.1.0",
     "tailwind-merge": "^3.5.0",
     "tw-animate-css": "^1.4.0"
   },
-  "lint-staged": {
-    "src/**/*.{js,jsx}": "prettier --write"
+  "overrides": {
+    "xcode": {
+      "uuid": "^11.1.1"
+    }
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.3",
     "@eslint/js": "^9.39.4",
     "@tailwindcss/vite": "^4.2.2",
     "@types/react": "^19.2.14",
@@ -54,7 +57,7 @@
     "globals": "^17.4.0",
     "husky": "^9.1.7",
     "jsdom": "^29.1.1",
-    "lint-staged": "^17.0.7",
+    "knip": "^6.41.0",
     "prettier": "^3.8.4",
     "tailwindcss": "^4.2.2",
     "vite": "^8.0.1",

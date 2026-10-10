@@ -2,8 +2,8 @@ import { useRef, useState, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
-import FullscreenChartWrapper from './FullscreenChartWrapper'
-import { useFullscreen } from './FullscreenContext'
+import FullscreenChartWrapper from '@/components/charts/FullscreenChartWrapper'
+import { useFullscreen } from '@/components/charts/FullscreenContext'
 
 const MARGIN_TOP = 40
 const PADDING_RIGHT = 15

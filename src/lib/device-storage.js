@@ -9,11 +9,13 @@ import {
   ICON_COLOR_KEY,
   THEME_KEY,
   STATS_VISIBLE_KEY,
+  INCLUDE_PARTNER_EVENTS_KEY,
   SITUATION_TAGS_KEY,
   PLACE_TAGS_KEY,
+  HOW_WE_MET_TAGS_KEY,
   ONBOARDING_DONE_KEY,
-  ONBOARDING_VERSION_KEY,
 } from '@/lib/constants'
+import { DEFAULT_SETTINGS } from '@/lib/config'
 
 // Returns localStorage only when it is safely available
 export function getSafeStorage() {
@@ -96,14 +98,11 @@ export async function savePeopleToDevice(people) {
 }
 
 const SETTINGS_DEFAULTS = {
-  iconColor: 'yellow',
-  language: 'en',
-  theme: 'pink',
-  statsVisible: true,
+  ...DEFAULT_SETTINGS,
   situationTags: [],
   placeTags: [],
+  howWeMetTags: [],
   onboardingDone: false,
-  onboardingVersion: 0,
 }
 
 // Loads app settings from native file system or localStorage.
@@ -120,27 +119,32 @@ export async function loadSettings() {
       const saved = JSON.parse(result.data || '{}')
       if (typeof saved.statsVisible === 'string')
         saved.statsVisible = saved.statsVisible !== 'false'
+      if (typeof saved.includePartnerEvents === 'string')
+        saved.includePartnerEvents = saved.includePartnerEvents === 'true'
       if (typeof saved.onboardingDone === 'string')
         saved.onboardingDone = saved.onboardingDone === 'true'
-      if (typeof saved.onboardingVersion === 'string')
-        saved.onboardingVersion = Number(saved.onboardingVersion) || 0
       return { ...SETTINGS_DEFAULTS, ...saved }
     } catch {
       // Missing native settings are migrated from localStorage when possible.
       const storage = getSafeStorage()
       const rawVisible = storage?.getItem(STATS_VISIBLE_KEY)
+      const rawIncludePartnerEvents = storage?.getItem(INCLUDE_PARTNER_EVENTS_KEY)
       const rawSituationTags = storage?.getItem(SITUATION_TAGS_KEY)
       const rawPlaceTags = storage?.getItem(PLACE_TAGS_KEY)
-      const rawOnboardingVersion = storage?.getItem(ONBOARDING_VERSION_KEY)
+      const rawHowWeMetTags = storage?.getItem(HOW_WE_MET_TAGS_KEY)
       const migrated = {
         iconColor: storage?.getItem(ICON_COLOR_KEY) || SETTINGS_DEFAULTS.iconColor,
         language: storage?.getItem(LANGUAGE_KEY) || SETTINGS_DEFAULTS.language,
         theme: storage?.getItem(THEME_KEY) || SETTINGS_DEFAULTS.theme,
         statsVisible: rawVisible === null ? SETTINGS_DEFAULTS.statsVisible : rawVisible !== 'false',
+        includePartnerEvents:
+          rawIncludePartnerEvents === null
+            ? SETTINGS_DEFAULTS.includePartnerEvents
+            : rawIncludePartnerEvents === 'true',
         situationTags: rawSituationTags ? JSON.parse(rawSituationTags) : [],
         placeTags: rawPlaceTags ? JSON.parse(rawPlaceTags) : [],
+        howWeMetTags: rawHowWeMetTags ? JSON.parse(rawHowWeMetTags) : [],
         onboardingDone: storage?.getItem(ONBOARDING_DONE_KEY) === 'true',
-        onboardingVersion: rawOnboardingVersion ? Number(rawOnboardingVersion) || 0 : 0,
       }
       // Persist migrated values so future reads use the file
       await saveSettings(migrated).catch(() => {})
@@ -150,19 +154,24 @@ export async function loadSettings() {
   const storage = getSafeStorage()
   if (!storage) return { ...SETTINGS_DEFAULTS }
   const rawVisible = storage.getItem(STATS_VISIBLE_KEY)
+  const rawIncludePartnerEvents = storage.getItem(INCLUDE_PARTNER_EVENTS_KEY)
   const rawSituationTags = storage.getItem(SITUATION_TAGS_KEY)
   const rawPlaceTags = storage.getItem(PLACE_TAGS_KEY)
+  const rawHowWeMetTags = storage.getItem(HOW_WE_MET_TAGS_KEY)
   const rawOnboardingDone = storage.getItem(ONBOARDING_DONE_KEY)
-  const rawOnboardingVersion = storage.getItem(ONBOARDING_VERSION_KEY)
   return {
     iconColor: storage.getItem(ICON_COLOR_KEY) || SETTINGS_DEFAULTS.iconColor,
     language: storage.getItem(LANGUAGE_KEY) || SETTINGS_DEFAULTS.language,
     theme: storage.getItem(THEME_KEY) || SETTINGS_DEFAULTS.theme,
     statsVisible: rawVisible === null ? SETTINGS_DEFAULTS.statsVisible : rawVisible !== 'false',
+    includePartnerEvents:
+      rawIncludePartnerEvents === null
+        ? SETTINGS_DEFAULTS.includePartnerEvents
+        : rawIncludePartnerEvents === 'true',
     situationTags: rawSituationTags ? JSON.parse(rawSituationTags) : [],
     placeTags: rawPlaceTags ? JSON.parse(rawPlaceTags) : [],
+    howWeMetTags: rawHowWeMetTags ? JSON.parse(rawHowWeMetTags) : [],
     onboardingDone: rawOnboardingDone === 'true',
-    onboardingVersion: rawOnboardingVersion ? Number(rawOnboardingVersion) || 0 : 0,
   }
 }
 
@@ -172,10 +181,11 @@ export async function saveSettings({
   language,
   theme,
   statsVisible,
+  includePartnerEvents,
   situationTags,
   placeTags,
+  howWeMetTags,
   onboardingDone,
-  onboardingVersion,
 }) {
   if (isNativePlatform()) {
     await Filesystem.writeFile({
@@ -186,10 +196,11 @@ export async function saveSettings({
         language,
         theme,
         statsVisible,
+        includePartnerEvents,
         situationTags,
         placeTags,
+        howWeMetTags,
         onboardingDone,
-        onboardingVersion,
       }),
       encoding: Encoding.UTF8,
       recursive: true,
@@ -202,12 +213,13 @@ export async function saveSettings({
   if (language !== undefined) storage.setItem(LANGUAGE_KEY, language)
   if (theme !== undefined) storage.setItem(THEME_KEY, theme)
   if (statsVisible !== undefined) storage.setItem(STATS_VISIBLE_KEY, String(statsVisible))
+  if (includePartnerEvents !== undefined)
+    storage.setItem(INCLUDE_PARTNER_EVENTS_KEY, String(includePartnerEvents))
   if (situationTags !== undefined)
     storage.setItem(SITUATION_TAGS_KEY, JSON.stringify(situationTags))
   if (placeTags !== undefined) storage.setItem(PLACE_TAGS_KEY, JSON.stringify(placeTags))
+  if (howWeMetTags !== undefined) storage.setItem(HOW_WE_MET_TAGS_KEY, JSON.stringify(howWeMetTags))
   if (onboardingDone !== undefined) storage.setItem(ONBOARDING_DONE_KEY, String(onboardingDone))
-  if (onboardingVersion !== undefined)
-    storage.setItem(ONBOARDING_VERSION_KEY, String(onboardingVersion))
 }
 
 const PERSON_REQUIRED_STRINGS = ['name', 'gender', 'howWeMet', 'zodiacSign', 'activity']
