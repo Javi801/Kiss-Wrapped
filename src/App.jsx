@@ -57,6 +57,8 @@ export default function KissWrappedApp() {
     setTheme,
     statsVisible,
     setStatsVisible,
+    includePartnerEvents,
+    setIncludePartnerEvents,
     situationTags,
     setSituationTags,
     placeTags,
@@ -300,6 +302,7 @@ export default function KissWrappedApp() {
                   setTheme={changeTheme}
                   statsVisible={statsVisible}
                   setStatsVisible={setStatsVisible}
+                  includePartnerEvents={includePartnerEvents}
                   modalBackRef={modalBackRef}
                 />
               ) : null}
@@ -349,6 +352,8 @@ export default function KissWrappedApp() {
                     people={people}
                     t={t}
                     language={language}
+                    includePartnerEvents={includePartnerEvents}
+                    setIncludePartnerEvents={setIncludePartnerEvents}
                     modalBackRef={modalBackRef}
                   />
                 </Suspense>
