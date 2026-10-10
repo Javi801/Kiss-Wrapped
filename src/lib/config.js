@@ -22,9 +22,6 @@ export const APP_VERSION = version
 export const APP_GITHUB_USER = 'Javi801'
 export const APP_GITHUB_REPO = 'https://github.com/Javi801/Kiss-Wrapped'
 
-// Bump to show the onboarding again to users who already completed an older version.
-export const ONBOARDING_VERSION = 2
-
 // Supported values for user settings. Persisted values outside these lists are ignored.
 export const LANGUAGES = ['en', 'es']
 export const THEMES = ['pink', 'green', 'dark']

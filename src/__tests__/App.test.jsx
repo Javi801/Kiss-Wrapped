@@ -60,13 +60,12 @@ function mockScreen(name) {
 vi.mock('@/components/app/HomeScreen', mockScreen('main'))
 vi.mock('@/components/app/AddPersonScreen', mockScreen('add'))
 vi.mock('@/components/app/IntroScreen', mockScreen('intro'))
-vi.mock('@/components/app/OnboardingScreen', mockScreen('onboarding'))
 vi.mock('@/components/app/PrivacyScreen', mockScreen('privacy'))
 vi.mock('@/components/people/PeopleManagerScreen', mockScreen('people'))
 vi.mock('@/components/stats/StatsScreen', mockScreen('stats'))
 
 import KissWrappedApp from '@/App'
-import { DEFAULT_SETTINGS, ONBOARDING_VERSION } from '@/lib/config'
+import { DEFAULT_SETTINGS } from '@/lib/config'
 import { registerOpenSelect } from '@/lib/open-selects'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
@@ -77,7 +76,6 @@ const SAVED_SETTINGS = {
   placeTags: [],
   howWeMetTags: [],
   onboardingDone: true,
-  onboardingVersion: ONBOARDING_VERSION,
 }
 
 const ana = { id: 'ana', name: 'Ana', events: [{ id: 'a1', date: '2024.01.01', score: 3 }] }
@@ -268,39 +266,23 @@ describe('App — boot', () => {
 })
 
 describe('App — onboarding', () => {
-  it('skips the onboarding while the feature is off', async () => {
-    await boot({ settings: { onboardingDone: false, onboardingVersion: 0 } })
+  it('opens on the intro and saves the onboarding as done while the feature is off', async () => {
+    await boot({ settings: { onboardingDone: false } })
     expect(visibleScreens()).toEqual(['intro'])
+    expect(savedSettings()).toMatchObject({ onboardingDone: true })
   })
 
-  it('shows the onboarding on first launch when the feature is on', async () => {
+  it('opens on the intro and keeps the onboarding pending on first launch', async () => {
     mockFeatures.onboarding = true
-    await boot({ settings: { onboardingDone: false, onboardingVersion: 0 } })
-    expect(visibleScreens()).toEqual(['onboarding'])
-    expect(navButtons()).toHaveLength(0)
+    await boot({ settings: { onboardingDone: false } })
+    expect(visibleScreens()).toEqual(['intro'])
+    expect(savedSettings()).toMatchObject({ onboardingDone: false })
   })
 
-  it('shows the onboarding again after its version changes', async () => {
-    mockFeatures.onboarding = true
-    await boot({ settings: { onboardingDone: true, onboardingVersion: ONBOARDING_VERSION - 1 } })
-    expect(visibleScreens()).toEqual(['onboarding'])
-  })
-
-  it('goes straight to the intro once the current onboarding was completed', async () => {
+  it('goes straight to the intro once the onboarding was completed', async () => {
     mockFeatures.onboarding = true
     await boot()
     expect(visibleScreens()).toEqual(['intro'])
-  })
-
-  it('remembers a completed onboarding and continues to the intro', async () => {
-    mockFeatures.onboarding = true
-    await boot({ settings: { onboardingDone: false, onboardingVersion: 0 } })
-    await act(async () => screens.onboarding.onComplete())
-    expect(visibleScreens()).toEqual(['intro'])
-    expect(savedSettings()).toMatchObject({
-      onboardingDone: true,
-      onboardingVersion: ONBOARDING_VERSION,
-    })
   })
 })
 

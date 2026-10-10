@@ -16,7 +16,6 @@ export const SITUATION_TAGS_KEY = 'kiss-wrapped-situation-tags-v1'
 export const PLACE_TAGS_KEY = 'kiss-wrapped-place-tags-v1'
 export const HOW_WE_MET_TAGS_KEY = 'kiss-wrapped-how-we-met-tags-v1'
 export const ONBOARDING_DONE_KEY = 'kiss-wrapped-onboarding-done-v1'
-export const ONBOARDING_VERSION_KEY = 'kiss-wrapped-onboarding-version-v1'
 export const PEOPLE_FILE_NAME = 'kiss-wrapped-people.json'
 export const SETTINGS_FILE_NAME = 'kiss-wrapped-settings.json'
 

@@ -42,7 +42,6 @@ import {
   SITUATION_TAGS_KEY,
   PLACE_TAGS_KEY,
   HOW_WE_MET_TAGS_KEY,
-  ONBOARDING_VERSION_KEY,
   PEOPLE_FILE_NAME,
   SETTINGS_FILE_NAME,
 } from '@/lib/constants'
@@ -315,7 +314,6 @@ describe('loadSettings (web path)', () => {
       placeTags: [],
       howWeMetTags: [],
       onboardingDone: false,
-      onboardingVersion: 0,
     })
   })
 
@@ -463,7 +461,6 @@ describe('saveSettings (web path)', () => {
       placeTags: ['Café', 'Home'],
       howWeMetTags: ['School', 'Work'],
       onboardingDone: true,
-      onboardingVersion: 2,
     })
     expect(await loadSettings()).toEqual({
       iconColor: 'blue',
@@ -475,7 +472,6 @@ describe('saveSettings (web path)', () => {
       placeTags: ['Café', 'Home'],
       howWeMetTags: ['School', 'Work'],
       onboardingDone: true,
-      onboardingVersion: 2,
     })
   })
 
@@ -499,11 +495,6 @@ describe('saveSettings (web path)', () => {
     await saveSettings({ includePartnerEvents: true })
     await saveSettings({ includePartnerEvents: false })
     expect((await loadSettings()).includePartnerEvents).toBe(false)
-  })
-
-  it('saves onboardingVersion to localStorage', async () => {
-    await saveSettings({ onboardingVersion: 2 })
-    expect(localStorage.getItem(ONBOARDING_VERSION_KEY)).toBe('2')
   })
 })
 
@@ -582,7 +573,6 @@ describe('loadSettings (native path — reads existing file)', () => {
       placeTags: [],
       howWeMetTags: ['School'],
       onboardingDone: true,
-      onboardingVersion: 2,
     }
     mockFilesystem.readFile.mockResolvedValueOnce({ data: JSON.stringify(stored) })
     expect(await loadSettings()).toEqual(stored)
@@ -628,13 +618,6 @@ describe('loadSettings (native path — reads existing file)', () => {
       data: JSON.stringify({ onboardingDone: 'false' }),
     })
     expect((await loadSettings()).onboardingDone).toBe(false)
-  })
-
-  it('coerces onboardingVersion string to number', async () => {
-    mockFilesystem.readFile.mockResolvedValueOnce({
-      data: JSON.stringify({ onboardingVersion: '3' }),
-    })
-    expect((await loadSettings()).onboardingVersion).toBe(3)
   })
 
   it('fills missing fields with SETTINGS_DEFAULTS', async () => {
@@ -777,7 +760,6 @@ describe('saveSettings (native path)', () => {
       situationTags: [],
       placeTags: [],
       onboardingDone: true,
-      onboardingVersion: 1,
     })
     expect(mockFilesystem.writeFile).toHaveBeenCalledWith(
       expect.objectContaining({ path: SETTINGS_FILE_NAME, directory: 'DATA' })
@@ -795,7 +777,6 @@ describe('saveSettings (native path)', () => {
       placeTags: ['Café'],
       howWeMetTags: ['School'],
       onboardingDone: true,
-      onboardingVersion: 2,
     }
     await saveSettings(settings)
     const written = JSON.parse(mockFilesystem.writeFile.mock.calls[0][0].data)
@@ -886,7 +867,6 @@ describe('persisted settings override config defaults (native path)', () => {
       situationTags: [],
       placeTags: [],
       onboardingDone: true,
-      onboardingVersion: 1,
     })
     const written = mockFilesystem.writeFile.mock.calls[0][0].data
     mockFilesystem.readFile.mockResolvedValueOnce({ data: written })
@@ -899,7 +879,7 @@ describe('persisted settings override config defaults (native path)', () => {
       placeTags: ['Café', 'Home'],
       howWeMetTags: ['School', 'Work'],
     }
-    await saveSettings({ ...USER_CHOICES, ...tags, onboardingDone: true, onboardingVersion: 1 })
+    await saveSettings({ ...USER_CHOICES, ...tags, onboardingDone: true })
     const written = mockFilesystem.writeFile.mock.calls[0][0].data
     mockFilesystem.readFile.mockResolvedValueOnce({ data: written })
     expect(await loadSettings()).toMatchObject(tags)

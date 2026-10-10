@@ -325,32 +325,4 @@ export const en = {
   crashReload: 'Reload app',
   onboardingSkip: 'Skip',
   onboardingNext: 'Next',
-  onboardingDone: 'Get started',
-  onboardingSlides: [
-    {
-      emoji: '💋',
-      title: 'Welcome',
-      description: 'Your private space to save and remember your most meaningful connections.',
-    },
-    {
-      emoji: '👤',
-      title: 'Add people',
-      description: 'Save the name and a few details about each person that matters to you.',
-    },
-    {
-      emoji: '📅',
-      title: 'Track moments',
-      description: 'Log the date, notes, and a score from 1 to 5 for each encounter.',
-    },
-    {
-      emoji: '🔒',
-      title: 'Your privacy, always',
-      description: 'Everything stays on your device. No accounts, no cloud, no tracking.',
-    },
-    {
-      type: 'mockup',
-      title: "Here's how to enter",
-      description: 'Tap the ♡ in the corner to open your space.',
-    },
-  ],
 }

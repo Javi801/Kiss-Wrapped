@@ -1,14 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { detectDeviceLanguage } from '@/lib/constants'
-import {
-  FEATURES,
-  ONBOARDING_VERSION,
-  LANGUAGES,
-  THEMES,
-  ICON_COLORS,
-  DEFAULT_SETTINGS,
-} from '@/lib/config'
+import { FEATURES, LANGUAGES, THEMES, ICON_COLORS, DEFAULT_SETTINGS } from '@/lib/config'
 import { normalizePeople, mergeEventTagsFromPeople, mergePeopleFieldTags } from '@/lib/helpers'
 import {
   loadPeopleFromDevice,
@@ -55,7 +48,6 @@ export function usePersistedAppState(setScreen) {
   // Whether the onboarding flow has been completed (true = skip, show app normally).
   // Initialized to true to avoid flashing the onboarding on re-renders; boot corrects it.
   const [onboardingDone, setOnboardingDone] = useState(true)
-  const [onboardingVersion, setOnboardingVersion] = useState(ONBOARDING_VERSION)
 
   // Prevents saving before the initial load completes.
   const [isLoaded, setIsLoaded] = useState(false)
@@ -82,20 +74,11 @@ export function usePersistedAppState(setScreen) {
         if (isMounted) {
           if (LANGUAGES.includes(settings.language)) setLanguage(settings.language)
 
-          const needsOnboarding =
-            FEATURES.onboarding &&
-            (!settings.onboardingDone || settings.onboardingVersion !== ONBOARDING_VERSION)
-          if (needsOnboarding) {
-            // First launch or updated tutorial: show onboarding.
-            if (!settings.onboardingDone) setLanguage(detectDeviceLanguage())
-            setOnboardingDone(false)
-            setOnboardingVersion(settings.onboardingVersion || 0)
-            setScreen('onboarding')
-          } else {
-            setOnboardingDone(true)
-            setOnboardingVersion(settings.onboardingVersion)
-            setScreen('intro')
-          }
+          const needsOnboarding = FEATURES.onboarding && !settings.onboardingDone
+          // First launch: start in the device language.
+          if (needsOnboarding) setLanguage(detectDeviceLanguage())
+          setOnboardingDone(!needsOnboarding)
+          setScreen('intro')
 
           if (ICON_COLORS.includes(settings.iconColor)) setIconColor(settings.iconColor)
           if (THEMES.includes(settings.theme)) setTheme(settings.theme)
@@ -120,9 +103,8 @@ export function usePersistedAppState(setScreen) {
         if (isMounted) {
           setPeople([])
           setOnboardingDone(false)
-          setOnboardingVersion(0)
           setLanguage(detectDeviceLanguage())
-          setScreen(FEATURES.onboarding ? 'onboarding' : 'intro')
+          setScreen('intro')
         }
       } finally {
         // Mark app as loaded only if the component is still mounted.
@@ -163,7 +145,6 @@ export function usePersistedAppState(setScreen) {
       placeTags,
       howWeMetTags,
       onboardingDone,
-      onboardingVersion,
     }).catch((error) => {
       if (import.meta.env.DEV) console.error('Failed to save settings', error)
     })
@@ -177,14 +158,12 @@ export function usePersistedAppState(setScreen) {
     placeTags,
     howWeMetTags,
     onboardingDone,
-    onboardingVersion,
     isLoaded,
   ])
 
-  // Marks the current onboarding version as done (triggers the save effect).
+  // Marks the onboarding as done (triggers the save effect).
   function completeOnboarding() {
     setOnboardingDone(true)
-    setOnboardingVersion(ONBOARDING_VERSION)
   }
 
   return {
