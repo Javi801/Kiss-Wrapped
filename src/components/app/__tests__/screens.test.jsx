@@ -104,6 +104,47 @@ describe('OnboardingWizard', () => {
     click(buttons[0])
     expect(onComplete).toHaveBeenCalledOnce()
   })
+
+  it('shows the welcome step first', () => {
+    render(<OnboardingWizard t={t} onComplete={() => {}} />)
+    expect(container.querySelector('h1').textContent).toBe(t.onboardingWelcomeTitle)
+    const paragraphs = [...container.querySelectorAll('p')].map((p) => p.textContent)
+    expect(paragraphs).toEqual([t.onboardingWelcomeLead, t.onboardingWelcomePrivacy])
+  })
+
+  it('derives the step counter total from the number of steps', () => {
+    const steps = [() => <i>one</i>, () => <i>two</i>, () => <i>three</i>]
+    render(<OnboardingWizard t={t} onComplete={() => {}} steps={steps} />)
+    expect(container.textContent).toContain(
+      t.onboardingStepCount.replace('{current}', 1).replace('{total}', 3)
+    )
+  })
+
+  it('advances with the next button and completes only on the last step', () => {
+    const onComplete = vi.fn()
+    const steps = [() => <i>one</i>, () => <i>two</i>]
+    render(<OnboardingWizard t={t} onComplete={onComplete} steps={steps} />)
+    const button = container.querySelector('button')
+    expect(container.querySelector('i').textContent).toBe('one')
+    expect(button.textContent).toBe(t.onboardingNext)
+
+    click(button)
+    expect(onComplete).not.toHaveBeenCalled()
+    expect(container.querySelector('i').textContent).toBe('two')
+    expect(container.textContent).toContain(
+      t.onboardingStepCount.replace('{current}', 2).replace('{total}', 2)
+    )
+    expect(button.textContent).toBe(t.onboardingFinish)
+
+    click(button)
+    expect(onComplete).toHaveBeenCalledOnce()
+  })
+
+  it('passes the translations to the current step', () => {
+    const steps = [({ t: stepT }) => <i>{stepT.onboardingNext}</i>]
+    render(<OnboardingWizard t={t} onComplete={() => {}} steps={steps} />)
+    expect(container.querySelector('i').textContent).toBe(t.onboardingNext)
+  })
 })
 
 describe('AddPersonScreen', () => {
