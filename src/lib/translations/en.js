@@ -206,7 +206,6 @@ export const en = {
   granHistoric: 'Historic',
   language: 'Language',
   settings: 'Settings',
-  viewOnboarding: 'View tutorial',
   hideStats: 'Hide stats',
   showStats: 'Show stats',
   english: 'English',

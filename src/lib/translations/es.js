@@ -206,7 +206,6 @@ export const es = {
   granHistoric: 'Histórico',
   language: 'Idioma',
   settings: 'Configuración',
-  viewOnboarding: 'Ver tutorial',
   hideStats: 'Ocultar estadísticas',
   showStats: 'Mostrar estadísticas',
   english: 'English',
