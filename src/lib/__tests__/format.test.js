@@ -3,6 +3,7 @@ import { COPY, GENDER_COLORS } from '@/lib/constants'
 import {
   translateActivity,
   translateGender,
+  translatePartnerError,
   eventIsMissingRequired,
   personHasIncompleteEvent,
   hasScore,
@@ -11,6 +12,7 @@ import {
   getZodiacForLanguage,
   getColorForCategory,
 } from '@/lib/format'
+import { PARTNER_ERRORS } from '@/lib/partner'
 
 const t = COPY.en
 
@@ -89,6 +91,25 @@ describe('translateGender', () => {
   })
   it('falls back to other for unknown values', () => {
     expect(translateGender('nonbinary', t)).toBe(t.other)
+  })
+})
+
+describe('translatePartnerError', () => {
+  it.each([
+    [PARTNER_ERRORS.unknownStatus, 'requiredPartnerStatus'],
+    [PARTNER_ERRORS.invalidDate, 'validDateMsg'],
+    [PARTNER_ERRORS.futureDate, 'futureDateMsg'],
+    [PARTNER_ERRORS.missingEnd, 'requiredPartnerTo'],
+    [PARTNER_ERRORS.invertedRange, 'partnerRangeError'],
+  ])('translates %s', (code, key) => {
+    expect(translatePartnerError(code, t)).toBe(t[key])
+  })
+  it('has a text for every code in both languages', () => {
+    for (const copy of Object.values(COPY)) {
+      for (const code of Object.values(PARTNER_ERRORS)) {
+        expect(translatePartnerError(code, copy)).toEqual(expect.any(String))
+      }
+    }
   })
 })
 

@@ -28,10 +28,11 @@ src/
   shadcn-tailwind.css   Vendored copy of shadcn's `tailwind.css`, imported by index.css
   components/
     app/                Top-level screens and app-level widgets (Home, AddPerson, Intro,
-                        Onboarding, Privacy, ErrorBoundary, Language/Theme/Color selectors)
+                        Onboarding, Privacy, ErrorBoundary, Language/Theme/Color selectors,
+                        ImportPartnerDialogs)
     people/             People list screen (search, filters, sorting)
     person/             PersonCard: one person's profile and event list
-    forms/              PersonForm, EventForm, FiltersPanel, TagInput
+    forms/              PersonForm, PartnerFields, EventForm, FiltersPanel, TagInput
     stats/              Stats screen, its four tabs, and stat-specific cards
     charts/             Generic, data-agnostic chart cards and fullscreen/export wrapper
     shared/             Small reusable tiles and the SparkleIcon
@@ -178,6 +179,7 @@ Invariants:
 - **Gender and activity are stored as language-neutral keys** and translated at render time with `translateGender` / `translateActivity`.
 - **`zodiacSign` is stored as the full localized string.** Its leading emoji is the language-independent key; convert between languages with `getZodiacForLanguage`, and get a display label with `getShortZodiacLabel`.
 - **Scores are validated with `hasScore`.** Anything that is not an integer 0–5 is normalized to `null` on write and on load.
+- **Partner fields are validated in `lib/partner.js`.** `validatePartnerFields` is the single set of rules (valid `yyyy.MM.dd` dates, none in the future, `partnerFrom` on or before `partnerTo`, and `past` requires `partnerTo`). It returns error codes, which `translatePartnerError` in `lib/format.js` turns into text. `PersonForm` and the import fix table both use it through `PartnerFields`. `partnerFrom` is kept only for `current` and `past`, and `partnerTo` only for `past`.
 - **Partner periods.** `getPartnerPeriod` / `excludePartnerEvents` in `lib/stats.js` remove events that fall inside a partner period from event-based statistics. Person-based statistics (counts by gender, age, zodiac) use the unfiltered list. Any new statistic must pick the correct list.
 
 ## Persistence
@@ -193,7 +195,8 @@ Lifecycle:
 
 1. **Boot** (`App.jsx`): `loadPeopleFromDevice()` → `normalizePeople()` → `setPeople`; then `loadSettings()` → validate each value against the supported lists in `lib/config.js` → set state. Values that were never saved fall back to `DEFAULT_SETTINGS`. Tag lists are merged with values already present in the data (`mergeEventTagsFromPeople`, `mergePeopleFieldTags`). Then `isLoaded = true`.
 2. **Save**: two effects write the full people array and the full settings object whenever they change, only after `isLoaded` is true. This guard prevents overwriting stored data with the initial empty state; keep it for any new persisted state.
-3. **Migrations run on load**, not as a separate step: legacy `age` → `birthYear` (`migrateLegacyAge`), legacy `isPartner` → `partnerStatus` (`normalizePeople`), and `localStorage` settings → native settings file (first native run).
+3. **Partner data is sanitized on load** without asking the user. `normalizePeople` calls `sanitizePartnerFields` (`lib/partner.js`): a date that is not a valid `yyyy.MM.dd` string becomes `''`, an inverted range drops `partnerFrom`, `past` without a valid `partnerTo` becomes `never`, and an unknown status becomes `current` when the record has `isPartner: true` and `never` otherwise. Future dates are kept, so the result does not depend on the day it runs.
+4. **Migrations run on load**, not as a separate step: legacy `age` → `birthYear` (`migrateLegacyAge`), legacy `isPartner` → `partnerStatus` (`resolvePartnerStatus`, called from `normalizePeople`), and `localStorage` settings → native settings file (first native run).
 
 Storage keys and file names in `lib/constants.js` are part of the on-device data contract. Do not rename them. When the data shape changes, add a tolerant migration in the load path and keep reading the old shape.
 
@@ -201,6 +204,7 @@ Storage keys and file names in `lib/constants.js` are part of the on-device data
 
 - **JSON backup export**: `exportPeopleJson` fills missing required fields, writes to `Directory.Cache`, opens the native share sheet, then deletes the temp file.
 - **JSON import** (`HomeScreen`): parses the file, requires an array of objects, skips persons whose `id` already exists, asks for confirmation, then calls `importAppData`, which normalizes and appends.
+- **Invalid partner data on import**: `hasPartnerIssues` (`lib/partner.js`) is run on the new people only. It flags an unknown `partnerStatus` and anything `validatePartnerFields` rejects, including future dates. When at least one person is flagged, `ImportPartnerDialogs` replaces the confirmation with a notice that offers to cancel, to import only the valid people, or to fix the flagged ones. The fix table has one row per flagged person, prefilled by `prefillPartnerFields`, where each row is corrected or discarded; importing is allowed once every row is valid or discarded. The rows are kept in `HomeScreen`'s `importStatus` (types `partner_issues` and `partner_resolve`), so going back from the table to the notice keeps the edits. The boot path never shows these dialogs.
 - **Chart PNG export**: `FullscreenChartWrapper` renders the chart with `html-to-image` and shares it the same way.
 - **Crash and error logs**: `ErrorBoundary`, `FullscreenChartWrapper`, and `saveErrorLog` write a text file to cache and share it. Nothing is sent automatically.
 
@@ -223,7 +227,7 @@ All of these follow the same sequence: write to `Directory.Cache` → `Filesyste
 
 ## Localization
 
-- All UI strings live in `COPY` in `lib/constants.js` under `en` and `es`. Every key must exist in both languages. No test enforces this, so check it by hand when adding keys.
+- All UI strings live in `COPY` in `lib/constants.js` under `en` and `es`. Every key must exist in both languages; `constants.test.js` enforces it.
 - No user-facing string is hardcoded in components.
 - `detectDeviceLanguage()` maps the device locale to `en` or `es` and is used as a fallback (for example in `ErrorBoundary`, which renders outside the providers).
 
@@ -263,6 +267,7 @@ Privacy mechanisms, in addition to the above:
 | Add a palette color token | Every palette in `PALETTES` |
 | Add a theme or a language | `PALETTES` or `COPY` + `ZODIAC_OPTIONS` in `lib/constants.js`, and the matching list in `lib/config.js` |
 | Add a field to Person or Event | The form (`PersonForm` / `EventForm`), `normalizePeople` for defaults and migration, `normalizeForExport` if it is required, display in `PersonCard`, tests in `lib/__tests__/` |
+| Change a partner rule or add a partner field | `lib/partner.js` (validation, import detection, load fallback) with unit tests, `PartnerFields` for the inputs, and `translatePartnerError` plus `COPY` for a new error |
 | Add a persisted setting | Default in `DEFAULT_SETTINGS` (`lib/config.js`), state in `App.jsx`, boot validation, the save effect, and `loadSettings` + `saveSettings` (both native and web branches) in `lib/device-storage.js` |
 | Add a statistic | Aggregation function in `lib/stats.js` with unit tests, called from the relevant stats tab (and from `getStatsData` if the PDF should show it); choose `people` vs `eventPeople` deliberately |
 | Add a chart type | New generic card in `components/charts/`, wrapped in `FullscreenChartWrapper` |

@@ -34,8 +34,10 @@ import { usePalette } from '@/lib/theme'
 import { exportPeopleJson } from '@/lib/device-storage'
 import { saveErrorLog } from '@/lib/pdf-export'
 import { excludePartnerEvents } from '@/lib/stats'
+import { hasPartnerIssues, prefillPartnerFields } from '@/lib/partner'
 import StatTile from '@/components/shared/StatTile'
 import ColorSelector from '@/components/app/ColorSelector'
+import ImportPartnerDialogs from '@/components/app/ImportPartnerDialogs'
 
 /**
  * Renders the main dashboard screen.
@@ -65,6 +67,8 @@ export default function MainScreen({
   // null = idle | { fileName, isNative, hadMissingFields } = success | Error = failed
   const [jsonExportStatus, setJsonExportStatus] = useState(null)
   // null = idle | { type: "confirm", count, data } | { type: "success", count } | { type: "error_type" | "error_format" }
+  // "partner_issues" (notice) and "partner_resolve" (fix table) also carry `rows`: one per person in
+  // `data` with invalid partner data, holding its index in `data`, the edited fields and `discarded`.
   const [importStatus, setImportStatus] = useState(null)
   const fileInputRef = useRef(null)
 
@@ -84,6 +88,8 @@ export default function MainScreen({
           else if (settingsOpen) setSettingsOpen(false)
           else if (confirmOpen) setConfirmOpen(false)
           else if (jsonExportStatus !== null) setJsonExportStatus(null)
+          else if (importStatus?.type === 'partner_resolve')
+            setImportStatus((prev) => ({ ...prev, type: 'partner_issues' }))
           else if (importStatus !== null) setImportStatus(null)
         }
       : null
@@ -137,16 +143,71 @@ export default function MainScreen({
         return
       }
 
+      const rows = newPeople.flatMap((person, index) =>
+        hasPartnerIssues(person)
+          ? [{ index, discarded: false, ...prefillPartnerFields(person) }]
+          : []
+      )
+
       setImportStatus({
-        type: 'confirm',
+        type: rows.length > 0 ? 'partner_issues' : 'confirm',
         totalInFile: parsed.length,
         newCount: newPeople.length,
         skippedCount,
         data: newPeople,
+        rows,
       })
     } catch {
       setImportStatus({ type: 'error_format' })
     }
+  }
+
+  // Returns from the fix table to the notice, keeping the edited rows.
+  function backToPartnerIssues() {
+    setImportStatus((prev) => ({ ...prev, type: 'partner_issues' }))
+  }
+
+  function updateImportRow(index, patch) {
+    setImportStatus((prev) => ({
+      ...prev,
+      rows: prev.rows.map((row) => (row.index === index ? { ...row, ...patch } : row)),
+    }))
+  }
+
+  // Imports only the people without partner issues.
+  function importSkippingPartnerIssues() {
+    const issueIndexes = new Set(importStatus.rows.map((row) => row.index))
+    const valid = importStatus.data.filter((_person, index) => !issueIndexes.has(index))
+    onImportData(valid)
+    setImportStatus({
+      type: 'success',
+      newCount: valid.length,
+      skippedIssueCount: importStatus.rows.length,
+    })
+  }
+
+  // Imports the valid people plus the fixed rows, in file order; discarded rows are dropped.
+  function importResolvedPartnerIssues() {
+    const rowByIndex = new Map(importStatus.rows.map((row) => [row.index, row]))
+    const resolved = importStatus.data.flatMap((person, index) => {
+      const row = rowByIndex.get(index)
+      if (!row) return [person]
+      if (row.discarded) return []
+      return [
+        {
+          ...person,
+          partnerStatus: row.partnerStatus,
+          partnerFrom: row.partnerStatus !== 'never' ? row.partnerFrom : '',
+          partnerTo: row.partnerStatus === 'past' ? row.partnerTo : '',
+        },
+      ]
+    })
+    onImportData(resolved)
+    setImportStatus({
+      type: 'success',
+      newCount: resolved.length,
+      discardedCount: importStatus.rows.filter((row) => row.discarded).length,
+    })
   }
 
   // Count all events across every saved person. Partner-period events don't count.
@@ -839,6 +900,17 @@ export default function MainScreen({
         </DialogContent>
       </Dialog>
 
+      <ImportPartnerDialogs
+        importStatus={importStatus}
+        t={t}
+        onCancel={() => setImportStatus(null)}
+        onFix={() => setImportStatus((prev) => ({ ...prev, type: 'partner_resolve' }))}
+        onSkip={importSkippingPartnerIssues}
+        onBack={backToPartnerIssues}
+        onRowChange={updateImportRow}
+        onImport={importResolvedPartnerIssues}
+      />
+
       {/* Import success dialog */}
       <Dialog
         open={importStatus?.type === 'success'}
@@ -866,9 +938,32 @@ export default function MainScreen({
               </DialogTitle>
             </div>
             <DialogDescription asChild>
-              <div style={{ color: PALETTE.textSoft }}>
-                <strong style={{ color: PALETTE.text }}>{importStatus?.newCount}</strong>{' '}
-                {t.importJsonSuccessDesc}
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.25rem',
+                  color: PALETTE.textSoft,
+                }}
+              >
+                <span>
+                  <strong style={{ color: PALETTE.text }}>{importStatus?.newCount}</strong>{' '}
+                  {t.importJsonSuccessDesc}
+                </span>
+                {importStatus?.skippedIssueCount > 0 && (
+                  <span>
+                    <strong style={{ color: PALETTE.text }}>
+                      {importStatus?.skippedIssueCount}
+                    </strong>{' '}
+                    {t.importJsonSuccessSkipped}
+                  </span>
+                )}
+                {importStatus?.discardedCount > 0 && (
+                  <span>
+                    <strong style={{ color: PALETTE.text }}>{importStatus?.discardedCount}</strong>{' '}
+                    {t.importJsonSuccessDiscarded}
+                  </span>
+                )}
               </div>
             </DialogDescription>
           </DialogHeader>
