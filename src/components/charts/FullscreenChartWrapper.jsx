@@ -172,6 +172,8 @@ export default function FullscreenChartWrapper({ children, centerContent = false
       }
     })
 
+    el.setAttribute('data-capturing', '')
+
     // Give layout a tick to reflow before capture.
     await new Promise((r) => setTimeout(r, 80))
 
@@ -190,6 +192,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
       setDownloadError(`Error: ${error?.message || String(error)}`)
       setDownloadErrorObj(error)
     } finally {
+      el.removeAttribute('data-capturing')
       saved.forEach(({ el: s, overflow, overflowX, overflowY, maxHeight, height }) => {
         s.style.overflow = overflow
         s.style.overflowX = overflowX
@@ -214,7 +217,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
             overflowX: 'hidden',
           }}
         >
-          {/* Floating controls */}
+          {/* Floating controls — hidden while capturing, when the title takes their space */}
           <div
             style={{
               position: 'fixed',
@@ -223,6 +226,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
               zIndex: 10001,
               display: 'flex',
               gap: 8,
+              visibility: downloading ? 'hidden' : 'visible',
             }}
           >
             <IconButton
@@ -260,6 +264,12 @@ export default function FullscreenChartWrapper({ children, centerContent = false
                   border-radius: 0 !important;
                   box-shadow: none !important;
                   position: relative;
+                }
+
+                /* Keeps the title clear of the floating download and close buttons,
+                   which are not part of the exported image. */
+                [data-fullscreen-chart]:not([data-capturing]) [data-slot="card-title"] {
+                  padding-right: 4.5rem;
                 }
 
                 [data-fullscreen-chart] > [data-slot="card"] > [data-slot="card-content"] {
@@ -387,6 +397,8 @@ export default function FullscreenChartWrapper({ children, centerContent = false
 
   return (
     <div
+      // Keeps the title clear of the fullscreen button.
+      className="[&_[data-slot=card-title]]:pr-6"
       style={{ position: 'relative' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
