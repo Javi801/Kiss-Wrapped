@@ -35,7 +35,7 @@ src/
     app/                Top-level screens and app-level widgets (Home, AddPerson, Intro,
                         Onboarding, Privacy, ErrorBoundary, Color selector),
                         plus the sections and dialogs of the Home screen (HomeHeroCard,
-                        HomeActions, HomeSettingsDialogs, AboutDialog, JsonExportDialogs,
+                        HomeActions, HomeSettingsDialogs, AboutDialog, AppGuideDialog, BottomNav, JsonExportDialogs,
                         ImportDialogs, ImportPartnerDialogs)
     people/             People list screen (PeopleManagerScreen) and its parts: PeopleToolbar
                         (search, filter sheet), AlphabetIndex, PeopleGroupList, the
@@ -98,7 +98,7 @@ Rules that hold today and should be preserved:
 
 | Export | Purpose |
 |---|---|
-| `FEATURES` | Feature flags. `pdfExport` gates the PDF button in `StatsScreen`; `onboarding` gates the onboarding wizard for new installs, decided in the `usePersistedAppState` boot. Both are currently `false` |
+| `FEATURES` | Feature flags. `pdfExport` gates the PDF button in `StatsScreen`; `onboarding` gates the onboarding wizard for new installs, decided in the `usePersistedAppState` boot, and its restart from the settings. `pdfExport` is currently `false` and `onboarding` is `true` |
 | `APP_VERSION`, `APP_GITHUB_USER`, `APP_GITHUB_REPO` | Metadata shown in the UI |
 | `LANGUAGES`, `THEMES`, `ICON_COLORS` | Supported setting values. A persisted value outside these lists is ignored at boot |
 | `DEFAULT_SETTINGS` | Initial `language`, `theme`, `iconColor`, `statsVisible`, `includePartnerEvents` |
@@ -148,7 +148,7 @@ There is no router. `screen` is a string and `App.jsx` conditionally renders one
 | `add` | `AddPersonScreen` | Focused layout, no bottom bar |
 | `people` | `PeopleManagerScreen` | List, filters, person cards, event editing |
 | `stats` | `StatsScreen` | Four tabs: overview, time, people, scores |
-| `onboarding` | `OnboardingWizard` | Opened by the intro heart, instead of `main`, while the onboarding is pending. Cannot be skipped; finishing it goes to `main` |
+| `onboarding` | `OnboardingWizard` | Opened by the intro heart, instead of `main`, while the onboarding is pending, and from the settings to repeat it. Cannot be skipped; finishing it goes to `main`. See [Onboarding](#onboarding) |
 
 - `useAppNavigation` (`hooks/useAppNavigation.js`) owns `screen`, the history stack, and `modalBackRef`.
 - `StatsScreen` is the only screen loaded on demand (`React.lazy` in `App.jsx`), which keeps the charting libraries out of the initial chunk. `App.jsx` fetches its chunk after the first render and renders a spinner as the `Suspense` fallback when the screen is opened before the chunk arrives.
@@ -160,6 +160,16 @@ There is no router. `screen` is a string and `App.jsx` conditionally renders one
   4. Otherwise pop the history stack; with an empty stack go to `main`, or exit if already there.
 - **Modal contract:** any component that opens a dialog, sheet, or overlay must set `modalBackRef.current` to a close callback while it is open and reset it to `null` when closed, so the back button closes the overlay instead of navigating. See `HomeScreen`, `usePersonCardModals` (for `PersonCard`), `PeopleToolbar` (for `PeopleManagerScreen`), and `StatsScreen` for the pattern.
 - Saving a new person and clearing data both reset the history and return to `intro` by design.
+
+### Onboarding
+
+`OnboardingWizard` is a sandbox: it never reads or writes the saved people, so it can run on a new install and be repeated from the settings with real data present.
+
+- **Steps** are listed in `ONBOARDING_STEPS` and the step counter total follows that list. A step marked `ownsActions` renders its own buttons and advances through `onNext`; otherwise the wizard shows its next/finish button. The steps are the welcome (`OnboardingWelcomeStep`), the person form (`OnboardingPersonStep`), the tour to the person card (`OnboardingTourStep`), the event form (`OnboardingEventStep`), and the return to the home screen (`OnboardingHomeStep`).
+- **Practice data** lives only in the wizard state and is discarded when the wizard unmounts. The person and event steps reuse `PersonForm` and `EventForm` with a skip action; skipping completes what was typed through `completePracticePerson` and `completePracticeEvent` (`lib/onboarding.js`).
+- **Tours** (`OnboardingTour`) play a list of scenes over the real `HomeScreen` and `PeopleManagerScreen`, fed with the practice person and with taps disabled. A scene moves on by itself, from its own button, or from the add-event button of the person card. The screens take optional guide props (`guideTarget` and `guideHint` on `HomeScreen`, `cardGuide` on `PeopleManagerScreen`, `guide` on `PersonCard`, `guideTarget` on `BottomNav`) that show the tap guide (`visuals/TapGuide`) and speech bubbles (`forms/SpeechBubble`). None of them has any effect when it is not passed.
+- **Restart.** `HomeScreen` receives `onRestartOnboarding` only while `FEATURES.onboarding` is on; it navigates to `onboarding` without touching `onboardingDone`, so the hardware back button returns to `main`.
+- **App guide.** `AppGuideDialog`, opened from the settings, renders `APP_GUIDE_SECTIONS` (`components/app/appGuideSections.js`): each entry is an icon plus translation keys for a title and its texts.
 
 ## Data model
 
@@ -295,6 +305,8 @@ Privacy mechanisms, in addition to the above:
 | Add a statistic | Aggregation function in `lib/stats.js` with unit tests, called from the relevant stats tab (and from `getStatsData` if the PDF should show it); choose `people` vs `eventPeople` deliberately |
 | Add a chart type | New generic card in `components/charts/`, wrapped in `FullscreenChartWrapper` |
 | Add a screen | New key in the `screen` conditional in `App.jsx`, `navItems` and `hideBottomBar` if relevant |
+| Add an onboarding step | A step component in `components/app/`, added to `ONBOARDING_STEPS` in `OnboardingWizard.jsx`; a tour step is a scene list handed to `OnboardingTour` |
+| Add a section to the app guide | An entry in `APP_GUIDE_SECTIONS` and its texts in every file of `lib/translations/` |
 | Add a dialog or sheet | Register a close callback on `modalBackRef` while open |
 | Add date or age logic | `lib/date.js` with unit tests; never inline date parsing in components |
 
@@ -303,5 +315,4 @@ Privacy mechanisms, in addition to the above:
 These are current facts about the code, listed so they are not mistaken for intended design:
 
 - **PDF export is off.** `FEATURES.pdfExport` is `false` pending a fix to the export; the button in `StatsScreen` is hidden.
-- **Onboarding is off and unfinished.** `FEATURES.onboarding` is `false`, so the entry guide never shows and the heart never opens `OnboardingWizard`, which is missing its last step. It has four: the welcome (`OnboardingWelcomeStep`), the person form (`OnboardingPersonStep`), the guided tour (`OnboardingTourStep`) and the event form (`OnboardingEventStep`). Steps are listed in `ONBOARDING_STEPS`, and the step counter total follows that list. A step marked `ownsActions` renders its own buttons and advances through `onNext`. The person step reuses `PersonForm` with a skip action; skipping completes what was typed through `completePracticePerson` (`lib/onboarding.js`). The resulting practice person lives only in the wizard state, is never saved, and is discarded when the wizard finishes. The tour (`OnboardingTour`) plays a list of scenes over the real `HomeScreen` and `PeopleManagerScreen`, fed with the practice person and with taps disabled; the screens take optional guide props (`guideTarget`, `cardGuide`, and `guide` on `PersonCard`) that show the tap guide (`visuals/TapGuide`) and speech bubbles (`forms/SpeechBubble`). The tour waits on the expanded person card until the add-event button is tapped. The event step reuses `EventForm` with a skip action that goes through `completePracticeEvent`.
 
