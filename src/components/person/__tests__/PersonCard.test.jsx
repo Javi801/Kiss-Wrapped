@@ -9,6 +9,8 @@ import { formatShortDate } from '@/lib/date'
 const forms = vi.hoisted(() => ({ person: null, event: null }))
 // onOpenChange handlers of the dialogs that are currently open.
 const openDialogs = vi.hoisted(() => ({ current: [] }))
+// Props last received by the action row of the expanded card.
+const actions = vi.hoisted(() => ({ props: null }))
 
 vi.mock('@/lib/theme', () => ({ usePalette: () => ({}) }))
 vi.mock('@/components/forms/PersonForm', () => ({
@@ -23,6 +25,17 @@ vi.mock('@/components/forms/EventForm', () => ({
     return null
   },
 }))
+// Records the props and renders the real action row.
+vi.mock('@/components/person/PersonCardActions', async (importOriginal) => {
+  const { createElement } = await import('react')
+  const { default: PersonCardActions } = await importOriginal()
+  return {
+    default: (props) => {
+      actions.props = props
+      return createElement(PersonCardActions, props)
+    },
+  }
+})
 vi.mock('framer-motion', async () => {
   const { createElement, Fragment } = await import('react')
   return {
@@ -145,6 +158,7 @@ const eventRows = () => buttons().filter((item) => / 20\d\d/.test(item.textConte
 beforeEach(() => {
   forms.person = null
   forms.event = null
+  actions.props = null
   openDialogs.current = []
 })
 
@@ -195,6 +209,18 @@ describe('PersonCard — header', () => {
   it('does not flag a complete person whose events are complete', () => {
     renderCard({ events: [complete()] })
     expect(badgeTexts()).not.toContain(t.missingEventDetailsBadge)
+  })
+
+  it('tells the action row that the profile is incomplete when a profile field is missing', () => {
+    renderCard({ howWeMet: '', events: [complete()] })
+    toggle()
+    expect(actions.props.personIncomplete).toBe(true)
+  })
+
+  it('does not tell the action row that the profile is incomplete when only an event is', () => {
+    renderCard({ events: [complete({ place: '' })] })
+    toggle()
+    expect(actions.props.personIncomplete).toBe(false)
   })
 })
 
