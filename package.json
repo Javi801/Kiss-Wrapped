@@ -20,7 +20,6 @@
   "dependencies": {
     "@capacitor/android": "^8.3.0",
     "@capacitor/app": "^8.1.0",
-    "@capacitor/cli": "^8.3.0",
     "@capacitor/core": "^8.3.0",
     "@capacitor/filesystem": "^8.1.2",
     "@capacitor/share": "^8.0.1",
@@ -35,11 +34,16 @@
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "recharts": "^3.8.1",
-    "shadcn": "^4.1.0",
     "tailwind-merge": "^3.5.0",
     "tw-animate-css": "^1.4.0"
   },
+  "overrides": {
+    "xcode": {
+      "uuid": "^11.1.1"
+    }
+  },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.3",
     "@eslint/js": "^9.39.4",
     "@tailwindcss/vite": "^4.2.2",
     "@types/react": "^19.2.14",
