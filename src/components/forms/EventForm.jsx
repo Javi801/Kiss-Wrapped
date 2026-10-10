@@ -29,12 +29,21 @@ import { usePalette } from '@/lib/theme'
 import { todayString, isValidDateString, isFutureDate } from '@/lib/date'
 import { hasScore, renderKisses } from '@/lib/format'
 import TagInput from '@/components/forms/TagInput'
+import SpeechBubble from '@/components/forms/SpeechBubble'
 
+/**
+ * Form used for creating or editing an event.
+ * `onSkip` adds an action that receives the current values without validating them.
+ * `tagsHint` shows a speech bubble under the place field.
+ */
 export default function EventForm({
   initialValues,
   onSave,
   onCancel,
   onDelete,
+  onSkip,
+  skipLabel,
+  tagsHint,
   t,
   situationTags = [],
   onAddSituationTag,
@@ -133,6 +142,7 @@ export default function EventForm({
           addTagLabel={t.addTag}
           isParentOpen={isParentOpen}
         />
+        {tagsHint && <SpeechBubble>{tagsHint}</SpeechBubble>}
         <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
           {place.length}/{LIMITS.tagLength}
         </p>
@@ -208,15 +218,28 @@ export default function EventForm({
           >
             {t.saveEvent}
           </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="rounded-2xl"
-            style={{ ...inputStyle }}
-            onClick={onCancel}
-          >
-            {t.cancel}
-          </Button>
+          {onCancel && (
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-2xl"
+              style={{ ...inputStyle }}
+              onClick={onCancel}
+            >
+              {t.cancel}
+            </Button>
+          )}
+          {onSkip && (
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-2xl"
+              style={{ ...inputStyle }}
+              onClick={() => onSkip({ date, details, score, place, situation, observations })}
+            >
+              {skipLabel}
+            </Button>
+          )}
         </div>
         {onDelete && (
           <AlertDialog>
