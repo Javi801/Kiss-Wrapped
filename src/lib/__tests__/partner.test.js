@@ -5,6 +5,7 @@ import {
   resolvePartnerStatus,
   validatePartnerFields,
   hasPartnerIssues,
+  prefillPartnerFields,
   sanitizePartnerFields,
 } from '@/lib/partner'
 
@@ -217,6 +218,48 @@ describe('hasPartnerIssues', () => {
     ])('%s', (_label, rawPerson) => {
       expect(hasPartnerIssues(rawPerson)).toBe(true)
     })
+  })
+})
+
+describe('prefillPartnerFields', () => {
+  it('keeps valid data', () => {
+    const fields = { partnerStatus: 'past', partnerFrom: '2020.01.01', partnerTo: '2021.01.01' }
+    expect(prefillPartnerFields(fields)).toEqual(fields)
+  })
+  it.each(['ex', '', 1])('leaves the unknown status %j empty', (partnerStatus) => {
+    expect(prefillPartnerFields({ partnerStatus, isPartner: true }).partnerStatus).toBe('')
+  })
+  it('resolves an absent status through the legacy isPartner flag', () => {
+    expect(prefillPartnerFields({ isPartner: true }).partnerStatus).toBe('current')
+    expect(prefillPartnerFields({}).partnerStatus).toBe('never')
+  })
+  it.each(['2020-01-01', '2023.02.30', 20200101, null, undefined])(
+    'empties the invalid date %j',
+    (value) => {
+      expect(
+        prefillPartnerFields({ partnerStatus: 'past', partnerFrom: value, partnerTo: value })
+      ).toEqual({ partnerStatus: 'past', partnerFrom: '', partnerTo: '' })
+    }
+  )
+  it('keeps the dates of an inverted range', () => {
+    const fields = { partnerStatus: 'past', partnerFrom: '2022.01.01', partnerTo: '2021.01.01' }
+    expect(prefillPartnerFields(fields)).toEqual(fields)
+  })
+  it('keeps a future date so its error is shown', () => {
+    expect(prefillPartnerFields({ partnerStatus: 'current', partnerFrom: '2024.06.16' })).toEqual({
+      partnerStatus: 'current',
+      partnerFrom: '2024.06.16',
+      partnerTo: '',
+    })
+  })
+  it('keeps valid dates next to an unknown status', () => {
+    expect(
+      prefillPartnerFields({
+        partnerStatus: 'ex',
+        partnerFrom: '2020.01.01',
+        partnerTo: '2021.01.01',
+      })
+    ).toEqual({ partnerStatus: '', partnerFrom: '2020.01.01', partnerTo: '2021.01.01' })
   })
 })
 

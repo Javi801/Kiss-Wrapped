@@ -52,20 +52,31 @@ export function validatePartnerFields({ partnerStatus, partnerFrom, partnerTo })
   return errors
 }
 
+// A status that is present but not one of PARTNER_STATUSES; an absent one is not unknown
+const hasUnknownStatus = ({ partnerStatus }) =>
+  partnerStatus !== undefined && partnerStatus !== null && !PARTNER_STATUSES.includes(partnerStatus)
+
 // Returns true when a raw imported person has partner data the user has to resolve.
 // An absent partnerStatus follows the legacy isPartner path and is not an issue by itself.
 export function hasPartnerIssues(rawPerson) {
-  const { partnerStatus, partnerFrom, partnerTo } = rawPerson
-  if (partnerStatus !== undefined && partnerStatus !== null) {
-    if (!PARTNER_STATUSES.includes(partnerStatus)) return true
-  }
+  if (hasUnknownStatus(rawPerson)) return true
 
   const errors = validatePartnerFields({
     partnerStatus: resolvePartnerStatus(rawPerson),
-    partnerFrom,
-    partnerTo,
+    partnerFrom: rawPerson.partnerFrom,
+    partnerTo: rawPerson.partnerTo,
   })
   return Object.keys(errors).length > 0
+}
+
+// Starting values for fixing a raw imported person: whatever came valid.
+// An unknown status is left empty so the user has to pick one.
+export function prefillPartnerFields(rawPerson) {
+  return {
+    partnerStatus: hasUnknownStatus(rawPerson) ? '' : resolvePartnerStatus(rawPerson),
+    partnerFrom: isValidDate(rawPerson.partnerFrom) ? rawPerson.partnerFrom : '',
+    partnerTo: isValidDate(rawPerson.partnerTo) ? rawPerson.partnerTo : '',
+  }
 }
 
 // Automatic fallback for partner data that cannot be shown to the user for fixing.
