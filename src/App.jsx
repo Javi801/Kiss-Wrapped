@@ -1,31 +1,18 @@
-import React, { Suspense, lazy, useEffect, useRef, useState } from 'react'
+import React, { Suspense, lazy, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, Users, BarChart3, UserPlus } from 'lucide-react'
-import { App as CapacitorApp } from '@capacitor/app'
-import { Capacitor } from '@capacitor/core'
 
-import { PALETTES, TEXT, COPY, detectDeviceLanguage } from '@/lib/constants'
-import {
-  FEATURES,
-  ONBOARDING_VERSION,
-  LANGUAGES,
-  THEMES,
-  ICON_COLORS,
-  DEFAULT_SETTINGS,
-} from '@/lib/config'
+import { PALETTES, TEXT, COPY } from '@/lib/constants'
 import { ThemeProvider } from '@/lib/theme'
 import { CopyProvider } from '@/lib/copy'
 import { setAppIconColor } from '@/plugins/appicon'
 import { todayString } from '@/lib/date'
-import { uid, normalizePeople, mergeEventTagsFromPeople, mergePeopleFieldTags } from '@/lib/helpers'
+import { uid, normalizePeople } from '@/lib/helpers'
 import { hasScore } from '@/lib/format'
-import {
-  loadPeopleFromDevice,
-  savePeopleToDevice,
-  clearPeopleFromDevice,
-  loadSettings,
-  saveSettings,
-} from '@/lib/device-storage'
+import { clearPeopleFromDevice } from '@/lib/device-storage'
+import { useAppNavigation } from '@/hooks/useAppNavigation'
+import { usePrivacyOverlay } from '@/hooks/usePrivacyOverlay'
+import { usePersistedAppState } from '@/hooks/usePersistedAppState'
 
 import PeopleManagerScreen from '@/components/people/PeopleManagerScreen'
 import HomeScreen from './components/app/HomeScreen'
@@ -42,57 +29,7 @@ const StatsScreen = lazy(() => import('@/components/stats/StatsScreen'))
  * It manages global app state, persistence, navigation, and data mutations.
  */
 export default function KissWrappedApp() {
-  // Main people dataset used across the whole app.
-  const [people, setPeople] = useState([])
-
-  // Current visible screen. Boot starts blank until persisted settings are read.
-  const [screen, setScreen] = useState('boot')
-
-  // Navigation history stack for hardware back button support.
-  const screenHistoryRef = useRef([])
-
-  // When a modal/sheet is open it registers a close callback here.
-  // The back button handler checks this before doing screen navigation.
-  const modalBackRef = useRef(null)
-  // Ref keeps the latest screen value accessible inside the Capacitor listener.
-  const screenRef = useRef('boot')
-
-  // Current UI language.
-  const [language, setLanguage] = useState(DEFAULT_SETTINGS.language)
-
-  // Icon color palette selected by the user.
-  const [iconColor, setIconColor] = useState(DEFAULT_SETTINGS.iconColor)
-
-  // Active UI theme.
-  const [theme, setTheme] = useState(DEFAULT_SETTINGS.theme)
-
-  // Whether the stats tiles on the home screen are visible.
-  const [statsVisible, setStatsVisible] = useState(DEFAULT_SETTINGS.statsVisible)
-
-  // User-defined situation tags shared across all event forms.
-  const [situationTags, setSituationTags] = useState([])
-
-  // User-defined place tags shared across all event forms.
-  const [placeTags, setPlaceTags] = useState([])
-
-  // User-defined how-we-met tags shared across all person forms.
-  const [howWeMetTags, setHowWeMetTags] = useState([])
-
-  // Whether the onboarding flow has been completed (true = skip, show app normally).
-  // Initialized to true to avoid flashing the onboarding on re-renders; boot corrects it.
-  const [onboardingDone, setOnboardingDone] = useState(true)
-  const [onboardingVersion, setOnboardingVersion] = useState(ONBOARDING_VERSION)
-
-  // Prevents saving before the initial load completes.
-  const [isLoaded, setIsLoaded] = useState(false)
-
-  // True while the app is backgrounded — triggers the privacy overlay.
-  const [isPrivate, setIsPrivate] = useState(false)
-
-  // Keep screenRef in sync so the Capacitor listener always sees the latest value.
-  useEffect(() => {
-    screenRef.current = screen
-  }, [screen])
+  const { screen, setScreen, navigateTo, resetTo, modalBackRef } = useAppNavigation()
 
   const scrollRef = useRef(null)
 
@@ -100,193 +37,28 @@ export default function KissWrappedApp() {
     scrollRef.current?.scrollTo(0, 0)
   }, [screen])
 
-  /**
-   * Navigates forward to a new screen and pushes the current one onto the history stack.
-   */
-  function navigateTo(newScreen) {
-    screenHistoryRef.current = [...screenHistoryRef.current, screenRef.current]
-    setScreen(newScreen)
-  }
+  // True while the app is backgrounded — triggers the privacy overlay.
+  const isPrivate = usePrivacyOverlay()
 
-  /**
-   * Handles the hardware back button.
-   * From the "add" screen always returns to "intro" (privacy rule).
-   * From "intro" exits the app.
-   * From any other screen pops the history stack.
-   */
-  useEffect(() => {
-    const listenerPromise = CapacitorApp.addListener('backButton', () => {
-      if (modalBackRef.current) {
-        modalBackRef.current()
-        return
-      }
-
-      const current = screenRef.current
-
-      if (current === 'add') {
-        screenHistoryRef.current = []
-        setScreen('intro')
-      } else if (current === 'intro') {
-        CapacitorApp.exitApp()
-      } else {
-        const history = screenHistoryRef.current
-        if (history.length > 0) {
-          const prev = history[history.length - 1]
-          screenHistoryRef.current = history.slice(0, -1)
-          setScreen(prev)
-        } else if (current === 'main') {
-          CapacitorApp.exitApp()
-        } else {
-          setScreen('main')
-        }
-      }
-    })
-
-    return () => {
-      listenerPromise.then((h) => h.remove())
-    }
-  }, [])
-
-  useEffect(() => {
-    const hide = () => setIsPrivate(true)
-
-    if (Capacitor.isNativePlatform()) {
-      // pause fires early (before the app-switcher screenshot) and is reliable for showing.
-      // resume fires spuriously on EMUI ~1s after pause even while still in the switcher,
-      // so we ignore it and only restore via appStateChange which fires on true foreground.
-      document.addEventListener('pause', hide)
-      const capListener = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
-        if (isActive) setIsPrivate(false)
-      })
-      return () => {
-        document.removeEventListener('pause', hide)
-        capListener.then((h) => h.remove())
-      }
-    }
-
-    // Web / browser dev: visibilitychange is the only option
-    const handleVisibility = () => setIsPrivate(document.hidden)
-    document.addEventListener('visibilitychange', handleVisibility)
-    return () => document.removeEventListener('visibilitychange', handleVisibility)
-  }, [])
-
-  /**
-   * Bootstraps persisted app data on first render.
-   * It loads saved people and the saved language if available.
-   */
-  useEffect(() => {
-    let isMounted = true
-
-    async function boot() {
-      try {
-        // Load stored people from device or browser storage.
-        const rawPeople = await loadPeopleFromDevice()
-        if (!isMounted) return
-
-        // Normalize loaded data before storing it in state.
-        const loadedPeople = normalizePeople(rawPeople)
-        setPeople(loadedPeople)
-
-        // Restore saved settings (language + icon color).
-        const settings = await loadSettings()
-        if (isMounted) {
-          if (LANGUAGES.includes(settings.language)) setLanguage(settings.language)
-
-          const needsOnboarding =
-            FEATURES.onboarding &&
-            (!settings.onboardingDone || settings.onboardingVersion !== ONBOARDING_VERSION)
-          if (needsOnboarding) {
-            // First launch or updated tutorial: show onboarding.
-            if (!settings.onboardingDone) setLanguage(detectDeviceLanguage())
-            setOnboardingDone(false)
-            setOnboardingVersion(settings.onboardingVersion || 0)
-            setScreen('onboarding')
-          } else {
-            setOnboardingDone(true)
-            setOnboardingVersion(settings.onboardingVersion)
-            setScreen('intro')
-          }
-
-          if (ICON_COLORS.includes(settings.iconColor)) setIconColor(settings.iconColor)
-          if (THEMES.includes(settings.theme)) setTheme(settings.theme)
-          setStatsVisible(settings.statsVisible)
-
-          const savedTags = Array.isArray(settings.situationTags) ? settings.situationTags : []
-          setSituationTags(mergeEventTagsFromPeople(loadedPeople, savedTags, 'situation'))
-
-          const savedPlaceTags = Array.isArray(settings.placeTags) ? settings.placeTags : []
-          setPlaceTags(mergeEventTagsFromPeople(loadedPeople, savedPlaceTags, 'place'))
-
-          const savedHowWeMetTags = Array.isArray(settings.howWeMetTags)
-            ? settings.howWeMetTags
-            : []
-          setHowWeMetTags(mergePeopleFieldTags(loadedPeople, savedHowWeMetTags, 'howWeMet'))
-        }
-      } catch (error) {
-        if (import.meta.env.DEV) console.error('Failed to load app data', error)
-
-        // Fallback to an empty dataset if loading fails.
-        if (isMounted) {
-          setPeople([])
-          setOnboardingDone(false)
-          setOnboardingVersion(0)
-          setLanguage(detectDeviceLanguage())
-          setScreen(FEATURES.onboarding ? 'onboarding' : 'intro')
-        }
-      } finally {
-        // Mark app as loaded only if the component is still mounted.
-        if (isMounted) setIsLoaded(true)
-      }
-    }
-
-    boot()
-
-    // Prevent state updates if the component unmounts mid-load.
-    return () => {
-      isMounted = false
-    }
-  }, [])
-
-  /**
-   * Persists people data after the initial load is complete.
-   * This avoids overwriting stored data during boot.
-   */
-  useEffect(() => {
-    if (!isLoaded) return
-
-    savePeopleToDevice(people).catch((error) => {
-      if (import.meta.env.DEV) console.error('Failed to save people file', error)
-    })
-  }, [people, isLoaded])
-
-  // Persists settings whenever language, iconColor, theme, statsVisible, situationTags, placeTags or onboardingDone change (after boot).
-  useEffect(() => {
-    if (!isLoaded) return
-    saveSettings({
-      iconColor,
-      language,
-      theme,
-      statsVisible,
-      situationTags,
-      placeTags,
-      howWeMetTags,
-      onboardingDone,
-      onboardingVersion,
-    }).catch((error) => {
-      if (import.meta.env.DEV) console.error('Failed to save settings', error)
-    })
-  }, [
-    iconColor,
+  const {
+    people,
+    setPeople,
     language,
+    setLanguage,
+    iconColor,
+    setIconColor,
     theme,
+    setTheme,
     statsVisible,
+    setStatsVisible,
     situationTags,
+    setSituationTags,
     placeTags,
+    setPlaceTags,
     howWeMetTags,
-    onboardingDone,
-    onboardingVersion,
-    isLoaded,
-  ])
+    setHowWeMetTags,
+    completeOnboarding,
+  } = usePersistedAppState(setScreen)
 
   // Applies the dark class to <html> so shadcn portal components also get dark styles.
   useEffect(() => {
@@ -334,8 +106,7 @@ export default function KissWrappedApp() {
     }
 
     setPeople([])
-    screenHistoryRef.current = []
-    setScreen('intro')
+    resetTo('intro')
   }
 
   // Appends imported people (already deduplicated by the caller) to the existing dataset.
@@ -363,8 +134,7 @@ export default function KissWrappedApp() {
     setPeople((prev) => [newPerson, ...prev])
 
     // Return to the entry screen after saving.
-    screenHistoryRef.current = []
-    setScreen('intro')
+    resetTo('intro')
   }
 
   // Updates a person's main profile fields.
@@ -448,10 +218,8 @@ export default function KissWrappedApp() {
    * Marks onboarding as done (triggers the save effect) and goes to the intro screen.
    */
   function handleOnboardingComplete() {
-    setOnboardingDone(true)
-    setOnboardingVersion(ONBOARDING_VERSION)
-    screenHistoryRef.current = []
-    setScreen('intro')
+    completeOnboarding()
+    resetTo('intro')
   }
 
   // Bottom navigation configuration.
