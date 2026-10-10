@@ -104,6 +104,8 @@ const savedSettings = () => mockStorage.saveSettings.mock.calls.at(-1)[0]
 const pressBack = () => act(() => mockCapacitorApp.listeners.backButton())
 const openMain = () => act(() => screens.intro.onOpenMain())
 const go = (screen) => act(() => screens.main.onNavigate(screen))
+// The stats screen is lazy: waits for its dynamic import so it replaces the fallback.
+const settleLazyScreens = () => act(async () => vi.dynamicImportSettled())
 
 // Boots, opens the app and lands on the people screen.
 async function bootOnPeople(options) {
@@ -309,6 +311,7 @@ describe('App — navigation', () => {
     act(() => {
       navButtons()[index].dispatchEvent(new MouseEvent('click', { bubbles: true }))
     })
+    await settleLazyScreens()
     expect(visibleScreens()).toEqual([screen])
     expect(navButtons()).toHaveLength(4)
   })
@@ -366,6 +369,7 @@ describe('App — hardware back button', () => {
     await boot()
     openMain()
     go('stats')
+    await settleLazyScreens()
     const closeDialog = vi.fn()
     screens.stats.modalBackRef.current = closeDialog
 
