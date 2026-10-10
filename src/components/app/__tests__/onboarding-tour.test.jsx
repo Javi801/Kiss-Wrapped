@@ -47,7 +47,7 @@ const t = COPY.en
 const person = { id: 'mia', name: 'Mia', events: [] }
 const settings = {
   theme: 'dark',
-  iconColor: 'pink',
+  iconColor: 'darkPink',
   statsVisible: false,
   includePartnerEvents: true,
 }

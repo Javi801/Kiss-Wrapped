@@ -14,11 +14,12 @@ import java.util.List;
 @CapacitorPlugin(name = "AppIcon")
 public class AppIconPlugin extends Plugin {
 
-    private static final List<String> COLORS = Arrays.asList("yellow", "pink", "blue", "purple");
+    private static final List<String> COLORS = Arrays.asList(
+            "lightPurple", "golden", "darkPurple", "darkPink", "darkGreen", "lightGreen", "lightPink");
 
     @PluginMethod
     public void setColor(PluginCall call) {
-        String color = call.getString("color", "yellow");
+        String color = call.getString("color", "lightPink");
         if (!COLORS.contains(color)) {
             call.reject("Unknown color: " + color);
             return;

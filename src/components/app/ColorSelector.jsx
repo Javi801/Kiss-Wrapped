@@ -9,12 +9,16 @@ import {
 import { TEXT, PALETTES } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
 import { ICON_COLORS } from '@/lib/config'
-import { PALETTE_SWATCHES } from '@/components/shared/SparkleIcon'
+import { ICON_VARIANTS } from '@/components/shared/SparkleIcon.constants'
 
 const THEMES = Object.keys(PALETTES).map((key) => ({
   key,
   gradient: `linear-gradient(135deg, ${PALETTES[key].bgGradientFrom}, ${PALETTES[key].bgGradientVia}, ${PALETTES[key].bgGradientTo})`,
 }))
+
+// Two-tone swatch: the heart color in the center over the icon background.
+const iconSwatch = ({ heart, background }) =>
+  `radial-gradient(circle, ${heart} 0 40%, ${background} 46%)`
 
 export default function ColorSelector({
   iconColor,
@@ -123,7 +127,14 @@ export default function ColorSelector({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <span
                     className="rounded-full"
-                    style={{ height: '1rem', width: '1rem', background: PALETTE_SWATCHES[p] }}
+                    style={{
+                      height: '1rem',
+                      width: '1rem',
+                      flexShrink: 0,
+                      background: iconSwatch(ICON_VARIANTS[p]),
+                      // Keeps the near-black backgrounds visible on the dark theme.
+                      border: '1px solid rgba(128, 128, 128, 0.55)',
+                    }}
                   />
                   {colorLabel(p)}
                 </div>

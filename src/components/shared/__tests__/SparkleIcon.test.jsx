@@ -1,50 +1,39 @@
 import { describe, it, expect } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { ICON_COLORS } from '@/lib/config'
-import { SparkleIcon, PALETTE_SWATCHES } from '@/components/shared/SparkleIcon'
-import {
-  PALETTE_SWATCHES as SOURCE_SWATCHES,
-  SPARKLE_PALETTES,
-  SPARKLE_VIEWBOX,
-} from '@/components/shared/SparkleIcon.constants'
+import { SparkleIcon } from '@/components/shared/SparkleIcon'
+import { ICON_VARIANTS, DEFAULT_ICON_VARIANT } from '@/components/shared/SparkleIcon.constants'
 
-const fills = (html) => [...html.matchAll(/fill="([^"]+)"/g)].map((match) => match[1])
+const src = (html) => html.match(/src="([^"]+)"/)?.[1]
 
 describe('SparkleIcon', () => {
-  it.each(ICON_COLORS)('draws the %s icon only with that palette', (color) => {
-    const used = new Set(fills(renderToStaticMarkup(<SparkleIcon palette={color} />)))
-    const allowed = Object.values(SPARKLE_PALETTES[color])
-    expect(used.size).toBeGreaterThan(0)
-    expect([...used].every((fill) => allowed.includes(fill))).toBe(true)
+  it.each(ICON_COLORS)('shows the image of the %s icon', (color) => {
+    const html = renderToStaticMarkup(<SparkleIcon palette={color} />)
+    expect(src(html).endsWith(`/${ICON_VARIANTS[color].image}`)).toBe(true)
   })
 
-  it('draws the same pixels for every color', () => {
-    const counts = ICON_COLORS.map(
-      (color) => fills(renderToStaticMarkup(<SparkleIcon palette={color} />)).length
+  it('shows a different image for every color', () => {
+    const sources = ICON_COLORS.map((color) =>
+      src(renderToStaticMarkup(<SparkleIcon palette={color} />))
     )
-    expect(new Set(counts).size).toBe(1)
+    expect(new Set(sources).size).toBe(ICON_COLORS.length)
   })
 
-  it('defaults to the yellow palette', () => {
+  it('defaults to the default icon color', () => {
     expect(renderToStaticMarkup(<SparkleIcon />)).toBe(
-      renderToStaticMarkup(<SparkleIcon palette="yellow" />)
+      renderToStaticMarkup(<SparkleIcon palette={DEFAULT_ICON_VARIANT} />)
     )
   })
 
-  it('falls back to purple for an unknown palette', () => {
+  it('falls back to the default icon color for an unknown palette', () => {
     expect(renderToStaticMarkup(<SparkleIcon palette="teal" />)).toBe(
-      renderToStaticMarkup(<SparkleIcon palette="purple" />)
+      renderToStaticMarkup(<SparkleIcon palette={DEFAULT_ICON_VARIANT} />)
     )
   })
 
-  it('renders a square svg of the requested size', () => {
+  it('renders a square image of the requested size', () => {
     const html = renderToStaticMarkup(<SparkleIcon size={48} />)
     expect(html).toContain('width="48"')
     expect(html).toContain('height="48"')
-    expect(html).toContain(`viewBox="0 0 ${SPARKLE_VIEWBOX} ${SPARKLE_VIEWBOX}"`)
-  })
-
-  it('re-exports the swatches used by the color selector', () => {
-    expect(PALETTE_SWATCHES).toBe(SOURCE_SWATCHES)
   })
 })
