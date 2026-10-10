@@ -4,7 +4,7 @@ import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { COPY } from '@/lib/constants'
 
-const seen = vi.hoisted(() => ({ home: null, people: null, eventForm: null }))
+const seen = vi.hoisted(() => ({ home: null, people: null, eventForm: null, nav: null }))
 
 vi.mock('@/lib/theme', () => ({ usePalette: () => ({}) }))
 vi.mock('@/components/app/HomeScreen', () => ({
@@ -23,6 +23,12 @@ vi.mock('@/components/people/PeopleManagerScreen', () => ({
     )
   },
 }))
+vi.mock('@/components/app/BottomNav', () => ({
+  default: (props) => {
+    seen.nav = props
+    return <nav />
+  },
+}))
 vi.mock('@/components/forms/EventForm', () => ({
   default: (props) => {
     seen.eventForm = props
@@ -33,6 +39,7 @@ vi.mock('@/components/forms/EventForm', () => ({
 import OnboardingTour, { TOUR_SCENE_MS } from '@/components/app/OnboardingTour'
 import OnboardingTourStep from '@/components/app/OnboardingTourStep'
 import OnboardingEventStep from '@/components/app/OnboardingEventStep'
+import OnboardingHomeStep from '@/components/app/OnboardingHomeStep'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
@@ -66,6 +73,7 @@ beforeEach(() => {
   seen.home = null
   seen.people = null
   seen.eventForm = null
+  seen.nav = null
 })
 
 afterEach(() => {
@@ -184,6 +192,75 @@ describe('OnboardingTour', () => {
     render(<OnboardingTour scenes={scenes} person={person} t={t} language="en" />)
     expect(() => wait()).not.toThrow()
     expect(screen()).toBe('home')
+  })
+})
+
+describe('OnboardingHomeStep', () => {
+  const stepButton = () => container.querySelector('button[type="button"]')
+
+  function renderStep() {
+    const onNext = vi.fn()
+    render(
+      <OnboardingHomeStep
+        t={t}
+        language="en"
+        practicePerson={person}
+        settings={settings}
+        onNext={onNext}
+      />
+    )
+    return onNext
+  }
+
+  it('starts on the expanded person card, pointing at home in the bottom bar', () => {
+    renderStep()
+    expect(screen()).toBe('people')
+    expect(note()).toBe(t.onboardingTourSavedNote)
+    expect(seen.people.cardGuide).toMatchObject({ expanded: true, tapTarget: undefined })
+    expect(seen.nav).toMatchObject({ screen: 'people', guideTarget: 'main' })
+    expect(() => seen.nav.onNavigate('main')).not.toThrow()
+    expect(stepButton()).toBeNull()
+  })
+
+  it('goes back home by itself and shows the data hint with a next button', () => {
+    renderStep()
+    wait()
+    expect(screen()).toBe('home')
+    expect(container.querySelector('nav')).toBeNull()
+    expect(container.querySelector('[role="status"]')).toBeNull()
+    expect(seen.home).toMatchObject({
+      guideTarget: 'data',
+      guideHint: { title: t.onboardingDataHintTitle, body: t.onboardingDataHintBody },
+      ...settings,
+    })
+    expect(stepButton().textContent).toBe(t.onboardingNext)
+    wait(TOUR_SCENE_MS * 10)
+    expect(seen.home.guideTarget).toBe('data')
+  })
+
+  it('shows the settings hint last and finishes from its button', () => {
+    const onNext = renderStep()
+    wait()
+    act(() => stepButton().click())
+    expect(onNext).not.toHaveBeenCalled()
+    expect(seen.home).toMatchObject({
+      guideTarget: 'settings',
+      guideHint: { title: t.onboardingSettingsHintTitle, body: t.onboardingSettingsHintBody },
+    })
+    expect(stepButton().textContent).toBe(t.onboardingFinish)
+    act(() => stepButton().click())
+    expect(onNext).toHaveBeenCalledOnce()
+  })
+})
+
+describe('OnboardingTour — scrolling', () => {
+  it('brings the top of a scene without bubbles into view', () => {
+    const scrollIntoView = vi.fn()
+    Element.prototype.scrollIntoView = scrollIntoView
+    const scenes = [{ screen: 'home', note: 'onboardingTourHomeNote', auto: true }]
+    render(<OnboardingTour scenes={scenes} person={person} t={t} language="en" />)
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: 'start', behavior: 'smooth' })
+    delete Element.prototype.scrollIntoView
   })
 })
 

@@ -499,3 +499,70 @@ describe('HomeScreen — onboarding guide', () => {
     expect(find(t.addNewPerson).textContent).not.toContain('👆')
   })
 })
+
+describe('HomeScreen — app guide and tutorial', () => {
+  it('moves from settings to the app guide', async () => {
+    render()
+    await click(t.settings)
+    await click(t.appGuide, dialog())
+    expect(container.querySelectorAll('[data-dialog]')).toHaveLength(1)
+    expect(dialog().textContent).toContain(t.appGuideIntro)
+    expect(dialog().textContent).toContain(t.guideDataExport)
+  })
+
+  it('closes the app guide from its button and from the back button', async () => {
+    render()
+    await click(t.settings)
+    await click(t.appGuide, dialog())
+    await click(t.close, dialog())
+    expect(dialog()).toBeNull()
+
+    await click(t.settings)
+    await click(t.appGuide, dialog())
+    act(() => modalBackRef.current())
+    expect(dialog()).toBeNull()
+    expect(modalBackRef.current).toBeNull()
+  })
+
+  it('offers no tutorial restart unless it can be restarted', async () => {
+    render()
+    await click(t.settings)
+    expect(find(t.restartTutorial, dialog())).toBeUndefined()
+  })
+
+  it('restarts the tutorial from settings and closes them', async () => {
+    const onRestartOnboarding = vi.fn()
+    render({ onRestartOnboarding })
+    await click(t.settings)
+    await click(t.restartTutorial, dialog())
+    expect(onRestartOnboarding).toHaveBeenCalledOnce()
+    expect(dialog()).toBeNull()
+  })
+})
+
+describe('HomeScreen — onboarding hints', () => {
+  const hint = { title: 'Hint title', body: 'Hint body' }
+  const notes = () => [...container.querySelectorAll('[role="note"]')]
+
+  it('shows no hint by default, even with a hint text', () => {
+    render({ guideHint: hint })
+    expect(notes()).toHaveLength(0)
+  })
+
+  it('shows the data hint right above the data buttons', () => {
+    render({ guideTarget: 'data', guideHint: hint })
+    expect(notes()).toHaveLength(1)
+    expect(notes()[0].textContent).toBe('Hint titleHint body')
+    expect(notes()[0].nextElementSibling.contains(find(t.exportJsonLabel))).toBe(true)
+  })
+
+  it('shows the settings hint inside the hero card, pointing at its right side', () => {
+    render({ guideTarget: 'settings', guideHint: hint })
+    expect(notes()).toHaveLength(1)
+    expect(notes()[0].textContent).toBe('Hint titleHint body')
+    expect(notes()[0].querySelector('[aria-hidden="true"]').style.right).not.toBe('')
+    expect(
+      notes()[0].compareDocumentPosition(find(t.settings)) & Node.DOCUMENT_POSITION_PRECEDING
+    ).toBeTruthy()
+  })
+})

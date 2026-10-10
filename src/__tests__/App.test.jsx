@@ -330,6 +330,38 @@ describe('App — onboarding', () => {
   })
 })
 
+describe('App — restarting the onboarding', () => {
+  it('offers no restart while the feature is off', async () => {
+    await boot()
+    openMain()
+    expect(screens.main.onRestartOnboarding).toBeUndefined()
+  })
+
+  it('opens the wizard from the dashboard and comes back with the back button', async () => {
+    mockFeatures.onboarding = true
+    mockNative.isNative = true
+    await boot({ people: [ana] })
+    openMain()
+    act(() => screens.main.onRestartOnboarding())
+    expect(visibleScreens()).toEqual(['onboarding'])
+    expect(navButtons()).toHaveLength(0)
+
+    await pressBack()
+    expect(visibleScreens()).toEqual(['main'])
+  })
+
+  it('ends on the dashboard and keeps the saved people', async () => {
+    mockFeatures.onboarding = true
+    await boot({ people: [ana] })
+    openMain()
+    act(() => screens.main.onRestartOnboarding())
+    await act(async () => screens.onboarding.onComplete())
+    expect(visibleScreens()).toEqual(['main'])
+    expect(screens.main.people).toEqual([expect.objectContaining({ id: ana.id })])
+    expect(savedSettings()).toMatchObject({ onboardingDone: true })
+  })
+})
+
 describe('App — navigation', () => {
   it('opens the dashboard with the bottom bar from the intro', async () => {
     await boot()
