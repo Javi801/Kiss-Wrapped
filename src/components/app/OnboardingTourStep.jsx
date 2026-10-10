@@ -2,7 +2,14 @@ import OnboardingTour from '@/components/app/OnboardingTour'
 
 // From the home screen to the practice person's details, where the tour waits.
 const TOUR_SCENES = [
-  { screen: 'home', note: 'onboardingTourHomeNote', guideTarget: 'people', auto: true },
+  // The first scene stays longer: the home screen is new and has more to take in.
+  {
+    screen: 'home',
+    note: 'onboardingTourHomeNote',
+    guideTarget: 'people',
+    auto: true,
+    duration: 3000,
+  },
   {
     screen: 'people',
     note: 'onboardingTourListNote',

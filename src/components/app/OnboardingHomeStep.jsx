@@ -8,6 +8,8 @@ const HOME_SCENES = [
     card: { expanded: true },
     nav: 'main',
     auto: true,
+    // Long enough to see the saved event and the tap on the bottom bar.
+    duration: 3000,
   },
   {
     screen: 'home',

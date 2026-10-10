@@ -7,7 +7,7 @@ import OnboardingButton from '@/components/app/OnboardingButton'
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
 
-// Time an automatic scene stays on screen.
+// Time an automatic scene stays on screen unless it sets its own `duration`.
 export const TOUR_SCENE_MS = 1800
 
 const noop = () => {}
@@ -18,9 +18,9 @@ const noop = () => {}
  * scene that points at it.
  *
  * Props:
- *  - scenes      Ordered scenes: `{ screen: 'home' | 'people', note, auto, button,
+ *  - scenes      Ordered scenes: `{ screen: 'home' | 'people', note, auto, duration, button,
  *                guideTarget, hint, card, nav }`. `note`, `button` and the `hint` fields
- *                are translation keys. An `auto` scene moves on by itself and a scene
+ *                are translation keys. An `auto` scene moves on by itself, after `duration` ms when given, and a scene
  *                with `button` moves on from that button; any other waits for `onAddEvent`.
  *                `guideTarget` is what the home screen points at, with `hint`
  *                (`{ title, body }`) as its text; a scene with `hint` dims everything else. `card` guides the person card:
@@ -59,9 +59,9 @@ export default function OnboardingTour({
     const timer = setTimeout(() => {
       if (isLast) onDone?.()
       else setSceneIndex((index) => index + 1)
-    }, TOUR_SCENE_MS)
+    }, scene.duration ?? TOUR_SCENE_MS)
     return () => clearTimeout(timer)
-  }, [sceneIndex, scene.auto, isLast, onDone])
+  }, [sceneIndex, scene.auto, scene.duration, isLast, onDone])
 
   // Brings the first speech bubble of the scene into view, or its top when it has none.
   useEffect(() => {
