@@ -7,7 +7,12 @@ import { ThemeProvider } from '@/lib/theme'
 import { CopyProvider } from '@/lib/copy'
 import { setAppIconColor } from '@/plugins/appicon'
 import { todayString } from '@/lib/date'
-import { uid, normalizePeople } from '@/lib/helpers'
+import {
+  uid,
+  normalizePeople,
+  mergeEventTagsFromPeople,
+  mergePeopleFieldTags,
+} from '@/lib/helpers'
 import { hasScore } from '@/lib/format'
 import { clearPeopleFromDevice } from '@/lib/device-storage'
 import { useAppNavigation } from '@/hooks/useAppNavigation'
@@ -117,9 +122,23 @@ export default function KissWrappedApp() {
     resetTo('intro')
   }
 
+  // Registers the place and situation values used by the given people's events as tags.
+  function registerEventTags(sourcePeople) {
+    setSituationTags((prev) => mergeEventTagsFromPeople(sourcePeople, prev, 'situation'))
+    setPlaceTags((prev) => mergeEventTagsFromPeople(sourcePeople, prev, 'place'))
+  }
+
+  // Registers the how-we-met values of the given people as tags.
+  function registerHowWeMetTags(sourcePeople) {
+    setHowWeMetTags((prev) => mergePeopleFieldTags(sourcePeople, prev, 'howWeMet'))
+  }
+
   // Appends imported people (already deduplicated by the caller) to the existing dataset.
   function importAppData(rawPeople) {
-    setPeople((prev) => [...prev, ...normalizePeople(rawPeople)])
+    const importedPeople = normalizePeople(rawPeople)
+    setPeople((prev) => [...prev, ...importedPeople])
+    registerEventTags(importedPeople)
+    registerHowWeMetTags(importedPeople)
   }
 
   // Creates a new person and inserts an initial empty event.
@@ -140,6 +159,7 @@ export default function KissWrappedApp() {
     }
 
     setPeople((prev) => [newPerson, ...prev])
+    registerHowWeMetTags([newPerson])
 
     // Return to the entry screen after saving.
     resetTo('intro')
@@ -150,6 +170,7 @@ export default function KissWrappedApp() {
     setPeople((prev) =>
       prev.map((person) => (person.id === personId ? { ...person, ...values } : person))
     )
+    registerHowWeMetTags([values])
   }
 
   // Deletes a person completely from the dataset.
@@ -176,6 +197,7 @@ export default function KissWrappedApp() {
           : person
       )
     )
+    registerEventTags([{ events: [values] }])
   }
 
   // Updates a specific event for a person. Invalid scores are normalized to null.
@@ -198,6 +220,7 @@ export default function KissWrappedApp() {
           : person
       )
     )
+    registerEventTags([{ events: [values] }])
   }
 
   // Deletes one event from a person.
