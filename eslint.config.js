@@ -31,6 +31,7 @@ export default defineConfig([
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'max-lines': ['warn', { max: 400, skipBlankLines: true, skipComments: true }],
     },
   },
   {
@@ -38,5 +39,9 @@ export default defineConfig([
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },
     },
+  },
+  {
+    files: ['**/__tests__/**/*.{js,jsx}'],
+    rules: { 'max-lines': 'off' },
   },
 ])
