@@ -111,6 +111,7 @@ describe('PersonCardActions — onboarding guide', () => {
     expect(container.querySelector('[role="note"]')).toBeNull()
     expect(container.textContent).not.toContain('👆')
     expect(addEvent().style.pointerEvents).toBe('')
+    expect(addEvent().hasAttribute('data-tour-target')).toBe(false)
   })
 
   it('shows the edit hint as a note above the buttons', () => {
@@ -126,6 +127,7 @@ describe('PersonCardActions — onboarding guide', () => {
     render({ showTapGuide: true })
     expect(addEvent().textContent).toContain('👆')
     expect(addEvent().style.pointerEvents).toBe('auto')
+    expect(addEvent().hasAttribute('data-tour-target')).toBe(true)
     act(() => addEvent().click())
     expect(handlers.onAddEvent).toHaveBeenCalledOnce()
   })

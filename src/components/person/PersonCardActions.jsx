@@ -23,7 +23,7 @@ import TapGuide from '@/components/visuals/TapGuide'
  * highlighted when the person's own profile is missing required fields.
  * For the onboarding tour, `editHint` adds a speech bubble pointing at the edit
  * button and `showTapGuide` puts the tap guide on the add-event button, the
- * only one that then reacts to taps.
+ * only one the tour then leaves reachable (`data-tour-target`).
  */
 export default function PersonCardActions({
   hasEvents,
@@ -54,6 +54,7 @@ export default function PersonCardActions({
 
       <Button
         onClick={onAddEvent}
+        data-tour-target={showTapGuide ? '' : undefined}
         style={{
           background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
           color: PALETTE.textOnAccent,

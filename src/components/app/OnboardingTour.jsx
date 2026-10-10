@@ -6,16 +6,21 @@ import BottomNav from '@/components/app/BottomNav'
 import OnboardingButton from '@/components/app/OnboardingButton'
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
+import { setInertExcept } from '@/lib/inert'
 
 // Time an automatic scene stays on screen unless it sets its own `duration`.
 export const TOUR_SCENE_MS = 1800
 
 const noop = () => {}
 
+// What stays reachable on the screens: the speech bubbles, so they are still read
+// aloud, and the control a scene asks the user to tap.
+const TOUR_KEEP_SELECTOR = '[role="note"], [data-tour-target]'
+
 /**
  * Plays a guided tour over the real screens, fed with the practice person.
- * Nothing on the screens reacts to taps, except the add-event button of a
- * scene that points at it.
+ * Nothing on the screens reacts to taps, the keyboard or assistive technology,
+ * except the add-event button of a scene that points at it.
  *
  * Props:
  *  - scenes      Ordered scenes: `{ screen: 'home' | 'people', note, auto, duration, button,
@@ -43,6 +48,7 @@ export default function OnboardingTour({
   const PALETTE = usePalette()
   const [sceneIndex, setSceneIndex] = useState(0)
   const rootRef = useRef(null)
+  const screensRef = useRef(null)
 
   const scene = scenes[sceneIndex]
   const isLast = sceneIndex === scenes.length - 1
@@ -62,6 +68,10 @@ export default function OnboardingTour({
     }, scene.duration ?? TOUR_SCENE_MS)
     return () => clearTimeout(timer)
   }, [sceneIndex, scene.auto, scene.duration, isLast, onDone])
+
+  // Taps are already blocked by the wrapper; this also takes the screens out of the
+  // keyboard and of assistive technology. Redone per scene, as each one renders its own.
+  useEffect(() => setInertExcept(screensRef.current, TOUR_KEEP_SELECTOR), [sceneIndex])
 
   // Brings the first speech bubble of the scene into view, or its top when it has none.
   useEffect(() => {
@@ -116,7 +126,7 @@ export default function OnboardingTour({
       )}
 
       {/* The tour drives the screens: taps do nothing. */}
-      <div style={{ pointerEvents: 'none' }}>
+      <div ref={screensRef} style={{ pointerEvents: 'none' }}>
         {scene.screen === 'home' ? (
           <HomeScreen
             onNavigate={noop}
