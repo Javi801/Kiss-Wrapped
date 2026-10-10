@@ -104,7 +104,8 @@ export function usePersistedAppState(setScreen) {
         // Fallback to an empty dataset if loading fails.
         if (isMounted) {
           setPeople([])
-          setOnboardingDone(false)
+          // A failed load is not a new install: do not send the user through the onboarding.
+          setOnboardingDone(true)
           setLanguage(detectDeviceLanguage())
           setScreen('intro')
         }

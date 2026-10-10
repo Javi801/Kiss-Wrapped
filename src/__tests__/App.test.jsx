@@ -257,6 +257,22 @@ describe('App — boot', () => {
     expect(screens.main.people).toEqual([])
   })
 
+  it('does not send the user through the onboarding when loading fails', async () => {
+    mockFeatures.onboarding = true
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    mockStorage.loadPeopleFromDevice.mockRejectedValue(new Error('corrupt file'))
+    container = document.createElement('div')
+    document.body.appendChild(container)
+    root = createRoot(container)
+    await act(async () => {
+      root.render(<KissWrappedApp />)
+    })
+    expect(screens.intro.showEntryGuide).toBe(false)
+    expect(savedSettings()).toMatchObject({ onboardingDone: true })
+    openMain()
+    expect(visibleScreens()).toEqual(['main'])
+  })
+
   it('applies the dark class to the document only for the dark theme', async () => {
     await boot({ settings: { theme: 'dark' } })
     expect(document.documentElement.classList.contains('dark')).toBe(true)
