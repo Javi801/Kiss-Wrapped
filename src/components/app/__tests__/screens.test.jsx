@@ -64,6 +64,34 @@ describe('IntroScreen', () => {
     render(<IntroScreen onOpenMain={() => {}} t={t} />)
     expect(container.querySelectorAll('button, a')).toHaveLength(1)
   })
+
+  it('hides the entry guide by default', () => {
+    render(<IntroScreen onOpenMain={() => {}} t={t} />)
+    expect(container.textContent).not.toContain(t.entryGuideTitle)
+    expect(container.textContent).not.toContain('👆')
+  })
+
+  it('shows the entry guide callout and the tapping hand when asked', () => {
+    render(<IntroScreen onOpenMain={() => {}} showEntryGuide t={t} />)
+    expect(container.querySelector('h2').textContent).toBe(t.entryGuideTitle)
+    expect(container.textContent).toContain(t.entryGuideBody)
+    expect(container.textContent).toContain('👆')
+  })
+
+  it('keeps the animated hints out of the accessibility tree and of the way of taps', () => {
+    render(<IntroScreen onOpenMain={() => {}} showEntryGuide t={t} />)
+    const hints = [...container.querySelectorAll('[aria-hidden="true"]')]
+    expect(hints).toHaveLength(2)
+    for (const hint of hints) expect(hint.style.pointerEvents).toBe('none')
+  })
+
+  it('still opens the app from the heart while the entry guide is shown', () => {
+    const onOpenMain = vi.fn()
+    render(<IntroScreen onOpenMain={onOpenMain} showEntryGuide t={t} />)
+    expect(container.querySelectorAll('button, a')).toHaveLength(1)
+    click(container.querySelector(`button[aria-label="${t.hiddenAccess}"]`))
+    expect(onOpenMain).toHaveBeenCalledOnce()
+  })
 })
 
 describe('OnboardingWizard', () => {
