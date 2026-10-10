@@ -1,11 +1,13 @@
 import { describe, it, expect } from 'vitest'
 import {
   uid,
+  createPerson,
   normalizePeople,
   hexToRgb,
   mergeEventTagsFromPeople,
   mergePeopleFieldTags,
 } from '@/lib/helpers'
+import { todayString } from '@/lib/date'
 
 describe('uid', () => {
   it('returns a non-empty alphanumeric string', () => {
@@ -381,5 +383,21 @@ describe('mergePeopleFieldTags', () => {
     const existing = ['Friends']
     mergePeopleFieldTags([{ howWeMet: 'App' }], existing, 'howWeMet')
     expect(existing).toEqual(['Friends'])
+  })
+})
+
+describe('createPerson', () => {
+  it('adds an id and an initial empty event dated today', () => {
+    const person = createPerson({ name: 'Mia', realName: 'Maria', howWeMet: 'School' })
+    expect(person).toMatchObject({ name: 'Mia', realName: 'Maria', howWeMet: 'School' })
+    expect(person.id).toMatch(/^[a-z0-9]+$/)
+    expect(person.events).toEqual([
+      { id: expect.any(String), date: todayString(), details: '', score: null },
+    ])
+    expect(person.events[0].id).not.toBe(person.id)
+  })
+
+  it('defaults the optional text fields to empty strings', () => {
+    expect(createPerson({ name: 'Mia' })).toMatchObject({ realName: '', howWeMet: '' })
   })
 })

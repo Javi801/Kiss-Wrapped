@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
 import { COPY, ZODIAC_OPTIONS } from '@/lib/constants'
 import { LIMITS } from '@/lib/config'
-import { completePracticePerson } from '@/lib/onboarding'
+import { completePracticeEvent, completePracticePerson } from '@/lib/onboarding'
 
 const t = COPY.en
 // Mid-June: Aquarius has already ended this year, Gemini is running.
@@ -119,5 +119,75 @@ describe('completePracticePerson', () => {
   it('uses the zodiac options of the active language', () => {
     expect(completePracticePerson(EMPTY, 'es', COPY.es).zodiacSign).toBe(sign('♒', 'es'))
     expect(completePracticePerson(EMPTY, 'es', COPY.es).name).toBe(COPY.es.onboardingPracticeName)
+  })
+})
+
+describe('completePracticeEvent', () => {
+  const EMPTY_EVENT = {
+    date: '',
+    details: '',
+    score: 'none',
+    place: '',
+    situation: '',
+    observations: '',
+  }
+
+  it('fills an empty form with a full example event dated today', () => {
+    expect(completePracticeEvent(EMPTY_EVENT, t)).toEqual({
+      date: '2024.06.15',
+      details: '',
+      score: null,
+      place: t.onboardingPracticePlace,
+      situation: t.onboardingPracticeSituation,
+      observations: '',
+    })
+  })
+
+  it('keeps every valid value that was entered', () => {
+    expect(
+      completePracticeEvent(
+        {
+          date: '2024.03.08',
+          details: ' walk ',
+          score: '4',
+          place: ' Park ',
+          situation: ' Date ',
+          observations: ' sunny ',
+        },
+        t
+      )
+    ).toEqual({
+      date: '2024.03.08',
+      details: 'walk',
+      score: 4,
+      place: 'Park',
+      situation: 'Date',
+      observations: 'sunny',
+    })
+  })
+
+  it('keeps a score of zero', () => {
+    expect(completePracticeEvent({ ...EMPTY_EVENT, score: '0' }, t).score).toBe(0)
+  })
+
+  it('replaces values that are not valid', () => {
+    for (const date of ['2024.13.40', 'yesterday', '2024.06.16', undefined]) {
+      expect(completePracticeEvent({ ...EMPTY_EVENT, date }, t).date).toBe('2024.06.15')
+    }
+    for (const score of ['', '9', '2.5', 'many', undefined]) {
+      expect(completePracticeEvent({ ...EMPTY_EVENT, score }, t).score).toBeNull()
+    }
+    expect(completePracticeEvent({ place: '   ', situation: '  ' }, t)).toMatchObject({
+      place: t.onboardingPracticePlace,
+      situation: t.onboardingPracticeSituation,
+      details: '',
+      observations: '',
+    })
+  })
+
+  it('uses the example values of the active language', () => {
+    expect(completePracticeEvent(EMPTY_EVENT, COPY.es).situation).toBe(
+      COPY.es.onboardingPracticeSituation
+    )
   })
 })

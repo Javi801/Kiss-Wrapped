@@ -456,3 +456,16 @@ describe('PeopleManagerScreen — filter sheet', () => {
     expect(modalBackRef.current).toBeNull()
   })
 })
+
+describe('PeopleManagerScreen — onboarding guide', () => {
+  it('passes no guide to the cards by default', () => {
+    render([person('Ana')])
+    expect(Object.values(seen.cards)[0].guide).toBeUndefined()
+  })
+
+  it('passes the card guide to the cards', () => {
+    const cardGuide = { expanded: true }
+    render([person('Ana')], { cardGuide })
+    expect(Object.values(seen.cards)[0].guide).toBe(cardGuide)
+  })
+})

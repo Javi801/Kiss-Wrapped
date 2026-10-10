@@ -485,3 +485,17 @@ describe('HomeScreen — hardware back button and dismissal', () => {
     expect(dialog()).not.toBeNull()
   })
 })
+
+describe('HomeScreen — onboarding guide', () => {
+  it('shows no tap guide by default', () => {
+    render()
+    expect(container.textContent).not.toContain('👆')
+  })
+
+  it('puts the tap guide on the people button', () => {
+    render({ guideTarget: 'people' })
+    expect(find(t.viewEditPeople).textContent).toContain('👆')
+    expect(find(t.viewEditPeople).style.position).toBe('relative')
+    expect(find(t.addNewPerson).textContent).not.toContain('👆')
+  })
+})

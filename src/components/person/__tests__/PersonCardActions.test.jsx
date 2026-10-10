@@ -101,3 +101,32 @@ describe('PersonCardActions', () => {
     expect(handlers.onDeletePerson).not.toHaveBeenCalled()
   })
 })
+
+describe('PersonCardActions — onboarding guide', () => {
+  const addEvent = () =>
+    [...container.querySelectorAll('button')].find((item) => item.textContent.includes(t.addEvent))
+
+  it('shows no hint and no tap guide by default', () => {
+    render()
+    expect(container.querySelector('[role="note"]')).toBeNull()
+    expect(container.textContent).not.toContain('👆')
+    expect(addEvent().style.pointerEvents).toBe('')
+  })
+
+  it('shows the edit hint as a note above the buttons', () => {
+    render({ editHint: 'About editing' })
+    const note = container.querySelector('[role="note"]')
+    expect(note.textContent).toBe('About editing')
+    expect(note.compareDocumentPosition(button(t.editPerson))).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING
+    )
+  })
+
+  it('puts the tap guide on the add-event button and keeps it tappable', () => {
+    render({ showTapGuide: true })
+    expect(addEvent().textContent).toContain('👆')
+    expect(addEvent().style.pointerEvents).toBe('auto')
+    act(() => addEvent().click())
+    expect(handlers.onAddEvent).toHaveBeenCalledOnce()
+  })
+})

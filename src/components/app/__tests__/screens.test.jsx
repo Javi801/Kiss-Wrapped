@@ -201,6 +201,53 @@ describe('OnboardingWizard', () => {
     expect(container.querySelector('i').textContent).toBe('Mia')
   })
 
+  it('gives the practice person an id and its first event', () => {
+    const steps = [
+      step(({ onPracticePerson }) => <button onClick={() => onPracticePerson({ name: 'Mia' })} />),
+      step(({ practicePerson }) => (
+        <i>{practicePerson ? `${typeof practicePerson.id}:${practicePerson.events.length}` : ''}</i>
+      )),
+    ]
+    render(<OnboardingWizard t={t} onComplete={() => {}} steps={steps} />)
+    click(container.querySelector('button'))
+    click(container.querySelectorAll('button')[1])
+    expect(container.querySelector('i').textContent).toBe('string:1')
+  })
+
+  it('adds the practice event on top of the practice person events', () => {
+    const steps = [
+      step(
+        ({ onPracticePerson, onPracticeEvent, practicePerson, onNext }) => (
+          <>
+            <button onClick={() => onPracticePerson({ name: 'Mia' })} />
+            <button onClick={() => onPracticeEvent({ place: 'Park' })} />
+            <button onClick={onNext} />
+            <b>{practicePerson?.events.length}</b>
+          </>
+        ),
+        true
+      ),
+      step(({ practicePerson }) => (
+        <i>{`${practicePerson.events[0].place}:${typeof practicePerson.events[0].id}`}</i>
+      )),
+    ]
+    render(<OnboardingWizard t={t} onComplete={() => {}} steps={steps} />)
+    const buttons = container.querySelectorAll('button')
+    click(buttons[0])
+    click(buttons[1])
+    expect(container.querySelector('b').textContent).toBe('2')
+    click(buttons[2])
+    expect(container.querySelector('i').textContent).toBe('Park:string')
+  })
+
+  it('passes the settings to the current step', () => {
+    const steps = [step(({ settings }) => <i>{settings.theme}</i>)]
+    render(
+      <OnboardingWizard t={t} settings={{ theme: 'dark' }} onComplete={() => {}} steps={steps} />
+    )
+    expect(container.querySelector('i').textContent).toBe('dark')
+  })
+
   it('shows the person form as the second step', () => {
     render(<OnboardingWizard t={t} language="en" onComplete={() => {}} />)
     click(container.querySelector('button'))
