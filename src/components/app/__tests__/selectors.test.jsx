@@ -3,7 +3,7 @@ import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { COPY } from '@/lib/constants'
-import { ICON_COLORS, LANGUAGES, THEMES } from '@/lib/config'
+import { ICON_COLORS, THEMES } from '@/lib/config'
 
 const select = vi.hoisted(() => ({ props: null }))
 
@@ -23,8 +23,6 @@ vi.mock('@/components/ui/select', async () => {
 })
 
 import ColorSelector from '@/components/app/ColorSelector'
-import LanguageSelector from '@/components/app/LanguageSelector'
-import ThemeSelector from '@/components/app/ThemeSelector'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
@@ -58,30 +56,6 @@ beforeEach(() => {
 afterEach(() => {
   act(() => root.unmount())
   container.remove()
-})
-
-describe('ThemeSelector', () => {
-  it('offers every supported theme with its translated name', () => {
-    render(<ThemeSelector theme="pink" setTheme={() => {}} t={t} />)
-    expect(buttons().map((button) => button.textContent)).toEqual(THEMES.map(themeLabel))
-    expect(THEMES.map(themeLabel).every(Boolean)).toBe(true)
-  })
-
-  it.each(THEMES)('selects the %s theme when its button is tapped', (theme) => {
-    const setTheme = vi.fn()
-    render(<ThemeSelector theme="pink" setTheme={setTheme} t={t} />)
-    click(buttons().find((button) => button.textContent === themeLabel(theme)))
-    expect(setTheme).toHaveBeenCalledOnce()
-    expect(setTheme).toHaveBeenCalledWith(theme)
-  })
-
-  it('emphasizes only the active theme', () => {
-    render(<ThemeSelector theme="green" setTheme={() => {}} t={t} />)
-    const bold = [...container.querySelectorAll('span')]
-      .filter((span) => span.style.fontWeight === '700')
-      .map((span) => span.textContent)
-    expect(bold).toEqual([themeLabel('green')])
-  })
 })
 
 describe('ColorSelector', () => {
@@ -130,22 +104,5 @@ describe('ColorSelector', () => {
     expect(buttons().map((button) => button.textContent)).toEqual(THEMES.map(themeLabel))
     click(buttons().find((button) => button.textContent === themeLabel('dark')))
     expect(setTheme).toHaveBeenCalledWith('dark')
-  })
-})
-
-describe('LanguageSelector', () => {
-  it('offers every supported language', () => {
-    render(<LanguageSelector language="en" setLanguage={() => {}} t={t} />)
-    expect(items().map((item) => item.dataset.value)).toEqual(LANGUAGES)
-    expect(container.querySelector('li[data-value="en"]').textContent).toBe(t.english)
-    expect(container.querySelector('li[data-value="es"]').textContent).toBe(t.spanish)
-  })
-
-  it('binds the select to the current language and its setter', () => {
-    const setLanguage = vi.fn()
-    render(<LanguageSelector language="es" setLanguage={setLanguage} t={t} />)
-    expect(select.props.value).toBe('es')
-    select.props.onValueChange('en')
-    expect(setLanguage).toHaveBeenCalledWith('en')
   })
 })

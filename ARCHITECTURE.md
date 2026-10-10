@@ -32,7 +32,7 @@ src/
   shadcn-tailwind.css   Vendored copy of shadcn's `tailwind.css`, imported by index.css
   components/
     app/                Top-level screens and app-level widgets (Home, AddPerson, Intro,
-                        Onboarding, Privacy, ErrorBoundary, Language/Theme/Color selectors),
+                        Onboarding, Privacy, ErrorBoundary, Color selector),
                         plus the sections and dialogs of the Home screen (HomeHeroCard,
                         HomeActions, HomeSettingsDialogs, AboutDialog, JsonExportDialogs,
                         ImportDialogs, ImportPartnerDialogs)

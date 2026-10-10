@@ -11,7 +11,6 @@ const palette = vi.hoisted(() => ({
 vi.mock('@/lib/theme', () => ({ usePalette: () => palette }))
 
 import StatTile from '@/components/shared/StatTile'
-import SettingsTile from '@/components/shared/SettingsTile'
 import TileCard from '@/components/shared/TileCard'
 
 describe('TileCard', () => {
@@ -34,12 +33,6 @@ describe('TileCard', () => {
     const html = renderToStaticMarkup(<TileCard accent>x</TileCard>)
     expect(html).not.toContain(palette.cardBorder)
     expect(html).not.toContain(palette.cardBg)
-  })
-
-  it('lets the caller override the content padding', () => {
-    const html = renderToStaticMarkup(<TileCard contentStyle={{ padding: '3rem' }}>x</TileCard>)
-    expect(html).toContain('padding:3rem')
-    expect(html).not.toContain('padding:1.25rem')
   })
 })
 
@@ -68,36 +61,5 @@ describe('StatTile', () => {
     expect(regular).toContain(`color:${palette.text}`)
     expect(accent).not.toContain(`color:${palette.text}`)
     expect(accent).toContain('color:#ffffff')
-  })
-})
-
-describe('SettingsTile', () => {
-  it('renders the label and its children', () => {
-    const html = renderToStaticMarkup(
-      <SettingsTile label="Appearance">
-        <button>toggle</button>
-      </SettingsTile>
-    )
-    expect(html).toContain('Appearance')
-    expect(html).toContain('<button>toggle</button>')
-  })
-
-  it('omits the label paragraph when there is no label', () => {
-    const html = renderToStaticMarkup(
-      <SettingsTile>
-        <button>toggle</button>
-      </SettingsTile>
-    )
-    expect(html).not.toContain('<p')
-    expect(html).toContain('<button>toggle</button>')
-  })
-
-  it('forwards contentStyle to the card', () => {
-    const html = renderToStaticMarkup(
-      <SettingsTile label="Appearance" contentStyle={{ padding: '3rem' }}>
-        x
-      </SettingsTile>
-    )
-    expect(html).toContain('padding:3rem')
   })
 })
