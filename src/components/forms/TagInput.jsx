@@ -14,6 +14,19 @@ function getViewportMetrics() {
   }
 }
 
+// Room a side needs to keep the dropdown; below it the other side is considered.
+const MIN_ROOM = 160
+
+function isSamePosition(a, b) {
+  return (
+    a?.placement === b.placement &&
+    a.top === b.top &&
+    a.left === b.left &&
+    a.width === b.width &&
+    a.maxHeight === b.maxHeight
+  )
+}
+
 export default function TagInput({
   value,
   onChange,
@@ -53,8 +66,11 @@ export default function TagInput({
     if (anchorBottom < 0 || anchorTop > vph) return null
     const spaceBelow = vph - anchorBottom - 4
     const spaceAbove = anchorTop - 4
-    if (!placementRef.current) {
-      placementRef.current = spaceBelow < 160 && spaceAbove > spaceBelow ? 'up' : 'down'
+    // The side is kept while it has room, so scrolling does not make the dropdown
+    // flip, and picked again once it runs out (e.g. the keyboard covers it).
+    const room = placementRef.current === 'up' ? spaceAbove : spaceBelow
+    if (!placementRef.current || room < MIN_ROOM) {
+      placementRef.current = spaceBelow < MIN_ROOM && spaceAbove > spaceBelow ? 'up' : 'down'
     }
     const placement = placementRef.current
     return {
@@ -101,9 +117,16 @@ export default function TagInput({
       if (!next) {
         closeDropdown()
       } else {
-        setPos(next)
+        setPos((prev) => (isSamePosition(prev, next) ? prev : next))
       }
     }
+
+    // The input can also move with no scroll or resize event at all (a transition
+    // or a layout change in the parent dialog), so it is checked on every frame too.
+    let frame = requestAnimationFrame(function follow() {
+      reposition()
+      frame = requestAnimationFrame(follow)
+    })
 
     document.addEventListener('mousedown', closeIfOutside)
     window.addEventListener('scroll', reposition, true)
@@ -111,6 +134,7 @@ export default function TagInput({
     window.visualViewport?.addEventListener('resize', reposition)
     window.visualViewport?.addEventListener('scroll', reposition)
     return () => {
+      cancelAnimationFrame(frame)
       document.removeEventListener('mousedown', closeIfOutside)
       window.removeEventListener('scroll', reposition, true)
       window.removeEventListener('resize', reposition)

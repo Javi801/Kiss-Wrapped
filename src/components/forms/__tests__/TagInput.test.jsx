@@ -74,6 +74,7 @@ afterEach(() => {
   act(() => root.unmount())
   container.remove()
   vi.restoreAllMocks()
+  vi.useRealTimers()
 })
 
 describe('TagInput — suggestions', () => {
@@ -267,5 +268,53 @@ describe('TagInput — placement', () => {
       window.dispatchEvent(new Event('scroll'))
     })
     expect(dropdown().style.top).toBe('104px')
+  })
+
+  it('follows the input when it moves without a scroll or resize event', () => {
+    vi.useFakeTimers({ toFake: ['requestAnimationFrame', 'cancelAnimationFrame'] })
+    render()
+    placeInputAt(100, 140)
+    focus()
+    placeInputAt(60, 100)
+    act(() => {
+      vi.advanceTimersToNextFrame()
+    })
+    expect(dropdown().style.top).toBe('104px')
+  })
+
+  it('closes when the input moves out of view without a scroll or resize event', () => {
+    vi.useFakeTimers({ toFake: ['requestAnimationFrame', 'cancelAnimationFrame'] })
+    render()
+    placeInputAt(100, 140)
+    focus()
+    placeInputAt(-80, -40)
+    act(() => {
+      vi.advanceTimersToNextFrame()
+    })
+    expect(options()).toHaveLength(0)
+  })
+
+  it('moves above the input once the room below runs out', () => {
+    render()
+    placeInputAt(100, 140)
+    focus()
+    placeInputAt(600, 640)
+    act(() => {
+      window.dispatchEvent(new Event('resize'))
+    })
+    expect(dropdown().style.top).toBe('596px')
+    expect(dropdown().style.transform).toBe('translateY(-100%)')
+  })
+
+  it('stays above the input while there is still room there', () => {
+    render()
+    placeInputAt(700, 740)
+    focus()
+    placeInputAt(400, 440)
+    act(() => {
+      window.dispatchEvent(new Event('scroll'))
+    })
+    expect(dropdown().style.top).toBe('396px')
+    expect(dropdown().style.transform).toBe('translateY(-100%)')
   })
 })
