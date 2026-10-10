@@ -5,6 +5,7 @@ import {
   translateGender,
   translatePartnerError,
   eventIsMissingRequired,
+  personIsMissingRequired,
   personHasIncompleteEvent,
   hasScore,
   renderKisses,
@@ -148,6 +149,29 @@ describe('eventIsMissingRequired', () => {
   })
   it('returns true when both fields are absent', () => {
     expect(eventIsMissingRequired({})).toBe(true)
+  })
+})
+
+describe('personIsMissingRequired', () => {
+  it('returns false when every profile field is filled in', () => {
+    expect(personIsMissingRequired(COMPLETE_PERSON)).toBe(false)
+  })
+  it.each([
+    ['name', ''],
+    ['name', '   '],
+    ['birthYear', null],
+    ['gender', ''],
+    ['zodiacSign', ''],
+    ['activity', ''],
+    ['howWeMet', ''],
+    ['howWeMet', '   '],
+    ['howWeMet', undefined],
+  ])('returns true when %s is %o', (field, value) => {
+    expect(personIsMissingRequired({ ...COMPLETE_PERSON, [field]: value })).toBe(true)
+  })
+  it('ignores incomplete events', () => {
+    const person = { ...COMPLETE_PERSON, events: [{ place: 'park' }] }
+    expect(personIsMissingRequired(person)).toBe(false)
   })
 })
 
