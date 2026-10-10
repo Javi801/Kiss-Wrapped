@@ -13,6 +13,23 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rolldownOptions: {
+      output: {
+        // Vendor groups only spread the initial load across files; they do not defer anything.
+        codeSplitting: {
+          // Off so a group cannot absorb modules the entry also uses (clsx via recharts),
+          // which would make the entry load that whole group at startup.
+          includeDependenciesRecursively: false,
+          groups: [
+            { name: "react", test: /node_modules[\\/](react|react-dom|scheduler)[\\/]/ },
+            { name: "motion", test: /node_modules[\\/](framer-motion|motion-dom|motion-utils)[\\/]/ },
+            { name: "recharts", test: /node_modules[\\/](recharts|victory-vendor|d3-[^\\/]+)[\\/]/ },
+          ],
+        },
+      },
+    },
+  },
   test: {
     environment: "node",
     coverage: {
