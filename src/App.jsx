@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, Users, BarChart3, UserPlus } from 'lucide-react'
 import { App as CapacitorApp } from '@capacitor/app'
@@ -33,7 +33,9 @@ import AddPersonScreen from './components/app/AddPersonScreen'
 import IntroScreen from './components/app/IntroScreen'
 import OnboardingScreen from './components/app/OnboardingScreen'
 import PrivacyScreen from './components/app/PrivacyScreen'
-import StatsScreen from '@/components/stats/StatsScreen'
+
+// Loaded on demand so the charting libraries stay out of the initial chunk.
+const StatsScreen = lazy(() => import('@/components/stats/StatsScreen'))
 
 /**
  * Main app container.
@@ -562,12 +564,14 @@ export default function KissWrappedApp() {
 
               {/* Statistics screen */}
               {screen === 'stats' ? (
-                <StatsScreen
-                  people={people}
-                  t={t}
-                  language={language}
-                  modalBackRef={modalBackRef}
-                />
+                <Suspense fallback={null}>
+                  <StatsScreen
+                    people={people}
+                    t={t}
+                    language={language}
+                    modalBackRef={modalBackRef}
+                  />
+                </Suspense>
               ) : null}
             </motion.div>
 

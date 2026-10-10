@@ -1,4 +1,3 @@
-import jsPDF from 'jspdf'
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem'
 import { Share } from '@capacitor/share'
 import { CHART_COLORS, PALETTE } from '@/lib/constants'
@@ -251,6 +250,7 @@ function buildScoreLabels(scoresByKisses, t) {
 export async function exportStatsPdf(people, t, language = DEFAULT_SETTINGS.language) {
   const stats = getStatsData(people, t, language)
   const copy = buildWrappedCopy(language)
+  const { default: jsPDF } = await import('jspdf')
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })
   const pageW = doc.internal.pageSize.getWidth()
   const pageH = doc.internal.pageSize.getHeight()
