@@ -1,9 +1,28 @@
 import { hasScore } from '@/lib/format'
+import { todayString } from '@/lib/date'
 import { sanitizePartnerFields } from '@/lib/partner'
 
 // Generates a short unique id for entities
 export function uid() {
   return Math.random().toString(36).slice(2, 10)
+}
+
+// Builds a new person from the person form values, with an initial empty event dated today.
+export function createPerson(values) {
+  return {
+    id: uid(),
+    ...values,
+    realName: values.realName || '',
+    howWeMet: values.howWeMet || '',
+    events: [
+      {
+        id: uid(),
+        date: todayString(),
+        details: '',
+        score: null,
+      },
+    ],
+  }
 }
 
 // Normalizes people data ensuring events array, valid scores, and partner fields.

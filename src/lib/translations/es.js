@@ -336,6 +336,19 @@ export const es = {
   onboardingZodiacHint:
     'La edad se actualiza sola según el signo. Si el signo es el de estas fechas, arriba aparecerá una pregunta sobre el cumpleaños para calcularla bien.',
   onboardingPracticeName: 'Persona de ejemplo',
+  onboardingTourHomeNote: 'Así se llega a tus personas',
+  onboardingTourListNote: 'Aquí están las personas que guardas',
+  onboardingTourPersonNote: 'Toca Agregar evento para continuar',
+  onboardingEditPersonHint:
+    'Aquí editas sus datos. Al crearla queda incompleta: hay datos que debes completar tú, como cómo se conocieron.',
+  onboardingEventHint:
+    'Toca un evento para editarlo. El primero se crea vacío: el lugar y la situación los completas tú.',
+  onboardingEventTitle: 'Registra un encuentro',
+  onboardingEventBody: 'Llena los datos del encuentro, u omítelo para usar uno de ejemplo.',
+  onboardingTagsHint:
+    'Lugar y situación se guardan como etiquetas, para que puedas reutilizarlas en otros eventos.',
+  onboardingPracticePlace: 'Café',
+  onboardingPracticeSituation: 'Cita',
   entryGuideTitle: 'Entrada real de la app',
   entryGuideBody: 'Toca el corazón sutil de la esquina para abrir tu espacio.',
 }

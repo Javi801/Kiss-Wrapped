@@ -6,8 +6,13 @@ import { PALETTES, TEXT, COPY } from '@/lib/constants'
 import { ThemeProvider } from '@/lib/theme'
 import { CopyProvider } from '@/lib/copy'
 import { setAppIconColor } from '@/plugins/appicon'
-import { todayString } from '@/lib/date'
-import { uid, normalizePeople, mergeEventTagsFromPeople, mergePeopleFieldTags } from '@/lib/helpers'
+import {
+  uid,
+  createPerson,
+  normalizePeople,
+  mergeEventTagsFromPeople,
+  mergePeopleFieldTags,
+} from '@/lib/helpers'
 import { hasScore } from '@/lib/format'
 import { clearPeopleFromDevice } from '@/lib/device-storage'
 import { useAppNavigation } from '@/hooks/useAppNavigation'
@@ -139,20 +144,7 @@ export default function KissWrappedApp() {
 
   // Creates a new person and inserts an initial empty event.
   function addPerson(values) {
-    const newPerson = {
-      id: uid(),
-      ...values,
-      realName: values.realName || '',
-      howWeMet: values.howWeMet || '',
-      events: [
-        {
-          id: uid(),
-          date: todayString(),
-          details: '',
-          score: null,
-        },
-      ],
-    }
+    const newPerson = createPerson(values)
 
     setPeople((prev) => [newPerson, ...prev])
     registerHowWeMetTags([newPerson])
@@ -446,7 +438,12 @@ export default function KissWrappedApp() {
         </div>
         {/* Full-screen overlays rendered outside the masked scroll area */}
         {screen === 'onboarding' ? (
-          <OnboardingWizard t={t} language={language} onComplete={handleOnboardingComplete} />
+          <OnboardingWizard
+            t={t}
+            language={language}
+            settings={{ theme, iconColor, statsVisible, includePartnerEvents }}
+            onComplete={handleOnboardingComplete}
+          />
         ) : null}
         {screen === 'intro' ? (
           <IntroScreen

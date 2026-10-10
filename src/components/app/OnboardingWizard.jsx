@@ -3,12 +3,17 @@ import { usePalette } from '@/lib/theme'
 import { TEXT } from '@/lib/constants'
 import OnboardingWelcomeStep from '@/components/app/OnboardingWelcomeStep'
 import OnboardingPersonStep from '@/components/app/OnboardingPersonStep'
+import OnboardingTourStep from '@/components/app/OnboardingTourStep'
+import OnboardingEventStep from '@/components/app/OnboardingEventStep'
+import { createPerson, uid } from '@/lib/helpers'
 
 // Ordered wizard steps. The step counter total comes from this list's length.
 // A step with `ownsActions` renders its own buttons and advances through `onNext`.
 const ONBOARDING_STEPS = [
   { Component: OnboardingWelcomeStep },
   { Component: OnboardingPersonStep, ownsActions: true },
+  { Component: OnboardingTourStep, ownsActions: true },
+  { Component: OnboardingEventStep, ownsActions: true },
 ]
 
 /**
@@ -18,18 +23,32 @@ const ONBOARDING_STEPS = [
  * Props:
  *  - t           Active translation dictionary
  *  - language    Active language
+ *  - settings    Settings the home screen of the tour shows
  *  - onComplete  Called when the user finishes the wizard
  *  - steps       Step entries `{ Component, ownsActions }`, rendered in order
  */
-export default function OnboardingWizard({ t, language, onComplete, steps = ONBOARDING_STEPS }) {
+export default function OnboardingWizard({
+  t,
+  language,
+  settings,
+  onComplete,
+  steps = ONBOARDING_STEPS,
+}) {
   const PALETTE = usePalette()
   const [stepIndex, setStepIndex] = useState(0)
-  // Person created in the wizard for the later steps. It is never saved.
+  // Person created in the wizard for the later steps, with its events. It is never saved.
   const [practicePerson, setPracticePerson] = useState(null)
 
   const { Component: Step, ownsActions } = steps[stepIndex]
   const isLast = stepIndex === steps.length - 1
   const goNext = isLast ? onComplete : () => setStepIndex(stepIndex + 1)
+
+  function addPracticeEvent(values) {
+    setPracticePerson((person) => ({
+      ...person,
+      events: [{ id: uid(), ...values }, ...person.events],
+    }))
+  }
   const stepCount = t.onboardingStepCount
     .replace('{current}', stepIndex + 1)
     .replace('{total}', steps.length)
@@ -64,7 +83,9 @@ export default function OnboardingWizard({ t, language, onComplete, steps = ONBO
         <span style={{ ...TEXT.label, color: PALETTE.textSoft }}>{stepCount}</span>
       </div>
 
+      {/* Keyed by step so each one starts scrolled to its top. */}
       <div
+        key={stepIndex}
         style={{
           position: 'relative',
           flex: 1,
@@ -80,8 +101,10 @@ export default function OnboardingWizard({ t, language, onComplete, steps = ONBO
           <Step
             t={t}
             language={language}
+            settings={settings}
             practicePerson={practicePerson}
-            onPracticePerson={setPracticePerson}
+            onPracticePerson={(values) => setPracticePerson(createPerson(values))}
+            onPracticeEvent={addPracticeEvent}
             onNext={goNext}
           />
         </div>

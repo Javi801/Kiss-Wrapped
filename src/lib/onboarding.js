@@ -1,6 +1,12 @@
-import { GENDERS, ZODIAC_OPTIONS } from '@/lib/constants'
+import { GENDERS, SCORE_OPTIONS, ZODIAC_OPTIONS } from '@/lib/constants'
 import { LIMITS } from '@/lib/config'
-import { deriveBirthYear, isWithinZodiacPeriod } from '@/lib/date'
+import {
+  deriveBirthYear,
+  isFutureDate,
+  isValidDateString,
+  isWithinZodiacPeriod,
+  todayString,
+} from '@/lib/date'
 
 const PRACTICE_AGE = 25
 const ACTIVITIES = ['studies', 'works', 'studies and works', 'other']
@@ -39,5 +45,24 @@ export function completePracticePerson(values, language, t) {
     partnerTo: '',
     birthYear: deriveBirthYear(age, zodiacSign, birthdayAlreadyHappened),
     birthdayAlreadyHappened,
+  }
+}
+
+/**
+ * Builds the practice event of the onboarding from a partly filled event form.
+ * Keeps every valid value and fills the rest, returning the shape `EventForm` saves.
+ */
+export function completePracticeEvent(values, t) {
+  const hasDate = isValidDateString(values.date) && !isFutureDate(values.date)
+  // The form holds the score as a string, 'none' when it is not set.
+  const score = /^\d+$/.test(String(values.score)) ? Number(values.score) : null
+
+  return {
+    date: hasDate ? values.date : todayString(),
+    details: (values.details || '').trim(),
+    score: SCORE_OPTIONS.includes(score) ? score : null,
+    place: (values.place || '').trim() || t.onboardingPracticePlace,
+    situation: (values.situation || '').trim() || t.onboardingPracticeSituation,
+    observations: (values.observations || '').trim(),
   }
 }

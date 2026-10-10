@@ -336,6 +336,19 @@ export const en = {
   onboardingZodiacHint:
     'The age updates on its own based on the sign. If the sign is the current one, a question about the birthday appears above to get it right.',
   onboardingPracticeName: 'Example person',
+  onboardingTourHomeNote: 'This is how you get to your people',
+  onboardingTourListNote: 'Here are the people you save',
+  onboardingTourPersonNote: 'Tap Add event to continue',
+  onboardingEditPersonHint:
+    'Edit their details here. A new person starts incomplete: some details are yours to fill in, like how you met.',
+  onboardingEventHint:
+    'Tap an event to edit it. The first one starts empty: the place and the situation are yours to fill in.',
+  onboardingEventTitle: 'Log an encounter',
+  onboardingEventBody: 'Fill in the encounter, or skip it to use an example one.',
+  onboardingTagsHint:
+    'Place and situation are saved as tags, so you can reuse them in other events.',
+  onboardingPracticePlace: 'Café',
+  onboardingPracticeSituation: 'Date',
   entryGuideTitle: "The app's real entrance",
   entryGuideBody: 'Tap the subtle heart in the corner to open your space.',
 }
