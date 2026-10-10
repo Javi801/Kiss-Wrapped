@@ -51,7 +51,7 @@ export default function KissWrappedApp() {
 
   // Fetches the stats chunk after the first render so opening the screen does not wait for it.
   useEffect(() => {
-    loadStatsScreen().catch(() => {})
+    loadStatsScreen().catch(() => { })
   }, [])
 
   // True while the app is backgrounded — triggers the privacy overlay.
@@ -178,16 +178,16 @@ export default function KissWrappedApp() {
       prev.map((person) =>
         person.id === personId
           ? {
-              ...person,
-              events: [
-                {
-                  id: uid(),
-                  ...values,
-                  score: hasScore(values.score) ? values.score : null,
-                },
-                ...(person.events || []),
-              ],
-            }
+            ...person,
+            events: [
+              {
+                id: uid(),
+                ...values,
+                score: hasScore(values.score) ? values.score : null,
+              },
+              ...(person.events || []),
+            ],
+          }
           : person
       )
     )
@@ -200,17 +200,17 @@ export default function KissWrappedApp() {
       prev.map((person) =>
         person.id === personId
           ? {
-              ...person,
-              events: (person.events || []).map((event) =>
-                event.id === eventId
-                  ? {
-                      ...event,
-                      ...values,
-                      score: hasScore(values.score) ? values.score : null,
-                    }
-                  : event
-              ),
-            }
+            ...person,
+            events: (person.events || []).map((event) =>
+              event.id === eventId
+                ? {
+                  ...event,
+                  ...values,
+                  score: hasScore(values.score) ? values.score : null,
+                }
+                : event
+            ),
+          }
           : person
       )
     )
@@ -223,9 +223,9 @@ export default function KissWrappedApp() {
       prev.map((person) =>
         person.id === personId
           ? {
-              ...person,
-              events: (person.events || []).filter((event) => event.id !== eventId),
-            }
+            ...person,
+            events: (person.events || []).filter((event) => event.id !== eventId),
+          }
           : person
       )
     )
@@ -264,6 +264,12 @@ export default function KissWrappedApp() {
             height: '100vh',
             color: palette.text,
             background: `linear-gradient(180deg, ${palette.bgGradientFrom}, ${palette.bgSoft}, ${palette.gradientEnd})`,
+
+            paddingTop: 'env(safe-area-inset-top)',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+            paddingLeft: 'env(safe-area-inset-left)',
+            paddingRight: 'env(safe-area-inset-right)',
+            boxSizing: 'border-box',
           }}
         >
           <div
@@ -399,6 +405,6 @@ export default function KissWrappedApp() {
         ) : null}
         <AnimatePresence>{isPrivate && <PrivacyScreen key="privacy" />}</AnimatePresence>
       </CopyProvider>
-    </ThemeProvider>
+    </ThemeProvider >
   )
 }
