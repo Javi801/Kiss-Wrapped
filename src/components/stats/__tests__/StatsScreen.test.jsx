@@ -180,6 +180,62 @@ describe('StatsScreen — shared datasets', () => {
   })
 })
 
+describe('StatsScreen — partner events toggle', () => {
+  const everyEvent = ['a1', 'a2', 'm1', 'm2', 'z1']
+
+  it('keeps partner-period events in every tab when they are included', async () => {
+    const people = [ana, mia, zoe]
+    render(people, { includePartnerEvents: true })
+    expect(tabs.overview.people).toBe(people)
+    expect(tabs.overview.allEvents.map((event) => event.id)).toEqual(everyEvent)
+
+    await click(t.time)
+    expect(tabs.time.people).toBe(people)
+    expect(tabs.time.allEvents.map((event) => event.id)).toEqual(everyEvent)
+
+    await click(t.profilesStats)
+    expect(tabs.people.people).toBe(people)
+    expect(tabs.people.eventPeople).toBe(people)
+
+    await click(t.scores)
+    expect(tabs.scores.allEvents.map((event) => event.id)).toEqual(everyEvent)
+  })
+
+  it('recomputes the datasets of the open tab when the choice changes', () => {
+    const people = [ana, mia, zoe]
+    render(people, { includePartnerEvents: false })
+    expect(tabs.overview.allEvents.map((event) => event.id)).toEqual(['a1', 'a2', 'm1'])
+
+    act(() => {
+      root.render(<StatsScreen people={people} t={t} language="en" includePartnerEvents={true} />)
+    })
+    expect(tabs.overview.allEvents.map((event) => event.id)).toEqual(everyEvent)
+  })
+
+  it.each([
+    [false, 'false'],
+    [true, 'true'],
+  ])('shows the toggle pressed state for includePartnerEvents=%s', (value, pressed) => {
+    render([ana, mia], { includePartnerEvents: value })
+    expect(button(t.includePartnerEvents).getAttribute('aria-pressed')).toBe(pressed)
+  })
+
+  it('flips the choice when the toggle is clicked', async () => {
+    const setIncludePartnerEvents = vi.fn()
+    render([ana, mia], { includePartnerEvents: false, setIncludePartnerEvents })
+    await click(t.includePartnerEvents)
+    expect(setIncludePartnerEvents).toHaveBeenCalledOnce()
+    const update = setIncludePartnerEvents.mock.calls[0][0]
+    expect(update(false)).toBe(true)
+    expect(update(true)).toBe(false)
+  })
+
+  it('hides the toggle when nobody has a partner period', () => {
+    render([ana], { includePartnerEvents: false })
+    expect(button(t.includePartnerEvents)).toBeUndefined()
+  })
+})
+
 describe('StatsScreen — PDF export', () => {
   it('hides the export button while the feature is off', () => {
     mockFeatures.pdfExport = false

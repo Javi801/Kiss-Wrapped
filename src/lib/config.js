@@ -37,6 +37,7 @@ export const DEFAULT_SETTINGS = {
   theme: 'pink',
   iconColor: 'yellow',
   statsVisible: true,
+  includePartnerEvents: false,
 }
 
 // Input and display limits.

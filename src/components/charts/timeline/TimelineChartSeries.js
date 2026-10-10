@@ -8,11 +8,11 @@ const EMPTY_SERIES = { data: [], title: '', avg: 0, maxValue: 1, canNext: false 
 
 const pad2 = (n) => String(n).padStart(2, '0')
 
-export function dateToKey(d) {
+function dateToKey(d) {
   return `${d.getFullYear()}.${pad2(d.getMonth() + 1)}.${pad2(d.getDate())}`
 }
 
-export function capitalize(str) {
+function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 

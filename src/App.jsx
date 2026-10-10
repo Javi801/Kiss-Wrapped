@@ -1,6 +1,6 @@
 import React, { Suspense, lazy, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Users, BarChart3, UserPlus } from 'lucide-react'
+import { Search, Users, BarChart3, UserPlus, Loader2 } from 'lucide-react'
 
 import { PALETTES, TEXT, COPY } from '@/lib/constants'
 import { ThemeProvider } from '@/lib/theme'
@@ -22,7 +22,8 @@ import OnboardingScreen from './components/app/OnboardingScreen'
 import PrivacyScreen from './components/app/PrivacyScreen'
 
 // Loaded on demand so the charting libraries stay out of the initial chunk.
-const StatsScreen = lazy(() => import('@/components/stats/StatsScreen'))
+const loadStatsScreen = () => import('@/components/stats/StatsScreen')
+const StatsScreen = lazy(loadStatsScreen)
 
 /**
  * Main app container.
@@ -36,6 +37,11 @@ export default function KissWrappedApp() {
   useEffect(() => {
     scrollRef.current?.scrollTo(0, 0)
   }, [screen])
+
+  // Fetches the stats chunk after the first render so opening the screen does not wait for it.
+  useEffect(() => {
+    loadStatsScreen().catch(() => {})
+  }, [])
 
   // True while the app is backgrounded — triggers the privacy overlay.
   const isPrivate = usePrivacyOverlay()
@@ -51,6 +57,8 @@ export default function KissWrappedApp() {
     setTheme,
     statsVisible,
     setStatsVisible,
+    includePartnerEvents,
+    setIncludePartnerEvents,
     situationTags,
     setSituationTags,
     placeTags,
@@ -294,6 +302,7 @@ export default function KissWrappedApp() {
                   setTheme={changeTheme}
                   statsVisible={statsVisible}
                   setStatsVisible={setStatsVisible}
+                  includePartnerEvents={includePartnerEvents}
                   modalBackRef={modalBackRef}
                 />
               ) : null}
@@ -332,11 +341,19 @@ export default function KissWrappedApp() {
 
               {/* Statistics screen */}
               {screen === 'stats' ? (
-                <Suspense fallback={null}>
+                <Suspense
+                  fallback={
+                    <div role="status" className="flex h-full items-center justify-center">
+                      <Loader2 className="h-8 w-8 animate-spin" style={{ color: palette.accent }} />
+                    </div>
+                  }
+                >
                   <StatsScreen
                     people={people}
                     t={t}
                     language={language}
+                    includePartnerEvents={includePartnerEvents}
+                    setIncludePartnerEvents={setIncludePartnerEvents}
                     modalBackRef={modalBackRef}
                   />
                 </Suspense>

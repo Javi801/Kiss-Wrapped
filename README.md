@@ -66,7 +66,7 @@ At a glance:
     <td width="50%" valign="top">
       <picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/feature-stats-dark.svg"><img src="assets/readme/feature-stats-light.svg" width="55" alt="Stats icon"></picture><br>
       <strong>Analytics dashboard</strong><br>
-      Four stat tabs: Overview, Time, People, and Scores. Includes heatmaps, area charts, zodiac distributions, score dumbbells, and age-range boxplots. Any chart can be expanded to fullscreen and exported as a PNG.<br><br>
+      Four stat tabs: Overview, Time, People, and Scores. Includes heatmaps, area charts, zodiac distributions, score dumbbells, and age-range boxplots. Any chart can be expanded to fullscreen and exported as a PNG. A toggle on the screen chooses whether events from a partner period count, and every chart follows it.<br><br>
       <code>Heatmap</code> <code>Distributions</code> <code>Age at event</code> <code>Fullscreen</code> <code>PNG export</code>
     </td>
     <td width="50%" valign="top">
@@ -251,13 +251,14 @@ Event {
 }
 
 Settings {
-  language:         string    // en or es
-  theme:            string    // pink, green, or dark
-  iconColor:        string
-  statsVisible:     boolean
-  situationTags:    string[]
-  placeTags:        string[]
-  howWeMetTags:     string[]
+  language:             string    // en or es
+  theme:                string    // pink, green, or dark
+  iconColor:            string
+  statsVisible:         boolean
+  includePartnerEvents: boolean   // count events inside a partner period in the stats
+  situationTags:        string[]
+  placeTags:            string[]
+  howWeMetTags:         string[]
 }
 ```
 

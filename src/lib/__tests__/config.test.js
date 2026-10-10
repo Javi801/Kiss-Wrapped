@@ -112,6 +112,10 @@ describe('DEFAULT_SETTINGS', () => {
   it('defines statsVisible as a boolean', () => {
     expect(typeof DEFAULT_SETTINGS.statsVisible).toBe('boolean')
   })
+
+  it('leaves partner-period events out of the statistics', () => {
+    expect(DEFAULT_SETTINGS.includePartnerEvents).toBe(false)
+  })
 })
 
 describe('LIMITS', () => {

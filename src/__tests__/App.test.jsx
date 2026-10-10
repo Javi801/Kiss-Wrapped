@@ -194,6 +194,21 @@ describe('App — boot', () => {
     })
   })
 
+  it('restores the saved partner events choice for the home and stats screens', async () => {
+    await boot({ settings: { includePartnerEvents: true } })
+    openMain()
+    expect(screens.main.includePartnerEvents).toBe(true)
+    go('stats')
+    await settleLazyScreens()
+    expect(screens.stats.includePartnerEvents).toBe(true)
+  })
+
+  it('leaves partner events out when the saved choice is not a boolean', async () => {
+    await boot({ settings: { includePartnerEvents: 'yes' } })
+    openMain()
+    expect(screens.main.includePartnerEvents).toBe(false)
+  })
+
   it('ignores saved values that are no longer supported', async () => {
     await boot({ settings: { language: 'fr', theme: 'neon', iconColor: 'teal' } })
     openMain()
@@ -599,6 +614,21 @@ describe('App — settings', () => {
       screens.main.setTheme('green')
     })
     expect(savedSettings()).toMatchObject({ statsVisible: false, theme: 'green' })
+  })
+
+  it('saves the partner events choice made on the stats screen and applies it to home', async () => {
+    await boot()
+    openMain()
+    go('stats')
+    await settleLazyScreens()
+    expect(screens.stats.includePartnerEvents).toBe(false)
+
+    await act(async () => screens.stats.setIncludePartnerEvents(true))
+    expect(savedSettings().includePartnerEvents).toBe(true)
+    expect(screens.stats.includePartnerEvents).toBe(true)
+
+    pressBack()
+    expect(screens.main.includePartnerEvents).toBe(true)
   })
 
   it.each([

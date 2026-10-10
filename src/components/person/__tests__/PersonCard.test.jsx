@@ -276,13 +276,14 @@ describe('PersonCard — event list', () => {
 })
 
 describe('PersonCard — editing the person', () => {
-  it('opens the form with the current person, real name included', () => {
+  it('opens the form with the current person, real name and partner fields included', () => {
     renderCard({ realName: 'Maria' }, { howWeMetTags: ['School'] })
     toggle()
     click(t.editPerson)
     expect(dialog()).not.toBeNull()
     expect(forms.person.initialValues).toMatchObject({ id: 'mia', realName: 'Maria' })
     expect(forms.person.includeRealName).toBe(true)
+    expect(forms.person.includePartner).toBe(true)
     expect(forms.person.howWeMetTags).toEqual(['School'])
   })
 

@@ -34,6 +34,7 @@ export default function PersonForm({
   language,
   includeHowWeMet = true,
   includeRealName = false,
+  includePartner = false,
   saveLabel,
   mode,
   howWeMetTags = [],
@@ -283,14 +284,16 @@ export default function PersonForm({
         </div>
 
         {/* Partner marker + period */}
-        <PartnerFields
-          status={form.partnerStatus}
-          partnerFrom={form.partnerFrom}
-          partnerTo={form.partnerTo}
-          onChange={update}
-          errors={errors}
-          t={t}
-        />
+        {includePartner && (
+          <PartnerFields
+            status={form.partnerStatus}
+            partnerFrom={form.partnerFrom}
+            partnerTo={form.partnerTo}
+            onChange={update}
+            errors={errors}
+            t={t}
+          />
+        )}
 
         {/* How we met */}
         {includeHowWeMet && (

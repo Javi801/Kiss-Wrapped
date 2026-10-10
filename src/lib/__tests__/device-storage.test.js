@@ -38,6 +38,7 @@ import {
   LANGUAGE_KEY,
   THEME_KEY,
   STATS_VISIBLE_KEY,
+  INCLUDE_PARTNER_EVENTS_KEY,
   SITUATION_TAGS_KEY,
   PLACE_TAGS_KEY,
   HOW_WE_MET_TAGS_KEY,
@@ -309,6 +310,7 @@ describe('loadSettings (web path)', () => {
       language: DEFAULT_SETTINGS.language,
       theme: DEFAULT_SETTINGS.theme,
       statsVisible: DEFAULT_SETTINGS.statsVisible,
+      includePartnerEvents: DEFAULT_SETTINGS.includePartnerEvents,
       situationTags: [],
       placeTags: [],
       howWeMetTags: [],
@@ -456,6 +458,7 @@ describe('saveSettings (web path)', () => {
       language: 'es',
       theme: 'dark',
       statsVisible: true,
+      includePartnerEvents: true,
       situationTags: ['Date', 'Party'],
       placeTags: ['Café', 'Home'],
       howWeMetTags: ['School', 'Work'],
@@ -467,6 +470,7 @@ describe('saveSettings (web path)', () => {
       language: 'es',
       theme: 'dark',
       statsVisible: true,
+      includePartnerEvents: true,
       situationTags: ['Date', 'Party'],
       placeTags: ['Café', 'Home'],
       howWeMetTags: ['School', 'Work'],
@@ -478,6 +482,23 @@ describe('saveSettings (web path)', () => {
   it('round-trips statsVisible: false through save and load', async () => {
     await saveSettings({ statsVisible: false })
     expect((await loadSettings()).statsVisible).toBe(false)
+  })
+
+  it('saves includePartnerEvents to localStorage', async () => {
+    await saveSettings({ includePartnerEvents: true })
+    expect(localStorage.getItem(INCLUDE_PARTNER_EVENTS_KEY)).toBe('true')
+  })
+
+  it('does not overwrite includePartnerEvents when it is undefined', async () => {
+    localStorage.setItem(INCLUDE_PARTNER_EVENTS_KEY, 'true')
+    await saveSettings({ theme: 'dark' })
+    expect(localStorage.getItem(INCLUDE_PARTNER_EVENTS_KEY)).toBe('true')
+  })
+
+  it('round-trips includePartnerEvents: false through save and load', async () => {
+    await saveSettings({ includePartnerEvents: true })
+    await saveSettings({ includePartnerEvents: false })
+    expect((await loadSettings()).includePartnerEvents).toBe(false)
   })
 
   it('saves onboardingVersion to localStorage', async () => {
@@ -556,6 +577,7 @@ describe('loadSettings (native path — reads existing file)', () => {
       language: 'es',
       theme: 'dark',
       statsVisible: true,
+      includePartnerEvents: true,
       situationTags: [],
       placeTags: [],
       howWeMetTags: ['School'],
@@ -578,6 +600,20 @@ describe('loadSettings (native path — reads existing file)', () => {
       data: JSON.stringify({ statsVisible: 'true' }),
     })
     expect((await loadSettings()).statsVisible).toBe(true)
+  })
+
+  it("coerces includePartnerEvents string 'true' to boolean true", async () => {
+    mockFilesystem.readFile.mockResolvedValueOnce({
+      data: JSON.stringify({ includePartnerEvents: 'true' }),
+    })
+    expect((await loadSettings()).includePartnerEvents).toBe(true)
+  })
+
+  it("coerces includePartnerEvents string 'false' to boolean false", async () => {
+    mockFilesystem.readFile.mockResolvedValueOnce({
+      data: JSON.stringify({ includePartnerEvents: 'false' }),
+    })
+    expect((await loadSettings()).includePartnerEvents).toBe(false)
   })
 
   it("coerces onboardingDone string 'true' to boolean true", async () => {
@@ -607,6 +643,7 @@ describe('loadSettings (native path — reads existing file)', () => {
     expect(settings.iconColor).toBe(DEFAULT_SETTINGS.iconColor)
     expect(settings.theme).toBe(DEFAULT_SETTINGS.theme)
     expect(settings.statsVisible).toBe(DEFAULT_SETTINGS.statsVisible)
+    expect(settings.includePartnerEvents).toBe(DEFAULT_SETTINGS.includePartnerEvents)
   })
 
   it('returns empty howWeMetTags when the settings file predates the field', async () => {
@@ -753,6 +790,7 @@ describe('saveSettings (native path)', () => {
       language: 'es',
       theme: 'dark',
       statsVisible: false,
+      includePartnerEvents: true,
       situationTags: ['Date'],
       placeTags: ['Café'],
       howWeMetTags: ['School'],
@@ -781,6 +819,7 @@ const USER_CHOICES = {
   theme: THEMES.find((value) => value !== DEFAULT_SETTINGS.theme),
   iconColor: ICON_COLORS.find((value) => value !== DEFAULT_SETTINGS.iconColor),
   statsVisible: !DEFAULT_SETTINGS.statsVisible,
+  includePartnerEvents: !DEFAULT_SETTINGS.includePartnerEvents,
 }
 const SETTING_NAMES = Object.keys(USER_CHOICES)
 
@@ -874,6 +913,7 @@ describe('persisted settings override config defaults (native path)', () => {
         theme: THEME_KEY,
         iconColor: ICON_COLOR_KEY,
         statsVisible: STATS_VISIBLE_KEY,
+        includePartnerEvents: INCLUDE_PARTNER_EVENTS_KEY,
       }
       localStorage.setItem(keys[name], String(USER_CHOICES[name]))
       mockFilesystem.readFile.mockRejectedValueOnce(new Error('File not found'))

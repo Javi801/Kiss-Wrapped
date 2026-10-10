@@ -43,7 +43,7 @@ const validPerson = {
 let container
 let root
 
-function renderForm(partner) {
+function renderForm(partner, { includePartner = true } = {}) {
   const onSave = vi.fn()
   container = document.createElement('div')
   document.body.appendChild(container)
@@ -56,6 +56,7 @@ function renderForm(partner) {
         t={t}
         language="en"
         includeHowWeMet={false}
+        includePartner={includePartner}
       />
     )
   })
@@ -70,11 +71,13 @@ function submit() {
   })
 }
 
-function clickStatus(label) {
-  const button = [...container.querySelectorAll('button[type="button"]')].find(
+const statusButton = (label) =>
+  [...container.querySelectorAll('button[type="button"]')].find(
     (item) => item.textContent === label
   )
-  act(() => button.click())
+
+function clickStatus(label) {
+  act(() => statusButton(label).click())
 }
 
 const dateInputs = () => container.querySelectorAll('[data-testid="partner-date"]')
@@ -123,6 +126,34 @@ describe('PersonForm — partner fields', () => {
     expect(dateInputs()).toHaveLength(1)
     clickStatus(t.partnerNever)
     expect(dateInputs()).toHaveLength(0)
+  })
+})
+
+describe('PersonForm — without the partner fields', () => {
+  it('shows no partner status or dates', () => {
+    renderForm({ partnerStatus: 'past' }, { includePartner: false })
+    expect(statusButton(t.partnerNever)).toBeUndefined()
+    expect(dateInputs()).toHaveLength(0)
+    expect(container.textContent).not.toContain(t.partnerHint)
+  })
+
+  it('saves a person without a status as never a partner', () => {
+    const onSave = renderForm({}, { includePartner: false })
+    submit()
+    expect(savedPartner(onSave)).toEqual({ partnerStatus: 'never', partnerFrom: '', partnerTo: '' })
+  })
+
+  it('keeps the stored partner period', () => {
+    const onSave = renderForm(
+      { partnerStatus: 'current', partnerFrom: '2023.01.01' },
+      { includePartner: false }
+    )
+    submit()
+    expect(savedPartner(onSave)).toEqual({
+      partnerStatus: 'current',
+      partnerFrom: '2023.01.01',
+      partnerTo: '',
+    })
   })
 })
 

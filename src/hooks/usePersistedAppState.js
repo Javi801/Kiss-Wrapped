@@ -38,6 +38,11 @@ export function usePersistedAppState(setScreen) {
   // Whether the stats tiles on the home screen are visible.
   const [statsVisible, setStatsVisible] = useState(DEFAULT_SETTINGS.statsVisible)
 
+  // Whether events inside a partner period count in event-based statistics.
+  const [includePartnerEvents, setIncludePartnerEvents] = useState(
+    DEFAULT_SETTINGS.includePartnerEvents
+  )
+
   // User-defined situation tags shared across all event forms.
   const [situationTags, setSituationTags] = useState([])
 
@@ -95,6 +100,7 @@ export function usePersistedAppState(setScreen) {
           if (ICON_COLORS.includes(settings.iconColor)) setIconColor(settings.iconColor)
           if (THEMES.includes(settings.theme)) setTheme(settings.theme)
           setStatsVisible(settings.statsVisible)
+          setIncludePartnerEvents(settings.includePartnerEvents === true)
 
           const savedTags = Array.isArray(settings.situationTags) ? settings.situationTags : []
           setSituationTags(mergeEventTagsFromPeople(loadedPeople, savedTags, 'situation'))
@@ -144,7 +150,7 @@ export function usePersistedAppState(setScreen) {
     })
   }, [people, isLoaded])
 
-  // Persists settings whenever language, iconColor, theme, statsVisible, situationTags, placeTags or onboardingDone change (after boot).
+  // Persists settings whenever language, iconColor, theme, statsVisible, includePartnerEvents, situationTags, placeTags or onboardingDone change (after boot).
   useEffect(() => {
     if (!isLoaded) return
     saveSettings({
@@ -152,6 +158,7 @@ export function usePersistedAppState(setScreen) {
       language,
       theme,
       statsVisible,
+      includePartnerEvents,
       situationTags,
       placeTags,
       howWeMetTags,
@@ -165,6 +172,7 @@ export function usePersistedAppState(setScreen) {
     language,
     theme,
     statsVisible,
+    includePartnerEvents,
     situationTags,
     placeTags,
     howWeMetTags,
@@ -190,6 +198,8 @@ export function usePersistedAppState(setScreen) {
     setTheme,
     statsVisible,
     setStatsVisible,
+    includePartnerEvents,
+    setIncludePartnerEvents,
     situationTags,
     setSituationTags,
     placeTags,

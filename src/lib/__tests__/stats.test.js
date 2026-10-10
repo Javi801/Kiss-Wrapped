@@ -5,6 +5,7 @@ import {
   countEvents,
   excludePartnerEvents,
   getEventCountDistribution,
+  getEventPeople,
   getFirstEventDate,
   getLastEventDate,
   getPartnerPeriod,
@@ -908,5 +909,33 @@ describe('excludePartnerEvents', () => {
       makePerson('Bob', [makeEvent('2024.02.01')]),
     ]
     expect(excludePartnerEvents(people).map((person) => person.name)).toEqual(['Ana', 'Bob'])
+  })
+})
+
+describe('getEventPeople', () => {
+  const people = [
+    makePerson('Ana', [makeEvent('2024.01.01')]),
+    makePerson('Mia', [makeEvent('2022.06.01'), makeEvent('2023.06.01')], {
+      partnerStatus: 'past',
+      partnerFrom: '2023.01.01',
+      partnerTo: '2023.12.31',
+    }),
+    makePerson('Zoe', [makeEvent('2024.03.01')], { partnerStatus: 'current' }),
+  ]
+
+  it('returns the given list when partner-period events are included', () => {
+    expect(getEventPeople(people, true)).toBe(people)
+  })
+
+  it('removes partner-period events when they are not included', () => {
+    const result = getEventPeople(people, false)
+    expect(result.map((person) => person.name)).toEqual(['Ana', 'Mia'])
+    expect(result[1].events.map((event) => event.date)).toEqual(['2022.06.01'])
+  })
+
+  it('follows the default setting when no choice is given', () => {
+    expect(getEventPeople(people)).toEqual(
+      getEventPeople(people, DEFAULT_SETTINGS.includePartnerEvents)
+    )
   })
 })

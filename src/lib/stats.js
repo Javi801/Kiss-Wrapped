@@ -77,6 +77,17 @@ export function excludePartnerEvents(people) {
   return result
 }
 
+/**
+ * Returns the people used by event-based statistics for the user's choice:
+ * everyone when partner-period events are included, the filtered list otherwise.
+ */
+export function getEventPeople(
+  people,
+  includePartnerEvents = DEFAULT_SETTINGS.includePartnerEvents
+) {
+  return includePartnerEvents ? people : excludePartnerEvents(people)
+}
+
 // Weights for the group* helpers: count each person once, or by their number of events.
 export const countPeople = () => 1
 export const countEvents = (person) => person.events?.length || 0

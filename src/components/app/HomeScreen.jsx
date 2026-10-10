@@ -39,6 +39,7 @@ export default function MainScreen({
   setTheme,
   statsVisible,
   setStatsVisible,
+  includePartnerEvents,
   modalBackRef,
 }) {
   const PALETTE = usePalette()
@@ -158,6 +159,7 @@ export default function MainScreen({
         t={t}
         statsVisible={statsVisible}
         setStatsVisible={setStatsVisible}
+        includePartnerEvents={includePartnerEvents}
         onOpenLanguage={() => setLanguageOpen(true)}
         onOpenSettings={() => setSettingsOpen(true)}
       />

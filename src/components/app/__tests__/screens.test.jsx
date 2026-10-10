@@ -89,4 +89,9 @@ describe('AddPersonScreen', () => {
       saveLabel: t.saveAndBack,
     })
   })
+
+  it('leaves the partner fields out of the add form', () => {
+    render(<AddPersonScreen onSave={() => {}} onBack={() => {}} t={t} language="en" />)
+    expect(form.props.includePartner).toBeUndefined()
+  })
 })
