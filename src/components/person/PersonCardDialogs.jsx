@@ -52,6 +52,7 @@ export default function PersonCardDialogs({
             t={t}
             language={language}
             includeRealName
+            includePartner
             howWeMetTags={howWeMetTags}
             onAddHowWeMetTag={onAddHowWeMetTag}
             isParentOpen={editingPerson}
