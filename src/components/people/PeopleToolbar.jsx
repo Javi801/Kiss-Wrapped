@@ -31,6 +31,7 @@ export default function PeopleToolbar({
 
   function handleFilterOpenChange(open) {
     setFilterOpen(open)
+    if (!modalBackRef) return
     modalBackRef.current = open ? () => setFilterOpen(false) : null
   }
 

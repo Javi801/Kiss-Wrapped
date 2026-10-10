@@ -448,6 +448,14 @@ describe('PeopleManagerScreen — filter sheet', () => {
     expect(seen.sheet.open).toBe(false)
   })
 
+  it('opens and closes the sheet without a back button to register on', () => {
+    render([person('Ana')], { modalBackRef: undefined })
+    expect(() => act(() => seen.sheet.onOpenChange(true))).not.toThrow()
+    expect(seen.sheet.open).toBe(true)
+    expect(() => act(() => seen.sheet.onOpenChange(false))).not.toThrow()
+    expect(seen.sheet.open).toBe(false)
+  })
+
   it('releases the back button when the sheet is closed', () => {
     render([person('Ana')])
     act(() => seen.sheet.onOpenChange(true))
