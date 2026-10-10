@@ -25,6 +25,7 @@ src/
   App.jsx               Application shell: global state, persistence, navigation, mutations
   __tests__/            Unit tests for App.jsx
   index.css             Tailwind + shadcn theme tokens
+  shadcn-tailwind.css   Vendored copy of shadcn's `tailwind.css`, imported by index.css
   components/
     app/                Top-level screens and app-level widgets (Home, AddPerson, Intro,
                         Onboarding, Privacy, ErrorBoundary, Language/Theme/Color selectors)
