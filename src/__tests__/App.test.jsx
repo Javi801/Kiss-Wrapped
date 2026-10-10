@@ -67,6 +67,7 @@ vi.mock('@/components/stats/StatsScreen', mockScreen('stats'))
 
 import KissWrappedApp from '@/App'
 import { DEFAULT_SETTINGS, ONBOARDING_VERSION } from '@/lib/config'
+import { registerOpenSelect } from '@/lib/open-selects'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
@@ -397,6 +398,29 @@ describe('App — hardware back button', () => {
     expect(visibleScreens()).toEqual(['main'])
   })
 
+  it('closes an open select before an open dialog and before navigating', async () => {
+    await boot()
+    openMain()
+    go('stats')
+    await settleLazyScreens()
+    const closeDialog = vi.fn()
+    screens.stats.modalBackRef.current = closeDialog
+    const closeSelect = vi.fn()
+    const unregister = registerOpenSelect(closeSelect)
+
+    pressBack()
+    expect(closeSelect).toHaveBeenCalledOnce()
+    expect(closeDialog).not.toHaveBeenCalled()
+    expect(visibleScreens()).toEqual(['stats'])
+
+    // The select unregisters itself once it is closed.
+    unregister()
+    pressBack()
+    expect(closeSelect).toHaveBeenCalledOnce()
+    expect(closeDialog).toHaveBeenCalledOnce()
+    expect(visibleScreens()).toEqual(['stats'])
+  })
+
   it('stops listening when the app unmounts', async () => {
     await boot()
     await act(async () => root.unmount())
@@ -481,6 +505,57 @@ describe('App — people mutations', () => {
     }
     await act(async () => screens.main.onImportData([imported]))
     expect(savedPeople()[0].events[0].score).toBeNull()
+  })
+
+  it('registers the tags used by imported people', async () => {
+    await boot({
+      settings: { placeTags: ['Bar'], situationTags: ['Party'], howWeMetTags: ['App'] },
+    })
+    openMain()
+    const imported = {
+      id: 'new',
+      name: 'New',
+      howWeMet: 'School',
+      events: [
+        { id: 'n1', date: '2024.01.01', place: 'Park', situation: 'Date' },
+        { id: 'n2', date: '2024.02.01', place: 'bar', situation: 'Concert' },
+      ],
+    }
+    await act(async () => screens.main.onImportData([imported]))
+    expect(savedSettings()).toMatchObject({
+      placeTags: ['Bar', 'Park'],
+      situationTags: ['Party', 'Date', 'Concert'],
+      howWeMetTags: ['App', 'School'],
+    })
+  })
+
+  it('registers the how-we-met of a new person as a tag', async () => {
+    await boot({ settings: { howWeMetTags: ['App'] } })
+    openMain()
+    go('add')
+    await act(async () => screens.add.onSave({ name: 'Mia', howWeMet: ' School ' }))
+    expect(savedSettings().howWeMetTags).toEqual(['App', 'School'])
+  })
+
+  it('registers no how-we-met tag for a new person without one', async () => {
+    await boot({ settings: { howWeMetTags: ['App'] } })
+    openMain()
+    go('add')
+    await act(async () => screens.add.onSave({ name: 'Mia' }))
+    expect(savedSettings().howWeMetTags).toEqual(['App'])
+  })
+
+  it('registers the how-we-met of an edited person as a tag', async () => {
+    await bootOnPeople({ people: [ana], settings: { howWeMetTags: ['App'] } })
+    await act(async () => screens.people.onUpdatePerson('ana', { howWeMet: 'School' }))
+    expect(savedSettings().howWeMetTags).toEqual(['App', 'School'])
+    expect(screens.people.howWeMetTags).toEqual(['App', 'School'])
+  })
+
+  it('does not duplicate a how-we-met tag that differs only in case', async () => {
+    await bootOnPeople({ people: [ana], settings: { howWeMetTags: ['App'] } })
+    await act(async () => screens.people.onUpdatePerson('ana', { howWeMet: 'app' }))
+    expect(savedSettings().howWeMetTags).toEqual(['App'])
   })
 
   it('clears everything and returns to the intro', async () => {
@@ -581,6 +656,34 @@ describe('App — event mutations', () => {
     await act(async () => screens.people.onDeleteAllEvents('ana'))
     expect(eventsOf('ana')).toEqual([])
     expect(eventsOf('bob')).toHaveLength(1)
+  })
+
+  it('registers the place and situation of a new event as tags', async () => {
+    await bootOnPeople({ people: [ana], settings: { placeTags: ['Bar'] } })
+    await act(async () =>
+      screens.people.onAddEvent('ana', { date: '2024.05.05', place: 'Park', situation: 'Date' })
+    )
+    expect(savedSettings()).toMatchObject({ placeTags: ['Bar', 'Park'], situationTags: ['Date'] })
+    expect(screens.people.placeTags).toEqual(['Bar', 'Park'])
+    expect(screens.people.situationTags).toEqual(['Date'])
+  })
+
+  it('registers the place and situation of an edited event as tags', async () => {
+    await bootOnPeople({ people: [ana], settings: { situationTags: ['Party'] } })
+    await act(async () =>
+      screens.people.onUpdateEvent('ana', 'a1', {
+        date: '2024.01.01',
+        place: 'Park',
+        situation: 'Date',
+      })
+    )
+    expect(savedSettings()).toMatchObject({ placeTags: ['Park'], situationTags: ['Party', 'Date'] })
+  })
+
+  it('registers no tag for an event without place or situation', async () => {
+    await bootOnPeople({ people: [ana], settings: { placeTags: ['Bar'] } })
+    await act(async () => screens.people.onAddEvent('ana', { date: '2024.05.05', place: '  ' }))
+    expect(savedSettings()).toMatchObject({ placeTags: ['Bar'], situationTags: [] })
   })
 })
 
