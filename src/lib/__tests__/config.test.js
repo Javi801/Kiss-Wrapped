@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { describe, it, expect } from 'vitest'
 import {
   FEATURES,
@@ -12,7 +12,7 @@ import {
   LIMITS,
 } from '@/lib/config'
 import { COPY, PALETTES, ZODIAC_OPTIONS } from '@/lib/constants'
-import { SPARKLE_PALETTES, PALETTE_SWATCHES } from '@/components/shared/SparkleIcon.constants'
+import { ICON_VARIANTS, DEFAULT_ICON_VARIANT } from '@/components/shared/SparkleIcon.constants'
 
 const ANDROID_MAIN = new URL('../../../android/app/src/main/', import.meta.url)
 const readAndroid = (path) => readFileSync(new URL(path, ANDROID_MAIN), 'utf8')
@@ -61,8 +61,13 @@ describe('supported setting values', () => {
   })
 
   it('lists exactly the icon colors the icon component can draw', () => {
-    expect([...ICON_COLORS].sort()).toEqual(Object.keys(SPARKLE_PALETTES).sort())
-    expect([...ICON_COLORS].sort()).toEqual(Object.keys(PALETTE_SWATCHES).sort())
+    expect([...ICON_COLORS].sort()).toEqual(Object.keys(ICON_VARIANTS).sort())
+  })
+
+  it('has a generated in-app image for every icon color', () => {
+    for (const { image } of Object.values(ICON_VARIANTS)) {
+      expect(existsSync(new URL(`../../assets/icons/${image}`, import.meta.url)), image).toBe(true)
+    }
   })
 
   it('lists exactly the icon colors the Android plugin accepts', () => {
@@ -79,8 +84,19 @@ describe('supported setting values', () => {
         /<activity-alias\s+android:name="\.Alias(\w+)"[^>]*android:icon="@mipmap\/ic_launcher_(\w+)"/g
       ),
     ]
-    for (const [, name, icon] of aliases) expect(icon).toBe(name.toLowerCase())
-    expect(aliases.map(([, name]) => name.toLowerCase()).sort()).toEqual([...ICON_COLORS].sort())
+    const uncapitalize = (name) => name.charAt(0).toLowerCase() + name.slice(1)
+    for (const [, name, icon] of aliases) {
+      expect(icon).toBe(ICON_VARIANTS[uncapitalize(name)]?.resource)
+    }
+    expect(aliases.map(([, name]) => uncapitalize(name)).sort()).toEqual([...ICON_COLORS].sort())
+  })
+
+  it('has an adaptive launcher icon for every icon color', () => {
+    for (const { resource } of Object.values(ICON_VARIANTS)) {
+      const xml = readAndroid(`res/mipmap-anydpi-v26/ic_launcher_${resource}.xml`)
+      expect(xml).toContain(`@mipmap/ic_launcher_background_${resource}"`)
+      expect(xml).toContain(`@mipmap/ic_launcher_foreground_${resource}"`)
+    }
   })
 
   it('has no duplicated values', () => {
@@ -101,6 +117,16 @@ describe('DEFAULT_SETTINGS', () => {
 
   it('uses a supported icon color', () => {
     expect(ICON_COLORS).toContain(DEFAULT_SETTINGS.iconColor)
+  })
+
+  it('uses the icon color of the default launcher icon', () => {
+    expect(DEFAULT_SETTINGS.iconColor).toBe(DEFAULT_ICON_VARIANT)
+    const [, enabled] = readAndroid('AndroidManifest.xml').match(
+      /android:name="\.Alias(\w+)"(?:(?!<\/activity-alias>)[^])*?android:enabled="true"/
+    )
+    expect(enabled.charAt(0).toLowerCase() + enabled.slice(1)).toBe(DEFAULT_SETTINGS.iconColor)
+    const plugin = readAndroid('java/io/kisswrapped/AppIconPlugin.java')
+    expect(plugin).toContain(`getString("color", "${DEFAULT_SETTINGS.iconColor}")`)
   })
 
   it('defines statsVisible as a boolean', () => {

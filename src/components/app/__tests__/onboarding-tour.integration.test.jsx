@@ -15,7 +15,7 @@ import OnboardingHomeStep from '@/components/app/OnboardingHomeStep'
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
 const t = COPY.en
-const settings = { theme: 'pink', iconColor: 'yellow', statsVisible: true }
+const settings = { theme: 'pink', iconColor: 'lightPink', statsVisible: true }
 const person = createPerson({
   name: 'Mia',
   birthYear: 1995,

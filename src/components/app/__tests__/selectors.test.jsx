@@ -60,33 +60,33 @@ afterEach(() => {
 
 describe('ColorSelector', () => {
   it('offers every supported icon color with its translated name', () => {
-    render(<ColorSelector iconColor="yellow" setIconColor={() => {}} t={t} />)
+    render(<ColorSelector iconColor="lightPink" setIconColor={() => {}} t={t} />)
     expect(items().map((item) => item.dataset.value)).toEqual(ICON_COLORS)
     expect(items().map((item) => item.textContent)).toEqual(ICON_COLORS.map(colorLabel))
   })
 
   it('falls back to the color key when it has no translation', () => {
-    const { colorYellow: _omitted, ...withoutYellow } = t
-    render(<ColorSelector iconColor="yellow" setIconColor={() => {}} t={withoutYellow} />)
-    expect(container.querySelector('li[data-value="yellow"]').textContent).toBe('yellow')
+    const { colorLightPink: _omitted, ...withoutLightPink } = t
+    render(<ColorSelector iconColor="lightPink" setIconColor={() => {}} t={withoutLightPink} />)
+    expect(container.querySelector('li[data-value="lightPink"]').textContent).toBe('lightPink')
   })
 
   it('binds the select to the current icon color and its setter', () => {
     const setIconColor = vi.fn()
-    render(<ColorSelector iconColor="blue" setIconColor={setIconColor} t={t} />)
-    expect(select.props.value).toBe('blue')
-    select.props.onValueChange('pink')
-    expect(setIconColor).toHaveBeenCalledWith('pink')
+    render(<ColorSelector iconColor="darkGreen" setIconColor={setIconColor} t={t} />)
+    expect(select.props.value).toBe('darkGreen')
+    select.props.onValueChange('darkPink')
+    expect(setIconColor).toHaveBeenCalledWith('darkPink')
   })
 
   it('hides the theme picker unless a theme and its setter are given', () => {
-    render(<ColorSelector iconColor="yellow" setIconColor={() => {}} t={t} />)
+    render(<ColorSelector iconColor="lightPink" setIconColor={() => {}} t={t} />)
     expect(buttons()).toHaveLength(0)
     expect(container.textContent).not.toContain(t.appTheme)
   })
 
   it('hides the theme picker when only the theme is given', () => {
-    render(<ColorSelector iconColor="yellow" setIconColor={() => {}} theme="pink" t={t} />)
+    render(<ColorSelector iconColor="lightPink" setIconColor={() => {}} theme="pink" t={t} />)
     expect(buttons()).toHaveLength(0)
   })
 
@@ -94,7 +94,7 @@ describe('ColorSelector', () => {
     const setTheme = vi.fn()
     render(
       <ColorSelector
-        iconColor="yellow"
+        iconColor="lightPink"
         setIconColor={() => {}}
         theme="pink"
         setTheme={setTheme}
