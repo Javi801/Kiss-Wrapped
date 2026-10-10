@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 
 import BarChartCard from '@/components/charts/BarChartCard'
 import DumbbellChartCard from '@/components/charts/DumbbellChartCard'
-import EventsTimelineChartCard from '@/components/charts/EventsTimelineChartCard'
+import EventsTimelineChartCard from '@/components/charts/timeline/EventsTimelineChartCard'
 import MultiYearTopCard from '@/components/charts/MultiYearTopCard'
-import PersonsTimelineChartCard from '@/components/charts/PersonsTimelineChartCard'
+import PersonsTimelineChartCard from '@/components/charts/timeline/PersonsTimelineChartCard'
 import HeatmapChartCard from '@/components/charts/HeatmapChartCard'
 import { getPeopleInMultipleYears } from '@/lib/stats'
 

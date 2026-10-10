@@ -5,7 +5,7 @@ import { createRoot } from 'react-dom/client'
 
 vi.mock('@/lib/theme', () => ({ usePalette: () => ({ accent: 'rgb(1, 2, 3)' }) }))
 
-import TimelineCalendarPopup from '@/components/charts/TimelineCalendarPopup'
+import TimelineCalendarPopup from '@/components/charts/timeline/TimelineCalendarPopup'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
