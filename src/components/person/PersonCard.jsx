@@ -16,6 +16,8 @@ import usePersonCardModals from '@/components/person/usePersonCardModals'
 /**
  * Displays a person card with expandable event history.
  * Handles editing, deleting, and event management.
+ * `guide` puts the card under the onboarding tour, which then decides whether it is
+ * expanded: `{ expanded, tapTarget: 'card' | 'addEvent', editHint, eventHint, onAddEvent }`.
  */
 export default function PersonCard({
   person,
@@ -34,10 +36,12 @@ export default function PersonCard({
   onAddPlaceTag,
   howWeMetTags,
   onAddHowWeMetTag,
+  guide,
 }) {
   const PALETTE = usePalette()
   // Expand/collapse state.
-  const [expanded, setExpanded] = useState(false)
+  const [ownExpanded, setExpanded] = useState(false)
+  const expanded = guide ? guide.expanded : ownExpanded
 
   // Modal states.
   const { editingPerson, setEditingPerson, eventModal, setEventModal } =
@@ -72,6 +76,7 @@ export default function PersonCard({
               expanded={expanded}
               onToggle={() => setExpanded((v) => !v)}
               hasIncompleteEvent={hasIncompleteEvent}
+              showTapGuide={guide?.tapTarget === 'card'}
               t={t}
             />
 
@@ -98,7 +103,12 @@ export default function PersonCard({
                       hasEvents={sortedEvents.length > 0}
                       personIncomplete={personIsMissingRequired(person)}
                       onEditPerson={() => setEditingPerson(true)}
-                      onAddEvent={() => setEventModal({ open: true, mode: 'add', event: null })}
+                      onAddEvent={
+                        guide?.onAddEvent ??
+                        (() => setEventModal({ open: true, mode: 'add', event: null }))
+                      }
+                      editHint={guide?.editHint}
+                      showTapGuide={guide?.tapTarget === 'addEvent'}
                       onDeletePerson={() => onDeletePerson(person.id)}
                       onDeleteAllEvents={() => onDeleteAllEvents(person.id)}
                       t={t}
@@ -107,6 +117,7 @@ export default function PersonCard({
                     <PersonEventList
                       events={sortedEvents}
                       onSelectEvent={(event) => setEventModal({ open: true, mode: 'edit', event })}
+                      hint={guide?.eventHint}
                       t={t}
                       language={language}
                     />

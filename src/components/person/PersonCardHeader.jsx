@@ -6,12 +6,20 @@ import { TEXT, abbreviateZodiacMonths } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
 import { effectiveDisplayAge } from '@/lib/date'
 import { translateActivity, translateGender } from '@/lib/format'
+import TapGuide from '@/components/visuals/TapGuide'
 
 /**
  * Always-visible header of a person card: name, badges, basic info and the
  * expand/collapse toggle.
  */
-export default function PersonCardHeader({ person, expanded, onToggle, hasIncompleteEvent, t }) {
+export default function PersonCardHeader({
+  person,
+  expanded,
+  onToggle,
+  hasIncompleteEvent,
+  showTapGuide,
+  t,
+}) {
   const PALETTE = usePalette()
 
   return (
@@ -24,9 +32,11 @@ export default function PersonCardHeader({ person, expanded, onToggle, hasIncomp
         gap: '0.75rem',
         padding: '1.25rem',
         textAlign: 'left',
+        position: showTapGuide ? 'relative' : undefined,
       }}
       onClick={onToggle}
     >
+      {showTapGuide && <TapGuide />}
       <div style={{ minWidth: 0, flex: '1 1 0%' }}>
         {/* Name + badges */}
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.5rem' }}>

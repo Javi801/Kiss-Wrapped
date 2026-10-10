@@ -24,6 +24,7 @@ import AboutDialog from '@/components/app/AboutDialog'
 /**
  * Renders the main dashboard screen.
  * It shows summary metrics, primary actions, and app-level settings.
+ * `guideTarget` names the action button the onboarding tour points at.
  */
 export default function MainScreen({
   onNavigate,
@@ -41,6 +42,7 @@ export default function MainScreen({
   setStatsVisible,
   includePartnerEvents,
   modalBackRef,
+  guideTarget,
 }) {
   const PALETTE = usePalette()
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -186,6 +188,7 @@ export default function MainScreen({
         onExportJson={handleExportJson}
         onImportJson={() => fileInputRef.current?.click()}
         onClearData={() => setConfirmOpen(true)}
+        guideTarget={guideTarget}
       />
 
       <JsonExportDialogs

@@ -14,11 +14,16 @@ import {
 } from '@/components/ui/alert-dialog'
 
 import { usePalette } from '@/lib/theme'
+import SpeechBubble from '@/components/forms/SpeechBubble'
+import TapGuide from '@/components/visuals/TapGuide'
 
 /**
  * Action row of an expanded person card: edit person, add event, and the
  * confirmed delete-person / delete-all-events buttons. The edit button is
  * highlighted when the person's own profile is missing required fields.
+ * For the onboarding tour, `editHint` adds a speech bubble pointing at the edit
+ * button and `showTapGuide` puts the tap guide on the add-event button, the
+ * only one that then reacts to taps.
  */
 export default function PersonCardActions({
   hasEvents,
@@ -27,11 +32,13 @@ export default function PersonCardActions({
   onAddEvent,
   onDeletePerson,
   onDeleteAllEvents,
+  editHint,
+  showTapGuide,
   t,
 }) {
   const PALETTE = usePalette()
 
-  return (
+  const actions = (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
       <Button
         onClick={onEditPerson}
@@ -51,8 +58,10 @@ export default function PersonCardActions({
           background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
           color: PALETTE.textOnAccent,
           border: 'none',
+          ...(showTapGuide ? { position: 'relative', pointerEvents: 'auto' } : null),
         }}
       >
+        {showTapGuide && <TapGuide />}
         <Plus style={{ marginRight: '0.5rem', height: '1rem', width: '1rem' }} />
         {t.addEvent}
       </Button>
@@ -106,6 +115,15 @@ export default function PersonCardActions({
           </AlertDialogContent>
         </AlertDialog>
       )}
+    </div>
+  )
+
+  if (!editHint) return actions
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <SpeechBubble tailSide="bottom">{editHint}</SpeechBubble>
+      {actions}
     </div>
   )
 }

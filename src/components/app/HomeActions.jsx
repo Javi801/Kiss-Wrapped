@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
+import TapGuide from '@/components/visuals/TapGuide'
 
 const dataButtonLabelStyle = {
   fontSize: '0.625rem',
@@ -14,9 +15,17 @@ const dataButtonLabelStyle = {
 
 /**
  * Action buttons of the main screen: navigation to the other screens and the
- * data section (export, import and clear).
+ * data section (export, import and clear). `guideTarget` shows the tap guide
+ * on one of the buttons; only `'people'` is supported.
  */
-export default function HomeActions({ t, onNavigate, onExportJson, onImportJson, onClearData }) {
+export default function HomeActions({
+  t,
+  onNavigate,
+  onExportJson,
+  onImportJson,
+  onClearData,
+  guideTarget,
+}) {
   const PALETTE = usePalette()
 
   const outlineActionStyle = {
@@ -59,9 +68,14 @@ export default function HomeActions({ t, onNavigate, onExportJson, onImportJson,
       <Button
         variant="outline"
         className="rounded-3xl"
-        style={outlineActionStyle}
+        style={
+          guideTarget === 'people'
+            ? { ...outlineActionStyle, position: 'relative' }
+            : outlineActionStyle
+        }
         onClick={() => onNavigate('people')}
       >
+        {guideTarget === 'people' && <TapGuide />}
         <Users
           style={{
             marginRight: '0.75rem',
