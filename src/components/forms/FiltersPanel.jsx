@@ -69,7 +69,6 @@ const EMPTY_FILTERS = {
   zodiacSign: [],
   eventDateFrom: '',
   eventDateTo: '',
-  howWeMet: [],
 }
 
 function Divider() {
@@ -136,7 +135,6 @@ export default function FiltersPanel({
   sortBy,
   setSortBy,
   peopleCount,
-  howWeMetTags,
   t,
   language,
 }) {
@@ -161,15 +159,6 @@ export default function FiltersPanel({
       zodiacSign: prev.zodiacSign.includes(value)
         ? prev.zodiacSign.filter((z) => z !== value)
         : [...prev.zodiacSign, value],
-    }))
-  }
-
-  function toggleHowWeMet(value) {
-    setFilters((prev) => ({
-      ...prev,
-      howWeMet: prev.howWeMet.includes(value)
-        ? prev.howWeMet.filter((v) => v !== value)
-        : [...prev.howWeMet, value],
     }))
   }
 
@@ -264,23 +253,6 @@ export default function FiltersPanel({
             className="rounded-2xl"
             style={inputStyle}
           />
-        </div>
-      </div>
-
-      <Divider />
-
-      {/* How we met */}
-      <div>
-        <SectionLabel icon={Star} label={t.howWeMet} />
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-          {howWeMetTags.map((item) => (
-            <Chip
-              key={item}
-              label={item}
-              selected={filters.howWeMet.includes(item)}
-              onClick={() => toggleHowWeMet(item)}
-            />
-          ))}
         </div>
       </div>
 
