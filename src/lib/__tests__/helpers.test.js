@@ -207,6 +207,92 @@ describe('normalizePeople', () => {
     expect(bob.partnerFrom).toBe('')
     expect(bob.partnerTo).toBe('')
   })
+  it('resolves an invalid partnerStatus to current with legacy isPartner true', () => {
+    const people = [{ name: 'Ana', partnerStatus: 'maybe', isPartner: true, events: [] }]
+    const result = normalizePeople(people)[0]
+    expect(result.partnerStatus).toBe('current')
+    expect(result.isPartner).toBeUndefined()
+  })
+  it('clears a partner date that is not a valid yyyy.MM.dd string', () => {
+    const people = [
+      { name: 'Ana', partnerStatus: 'current', partnerFrom: '2023-01-01', events: [] },
+      { name: 'Bob', partnerStatus: 'current', partnerFrom: '2023.02.30', events: [] },
+      { name: 'Cleo', partnerStatus: 'current', partnerFrom: 20230101, events: [] },
+      {
+        name: 'Dan',
+        partnerStatus: 'past',
+        partnerFrom: 'bad',
+        partnerTo: '2023.12.31',
+        events: [],
+      },
+    ]
+    const [ana, bob, cleo, dan] = normalizePeople(people)
+    expect(ana.partnerFrom).toBe('')
+    expect(bob.partnerFrom).toBe('')
+    expect(cleo.partnerFrom).toBe('')
+    expect(dan.partnerStatus).toBe('past')
+    expect(dan.partnerFrom).toBe('')
+    expect(dan.partnerTo).toBe('2023.12.31')
+  })
+  it('drops partnerFrom and keeps partnerTo on an inverted range', () => {
+    const people = [
+      {
+        name: 'Ana',
+        partnerStatus: 'past',
+        partnerFrom: '2024.01.01',
+        partnerTo: '2023.12.31',
+        events: [],
+      },
+    ]
+    const result = normalizePeople(people)[0]
+    expect(result.partnerStatus).toBe('past')
+    expect(result.partnerFrom).toBe('')
+    expect(result.partnerTo).toBe('2023.12.31')
+  })
+  it('turns a past partner without a valid partnerTo into never', () => {
+    const people = [
+      { name: 'Ana', partnerStatus: 'past', partnerFrom: '2023.01.01', events: [] },
+      { name: 'Bob', partnerStatus: 'past', partnerFrom: '2023.01.01', partnerTo: '', events: [] },
+      {
+        name: 'Cleo',
+        partnerStatus: 'past',
+        partnerFrom: '2023.01.01',
+        partnerTo: 'bad',
+        events: [],
+      },
+    ]
+    for (const result of normalizePeople(people)) {
+      expect(result.partnerStatus).toBe('never')
+      expect(result.partnerFrom).toBe('')
+      expect(result.partnerTo).toBe('')
+    }
+  })
+  it('keeps future partner dates', () => {
+    const people = [
+      {
+        name: 'Ana',
+        partnerStatus: 'past',
+        partnerFrom: '2998.01.01',
+        partnerTo: '2999.01.01',
+        events: [],
+      },
+    ]
+    const result = normalizePeople(people)[0]
+    expect(result.partnerFrom).toBe('2998.01.01')
+    expect(result.partnerTo).toBe('2999.01.01')
+  })
+  it('leaves already normalized partner data unchanged', () => {
+    const once = normalizePeople([
+      {
+        name: 'Ana',
+        partnerStatus: 'past',
+        partnerFrom: '2024.01.01',
+        partnerTo: '2023.12.31',
+        events: [],
+      },
+    ])
+    expect(normalizePeople(once)).toEqual(once)
+  })
   it('replaces a missing events field with an empty array', () => {
     const people = [{ name: 'Ana' }]
     expect(normalizePeople(people)[0].events).toEqual([])
