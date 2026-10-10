@@ -120,7 +120,7 @@ export function flattenEvents(people) {
 /**
  * Keeps only the events with a valid score.
  */
-export function getScoredEvents(allEvents) {
+function getScoredEvents(allEvents) {
   return allEvents.filter((event) => hasScore(event.score))
 }
 
