@@ -5,6 +5,8 @@ import OnboardingWelcomeStep from '@/components/app/OnboardingWelcomeStep'
 import OnboardingPersonStep from '@/components/app/OnboardingPersonStep'
 import OnboardingTourStep from '@/components/app/OnboardingTourStep'
 import OnboardingEventStep from '@/components/app/OnboardingEventStep'
+import OnboardingHomeStep from '@/components/app/OnboardingHomeStep'
+import OnboardingButton from '@/components/app/OnboardingButton'
 import { createPerson, uid } from '@/lib/helpers'
 
 // Ordered wizard steps. The step counter total comes from this list's length.
@@ -14,11 +16,12 @@ const ONBOARDING_STEPS = [
   { Component: OnboardingPersonStep, ownsActions: true },
   { Component: OnboardingTourStep, ownsActions: true },
   { Component: OnboardingEventStep, ownsActions: true },
+  { Component: OnboardingHomeStep, ownsActions: true },
 ]
 
 /**
- * Full-screen onboarding wizard shown to new installs after the intro.
- * It cannot be skipped and has no way back: the only way out is finishing it.
+ * Full-screen onboarding wizard, shown to new installs after the intro and again
+ * from the settings. It cannot be skipped and has no way back between steps.
  *
  * Props:
  *  - t           Active translation dictionary
@@ -112,24 +115,9 @@ export default function OnboardingWizard({
 
       {ownsActions ? null : (
         <div style={{ position: 'relative', padding: '0 1.125rem 1.125rem' }}>
-          <button
-            type="button"
-            onClick={goNext}
-            style={{
-              width: '100%',
-              minHeight: '2.75rem',
-              padding: '0 0.8125rem',
-              borderRadius: '1rem',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '0.86rem',
-              fontWeight: 750,
-              color: '#ffffff',
-              background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
-            }}
-          >
+          <OnboardingButton onClick={goNext}>
             {isLast ? t.onboardingFinish : t.onboardingNext}
-          </button>
+          </OnboardingButton>
         </div>
       )}
     </div>

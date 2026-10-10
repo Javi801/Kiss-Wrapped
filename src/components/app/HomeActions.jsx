@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
 import TapGuide from '@/components/visuals/TapGuide'
+import SpeechBubble from '@/components/forms/SpeechBubble'
 
 const dataButtonLabelStyle = {
   fontSize: '0.625rem',
@@ -15,8 +16,9 @@ const dataButtonLabelStyle = {
 
 /**
  * Action buttons of the main screen: navigation to the other screens and the
- * data section (export, import and clear). `guideTarget` shows the tap guide
- * on one of the buttons; only `'people'` is supported.
+ * data section (export, import and clear). For the onboarding tour,
+ * `guideTarget="people"` shows the tap guide on the people button and
+ * `dataHint` (`{ title, body }`) a speech bubble over export and import.
  */
 export default function HomeActions({
   t,
@@ -25,6 +27,7 @@ export default function HomeActions({
   onImportJson,
   onClearData,
   guideTarget,
+  dataHint,
 }) {
   const PALETTE = usePalette()
 
@@ -117,6 +120,16 @@ export default function HomeActions({
           {t.dataSection}
         </span>
       </div>
+
+      {dataHint && (
+        <SpeechBubble
+          title={dataHint.title}
+          tailSide="bottom"
+          tailOffset={{ left: 'calc(33.3% - 0.3125rem)' }}
+        >
+          {dataHint.body}
+        </SpeechBubble>
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
         <Button

@@ -1,8 +1,9 @@
 import React, { Suspense, lazy, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Users, BarChart3, UserPlus, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 
 import { PALETTES, TEXT, COPY } from '@/lib/constants'
+import { FEATURES } from '@/lib/config'
 import { ThemeProvider } from '@/lib/theme'
 import { CopyProvider } from '@/lib/copy'
 import { setAppIconColor } from '@/plugins/appicon'
@@ -23,6 +24,7 @@ import PeopleManagerScreen from '@/components/people/PeopleManagerScreen'
 import HomeScreen from './components/app/HomeScreen'
 import AddPersonScreen from './components/app/AddPersonScreen'
 import IntroScreen from './components/app/IntroScreen'
+import BottomNav from './components/app/BottomNav'
 import OnboardingWizard from './components/app/OnboardingWizard'
 import PrivacyScreen from './components/app/PrivacyScreen'
 
@@ -233,21 +235,14 @@ export default function KissWrappedApp() {
   }
 
   /**
-   * Called when the user finishes the onboarding wizard.
+   * Called when the user finishes the onboarding wizard, on the first run or after
+   * restarting it from the settings.
    * Marks onboarding as done (triggers the save effect) and opens the dashboard.
    */
   function handleOnboardingComplete() {
     completeOnboarding()
     resetTo('main')
   }
-
-  // Bottom navigation configuration.
-  const navItems = [
-    { key: 'main', label: t.home, icon: Users },
-    { key: 'add', label: t.add, icon: UserPlus },
-    { key: 'people', label: t.people, icon: Search },
-    { key: 'stats', label: t.stats, icon: BarChart3 },
-  ]
 
   // Hide bottom navigation on screens that use a focused layout.
   const hideBottomBar =
@@ -315,6 +310,9 @@ export default function KissWrappedApp() {
                   setStatsVisible={setStatsVisible}
                   includePartnerEvents={includePartnerEvents}
                   modalBackRef={modalBackRef}
+                  onRestartOnboarding={
+                    FEATURES.onboarding ? () => navigateTo('onboarding') : undefined
+                  }
                 />
               ) : null}
 
@@ -372,68 +370,7 @@ export default function KissWrappedApp() {
             </motion.div>
 
             {/* Bottom navigation */}
-            {!hideBottomBar ? (
-              <div
-                style={{
-                  position: 'fixed',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  zIndex: 50,
-                  backdropFilter: 'blur(8px)',
-                  borderTop: `1px solid ${palette.inputBorder}`,
-                  backgroundColor: palette.navBarBg,
-                }}
-              >
-                <div
-                  style={{
-                    margin: '0 auto',
-                    display: 'grid',
-                    maxWidth: '28rem',
-                    gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-                    gap: '0.25rem',
-                    paddingLeft: '0.75rem',
-                    paddingRight: '0.75rem',
-                    paddingTop: '0.75rem',
-                    paddingBottom: '0.75rem',
-                  }}
-                >
-                  {navItems.map((item) => {
-                    const Icon = item.icon
-                    const active = screen === item.key
-
-                    return (
-                      <button
-                        key={item.key}
-                        onClick={() => navigateTo(item.key)}
-                        className="rounded-2xl"
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '0.25rem',
-                          paddingLeft: '0.5rem',
-                          paddingRight: '0.5rem',
-                          paddingTop: '0.5rem',
-                          paddingBottom: '0.5rem',
-                          ...TEXT.caption,
-                          fontWeight: '500',
-                          transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
-                          background: active
-                            ? `linear-gradient(90deg, ${palette.accent}, ${palette.accentSoft})`
-                            : 'transparent',
-                          color: active ? '#ffffff' : palette.textSoft,
-                        }}
-                      >
-                        <Icon style={{ height: '1rem', width: '1rem' }} />
-                        {item.label}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            ) : null}
+            {!hideBottomBar ? <BottomNav screen={screen} onNavigate={navigateTo} t={t} /> : null}
           </div>
         </div>
         {/* Full-screen overlays rendered outside the masked scroll area */}

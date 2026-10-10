@@ -3,9 +3,15 @@ import { usePalette } from '@/lib/theme'
 
 /**
  * Comic-style speech bubble whose tail points at the element right above it,
- * or right below it with `tailSide="bottom"`.
+ * or right below it with `tailSide="bottom"`. `tailOffset` moves the tail along
+ * the edge (`{ left }` or `{ right }`) and `title` adds a heading.
  */
-export default function SpeechBubble({ children, tailSide = 'top' }) {
+export default function SpeechBubble({
+  children,
+  title,
+  tailSide = 'top',
+  tailOffset = { left: '1.25rem' },
+}) {
   const PALETTE = usePalette()
   const border = `1px solid ${PALETTE.inputBorder}`
   const tailAbove = tailSide === 'top'
@@ -27,7 +33,7 @@ export default function SpeechBubble({ children, tailSide = 'top' }) {
         style={{
           position: 'absolute',
           [tailAbove ? 'top' : 'bottom']: '-0.375rem',
-          left: '1.25rem',
+          ...tailOffset,
           width: '0.625rem',
           height: '0.625rem',
           transform: 'rotate(45deg)',
@@ -36,6 +42,11 @@ export default function SpeechBubble({ children, tailSide = 'top' }) {
           backgroundColor: PALETTE.accentMuted,
         }}
       />
+      {title && (
+        <p style={{ ...TEXT.label, margin: '0 0 0.25rem', color: PALETTE.accentEmphasis2 }}>
+          {title}
+        </p>
+      )}
       <p style={{ ...TEXT.caption, margin: 0, color: PALETTE.text }}>{children}</p>
     </div>
   )

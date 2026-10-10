@@ -7,6 +7,7 @@ import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
 import { getEventPeople } from '@/lib/stats'
 import StatTile from '@/components/shared/StatTile'
+import SpeechBubble from '@/components/forms/SpeechBubble'
 
 const frostedButtonStyle = {
   height: '3.5rem',
@@ -36,7 +37,8 @@ const buttonColumnStyle = {
 
 /**
  * Hero card of the main screen: the summary metrics and the frosted buttons
- * for language, stats visibility and settings.
+ * for language, stats visibility and settings. For the onboarding tour,
+ * `settingsHint` (`{ title, body }`) shows a speech bubble pointing at the settings button.
  */
 export default function HomeHeroCard({
   people,
@@ -46,6 +48,7 @@ export default function HomeHeroCard({
   includePartnerEvents,
   onOpenLanguage,
   onOpenSettings,
+  settingsHint,
 }) {
   const PALETTE = usePalette()
 
@@ -183,6 +186,18 @@ export default function HomeHeroCard({
             <span style={buttonLabelStyle}>{t.settings}</span>
           </div>
         </div>
+
+        {/* The settings button is the last of three evenly spaced columns. */}
+        {settingsHint && (
+          <div style={{ position: 'relative', marginTop: '0.5rem' }}>
+            <SpeechBubble
+              title={settingsHint.title}
+              tailOffset={{ right: 'calc(16.7% - 0.3125rem)' }}
+            >
+              {settingsHint.body}
+            </SpeechBubble>
+          </div>
+        )}
       </CardContent>
     </Card>
   )
