@@ -17,10 +17,12 @@ import { usePalette } from '@/lib/theme'
 
 /**
  * Action row of an expanded person card: edit person, add event, and the
- * confirmed delete-person / delete-all-events buttons.
+ * confirmed delete-person / delete-all-events buttons. The edit button is
+ * highlighted when the person's own profile is missing required fields.
  */
 export default function PersonCardActions({
   hasEvents,
+  personIncomplete,
   onEditPerson,
   onAddEvent,
   onDeletePerson,
@@ -36,7 +38,7 @@ export default function PersonCardActions({
         style={{
           background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
           color: PALETTE.textOnAccent,
-          border: 'none',
+          border: personIncomplete ? `2px solid ${PALETTE.warningBorder}` : 'none',
         }}
       >
         <Pencil style={{ marginRight: '0.5rem', height: '1rem', width: '1rem' }} />

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Card, CardContent } from '@/components/ui/card'
 
 import { usePalette } from '@/lib/theme'
-import { personHasIncompleteEvent } from '@/lib/format'
+import { personHasIncompleteEvent, personIsMissingRequired } from '@/lib/format'
 
 import PersonCardHeader from '@/components/person/PersonCardHeader'
 import PersonCardDetails from '@/components/person/PersonCardDetails'
@@ -96,6 +96,7 @@ export default function PersonCard({
 
                     <PersonCardActions
                       hasEvents={sortedEvents.length > 0}
+                      personIncomplete={personIsMissingRequired(person)}
                       onEditPerson={() => setEditingPerson(true)}
                       onAddEvent={() => setEventModal({ open: true, mode: 'add', event: null })}
                       onDeletePerson={() => onDeletePerson(person.id)}

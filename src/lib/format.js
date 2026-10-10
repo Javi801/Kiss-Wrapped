@@ -30,17 +30,21 @@ export function eventIsMissingRequired(event) {
   return !event.place?.trim() || !event.situation?.trim()
 }
 
-// Check if a person or any of their events is missing required fields.
-export function personHasIncompleteEvent(person) {
-  const personMissing =
+// Check if a person's own profile is missing any required field.
+export function personIsMissingRequired(person) {
+  return (
     !person.name?.trim() ||
     !person.birthYear ||
     !person.gender ||
     !person.zodiacSign ||
     !person.activity ||
     !person.howWeMet?.trim()
+  )
+}
 
-  return personMissing || (person.events || []).some(eventIsMissingRequired)
+// Check if a person or any of their events is missing required fields.
+export function personHasIncompleteEvent(person) {
+  return personIsMissingRequired(person) || (person.events || []).some(eventIsMissingRequired)
 }
 
 // Validate score is an integer between 0 and 5.
