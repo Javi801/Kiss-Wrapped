@@ -27,7 +27,8 @@ src/
   __tests__/            Unit tests for App.jsx and the hooks it composes
   hooks/                Hooks used by App.jsx: usePersistedAppState (people, settings, boot,
                         save), useAppNavigation (screen, history, back button),
-                        usePrivacyOverlay (backgrounded state)
+                        usePrivacyOverlay (backgrounded state); plus useScrollFade (edge
+                        fade of a scroll container), used by ui/dialog and PeopleToolbar
   index.css             Tailwind + shadcn theme tokens
   shadcn-tailwind.css   Vendored copy of shadcn's `tailwind.css`, imported by index.css
   components/
@@ -97,7 +98,7 @@ Rules that hold today and should be preserved:
 
 | Export | Purpose |
 |---|---|
-| `FEATURES` | Feature flags. `pdfExport` gates the PDF button in `StatsScreen`; `onboarding` gates the onboarding routing in the `App.jsx` boot. Both are currently `false` |
+| `FEATURES` | Feature flags. `pdfExport` gates the PDF button in `StatsScreen`; `onboarding` gates the onboarding routing in the `usePersistedAppState` boot. Both are currently `false` |
 | `APP_VERSION`, `APP_GITHUB_USER`, `APP_GITHUB_REPO` | Metadata shown in the UI |
 | `ONBOARDING_VERSION` | Bump to show the onboarding again to users who completed an older version |
 | `LANGUAGES`, `THEMES`, `ICON_COLORS` | Supported setting values. A persisted value outside these lists is ignored at boot |
@@ -151,11 +152,13 @@ There is no router. `screen` is a string and `App.jsx` conditionally renders one
 | `onboarding` | `OnboardingScreen` | Reached only when `FEATURES.onboarding` is on |
 
 - `useAppNavigation` (`hooks/useAppNavigation.js`) owns `screen`, the history stack, and `modalBackRef`.
+- `StatsScreen` is the only screen loaded on demand (`React.lazy` in `App.jsx`), which keeps the charting libraries out of the initial chunk. `App.jsx` fetches its chunk after the first render and renders a spinner as the `Suspense` fallback when the screen is opened before the chunk arrives.
 - `navigateTo(screen)` pushes the current screen onto `screenHistoryRef` and switches. `resetTo(screen)` switches and empties the stack.
 - The Android hardware back button is handled by one Capacitor listener in `useAppNavigation`:
-  1. If `modalBackRef.current` is set, call it and stop.
-  2. From `add`, always go to `intro`. From `intro`, exit the app.
-  3. Otherwise pop the history stack; with an empty stack go to `main`, or exit if already there.
+  1. If a select is open, close it and stop. `ui/select.jsx` registers every open select in `lib/open-selects.js`, so selects need no `modalBackRef` wiring.
+  2. If `modalBackRef.current` is set, call it and stop.
+  3. From `add`, always go to `intro`. From `intro`, exit the app.
+  4. Otherwise pop the history stack; with an empty stack go to `main`, or exit if already there.
 - **Modal contract:** any component that opens a dialog, sheet, or overlay must set `modalBackRef.current` to a close callback while it is open and reset it to `null` when closed, so the back button closes the overlay instead of navigating. See `HomeScreen`, `usePersonCardModals` (for `PersonCard`), `PeopleToolbar` (for `PeopleManagerScreen`), and `StatsScreen` for the pattern.
 - Saving a new person and clearing data both reset the history and return to `intro` by design.
 
@@ -268,8 +271,8 @@ Privacy mechanisms, in addition to the above:
 
 ## Testing and quality gates
 
-- Tests live in a `__tests__/` folder next to the code they cover: `src/lib/__tests__/`, `src/plugins/__tests__/`, `src/components/<area>/__tests__/`, and `src/__tests__/` for `App.jsx` and `src/hooks/`, which are tested through `App.jsx`. All of them are unit tests.
-- `lib/` is fully covered. Component coverage is partial: the app shell, forms (`EventForm`, `TagInput`, `FiltersPanel`), stats screen and tabs, selectors, shared tiles, and `ErrorBoundary` have tests; `HomeScreen`, `PeopleManagerScreen`, `PersonCard`, and `PersonForm` are covered only for partner behavior; the Recharts/SVG chart cards, `FullscreenChartWrapper`, `OnboardingScreen`, and `visuals/` have none. Logic still belongs in `lib/`, where it is cheapest to test.
+- Tests live in a `__tests__/` folder next to the code they cover: `src/lib/__tests__/`, `src/plugins/__tests__/`, `src/components/<area>/__tests__/`, and `src/__tests__/` for `App.jsx` and `src/hooks/`. The hooks `App.jsx` composes are tested through it; `useScrollFade` has its own file. All of them are unit tests.
+- `lib/` is fully covered. Component coverage is broad: the app shell, the screens (`HomeScreen`, `PeopleManagerScreen`, `AddPersonScreen`, `IntroScreen`, `OnboardingScreen`, `StatsScreen` and its tabs), forms (`PersonForm`, `PartnerFields`, `EventForm`, `TagInput`, `FiltersPanel`), `PersonCard` with its `PersonCardActions` row, the chart cards and `FullscreenChartWrapper`, selectors, shared tiles, the `ui/` dialog, sheet and select wrappers, and `ErrorBoundary` have tests; `visuals/` has none. Logic still belongs in `lib/`, where it is cheapest to test.
 - Component tests mock their children and the palette (`vi.mock('@/lib/theme')`) and assert on the props handed to those children or on the rendered output. Static components render with `renderToStaticMarkup`; components with state, effects, or event handlers render with `createRoot` + `act` under jsdom. There is no testing-library dependency.
 - `config.test.js` checks that the configuration is consistent with the code it describes (supported lists, defaults, limits) and pins the current feature flag values, so releasing a feature means updating the flag and its test together.
 - The default Vitest environment is `node`. Files that need the DOM opt in with a `// @vitest-environment jsdom` pragma.

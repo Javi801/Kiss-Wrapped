@@ -123,7 +123,7 @@ At a glance:
   </tr>
   <tr>
     <td><code>components/app/</code></td>
-    <td>Top-level screens: Home, AddPerson, Intro, Language, Theme, Color selectors, ErrorBoundary, and PrivacyScreen</td>
+    <td>Top-level screens: Home, AddPerson, Intro, Onboarding, the Color selector, ErrorBoundary, and PrivacyScreen</td>
   </tr>
   <tr>
     <td><code>components/stats/</code></td>
@@ -135,7 +135,7 @@ At a glance:
   </tr>
   <tr>
     <td><code>components/charts/</code></td>
-    <td>Generic reusable chart cards: Bar, Pie, Radar, Area, Heatmap, Dumbbell. FullscreenChartWrapper and FullscreenContext enable fullscreen expansion and PNG export for any chart</td>
+    <td>Generic reusable chart cards: Bar, Pie, Donut, Area, Heatmap, Dumbbell, and the timeline cards. FullscreenChartWrapper and FullscreenContext enable fullscreen expansion and PNG export for any chart</td>
   </tr>
   <tr>
     <td><code>lib/</code></td>
@@ -220,12 +220,12 @@ Tests live in a `__tests__/` folder next to the code they cover, and all of them
 
 | Location | Covers |
 |----------|--------|
-| `src/lib/__tests__/` | `date.js`, `calendar.js`, `format.js`, `helpers.js`, `stats.js`, `constants.js`, `config.js`, `device-storage.js`, `pdf-export.js`, `utils.js`, and the theme and copy providers |
+| `src/lib/__tests__/` | `date.js`, `calendar.js`, `format.js`, `helpers.js`, `stats.js`, `constants.js`, `config.js`, `partner.js`, `import-people.js`, `device-storage.js`, `pdf-export.js`, `open-selects.js`, `utils.js`, and the theme and copy providers |
 | `src/plugins/__tests__/` | The app icon plugin wrapper |
-| `src/__tests__/` | `App.jsx`: boot, persistence, navigation, back button, and data mutations |
-| `src/components/*/__tests__/` | Forms, stats screen and tabs, selectors, shared tiles, `ErrorBoundary`, and partner behavior of the people screens |
+| `src/__tests__/` | `App.jsx`: boot, persistence, navigation, back button, and data mutations; and the `useScrollFade` hook |
+| `src/components/*/__tests__/` | Screens, forms, the person card, stats screen and tabs, chart cards and the fullscreen wrapper, selectors, shared tiles, the `ui/` dialog, sheet and select wrappers, and `ErrorBoundary` |
 
-`device-storage.js` and `utils.js` are excluded from threshold enforcement since they depend on native plugins or external APIs. Tests outside `src/lib/` run in the suite but do not count towards the thresholds. Chart cards and decorative visuals have no tests.
+`device-storage.js` and `utils.js` are excluded from threshold enforcement since they depend on native plugins or external APIs. Tests outside `src/lib/` run in the suite but do not count towards the thresholds. Decorative visuals have no tests.
 
 ## Data model
 
