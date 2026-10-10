@@ -288,7 +288,7 @@ Privacy mechanisms, in addition to the above:
 - The default Vitest environment is `node`. Files that need the DOM opt in with a `// @vitest-environment jsdom` pragma.
 - Coverage is collected for `src/lib/**/*.js` only, excluding `device-storage.js` and `utils.js`, and the thresholds (statements 95, branches 90, functions 95, lines 95) apply to that scope. Tests for components, `App.jsx`, `hooks/`, `plugins/`, and the `.jsx` files in `lib/` run in the suite but do not count towards the thresholds.
 - Pre-push hook (husky, `.husky/pre-push`): Prettier checks `src/**/*.{js,jsx}`, then the full test suite runs. There is no pre-commit hook.
-- CI (`.github/workflows/ci.yml`) runs on pushes and pull requests to `main` and `dev`: lint, `knip` (unused code and dependencies), the Prettier check, tests with coverage, and the build. A second job audits the production dependencies (`npm audit`), and pull requests also get a dependency review.
+- CI (`.github/workflows/ci.yml`) runs on pushes and pull requests to `main` and `dev`: lint, `knip` (unused code and dependencies), the Prettier check, tests with coverage, and the build. A second job audits the production dependencies (`npm audit`). A separate workflow (`.github/workflows/dependency-review.yml`) runs a dependency review on pull requests to `main` and `dev` only.
 - Formatting: Prettier with no semicolons, single quotes, width 100. ESLint flat config with React, hooks, and react-refresh rules.
 
 ## Where to make common changes
