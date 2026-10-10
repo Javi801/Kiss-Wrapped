@@ -101,7 +101,7 @@ Rules that hold today and should be preserved:
 | `APP_VERSION`, `APP_GITHUB_USER`, `APP_GITHUB_REPO` | Metadata shown in the UI |
 | `ONBOARDING_VERSION` | Bump to show the onboarding again to users who completed an older version |
 | `LANGUAGES`, `THEMES`, `ICON_COLORS` | Supported setting values. A persisted value outside these lists is ignored at boot |
-| `DEFAULT_SETTINGS` | Initial `language`, `theme`, `iconColor`, `statsVisible` |
+| `DEFAULT_SETTINGS` | Initial `language`, `theme`, `iconColor`, `statsVisible`, `includePartnerEvents` |
 | `LIMITS` | Input lengths, maximum age, and the size of the top-people ranking |
 
 Rules:
@@ -119,7 +119,7 @@ There is no state library. All global state is `useState` inside three hooks in 
 |---|---|
 | `people` | The whole dataset: an array of persons, each with nested `events` |
 | `screen` | Current screen key |
-| `language`, `theme`, `iconColor`, `statsVisible` | User settings |
+| `language`, `theme`, `iconColor`, `statsVisible`, `includePartnerEvents` | User settings |
 | `situationTags`, `placeTags`, `howWeMetTags` | Tag suggestions for form inputs |
 | `onboardingDone`, `onboardingVersion` | Onboarding progress |
 | `isLoaded` | Guards persistence until the initial load has finished |
@@ -200,7 +200,7 @@ Invariants:
 - **`zodiacSign` is stored as the full localized string.** Its leading emoji is the language-independent key; convert between languages with `getZodiacForLanguage`, and get a display label with `getShortZodiacLabel`.
 - **Scores are validated with `hasScore`.** Anything that is not an integer 0–5 is normalized to `null` on write and on load.
 - **Partner fields are validated in `lib/partner.js`.** `validatePartnerFields` is the single set of rules (valid `yyyy.MM.dd` dates, none in the future, `partnerFrom` on or before `partnerTo`, and `past` requires `partnerTo`). It returns error codes, which `translatePartnerError` in `lib/format.js` turns into text. `PersonForm` and the import fix table both use it through `PartnerFields`. `PersonForm` renders `PartnerFields` only when it receives `includePartner`, which the edit dialog in `PersonCardDialogs` passes and `AddPersonScreen` does not: every person is created as `never`, and the status is changed only by editing the person from the people list. `never` is a complete value, so it never marks a person as incomplete. `partnerFrom` is kept only for `current` and `past`, and `partnerTo` only for `past`.
-- **Partner periods.** `getPartnerPeriod` / `excludePartnerEvents` in `lib/stats.js` remove events that fall inside a partner period from event-based statistics. Person-based statistics (counts by gender, age, zodiac) use the unfiltered list. Any new statistic must pick the correct list.
+- **Partner periods.** `getPartnerPeriod` / `excludePartnerEvents` in `lib/stats.js` remove events that fall inside a partner period from event-based statistics. Whether they are removed is the user's choice, stored in the `includePartnerEvents` setting (`false` by default): `getEventPeople(people, includePartnerEvents)` returns the unfiltered list when it is `true` and the filtered one otherwise, and it is the only function that reads the setting. Person-based statistics (counts by gender, age, zodiac) always use the unfiltered list. Any new statistic must pick the correct list.
 
 ## Persistence
 
@@ -232,9 +232,10 @@ All of these follow the same sequence: write to `Directory.Cache` → `Filesyste
 
 ## Statistics
 
-- `StatsScreen` derives two shared datasets with `useMemo`: `eventPeople` (partner-period events removed) and `allEvents` (flattened events, each with a `person` reference). It passes them to the tabs.
+- `StatsScreen` derives two shared datasets with `useMemo`: `eventPeople` (`getEventPeople`, so partner-period events are removed unless `includePartnerEvents` is on) and `allEvents` (flattened events, each with a `person` reference). It passes them to the tabs.
+- `StatsScreen` renders the toggle for `includePartnerEvents` above the tab grid, only when at least one person has a partner period. The value and its setter come from `App.jsx`, so the choice is persisted and every chart of every tab recomputes when it changes. `HomeHeroCard` receives the same value and uses `getEventPeople` for its total-events tile, which keeps both screens in agreement. Fullscreen charts have no toggle and show the current choice.
 - Aggregations are pure functions exported from `lib/stats.js` (`groupByZodiac`, `getTopPeople`, `getScoresByKisses`, …). Each tab (`StatsOverviewTab`, `StatsTimeTab`, `StatsPeopleTab`, `StatsScoresTab`) calls the ones it needs inside `useMemo` and renders chart cards.
-- `getStatsData` in `lib/stats.js` composes those same functions into one object. It is used only by the PDF export (`FEATURES.pdfExport`). Where screen and PDF present a statistic differently (all 12 zodiac signs vs. a ranking, the zero-kiss score, zero-filled ranges), the difference is an explicit option of the shared function.
+- `getStatsData` in `lib/stats.js` composes those same functions into one object. It is used only by the PDF export (`FEATURES.pdfExport`) and always removes partner-period events: it does not read `includePartnerEvents` yet. Where screen and PDF present a statistic differently (all 12 zodiac signs vs. a ranking, the zero-kiss score, zero-filled ranges), the difference is an explicit option of the shared function.
 - Any chart wrapped in `FullscreenChartWrapper` gets fullscreen and PNG export. Charts read `useFullscreen()` to adapt their layout when expanded.
 
 ## Theming and styling
