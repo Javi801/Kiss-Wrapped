@@ -29,7 +29,6 @@ vi.mock('recharts', async () => {
   return {
     ResponsiveContainer: ({ children }) => children,
     AreaChart: main,
-    RadarChart: main,
     PieChart: ({ children }) => createElement('div', { 'data-chart': true }, children),
     Pie: (props) => {
       chart.main = props
@@ -52,17 +51,12 @@ vi.mock('recharts', async () => {
       return null
     },
     Area: () => null,
-    Radar: () => null,
     CartesianGrid: () => null,
-    PolarGrid: () => null,
-    PolarAngleAxis: () => null,
-    PolarRadiusAxis: () => null,
   }
 })
 
 import AreaChartCard from '@/components/charts/AreaChartCard'
 import PieChartCard from '@/components/charts/PieChartCard'
-import RadarChartCard from '@/components/charts/RadarChartCard'
 import { FullscreenContext } from '@/components/charts/FullscreenContext'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
@@ -246,51 +240,5 @@ describe('PieChartCard', () => {
     const regular = chart.main.outerRadius
     rerender(PieChartCard, { data }, { fullscreen: true })
     expect(chart.main.outerRadius).toBeGreaterThan(regular)
-  })
-})
-
-describe('RadarChartCard', () => {
-  const data = [
-    { label: 'Aries', value: 2 },
-    { label: 'Leo', value: 0 },
-  ]
-
-  it('shows the title, the subtitle and the given rows', () => {
-    render(RadarChartCard, { data })
-    expect(container.textContent).toContain('Card title')
-    expect(container.textContent).toContain('Card subtitle')
-    expect(chart.main.data).toBe(data)
-  })
-
-  it.each([
-    ['every value is zero', [{ label: 'Aries', value: 0 }]],
-    ['there are no rows', []],
-  ])('shows the empty text when %s', (_case, rowsGiven) => {
-    render(RadarChartCard, { data: rowsGiven })
-    expect(container.textContent).toContain('Nothing yet')
-    expect(container.querySelector('[data-chart]')).toBeNull()
-  })
-
-  it('names the axis and counts in the given unit', () => {
-    chart.hover = { active: true, payload: [{ value: 2, payload: { label: 'Aries' } }] }
-    render(RadarChartCard, { data, tooltipUnit: UNIT })
-    expect(tooltip()).toBe('Aries2 people')
-  })
-
-  it('uses the singular for one', () => {
-    chart.hover = { active: true, payload: [{ value: 1, payload: { label: 'Aries' } }] }
-    render(RadarChartCard, { data, tooltipUnit: UNIT })
-    expect(tooltip()).toBe('Aries1 person')
-  })
-
-  it('hides the tooltip while inactive', () => {
-    chart.hover = { active: false, payload: [{ value: 1, payload: { label: 'Aries' } }] }
-    render(RadarChartCard, { data, tooltipUnit: UNIT })
-    expect(tooltip()).toBe('')
-  })
-
-  it('falls back to the default tooltip without a unit', () => {
-    render(RadarChartCard, { data })
-    expect(chart.tooltip.content).toBeUndefined()
   })
 })
