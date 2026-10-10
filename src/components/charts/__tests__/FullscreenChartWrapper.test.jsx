@@ -64,7 +64,10 @@ const chartNode = () => document.body.querySelector('[data-testid="chart"]')
 const scrollArea = () => document.body.querySelector('[data-testid="scroll"]')
 const capture = () => document.body.querySelector('[data-fullscreen-chart]')
 const isFullscreen = () => capture() !== null
-const status = () => document.body.querySelector('[role="status"]')
+const errorDialog = () => document.body.querySelector('[role="dialog"]')
+const dialogButton = (label) =>
+  [...errorDialog().querySelectorAll('button')].find((button) => button.textContent === label)
+const logButton = () => dialogButton(t.chartShareLog)
 const openFullscreen = () => act(() => byTitle(t.chartFullscreen).click())
 const pressKey = (key) => act(() => window.dispatchEvent(new KeyboardEvent('keydown', { key })))
 
@@ -202,7 +205,7 @@ describe('FullscreenChartWrapper — downloading the image', () => {
       path: written.path,
       directory: 'CACHE',
     })
-    expect(status()).toBeNull()
+    expect(errorDialog()).toBeNull()
   })
 
   it('unclips scroll areas for the capture and restores them afterwards', async () => {
@@ -240,7 +243,7 @@ describe('FullscreenChartWrapper — downloading the image', () => {
     render()
     openFullscreen()
     await download()
-    expect(status()).toBeNull()
+    expect(errorDialog()).toBeNull()
   })
 })
 
@@ -250,7 +253,7 @@ describe('FullscreenChartWrapper — download errors', () => {
     render()
     openFullscreen()
     await download()
-    expect(status().textContent).toContain('Error: canvas too large')
+    expect(errorDialog().textContent).toContain('Error: canvas too large')
     expect(mockShare.share).not.toHaveBeenCalled()
     expect(scrollArea().style.maxHeight).toBe('100px')
     expect(byTitle(t.chartDownloadImage).disabled).toBe(false)
@@ -261,7 +264,7 @@ describe('FullscreenChartWrapper — download errors', () => {
     render()
     openFullscreen()
     await download()
-    expect(status().textContent).toContain('Error: Share canceled')
+    expect(errorDialog().textContent).toContain('Error: Share canceled')
   })
 
   it('describes a failure that is not an Error', async () => {
@@ -269,7 +272,7 @@ describe('FullscreenChartWrapper — download errors', () => {
     render()
     openFullscreen()
     await download()
-    expect(status().textContent).toContain('Error: plain failure')
+    expect(errorDialog().textContent).toContain('Error: plain failure')
   })
 
   it('clears the error on the next attempt', async () => {
@@ -278,8 +281,19 @@ describe('FullscreenChartWrapper — download errors', () => {
     openFullscreen()
     await download()
     await download()
-    expect(status()).toBeNull()
+    expect(errorDialog()).toBeNull()
     expect(mockShare.share).toHaveBeenCalledOnce()
+  })
+
+  it('closes the error with its close button and keeps the chart open', async () => {
+    mockToPng.mockRejectedValue(new Error('canvas too large'))
+    render()
+    openFullscreen()
+    await download()
+    expect(errorDialog().textContent).toContain(t.chartDownloadErrorTitle)
+    act(() => dialogButton(t.close).click())
+    expect(errorDialog()).toBeNull()
+    expect(isFullscreen()).toBe(true)
   })
 
   it('clears the error when fullscreen is reopened', async () => {
@@ -289,13 +303,13 @@ describe('FullscreenChartWrapper — download errors', () => {
     await download()
     act(() => byTitle(t.close).click())
     openFullscreen()
-    expect(status()).toBeNull()
+    expect(errorDialog()).toBeNull()
   })
 
   describe('sharing the error log', () => {
     const shareLog = () =>
       act(async () => {
-        status().querySelector('button').click()
+        logButton().click()
       })
     const log = () => mockFilesystem.writeFile.mock.calls.at(-1)[0]
 
@@ -312,7 +326,7 @@ describe('FullscreenChartWrapper — download errors', () => {
     it('writes a dated report with the error, platform and stack, then shares it', async () => {
       const error = new Error('canvas too large')
       await failDownload(error)
-      expect(status().querySelector('button').textContent).toBe(t.chartShareLog)
+      expect(logButton()).toBeDefined()
       await shareLog()
 
       expect(log().directory).toBe('CACHE')
@@ -341,10 +355,9 @@ describe('FullscreenChartWrapper — download errors', () => {
       let finish
       mockShare.share.mockReturnValue(new Promise((resolve) => (finish = resolve)))
       await shareLog()
-      expect(status().querySelector('button').disabled).toBe(true)
+      expect(logButton().disabled).toBe(true)
       await act(async () => finish())
-      expect(status().querySelector('button').disabled).toBe(false)
-      expect(status().querySelector('button').textContent).toBe(t.chartShareLog)
+      expect(logButton().disabled).toBe(false)
     })
 
     it('recovers when the log cannot be written or shared', async () => {
@@ -352,7 +365,7 @@ describe('FullscreenChartWrapper — download errors', () => {
       mockFilesystem.writeFile.mockRejectedValue(new Error('disk full'))
       await shareLog()
       expect(mockShare.share).not.toHaveBeenCalled()
-      expect(status().querySelector('button').disabled).toBe(false)
+      expect(logButton().disabled).toBe(false)
     })
 
     it('ignores a failed cleanup of the log file', async () => {
@@ -360,7 +373,7 @@ describe('FullscreenChartWrapper — download errors', () => {
       mockFilesystem.deleteFile.mockRejectedValue(new Error('gone'))
       await shareLog()
       expect(mockShare.share).toHaveBeenCalledOnce()
-      expect(status().querySelector('button').disabled).toBe(false)
+      expect(logButton().disabled).toBe(false)
     })
   })
 })

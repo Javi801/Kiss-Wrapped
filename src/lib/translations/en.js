@@ -194,6 +194,7 @@ export const en = {
   chartDownloadImage: 'Download image',
   chartFullscreen: 'Fullscreen',
   chartShareLog: 'Share log',
+  chartDownloadErrorTitle: 'Download failed',
   timelineTitle: 'Events over time',
   personsTimelineTitle: 'Persons over time',
   timelineAvg: 'on average',

@@ -41,12 +41,18 @@ function focusContent(event) {
   event.currentTarget.focus()
 }
 
-function DialogContent({ className, children, showCloseButton = true, ...props }) {
+function DialogContent({
+  className,
+  overlayClassName,
+  children,
+  showCloseButton = true,
+  ...props
+}) {
   const scrollFadeRef = useScrollFade()
 
   return (
     <DialogPortal>
-      <DialogOverlay />
+      <DialogOverlay className={overlayClassName} />
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(

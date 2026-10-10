@@ -9,8 +9,7 @@ import { usePalette } from '@/lib/theme'
 import { useCopy } from '@/lib/copy'
 import { TEXT } from '@/lib/constants'
 import { FullscreenContext } from '@/components/charts/FullscreenContext'
-
-const ERROR_DISMISS_MS = 4000
+import ChartDownloadErrorDialog from '@/components/charts/ChartDownloadErrorDialog'
 
 function getChartFilename() {
   return `kiss-wrapped-chart-${new Date().toISOString().slice(0, 10)}.png`
@@ -124,13 +123,6 @@ export default function FullscreenChartWrapper({ children, centerContent = false
     setDownloadErrorObj(null)
   }, [])
 
-  // The error dismisses itself, except while its log is being shared.
-  useEffect(() => {
-    if (!downloadError || sharingLog) return
-    const timer = setTimeout(dismissError, ERROR_DISMISS_MS)
-    return () => clearTimeout(timer)
-  }, [downloadError, sharingLog, dismissError])
-
   useEffect(() => {
     if (!isFullscreen) return
 
@@ -138,7 +130,8 @@ export default function FullscreenChartWrapper({ children, centerContent = false
     document.body.style.overflow = 'hidden'
 
     const onKeyDown = (event) => {
-      if (event.key === 'Escape') close()
+      // The error dialog prevents the default when Escape closes it.
+      if (event.key === 'Escape' && !event.defaultPrevented) close()
     }
     window.addEventListener('keydown', onKeyDown)
 
@@ -361,68 +354,13 @@ export default function FullscreenChartWrapper({ children, centerContent = false
             </div>
           </div>
 
-          {/* Download error — fixed to the viewport and outside captureRef */}
-          {downloadError ? (
-            <div
-              role="status"
-              style={{
-                position: 'fixed',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                zIndex: 10002,
-                width: 'max-content',
-                maxWidth: 'calc(100vw - 28px)',
-                boxSizing: 'border-box',
-                border: `1px solid ${PALETTE.inputBorder}`,
-                borderRadius: 16,
-                background: PALETTE.card,
-                color: PALETTE.text,
-                padding: '0.35rem 0.5rem 0.35rem 0.75rem',
-                fontSize: 12,
-                boxShadow: '0 6px 18px rgb(0 0 0 / 0.08)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-              }}
-            >
-              <span style={{ minWidth: 0, overflowWrap: 'anywhere' }}>{downloadError}</span>
-              <button
-                onClick={shareDownloadLog}
-                disabled={sharingLog}
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: PALETTE.accent,
-                  background: 'none',
-                  border: 'none',
-                  cursor: sharingLog ? 'default' : 'pointer',
-                  opacity: sharingLog ? 0.5 : 1,
-                  padding: '0.1rem 0.25rem',
-                  flexShrink: 0,
-                }}
-              >
-                {sharingLog ? '…' : t.chartShareLog}
-              </button>
-              <button
-                onClick={dismissError}
-                title={t.close}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: PALETTE.text,
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '0.25rem',
-                  flexShrink: 0,
-                }}
-              >
-                <X size={13} />
-              </button>
-            </div>
-          ) : null}
+          <ChartDownloadErrorDialog
+            message={downloadError}
+            sharingLog={sharingLog}
+            t={t}
+            onShareLog={shareDownloadLog}
+            onClose={dismissError}
+          />
         </div>
       </FullscreenContext.Provider>,
       document.body

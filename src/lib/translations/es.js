@@ -194,6 +194,7 @@ export const es = {
   chartDownloadImage: 'Descargar imagen',
   chartFullscreen: 'Pantalla completa',
   chartShareLog: 'Compartir log',
+  chartDownloadErrorTitle: 'Error al descargar',
   timelineTitle: 'Eventos a lo largo del tiempo',
   personsTimelineTitle: 'Personas a lo largo del tiempo',
   timelineAvg: 'en promedio',
