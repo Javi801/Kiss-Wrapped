@@ -29,6 +29,8 @@ import {
   exportPeopleJson,
   loadSettings,
   saveSettings,
+  getSafeStorage,
+  isNativePlatform,
 } from '@/lib/device-storage'
 import {
   STORAGE_KEY,
@@ -881,4 +883,91 @@ describe('persisted settings override config defaults (native path)', () => {
       expect(written[name]).toBe(USER_CHOICES[name])
     }
   )
+})
+
+// ---------------------------------------------------------------------------
+// getSafeStorage / isNativePlatform
+// ---------------------------------------------------------------------------
+describe('getSafeStorage', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('returns localStorage when it is available', () => {
+    expect(getSafeStorage()).toBe(window.localStorage)
+  })
+
+  it('returns null when accessing localStorage throws', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    vi.spyOn(window, 'localStorage', 'get').mockImplementation(() => {
+      throw new Error('SecurityError')
+    })
+    expect(getSafeStorage()).toBeNull()
+  })
+})
+
+describe('isNativePlatform', () => {
+  afterEach(() => {
+    mockNative.isNative = false
+  })
+
+  it('reports the platform given by Capacitor', () => {
+    mockNative.isNative = false
+    expect(isNativePlatform()).toBe(false)
+    mockNative.isNative = true
+    expect(isNativePlatform()).toBe(true)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// clearPeopleFromDevice (native path)
+// ---------------------------------------------------------------------------
+describe('clearPeopleFromDevice (native path)', () => {
+  beforeEach(() => {
+    mockNative.isNative = true
+    vi.clearAllMocks()
+    mockFilesystem.deleteFile.mockResolvedValue(undefined)
+    localStorage.clear()
+  })
+
+  afterEach(() => {
+    mockNative.isNative = false
+    vi.restoreAllMocks()
+  })
+
+  it('deletes the people file from the data directory', async () => {
+    await clearPeopleFromDevice()
+    expect(mockFilesystem.deleteFile).toHaveBeenCalledWith({
+      path: PEOPLE_FILE_NAME,
+      directory: 'DATA',
+    })
+  })
+
+  it('resolves when the people file does not exist', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mockFilesystem.deleteFile.mockRejectedValueOnce(new Error('File does not exist'))
+    await expect(clearPeopleFromDevice()).resolves.toBeUndefined()
+  })
+
+  it('leaves localStorage untouched', async () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([{ name: 'Ana' }]))
+    await clearPeopleFromDevice()
+    expect(localStorage.getItem(STORAGE_KEY)).not.toBeNull()
+  })
+})
+
+// ---------------------------------------------------------------------------
+// exportPeopleJson — cleanup failure
+// ---------------------------------------------------------------------------
+describe('exportPeopleJson — cleanup failure', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('still returns the export result when the cache file cannot be deleted', async () => {
+    mockFilesystem.deleteFile.mockRejectedValueOnce(new Error('delete failed'))
+    const result = await exportPeopleJson([COMPLETE_PERSON])
+    expect(result.hadMissingFields).toBe(false)
+    expect(mockShare.share).toHaveBeenCalledOnce()
+  })
 })

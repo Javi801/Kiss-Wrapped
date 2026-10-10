@@ -58,7 +58,7 @@ At a glance:
     <td width="50%" valign="top">
       <picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/feature-events-dark.svg"><img src="assets/readme/feature-events-light.svg" width="55" alt="Events icon"></picture><br>
       <strong>Event log</strong><br>
-      Record each interaction with a date, place, situation, and an optional score from 1 to 5. Events are tied to a person and editable or deletable at any time.<br><br>
+      Record each interaction with a date, place, situation, and an optional score from 0 to 5. Events are tied to a person and editable or deletable at any time.<br><br>
       <code>Dated entries</code> <code>Place + situation tags</code> <code>Scores</code>
     </td>
   </tr>
@@ -207,7 +207,7 @@ npm run test:watch      # watch mode
 npm run test:coverage   # generate coverage report
 ```
 
-Coverage is scoped to `src/lib/` with these minimum thresholds enforced by CI:
+Coverage is collected for `src/lib/` with these minimum thresholds enforced by CI:
 
 | Metric | Threshold |
 |--------|-----------|
@@ -216,7 +216,16 @@ Coverage is scoped to `src/lib/` with these minimum thresholds enforced by CI:
 | Functions | 95% |
 | Lines | 95% |
 
-Unit tests in `src/lib/__tests__/` cover: `date.js`, `calendar.js`, `format.js`, `helpers.js`, `stats.js`, `constants.js`, `device-storage.js`, `pdf-export.js`, and `utils.js`. `device-storage.js` and `utils.js` are excluded from threshold enforcement since they depend on native plugins or external APIs.
+Tests live in a `__tests__/` folder next to the code they cover, and all of them are unit tests:
+
+| Location | Covers |
+|----------|--------|
+| `src/lib/__tests__/` | `date.js`, `calendar.js`, `format.js`, `helpers.js`, `stats.js`, `constants.js`, `config.js`, `device-storage.js`, `pdf-export.js`, `utils.js`, and the theme and copy providers |
+| `src/plugins/__tests__/` | The app icon plugin wrapper |
+| `src/__tests__/` | `App.jsx`: boot, persistence, navigation, back button, and data mutations |
+| `src/components/*/__tests__/` | Forms, stats screen and tabs, selectors, shared tiles, `ErrorBoundary`, and partner behavior of the people screens |
+
+`device-storage.js` and `utils.js` are excluded from threshold enforcement since they depend on native plugins or external APIs. Tests outside `src/lib/` run in the suite but do not count towards the thresholds. Chart cards and decorative visuals have no tests.
 
 ## Data model
 
@@ -238,12 +247,12 @@ Event {
   date:      string           // "yyyy.MM.dd"
   place:     string
   situation: string
-  score:     number | null    // 1 to 5, or null
+  score:     number | null    // 0 to 5, or null
 }
 
 Settings {
   language:         string    // en or es
-  theme:            string    // light, green, or dark
+  theme:            string    // pink, green, or dark
   iconColor:        string
   statsVisible:     boolean
   situationTags:    string[]

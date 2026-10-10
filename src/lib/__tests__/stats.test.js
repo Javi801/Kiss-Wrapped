@@ -3,9 +3,11 @@ import { COPY } from '@/lib/constants'
 import { DEFAULT_SETTINGS, LIMITS } from '@/lib/config'
 import {
   countEvents,
+  excludePartnerEvents,
   getEventCountDistribution,
   getFirstEventDate,
   getLastEventDate,
+  getPartnerPeriod,
   getPeopleInMultipleYears,
   getPersonsByAge,
   getPersonsByAgeAtEvent,
@@ -14,6 +16,7 @@ import {
   getStatsData,
   getTopPeople,
   groupByZodiac,
+  isInPartnerPeriod,
 } from '@/lib/stats'
 
 const t = COPY.en
@@ -710,6 +713,14 @@ describe('getPersonsByAgeAtEvent', () => {
       { label: '22', value: 2 },
     ])
   })
+
+  it('ignores people without an events list', () => {
+    const people = [
+      makePerson('Ana', [makeEvent('2020.03.01')], { birthYear: 2000, zodiacSign: null }),
+      makePerson('Sam', undefined, { birthYear: 2000, zodiacSign: null, events: undefined }),
+    ]
+    expect(getPersonsByAgeAtEvent(people)).toEqual([{ label: '20', value: 1 }])
+  })
 })
 
 describe('getPersonsByFirstLetter', () => {
@@ -762,5 +773,140 @@ describe('getScoresByKisses', () => {
     expect(rows.find((d) => d.label === t.noScore)).toBeUndefined()
     expect(rows.find((d) => d.label === '💋💋').value).toBe(1)
     expect(rows.reduce((sum, row) => sum + row.value, 0)).toBe(1)
+  })
+})
+
+describe('getPartnerPeriod', () => {
+  it('returns null for people who were never a partner', () => {
+    expect(getPartnerPeriod({ partnerStatus: 'never', partnerFrom: '2024.01.01' })).toBeNull()
+  })
+
+  it('returns null for legacy records without a partner status', () => {
+    expect(getPartnerPeriod({})).toBeNull()
+  })
+
+  it('leaves the end open for a current partner, even when an end date is stored', () => {
+    expect(
+      getPartnerPeriod({
+        partnerStatus: 'current',
+        partnerFrom: '2024.01.01',
+        partnerTo: '2024.06.01',
+      })
+    ).toEqual({ from: '2024.01.01', to: null })
+  })
+
+  it('returns both bounds for a past partner', () => {
+    expect(
+      getPartnerPeriod({
+        partnerStatus: 'past',
+        partnerFrom: '2023.01.01',
+        partnerTo: '2023.12.31',
+      })
+    ).toEqual({ from: '2023.01.01', to: '2023.12.31' })
+  })
+
+  it.each([
+    ['current', { partnerFrom: '' }, { from: null, to: null }],
+    ['past', { partnerFrom: '', partnerTo: '' }, { from: null, to: null }],
+    ['past', { partnerFrom: '2023.01.01' }, { from: '2023.01.01', to: null }],
+    ['past', { partnerTo: '2023.12.31' }, { from: null, to: '2023.12.31' }],
+  ])('treats a missing bound of a %s partner as open (%o)', (partnerStatus, bounds, expected) => {
+    expect(getPartnerPeriod({ partnerStatus, ...bounds })).toEqual(expected)
+  })
+})
+
+describe('isInPartnerPeriod', () => {
+  const closed = { from: '2024.02.01', to: '2024.03.31' }
+
+  it('is false when there is no period', () => {
+    expect(isInPartnerPeriod('2024.02.15', null)).toBe(false)
+  })
+
+  it.each([
+    ['2024.01.31', false],
+    ['2024.02.01', true],
+    ['2024.02.15', true],
+    ['2024.03.31', true],
+    ['2024.04.01', false],
+  ])('treats both bounds as inclusive: %s -> %s', (date, expected) => {
+    expect(isInPartnerPeriod(date, closed)).toBe(expected)
+  })
+
+  it('has no upper limit when the end is open', () => {
+    const period = { from: '2024.02.01', to: null }
+    expect(isInPartnerPeriod('2099.01.01', period)).toBe(true)
+    expect(isInPartnerPeriod('2024.01.31', period)).toBe(false)
+  })
+
+  it('has no lower limit when the start is open', () => {
+    const period = { from: null, to: '2024.03.31' }
+    expect(isInPartnerPeriod('1990.01.01', period)).toBe(true)
+    expect(isInPartnerPeriod('2024.04.01', period)).toBe(false)
+  })
+
+  it('covers every date when both bounds are open', () => {
+    expect(isInPartnerPeriod('2024.02.15', { from: null, to: null })).toBe(true)
+    expect(isInPartnerPeriod('', { from: null, to: null })).toBe(true)
+  })
+
+  it('keeps an undated event out of a bounded period', () => {
+    expect(isInPartnerPeriod('', { from: '2024.02.01', to: null })).toBe(false)
+    expect(isInPartnerPeriod(undefined, { from: null, to: '2024.03.31' })).toBe(false)
+  })
+})
+
+describe('excludePartnerEvents', () => {
+  it('returns non-partners untouched', () => {
+    const ana = makePerson('Ana', [makeEvent('2024.01.01')], { partnerStatus: 'never' })
+    const result = excludePartnerEvents([ana])
+    expect(result).toHaveLength(1)
+    expect(result[0]).toBe(ana)
+  })
+
+  it('keeps only the events outside a past partner period', () => {
+    const mia = makePerson(
+      'Mia',
+      [makeEvent('2022.12.31'), makeEvent('2023.06.01'), makeEvent('2024.01.01')],
+      { partnerStatus: 'past', partnerFrom: '2023.01.01', partnerTo: '2023.12.31' }
+    )
+    const [result] = excludePartnerEvents([mia])
+    expect(result.events.map((event) => event.date)).toEqual(['2022.12.31', '2024.01.01'])
+    expect(result.name).toBe('Mia')
+  })
+
+  it('drops a partner whose events all fall inside the period', () => {
+    const mia = makePerson('Mia', [makeEvent('2024.03.01')], {
+      partnerStatus: 'current',
+      partnerFrom: '2024.01.01',
+    })
+    expect(excludePartnerEvents([mia])).toEqual([])
+  })
+
+  it('drops a partner without an events list', () => {
+    const mia = makePerson('Mia', undefined, { partnerStatus: 'current', events: undefined })
+    expect(excludePartnerEvents([mia])).toEqual([])
+  })
+
+  it('does not mutate the input people or their events', () => {
+    const events = [makeEvent('2023.06.01'), makeEvent('2025.01.01')]
+    const mia = makePerson('Mia', events, {
+      partnerStatus: 'past',
+      partnerFrom: '2023.01.01',
+      partnerTo: '2023.12.31',
+    })
+    const people = [mia]
+    excludePartnerEvents(people)
+    expect(people).toEqual([mia])
+    expect(mia.events).toBe(events)
+    expect(events).toHaveLength(2)
+  })
+
+  it('preserves the order of the remaining people', () => {
+    const people = [
+      makePerson('Ana', [makeEvent('2024.01.01')]),
+      makePerson('Mia', [makeEvent('2024.03.01')], { partnerStatus: 'current' }),
+      makePerson('Bob', [makeEvent('2024.02.01')]),
+    ]
+    expect(excludePartnerEvents(people).map((person) => person.name)).toEqual(['Ana', 'Bob'])
   })
 })

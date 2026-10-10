@@ -148,6 +148,22 @@ describe('exportStatsPdf', () => {
   })
 })
 
+describe('exportStatsPdf — cleanup failure', () => {
+  beforeEach(() => {
+    resetDocMocks()
+    vi.clearAllMocks()
+    mockFilesystem.writeFile.mockResolvedValue(undefined)
+    mockFilesystem.getUri.mockResolvedValue({ uri: 'file:///mock/export.pdf' })
+    mockShare.share.mockResolvedValue(undefined)
+  })
+
+  it('still resolves when the cache file cannot be deleted', async () => {
+    mockFilesystem.deleteFile.mockRejectedValueOnce(new Error('delete failed'))
+    await expect(exportStatsPdf([], t)).resolves.toBeUndefined()
+    expect(mockShare.share).toHaveBeenCalledOnce()
+  })
+})
+
 describe('saveErrorLog', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -194,6 +210,21 @@ describe('saveErrorLog', () => {
     expect(mockFilesystem.deleteFile).toHaveBeenCalledWith(
       expect.objectContaining({ directory: 'CACHE' })
     )
+  })
+})
+
+describe('saveErrorLog — cleanup failure', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockFilesystem.writeFile.mockResolvedValue(undefined)
+    mockFilesystem.getUri.mockResolvedValue({ uri: 'file:///mock/error.txt' })
+    mockShare.share.mockResolvedValue(undefined)
+  })
+
+  it('still resolves when the cache file cannot be deleted', async () => {
+    mockFilesystem.deleteFile.mockRejectedValueOnce(new Error('delete failed'))
+    await expect(saveErrorLog(new Error('boom'))).resolves.toBeUndefined()
+    expect(mockShare.share).toHaveBeenCalledOnce()
   })
 })
 
