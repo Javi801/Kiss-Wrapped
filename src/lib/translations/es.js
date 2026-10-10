@@ -274,6 +274,7 @@ export const es = {
   statsGroupPeople: 'Quién aparece más',
   statsGroupProfiles: 'Distribuciones por perfil y actividad',
   statsGroupScores: 'Calificaciones',
+  includePartnerEvents: 'Incluir eventos en pareja',
   noScore: 'Sin calificación',
   reportGenerated: 'Generado desde Kiss Wrapped',
   clearDataConfirmTitle: '¿Eliminar todos los datos?',

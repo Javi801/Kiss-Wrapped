@@ -22,7 +22,7 @@ import { TEXT } from '@/lib/constants'
 import { FEATURES } from '@/lib/config'
 import { usePalette } from '@/lib/theme'
 import { exportStatsPdf, saveErrorLog } from '@/lib/pdf-export'
-import { excludePartnerEvents, flattenEvents } from '@/lib/stats'
+import { flattenEvents, getEventPeople, getPartnerPeriod } from '@/lib/stats'
 
 import StatsOverviewTab from '@/components/stats/StatsOverviewTab'
 import StatsTimeTab from '@/components/stats/StatsTimeTab'
@@ -33,7 +33,14 @@ import StatsScoresTab from '@/components/stats/StatsScoresTab'
  * Renders the full statistics screen with tab navigation.
  * It prepares shared data and delegates each section to a dedicated tab component.
  */
-export default function StatsScreen({ people, t, language, modalBackRef }) {
+export default function StatsScreen({
+  people,
+  t,
+  language,
+  includePartnerEvents,
+  setIncludePartnerEvents,
+  modalBackRef,
+}) {
   const PALETTE = usePalette()
   const [tab, setTab] = useState('overview')
   const [, startTransition] = useTransition()
@@ -59,8 +66,18 @@ export default function StatsScreen({ people, t, language, modalBackRef }) {
     }
   }
 
-  // People counted in event-based statistics, with partner-period events removed.
-  const eventPeople = useMemo(() => excludePartnerEvents(people), [people])
+  // People counted in event-based statistics. Partner-period events are removed
+  // unless the user chose to include them.
+  const eventPeople = useMemo(
+    () => getEventPeople(people, includePartnerEvents),
+    [people, includePartnerEvents]
+  )
+
+  // The partner toggle changes nothing when nobody has a partner period.
+  const hasPartners = useMemo(
+    () => people.some((person) => getPartnerPeriod(person) !== null),
+    [people]
+  )
 
   /**
    * Flatten all events and preserve their parent person.
@@ -130,6 +147,56 @@ export default function StatsScreen({ people, t, language, modalBackRef }) {
           </Button>
         ) : null}
       </div>
+
+      {hasPartners ? (
+        <button
+          type="button"
+          aria-pressed={includePartnerEvents}
+          onClick={() => setIncludePartnerEvents((included) => !included)}
+          className="rounded-2xl"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '0.75rem',
+            paddingLeft: '1rem',
+            paddingRight: '1rem',
+            paddingTop: '0.75rem',
+            paddingBottom: '0.75rem',
+            textAlign: 'left',
+            border: `1px solid ${PALETTE.inputBorder}`,
+            background: PALETTE.controlBg,
+            color: PALETTE.text,
+          }}
+        >
+          <span style={{ ...TEXT.body, fontWeight: '500' }}>{t.includePartnerEvents}</span>
+          <span
+            aria-hidden="true"
+            className="rounded-full"
+            style={{
+              position: 'relative',
+              flexShrink: 0,
+              height: '1.5rem',
+              width: '2.75rem',
+              background: includePartnerEvents ? PALETTE.accent : PALETTE.inputBorder,
+              transition: 'background 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
+          >
+            <span
+              className="rounded-full"
+              style={{
+                position: 'absolute',
+                top: '0.125rem',
+                left: includePartnerEvents ? '1.375rem' : '0.125rem',
+                height: '1.25rem',
+                width: '1.25rem',
+                background: 'white',
+                transition: 'left 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+              }}
+            />
+          </span>
+        </button>
+      ) : null}
 
       <div
         style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.5rem' }}

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
-import { excludePartnerEvents } from '@/lib/stats'
+import { getEventPeople } from '@/lib/stats'
 import StatTile from '@/components/shared/StatTile'
 
 const frostedButtonStyle = {
@@ -43,13 +43,15 @@ export default function HomeHeroCard({
   t,
   statsVisible,
   setStatsVisible,
+  includePartnerEvents,
   onOpenLanguage,
   onOpenSettings,
 }) {
   const PALETTE = usePalette()
 
-  // Count all events across every saved person. Partner-period events don't count.
-  const totalEvents = excludePartnerEvents(people).reduce(
+  // Count all events across every saved person. Partner-period events count only
+  // when the user chose to include them in the statistics.
+  const totalEvents = getEventPeople(people, includePartnerEvents).reduce(
     (sum, person) => sum + (person.events?.length || 0),
     0
   )
