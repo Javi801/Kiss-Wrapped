@@ -325,6 +325,11 @@ export const es = {
   onboardingSkip: 'Omitir',
   onboardingNext: 'Siguiente',
   onboardingFinish: 'Terminar tutorial',
+  onboardingStepCount: 'Paso {current} de {total}',
+  onboardingWelcomeTitle: 'Te damos la bienvenida a Kiss Wrapped',
+  onboardingWelcomeLead: 'Registra tus citas y encuentros, y descubre tus estadísticas.',
+  onboardingWelcomePrivacy:
+    'Todo queda únicamente en este dispositivo: sin cuenta, sin nube y sin rastreo.',
   entryGuideTitle: 'Entrada real de la app',
   entryGuideBody: 'Toca el corazón sutil de la esquina para abrir tu espacio.',
 }
