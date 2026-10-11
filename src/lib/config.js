@@ -13,7 +13,7 @@ import { version } from '../../package.json'
 export const FEATURES = {
   // Kiss Wrapped PDF deck export on the stats screen. Off until the export bug is fixed.
   pdfExport: false,
-  // Onboarding tutorial: shown to new installs and restartable from the settings.
+  // Onboarding: shown to new installs and restartable from the settings.
   onboarding: true,
 }
 
@@ -60,7 +60,7 @@ export const LIMITS = {
   topPeopleCount: 8,
 }
 
-// Onboarding tutorial timings, in milliseconds, and practice values.
+// Onboarding timings, in milliseconds, and practice values.
 export const ONBOARDING = {
   // Time an automatic tour scene stays on screen unless it sets its own `duration`.
   sceneMs: 1800,

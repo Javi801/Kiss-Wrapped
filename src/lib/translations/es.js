@@ -339,10 +339,11 @@ export const es = {
   onboardingZodiacHint:
     'La edad se actualiza sola según el signo. Si el signo es el de estas fechas, arriba aparecerá una pregunta sobre el cumpleaños para calcularla bien.',
   onboardingPracticeName: 'Persona de ejemplo',
-  onboardingTourAddNote: 'Toca Agregar persona para continuar',
-  onboardingTourHomeNote: 'Toca Ver y editar personas para llegar a tus personas',
-  onboardingTourListNote: 'Aquí están las personas que guardas. Toca la tarjeta para abrirla',
-  onboardingTourPersonNote: 'Toca Agregar evento para continuar',
+  onboardingTourAddInstruction: 'Toca Agregar persona para continuar',
+  onboardingTourHomeInstruction: 'Toca Ver y editar personas para llegar a tus personas',
+  onboardingTourListInstruction:
+    'Aquí están las personas que guardas. Toca la tarjeta para abrirla',
+  onboardingTourPersonInstruction: 'Toca Agregar evento para continuar',
   onboardingEditPersonHint:
     'Aquí editas sus datos. Al crearla queda incompleta: hay datos que debes completar tú, como cómo se conocieron.',
   onboardingEventHint:
@@ -353,7 +354,7 @@ export const es = {
     'Lugar y situación se guardan como etiquetas, para que puedas reutilizarlas en otros eventos.',
   onboardingPracticePlace: 'Café',
   onboardingPracticeSituation: 'Cita',
-  onboardingTourSavedNote: 'El evento quedó guardado. Toca Inicio para volver',
+  onboardingTourSavedInstruction: 'El evento quedó guardado. Toca Inicio para volver',
   onboardingDataHintTitle: 'Sin respaldo automático',
   onboardingDataHintBody:
     'Todo queda en este dispositivo. Usa Exportar para guardar una copia e Importar para recuperarla.',

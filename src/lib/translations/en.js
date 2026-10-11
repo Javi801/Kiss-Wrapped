@@ -339,10 +339,10 @@ export const en = {
   onboardingZodiacHint:
     'The age updates on its own based on the sign. If the sign is the current one, a question about the birthday appears above to get it right.',
   onboardingPracticeName: 'Example person',
-  onboardingTourAddNote: 'Tap Add new person to continue',
-  onboardingTourHomeNote: 'Tap View and edit people to get to your people',
-  onboardingTourListNote: 'Here are the people you save. Tap the card to open it',
-  onboardingTourPersonNote: 'Tap Add event to continue',
+  onboardingTourAddInstruction: 'Tap Add new person to continue',
+  onboardingTourHomeInstruction: 'Tap View and edit people to get to your people',
+  onboardingTourListInstruction: 'Here are the people you save. Tap the card to open it',
+  onboardingTourPersonInstruction: 'Tap Add event to continue',
   onboardingEditPersonHint:
     'Edit their details here. A new person starts incomplete: some details are yours to fill in, like how you met.',
   onboardingEventHint:
@@ -353,7 +353,7 @@ export const en = {
     'Place and situation are saved as tags, so you can reuse them in other events.',
   onboardingPracticePlace: 'Café',
   onboardingPracticeSituation: 'Date',
-  onboardingTourSavedNote: 'The event is saved. Tap Home to go back',
+  onboardingTourSavedInstruction: 'The event is saved. Tap Home to go back',
   onboardingDataHintTitle: 'No automatic backup',
   onboardingDataHintBody:
     'Everything stays on this device. Use Export to save a copy and Import to bring it back.',

@@ -124,7 +124,7 @@ describe('OnboardingTour — person card scenes', () => {
   it('starts on the home screen, pointing at the people button', () => {
     renderScenes()
     expect(screen()).toBe('home')
-    expect(instruction()).toBe(t.onboardingTourHomeNote)
+    expect(instruction()).toBe(t.onboardingTourHomeInstruction)
     expect(seen.home).toMatchObject({
       people: [person],
       language: 'en',
@@ -138,7 +138,7 @@ describe('OnboardingTour — person card scenes', () => {
     renderScenes()
     tapHomeButton(SCREENS.people)
     expect(screen()).toBe('people')
-    expect(instruction()).toBe(t.onboardingTourListNote)
+    expect(instruction()).toBe(t.onboardingTourListInstruction)
     expect(seen.people.people).toEqual([person])
     expect(seen.people.cardTour).toMatchObject({
       expanded: false,
@@ -154,14 +154,14 @@ describe('OnboardingTour — person card scenes', () => {
     expect(screen()).toBe('home')
     wait(1)
     expect(screen()).toBe('people')
-    expect(instruction()).toBe(t.onboardingTourListNote)
+    expect(instruction()).toBe(t.onboardingTourListInstruction)
   })
 
   it('expands the card from a tap on it, with its hints', () => {
     renderScenes()
     tapHomeButton(SCREENS.people)
     tapCard()
-    expect(instruction()).toBe(t.onboardingTourPersonNote)
+    expect(instruction()).toBe(t.onboardingTourPersonInstruction)
     expect(seen.people.cardTour).toMatchObject({
       expanded: true,
       tapTarget: TOUR_TARGETS.addEvent,
@@ -175,9 +175,9 @@ describe('OnboardingTour — person card scenes', () => {
     wait(ONBOARDING.tapTimeoutMs / 2)
     tapHomeButton(SCREENS.people)
     wait(ONBOARDING.tapTimeoutMs - 1)
-    expect(instruction()).toBe(t.onboardingTourListNote)
+    expect(instruction()).toBe(t.onboardingTourListInstruction)
     wait(1)
-    expect(instruction()).toBe(t.onboardingTourPersonNote)
+    expect(instruction()).toBe(t.onboardingTourPersonInstruction)
   })
 
   it('waits on the expanded card until the add-event button is tapped', () => {
@@ -185,7 +185,7 @@ describe('OnboardingTour — person card scenes', () => {
     tapHomeButton(SCREENS.people)
     tapCard()
     wait(ONBOARDING.tapTimeoutMs * 10)
-    expect(instruction()).toBe(t.onboardingTourPersonNote)
+    expect(instruction()).toBe(t.onboardingTourPersonInstruction)
     expect(onDone).not.toHaveBeenCalled()
   })
 
@@ -228,7 +228,7 @@ describe('OnboardingTour — person card scenes', () => {
         seen.people.onAddEvent('mia', {})
       })
     }).not.toThrow()
-    expect(instruction()).toBe(t.onboardingTourListNote)
+    expect(instruction()).toBe(t.onboardingTourListInstruction)
   })
 })
 
@@ -236,8 +236,8 @@ describe('OnboardingTour', () => {
   it('reports the end of a tour whose last scene is automatic', () => {
     const onDone = vi.fn()
     const scenes = [
-      { screen: SCREENS.people, instruction: 'onboardingTourListNote', auto: true },
-      { screen: SCREENS.main, instruction: 'onboardingTourHomeNote', auto: true },
+      { screen: SCREENS.people, instruction: 'onboardingTourListInstruction', auto: true },
+      { screen: SCREENS.main, instruction: 'onboardingTourHomeInstruction', auto: true },
     ]
     render(<OnboardingTour scenes={scenes} person={person} t={t} language="en" onDone={onDone} />)
     expect(seen.people.cardTour).toBeUndefined()
@@ -250,7 +250,9 @@ describe('OnboardingTour', () => {
   })
 
   it('ends quietly when nothing listens for the end', () => {
-    const scenes = [{ screen: SCREENS.main, instruction: 'onboardingTourHomeNote', auto: true }]
+    const scenes = [
+      { screen: SCREENS.main, instruction: 'onboardingTourHomeInstruction', auto: true },
+    ]
     render(<OnboardingTour scenes={scenes} person={person} t={t} language="en" />)
     expect(() => wait()).not.toThrow()
     expect(screen()).toBe('home')
@@ -271,11 +273,11 @@ describe('OnboardingTour', () => {
     const scenes = [
       {
         screen: SCREENS.main,
-        instruction: 'onboardingTourHomeNote',
+        instruction: 'onboardingTourHomeInstruction',
         tourTarget: SCREENS.people,
         auto: true,
       },
-      { screen: SCREENS.people, instruction: 'onboardingTourListNote', auto: true },
+      { screen: SCREENS.people, instruction: 'onboardingTourListInstruction', auto: true },
     ]
     render(<OnboardingTour scenes={scenes} person={person} t={t} language="en" onDone={onDone} />)
     tapHomeButton(SCREENS.people)
@@ -336,14 +338,18 @@ describe('OnboardingTour', () => {
   it('renders no screen for a scene that names one it does not know', () => {
     const onDone = vi.fn()
     const scenes = [
-      { screen: SCREENS.stats, instruction: 'onboardingTourHomeNote', button: 'onboardingNext' },
+      {
+        screen: SCREENS.stats,
+        instruction: 'onboardingTourHomeInstruction',
+        button: 'onboardingNext',
+      },
       { screen: 'nowhere', auto: true },
     ]
     render(<OnboardingTour scenes={scenes} person={person} t={t} language="en" onDone={onDone} />)
     expect(container.querySelector('[data-screen]')).toBeNull()
     expect(seen).toMatchObject({ home: null, people: null, intro: null, nav: null })
     // The rest of the scene still plays: its instruction, its button and its end.
-    expect(instruction()).toBe(t.onboardingTourHomeNote)
+    expect(instruction()).toBe(t.onboardingTourHomeInstruction)
     act(() => container.querySelector('button').click())
     expect(container.querySelector('[data-screen]')).toBeNull()
     wait()
@@ -421,7 +427,7 @@ describe('OnboardingTour — a new onDone mid-scene', () => {
     render(tour(PERSON_CARD_SCENES, first))
     tapHomeButton(SCREENS.people)
     rerender(tour(PERSON_CARD_SCENES, latest))
-    expect(instruction()).toBe(t.onboardingTourListNote)
+    expect(instruction()).toBe(t.onboardingTourListInstruction)
   })
 })
 
@@ -488,7 +494,9 @@ describe('OnboardingTour — scrolling', () => {
   it('brings the top of a scene without bubbles into view', () => {
     const scrollIntoView = vi.fn()
     Element.prototype.scrollIntoView = scrollIntoView
-    const scenes = [{ screen: SCREENS.main, instruction: 'onboardingTourHomeNote', auto: true }]
+    const scenes = [
+      { screen: SCREENS.main, instruction: 'onboardingTourHomeInstruction', auto: true },
+    ]
     render(<OnboardingTour scenes={scenes} person={person} t={t} language="en" />)
     expect(scrollIntoView).toHaveBeenCalledWith({ block: 'start', behavior: 'smooth' })
     delete Element.prototype.scrollIntoView
@@ -546,7 +554,7 @@ describe('OnboardingEventStep', () => {
     expect(onNext).not.toHaveBeenCalled()
     expect(container.querySelector('h1')).toBeNull()
     expect(screen()).toBe('people')
-    expect(instruction()).toBe(t.onboardingTourSavedNote)
+    expect(instruction()).toBe(t.onboardingTourSavedInstruction)
     expect(seen.people).toMatchObject({ people: [person], language: 'en' })
     expect(seen.people.cardTour).toMatchObject({ expanded: true, tapTarget: undefined })
     expect(seen.nav).toMatchObject({ screen: SCREENS.people, tourTarget: SCREENS.main })

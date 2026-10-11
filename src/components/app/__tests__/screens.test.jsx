@@ -502,7 +502,11 @@ describe('OnboardingPersonStep', () => {
     expect(form.props).toBeNull()
     expect(tour.props.scenes).toBe(ADD_PERSON_SCENES)
     expect(tour.props.scenes).toEqual([
-      { screen: SCREENS.main, instruction: 'onboardingTourAddNote', tourTarget: SCREENS.add },
+      {
+        screen: SCREENS.main,
+        instruction: 'onboardingTourAddInstruction',
+        tourTarget: SCREENS.add,
+      },
     ])
     expect(tour.props).toMatchObject({ t, language: 'en', settings })
     expect(tour.props.person).toBeUndefined()

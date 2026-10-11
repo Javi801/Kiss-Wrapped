@@ -9,7 +9,7 @@ import { TOUR_TARGETS } from '@/lib/onboarding'
 
 // The home screen, waiting for a tap on its add-person button.
 export const ADD_PERSON_SCENES = [
-  { screen: SCREENS.main, instruction: 'onboardingTourAddNote', tourTarget: SCREENS.add },
+  { screen: SCREENS.main, instruction: 'onboardingTourAddInstruction', tourTarget: SCREENS.add },
 ]
 
 // Saving a person returns to the intro, as in the app. The tap on its heart plays by itself.
@@ -22,17 +22,17 @@ export const INTRO_SCENES = [
 export const PERSON_CARD_SCENES = [
   {
     screen: SCREENS.main,
-    instruction: 'onboardingTourHomeNote',
+    instruction: 'onboardingTourHomeInstruction',
     tourTarget: SCREENS.people,
   },
   {
     screen: SCREENS.people,
-    instruction: 'onboardingTourListNote',
+    instruction: 'onboardingTourListInstruction',
     card: { expanded: false, tapTarget: TOUR_TARGETS.card },
   },
   {
     screen: SCREENS.people,
-    instruction: 'onboardingTourPersonNote',
+    instruction: 'onboardingTourPersonInstruction',
     card: {
       expanded: true,
       tapTarget: TOUR_TARGETS.addEvent,
@@ -47,7 +47,7 @@ export const PERSON_CARD_SCENES = [
 export const SAVED_EVENT_SCENES = [
   {
     screen: SCREENS.people,
-    instruction: 'onboardingTourSavedNote',
+    instruction: 'onboardingTourSavedInstruction',
     card: { expanded: true },
     nav: SCREENS.main,
   },
