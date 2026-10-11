@@ -1,6 +1,6 @@
 import { BarChart3, Search, UserPlus, Users } from 'lucide-react'
 
-import { TEXT, SCREENS } from '@/lib/constants'
+import { TEXT, SCREENS, CONTENT_MAX_WIDTH } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
 import { tourTargetProps } from '@/lib/onboarding'
 import TapGuide from '@/components/visuals/TapGuide'
@@ -41,7 +41,7 @@ export default function BottomNav({ screen, onNavigate, tourTarget, t }) {
         style={{
           margin: '0 auto',
           display: 'grid',
-          maxWidth: '28rem',
+          maxWidth: CONTENT_MAX_WIDTH,
           gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
           gap: '0.25rem',
           paddingLeft: '0.75rem',

@@ -2,7 +2,7 @@ import React, { Suspense, lazy, useEffect, useCallback, useRef, useState } from 
 import { motion, AnimatePresence } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 
-import { PALETTES, TEXT, COPY, SCREENS } from '@/lib/constants'
+import { PALETTES, TEXT, COPY, SCREENS, CONTENT_MAX_WIDTH } from '@/lib/constants'
 import { FEATURES } from '@/lib/config'
 import { ThemeProvider } from '@/lib/theme'
 import { CopyProvider } from '@/lib/copy'
@@ -281,7 +281,7 @@ export default function KissWrappedApp() {
               display: 'flex',
               height: '100%',
               width: '100%',
-              maxWidth: '28rem',
+              maxWidth: CONTENT_MAX_WIDTH,
               flexDirection: 'column',
               paddingLeft: '1rem',
               paddingRight: '1rem',

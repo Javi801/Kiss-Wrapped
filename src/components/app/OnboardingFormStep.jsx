@@ -1,5 +1,5 @@
 import { usePalette } from '@/lib/theme'
-import { TEXT } from '@/lib/constants'
+import { TEXT, CONTENT_MAX_WIDTH } from '@/lib/constants'
 
 /**
  * Layout of an onboarding step that shows a form: a centered title and body over the content,
@@ -22,7 +22,7 @@ export default function OnboardingFormStep({ title, body, containerRef, children
         flexDirection: 'column',
         gap: '1rem',
         width: '100%',
-        maxWidth: '28rem',
+        maxWidth: CONTENT_MAX_WIDTH,
         margin: '0 auto',
       }}
     >

@@ -226,6 +226,9 @@ export const PALETTES = {
 // Default palette alias kept for non-React modules (e.g. pdf-export.js).
 export const PALETTE = PALETTES.pink
 
+// Width of the app's content column.
+export const CONTENT_MAX_WIDTH = '28rem'
+
 // Semantic text scale. Spread into style objects or use directly as style prop.
 export const TEXT = {
   caption: { fontSize: '0.75rem', lineHeight: '1rem' },

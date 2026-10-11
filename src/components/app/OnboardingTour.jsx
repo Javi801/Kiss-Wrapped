@@ -5,7 +5,7 @@ import IntroScreen from '@/components/app/IntroScreen'
 import PeopleManagerScreen from '@/components/people/PeopleManagerScreen'
 import BottomNav from '@/components/app/BottomNav'
 import OnboardingButton from '@/components/app/OnboardingButton'
-import { TEXT, SCREENS } from '@/lib/constants'
+import { TEXT, SCREENS, CONTENT_MAX_WIDTH } from '@/lib/constants'
 import { ONBOARDING } from '@/lib/config'
 import { usePalette } from '@/lib/theme'
 import { setInertExcept } from '@/lib/inert'
@@ -175,7 +175,7 @@ export default function OnboardingTour({
         flexDirection: 'column',
         gap: '1rem',
         width: '100%',
-        maxWidth: '28rem',
+        maxWidth: CONTENT_MAX_WIDTH,
         margin: '0 auto',
       }}
     >
