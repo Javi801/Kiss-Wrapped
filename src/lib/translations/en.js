@@ -116,6 +116,8 @@ export const en = {
   noPeopleFound: 'No people found',
   tryDifferent: 'Try a different search term or reset your filters.',
   clearSearch: 'Clear search',
+  noPeopleYet: 'No people yet',
+  noPeopleYetDesc: 'Add your first person to start recording your events.',
   years: 'years',
   met: 'Met',
   events: 'events',

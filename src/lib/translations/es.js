@@ -116,6 +116,8 @@ export const es = {
   noPeopleFound: 'No se encontraron personas',
   tryDifferent: 'Prueba otra búsqueda o restablece los filtros.',
   clearSearch: 'Limpiar búsqueda',
+  noPeopleYet: 'Todavía no hay personas',
+  noPeopleYetDesc: 'Agrega a tu primera persona para empezar a registrar tus eventos.',
   years: 'años',
   met: 'Nos conocimos',
   events: 'eventos',

@@ -86,6 +86,9 @@ export default function PeopleManagerScreen({
             }}
           />
         </div>
+      ) : people.length === 0 ? (
+        // No data at all: there is no search to clear, so invite the user to add people.
+        <EmptyState icon={Users} title={t.noPeopleYet} description={t.noPeopleYetDesc} />
       ) : (
         <EmptyState
           icon={Users}

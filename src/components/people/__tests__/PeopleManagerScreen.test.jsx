@@ -124,8 +124,16 @@ describe('PeopleManagerScreen — list', () => {
 
   it('shows the empty state when there is nobody', () => {
     render([])
-    expect(container.textContent).toContain(t.noPeopleFound)
+    expect(container.textContent).toContain(t.noPeopleYet)
+    expect(container.textContent).toContain(t.noPeopleYetDesc)
     expect(shown()).toEqual([])
+  })
+
+  it('offers no search reset when there is nobody', () => {
+    render([])
+    expect(container.textContent).not.toContain(t.noPeopleFound)
+    expect(container.textContent).not.toContain(t.tryDifferent)
+    expect(container.textContent).not.toContain(t.clearSearch)
   })
 
   it('wires every card to the screen handlers and tags', () => {
