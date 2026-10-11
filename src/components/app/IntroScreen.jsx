@@ -6,9 +6,15 @@ import IntroEntryGuide from '@/components/app/IntroEntryGuide'
 /**
  * Initial splash-like screen with hidden entry.
  * Acts as a playful gate before entering the main app.
- * `showEntryGuide` points out the hidden entry while onboarding is pending.
+ * `showEntryGuide` points out the hidden entry while onboarding is pending;
+ * `entryGuideCallout={false}` leaves only its tap guide, without the text.
  */
-export default function IntroScreen({ onOpenMain, showEntryGuide = false, t }) {
+export default function IntroScreen({
+  onOpenMain,
+  showEntryGuide = false,
+  entryGuideCallout = true,
+  t,
+}) {
   const PALETTE = usePalette()
   return (
     <div
@@ -59,7 +65,7 @@ export default function IntroScreen({ onOpenMain, showEntryGuide = false, t }) {
         >
           ♡
         </button>
-        {showEntryGuide ? <IntroEntryGuide t={t} /> : null}
+        {showEntryGuide ? <IntroEntryGuide t={t} showCallout={entryGuideCallout} /> : null}
       </div>
 
       {/* Center visual */}

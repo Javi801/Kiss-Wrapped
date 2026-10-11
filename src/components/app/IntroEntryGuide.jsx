@@ -5,9 +5,12 @@ import TapGuide from '@/components/visuals/TapGuide'
  * First-run guide for the hidden entry: the tap guide on the heart, plus a
  * callout explaining it. Must be rendered inside the positioned
  * wrapper of the heart button, which it uses as its anchor.
+ * `showCallout={false}` leaves only the tap guide.
  */
-export default function IntroEntryGuide({ t }) {
+export default function IntroEntryGuide({ t, showCallout = true }) {
   const PALETTE = usePalette()
+
+  if (!showCallout) return <TapGuide />
 
   return (
     <>
