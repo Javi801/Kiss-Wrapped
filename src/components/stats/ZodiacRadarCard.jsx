@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
 import FullscreenChartWrapper from '@/components/charts/FullscreenChartWrapper'
+import ZodiacOrbitStory from '@/components/stats/ZodiacOrbitStory'
 
 const MODES = ['persons', 'events']
 
@@ -38,7 +39,13 @@ function ChartTooltip({ active, payload, tooltipUnit }) {
   )
 }
 
-export default function ZodiacRadarCard({ personsByZodiac, eventsByZodiac, emptyText, t }) {
+export default function ZodiacRadarCard({
+  personsByZodiac,
+  eventsByZodiac,
+  zodiacOrbit,
+  emptyText,
+  t,
+}) {
   const P = usePalette()
   const [mode, setMode] = useState('persons')
 
@@ -58,8 +65,12 @@ export default function ZodiacRadarCard({ personsByZodiac, eventsByZodiac, empty
     events: t.chartEvents.charAt(0).toUpperCase() + t.chartEvents.slice(1),
   }
 
+  // Only the people mode has its own expanded view; the events mode expands the card.
+  const expandedView =
+    mode === 'persons' && hasData ? <ZodiacOrbitStory {...zodiacOrbit} t={t} /> : undefined
+
   return (
-    <FullscreenChartWrapper>
+    <FullscreenChartWrapper expandedView={expandedView}>
       <Card
         className="rounded-3xl"
         style={{
