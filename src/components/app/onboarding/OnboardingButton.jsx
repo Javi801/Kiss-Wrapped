@@ -1,3 +1,4 @@
+import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
 
 /**
@@ -17,9 +18,8 @@ export default function OnboardingButton({ onClick, children }) {
         borderRadius: '1rem',
         border: 'none',
         cursor: 'pointer',
-        fontSize: '0.86rem',
-        fontWeight: 750,
-        color: '#ffffff',
+        ...TEXT.bodyStrong,
+        color: PALETTE.textOnAccent,
         background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
       }}
     >

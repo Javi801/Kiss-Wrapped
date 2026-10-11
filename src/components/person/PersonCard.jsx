@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 
 import { usePalette } from '@/lib/theme'
 import { personHasIncompleteEvent, personIsMissingRequired } from '@/lib/format'
+import { TOUR_TARGETS } from '@/lib/onboarding'
 
 import PersonCardHeader from '@/components/person/PersonCardHeader'
 import PersonCardDetails from '@/components/person/PersonCardDetails'
@@ -16,8 +17,9 @@ import usePersonCardModals from '@/components/person/usePersonCardModals'
 /**
  * Displays a person card with expandable event history.
  * Handles editing, deleting, and event management.
- * `guide` puts the card under the onboarding tour, which then decides whether it is
- * expanded: `{ expanded, tapTarget: 'card' | 'addEvent', editHint, eventHint, onAddEvent }`.
+ * `tour` puts the card under the onboarding tour, which then decides whether it is
+ * expanded: `{ expanded, tapTarget, editHint, eventHint, onToggle, onAddEvent }`, where
+ * `tapTarget` is `TOUR_TARGETS.card` or `TOUR_TARGETS.addEvent`.
  */
 export default function PersonCard({
   person,
@@ -36,12 +38,12 @@ export default function PersonCard({
   onAddPlaceTag,
   howWeMetTags,
   onAddHowWeMetTag,
-  guide,
+  tour,
 }) {
   const PALETTE = usePalette()
   // Expand/collapse state.
   const [ownExpanded, setExpanded] = useState(false)
-  const expanded = guide ? guide.expanded : ownExpanded
+  const expanded = tour ? tour.expanded : ownExpanded
 
   // Modal states.
   const { editingPerson, setEditingPerson, eventModal, setEventModal } =
@@ -74,9 +76,9 @@ export default function PersonCard({
             <PersonCardHeader
               person={person}
               expanded={expanded}
-              onToggle={() => setExpanded((v) => !v)}
+              onToggle={tour?.onToggle ?? (() => setExpanded((v) => !v))}
               hasIncompleteEvent={hasIncompleteEvent}
-              showTapGuide={guide?.tapTarget === 'card'}
+              showTapGuide={tour?.tapTarget === TOUR_TARGETS.card}
               t={t}
             />
 
@@ -104,11 +106,11 @@ export default function PersonCard({
                       personIncomplete={personIsMissingRequired(person)}
                       onEditPerson={() => setEditingPerson(true)}
                       onAddEvent={
-                        guide?.onAddEvent ??
+                        tour?.onAddEvent ??
                         (() => setEventModal({ open: true, mode: 'add', event: null }))
                       }
-                      editHint={guide?.editHint}
-                      showTapGuide={guide?.tapTarget === 'addEvent'}
+                      editHint={tour?.editHint}
+                      showTapGuide={tour?.tapTarget === TOUR_TARGETS.addEvent}
                       onDeletePerson={() => onDeletePerson(person.id)}
                       onDeleteAllEvents={() => onDeleteAllEvents(person.id)}
                       t={t}
@@ -117,7 +119,7 @@ export default function PersonCard({
                     <PersonEventList
                       events={sortedEvents}
                       onSelectEvent={(event) => setEventModal({ open: true, mode: 'edit', event })}
-                      hint={guide?.eventHint}
+                      hint={tour?.eventHint}
                       t={t}
                       language={language}
                     />

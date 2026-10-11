@@ -44,7 +44,6 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^8.5.3",
-    "@capacitor/core": "^8.0.0",
     "@capacitor/ios": "^8.0.0",
     "@eslint/js": "^9.39.4",
     "@tailwindcss/vite": "^4.2.2",

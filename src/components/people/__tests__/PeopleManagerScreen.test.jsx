@@ -124,8 +124,16 @@ describe('PeopleManagerScreen — list', () => {
 
   it('shows the empty state when there is nobody', () => {
     render([])
-    expect(container.textContent).toContain(t.noPeopleFound)
+    expect(container.textContent).toContain(t.noPeopleYet)
+    expect(container.textContent).toContain(t.noPeopleYetDesc)
     expect(shown()).toEqual([])
+  })
+
+  it('offers no search reset when there is nobody', () => {
+    render([])
+    expect(container.textContent).not.toContain(t.noPeopleFound)
+    expect(container.textContent).not.toContain(t.tryDifferent)
+    expect(container.textContent).not.toContain(t.clearSearch)
   })
 
   it('wires every card to the screen handlers and tags', () => {
@@ -465,15 +473,15 @@ describe('PeopleManagerScreen — filter sheet', () => {
   })
 })
 
-describe('PeopleManagerScreen — onboarding guide', () => {
-  it('passes no guide to the cards by default', () => {
+describe('PeopleManagerScreen — onboarding tour', () => {
+  it('passes no tour to the cards by default', () => {
     render([person('Ana')])
-    expect(Object.values(seen.cards)[0].guide).toBeUndefined()
+    expect(Object.values(seen.cards)[0].tour).toBeUndefined()
   })
 
-  it('passes the card guide to the cards', () => {
-    const cardGuide = { expanded: true }
-    render([person('Ana')], { cardGuide })
-    expect(Object.values(seen.cards)[0].guide).toBe(cardGuide)
+  it('passes the card tour to the cards', () => {
+    const cardTour = { expanded: true }
+    render([person('Ana')], { cardTour })
+    expect(Object.values(seen.cards)[0].tour).toBe(cardTour)
   })
 })

@@ -116,6 +116,8 @@ export const es = {
   noPeopleFound: 'No se encontraron personas',
   tryDifferent: 'Prueba otra búsqueda o restablece los filtros.',
   clearSearch: 'Limpiar búsqueda',
+  noPeopleYet: 'Todavía no hay personas',
+  noPeopleYetDesc: 'Agrega a tu primera persona para empezar a registrar tus eventos.',
   years: 'años',
   met: 'Nos conocimos',
   events: 'eventos',
@@ -339,9 +341,11 @@ export const es = {
   onboardingZodiacHint:
     'La edad se actualiza sola según el signo. Si el signo es el de estas fechas, arriba aparecerá una pregunta sobre el cumpleaños para calcularla bien.',
   onboardingPracticeName: 'Persona de ejemplo',
-  onboardingTourHomeNote: 'Así se llega a tus personas',
-  onboardingTourListNote: 'Aquí están las personas que guardas',
-  onboardingTourPersonNote: 'Toca Agregar evento para continuar',
+  onboardingTourAddInstruction: 'Toca Agregar persona para continuar',
+  onboardingTourHomeInstruction: 'Toca Ver y editar personas para llegar a tus personas',
+  onboardingTourListInstruction:
+    'Aquí están las personas que guardas. Toca la tarjeta para abrirla',
+  onboardingTourPersonInstruction: 'Toca Agregar evento para continuar',
   onboardingEditPersonHint:
     'Aquí editas sus datos. Al crearla queda incompleta: hay datos que debes completar tú, como cómo se conocieron.',
   onboardingEventHint:
@@ -352,17 +356,17 @@ export const es = {
     'Lugar y situación se guardan como etiquetas, para que puedas reutilizarlas en otros eventos.',
   onboardingPracticePlace: 'Café',
   onboardingPracticeSituation: 'Cita',
-  onboardingTourSavedNote: 'El evento quedó guardado. Ahora, de vuelta al inicio',
+  onboardingTourSavedInstruction: 'El evento quedó guardado. Toca Inicio para volver',
   onboardingDataHintTitle: 'Sin respaldo automático',
   onboardingDataHintBody:
     'Todo queda en este dispositivo. Usa Exportar para guardar una copia e Importar para recuperarla.',
   onboardingSettingsHintTitle: 'Hazla tuya',
   onboardingSettingsHintBody:
     'En Configuración cambias el tema y el color del ícono. Ahí también puedes reiniciar este tutorial y abrir la guía de la app.',
-  restartTutorial: 'Reiniciar el tutorial',
-  tutorialDoneTitle: 'Tutorial terminado',
-  tutorialDoneBody: 'Hay más información de uso en Configuración, en «Guía de la app».',
-  tutorialDoneAction: 'Entendido',
+  restartOnboarding: 'Reiniciar el tutorial',
+  onboardingDoneTitle: 'Tutorial terminado',
+  onboardingDoneBody: 'Hay más información de uso en Configuración, en «Guía de la app».',
+  onboardingDoneAction: 'Entendido',
   appGuide: 'Guía de la app',
   appGuideIntro: 'Lo que el tutorial no alcanza a mostrar.',
   guideEntryTitle: 'Entrada oculta',

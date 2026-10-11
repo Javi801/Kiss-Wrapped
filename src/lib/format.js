@@ -1,12 +1,20 @@
-import { GENDER_COLORS, ZODIAC_OPTIONS } from '@/lib/constants'
+import { ACTIVITY, GENDER_COLORS, ZODIAC_OPTIONS } from '@/lib/constants'
 import { PARTNER_ERRORS } from '@/lib/partner'
 
 // Translate activity key into localized label.
 export function translateActivity(value, t) {
-  if (value === 'studies') return t.studies
-  if (value === 'works') return t.works
-  if (value === 'studies and works') return t.studiesWorks
+  if (value === ACTIVITY.studies) return t.studies
+  if (value === ACTIVITY.works) return t.works
+  if (value === ACTIVITY.studiesAndWorks) return t.studiesWorks
   return t.other
+}
+
+// Placeholder of the detail field for an activity; empty when the activity asks for none.
+export function activityDetailPlaceholder(value, t) {
+  if (value === ACTIVITY.studies) return t.specificStudies
+  if (value === ACTIVITY.works) return t.specificWorks
+  if (value === ACTIVITY.studiesAndWorks) return t.specificStudiesWorks
+  return ''
 }
 
 // Translate gender key into localized label.
@@ -23,6 +31,13 @@ export function translatePartnerError(code, t) {
   if (code === PARTNER_ERRORS.missingEnd) return t.requiredPartnerTo
   if (code === PARTNER_ERRORS.invertedRange) return t.partnerRangeError
   return t.validDateMsg
+}
+
+// Fill the `{name}` placeholders of a text with the matching values. A placeholder without a value stays as written.
+export function fillPlaceholders(text, values) {
+  return text.replace(/\{(\w+)\}/g, (placeholder, name) =>
+    Object.prototype.hasOwnProperty.call(values, name) ? String(values[name]) : placeholder
+  )
 }
 
 // Check if an event is missing any required field.

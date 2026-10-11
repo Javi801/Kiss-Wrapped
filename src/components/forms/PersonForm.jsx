@@ -16,10 +16,15 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-import { GENDERS, ZODIAC_OPTIONS, TEXT } from '@/lib/constants'
+import { ACTIVITY, GENDERS, ZODIAC_OPTIONS, TEXT } from '@/lib/constants'
 import { LIMITS } from '@/lib/config'
 import { usePalette } from '@/lib/theme'
-import { translateGender, translatePartnerError, getZodiacForLanguage } from '@/lib/format'
+import {
+  activityDetailPlaceholder,
+  translateGender,
+  translatePartnerError,
+  getZodiacForLanguage,
+} from '@/lib/format'
 import { calculateDisplayAge, deriveBirthYear, isWithinZodiacPeriod } from '@/lib/date'
 import { PARTNER_STATUSES, validatePartnerFields } from '@/lib/partner'
 
@@ -48,6 +53,8 @@ export default function PersonForm({
   isParentOpen,
 }) {
   const PALETTE = usePalette()
+  // The add form addresses the user; any other mode speaks about the person.
+  const isAdd = mode === 'add'
   // Local form state initialization.
   const [form, setForm] = useState(() => {
     if (!initialValues) {
@@ -229,7 +236,7 @@ export default function PersonForm({
             {showBirthdayCheckbox && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <p style={{ ...TEXT.caption, color: PALETTE.text }}>
-                  {mode === 'add' ? t.birthdayAlreadyHappened : t.birthdayAlreadyHappenedThird}
+                  {isAdd ? t.birthdayAlreadyHappened : t.birthdayAlreadyHappenedThird}
                 </p>
                 <div
                   style={{
@@ -358,12 +365,12 @@ export default function PersonForm({
             </SelectTrigger>
 
             <SelectContent>
-              <SelectItem value="studies">{mode === 'add' ? t.studiesForm : t.studies}</SelectItem>
-              <SelectItem value="works">{mode === 'add' ? t.worksForm : t.works}</SelectItem>
-              <SelectItem value="studies and works">
-                {mode === 'add' ? t.studiesWorksForm : t.studiesWorks}
+              <SelectItem value={ACTIVITY.studies}>{isAdd ? t.studiesForm : t.studies}</SelectItem>
+              <SelectItem value={ACTIVITY.works}>{isAdd ? t.worksForm : t.works}</SelectItem>
+              <SelectItem value={ACTIVITY.studiesAndWorks}>
+                {isAdd ? t.studiesWorksForm : t.studiesWorks}
               </SelectItem>
-              <SelectItem value="other">{t.other}</SelectItem>
+              <SelectItem value={ACTIVITY.other}>{t.other}</SelectItem>
             </SelectContent>
           </Select>
 
@@ -379,15 +386,7 @@ export default function PersonForm({
             <Textarea
               value={form.detail}
               onChange={(e) => update('detail', e.target.value)}
-              placeholder={
-                form.activity === 'studies'
-                  ? t.specificStudies
-                  : form.activity === 'works'
-                    ? t.specificWorks
-                    : form.activity === 'studies and works'
-                      ? t.specificStudiesWorks
-                      : ''
-              }
+              placeholder={activityDetailPlaceholder(form.activity, t)}
               maxLength={LIMITS.personDetailLength}
               className="rounded-2xl"
               style={{ ...inputStyle }}

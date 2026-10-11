@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
 import { getEventPeople } from '@/lib/stats'
+import { TOUR_LAYERS } from '@/lib/onboarding'
 import StatTile from '@/components/shared/StatTile'
 import SpeechBubble from '@/components/forms/SpeechBubble'
 
@@ -97,14 +98,7 @@ export default function HomeHeroCard({
           }}
         />
 
-        <h1
-          style={{
-            ...TEXT.heading,
-            letterSpacing: '-0.025em',
-          }}
-        >
-          {t.heroTitle}
-        </h1>
+        <h1 style={TEXT.heading}>{t.heroTitle}</h1>
 
         <div
           style={{
@@ -182,7 +176,7 @@ export default function HomeHeroCard({
                   ? {
                       ...frostedButtonStyle,
                       position: 'relative',
-                      zIndex: 2,
+                      zIndex: TOUR_LAYERS.raised,
                       backgroundColor: PALETTE.accent,
                     }
                   : frostedButtonStyle

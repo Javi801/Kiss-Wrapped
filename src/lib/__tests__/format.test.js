@@ -1,9 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { COPY, GENDER_COLORS } from '@/lib/constants'
 import {
+  activityDetailPlaceholder,
   translateActivity,
   translateGender,
   translatePartnerError,
+  fillPlaceholders,
   eventIsMissingRequired,
   personIsMissingRequired,
   personHasIncompleteEvent,
@@ -68,6 +70,20 @@ describe('renderKisses', () => {
   })
 })
 
+describe('activityDetailPlaceholder', () => {
+  it('returns the placeholder of each activity that asks for a detail', () => {
+    expect(activityDetailPlaceholder('studies', t)).toBe(t.specificStudies)
+    expect(activityDetailPlaceholder('works', t)).toBe(t.specificWorks)
+    expect(activityDetailPlaceholder('studies and works', t)).toBe(t.specificStudiesWorks)
+  })
+
+  it('returns an empty placeholder for any other value', () => {
+    expect(activityDetailPlaceholder('other', t)).toBe('')
+    expect(activityDetailPlaceholder('', t)).toBe('')
+    expect(activityDetailPlaceholder(undefined, t)).toBe('')
+  })
+})
+
 describe('translateActivity', () => {
   it('translates "studies"', () => {
     expect(translateActivity('studies', t)).toBe(t.studies)
@@ -111,6 +127,32 @@ describe('translatePartnerError', () => {
         expect(translatePartnerError(code, copy)).toEqual(expect.any(String))
       }
     }
+  })
+})
+
+describe('fillPlaceholders', () => {
+  it('fills several placeholders', () => {
+    expect(fillPlaceholders('{name} met {other}', { name: 'Ana', other: 'Leo' })).toBe(
+      'Ana met Leo'
+    )
+  })
+  it('fills every occurrence of a repeated placeholder', () => {
+    expect(fillPlaceholders('{name}, {name}!', { name: 'Ana' })).toBe('Ana, Ana!')
+  })
+  it('fills numeric values, zero included', () => {
+    expect(fillPlaceholders('{done} of {total}', { done: 0, total: 12 })).toBe('0 of 12')
+  })
+  it('leaves an unknown placeholder as written', () => {
+    expect(fillPlaceholders('{name} and {missing}', { name: 'Ana' })).toBe('Ana and {missing}')
+  })
+  it('does not fill a placeholder from an inherited property', () => {
+    expect(fillPlaceholders('{toString}', {})).toBe('{toString}')
+  })
+  it('returns a text without placeholders unchanged', () => {
+    expect(fillPlaceholders('No placeholders here', { name: 'Ana' })).toBe('No placeholders here')
+  })
+  it('returns an empty text unchanged', () => {
+    expect(fillPlaceholders('', { name: 'Ana' })).toBe('')
   })
 })
 

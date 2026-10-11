@@ -2,6 +2,7 @@
   {
     "id": "k4m2x8n1",
     "name": "Sofía",
+    "realName": "",
     "gender": "female",
     "birthYear": 1998,
     "zodiacSign": "♍ Virgo (August 24 - September 22)",
@@ -9,6 +10,9 @@
     "detail": "Graphic designer at a studio",
     "howWeMet": "Through a mutual friend at a gallery opening",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "e1a27b3c",
@@ -60,6 +64,7 @@
   {
     "id": "p7r3t5q9",
     "name": "Jake",
+    "realName": "",
     "gender": "male",
     "birthYear": 1997,
     "zodiacSign": "♏ Scorpio (October 23 - November 21)",
@@ -67,6 +72,9 @@
     "detail": "Freelance photographer",
     "howWeMet": "Through a mutual friend, ended up at the same New Year's party",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "d6e72f8b",
@@ -82,6 +90,7 @@
   {
     "id": "b8w6z1y4",
     "name": "Mia",
+    "realName": "",
     "gender": "female",
     "birthYear": 2000,
     "zodiacSign": "♉ Taurus (April 20 - May 20)",
@@ -89,6 +98,9 @@
     "detail": "Architecture — second year",
     "howWeMet": "University, same faculty",
     "birthdayAlreadyHappened": true,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "g7f83a9b",
@@ -122,6 +134,7 @@
   {
     "id": "h2j9d5s7",
     "name": "Camille",
+    "realName": "",
     "gender": "female",
     "birthYear": 1999,
     "zodiacSign": "♈ Aries (March 21 - April 19)",
@@ -129,6 +142,9 @@
     "detail": "Marketing coordinator",
     "howWeMet": "New Year's Eve party, introduced by a mutual friend",
     "birthdayAlreadyHappened": true,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "j0c16d2e",
@@ -198,6 +214,7 @@
   {
     "id": "n6v1c3g8",
     "name": "Tom",
+    "realName": "",
     "gender": "male",
     "birthYear": 1996,
     "zodiacSign": "♌ Leo (July 23 - August 23)",
@@ -205,6 +222,9 @@
     "detail": "Sound engineer",
     "howWeMet": "At a music festival, we ended up near the same stage",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "q7d83e9f",
@@ -229,6 +249,7 @@
   {
     "id": "f4x9q2m5",
     "name": "Valentina",
+    "realName": "",
     "gender": "female",
     "birthYear": 2001,
     "zodiacSign": "♉ Taurus (April 20 - May 20)",
@@ -236,6 +257,9 @@
     "detail": "Psychology — first year",
     "howWeMet": "House party, friend of a friend",
     "birthdayAlreadyHappened": true,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "s9f05a1b",
@@ -251,6 +275,7 @@
   {
     "id": "r8b3k7n2",
     "name": "Nadia",
+    "realName": "",
     "gender": "female",
     "birthYear": 1998,
     "zodiacSign": "♑ Capricorn (December 22 - January 19)",
@@ -258,6 +283,9 @@
     "detail": "Part-time at a coffee shop, studying Business",
     "howWeMet": "Same workplace for a few months",
     "birthdayAlreadyHappened": true,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "t0a16b2c",
@@ -300,6 +328,7 @@
   {
     "id": "s5w1j4h9",
     "name": "Lena",
+    "realName": "",
     "gender": "female",
     "birthYear": 1999,
     "zodiacSign": "♊ Gemini (May 21 - June 20)",
@@ -307,6 +336,9 @@
     "detail": "Communications — third year",
     "howWeMet": "At a music festival, she was with the same group as some friends",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "x4e50f6a",
@@ -331,6 +363,7 @@
   {
     "id": "t3z6p8v2",
     "name": "Alex",
+    "realName": "",
     "gender": "other",
     "birthYear": 1997,
     "zodiacSign": "♎ Libra (September 23 - October 22)",
@@ -338,6 +371,9 @@
     "detail": "UX designer at a startup",
     "howWeMet": "At a queer bar, introduced by a mutual friend",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "z6a72b8c",
@@ -371,6 +407,7 @@
   {
     "id": "m7y4d1n6",
     "name": "Sara",
+    "realName": "",
     "gender": "female",
     "birthYear": 2002,
     "zodiacSign": "♌ Leo (July 23 - August 23)",
@@ -378,6 +415,9 @@
     "detail": "Fine Arts — first year",
     "howWeMet": "At a summer festival through a common friend",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "c9d05e1f",
@@ -393,6 +433,7 @@
   {
     "id": "q2x9f5b8",
     "name": "Marco",
+    "realName": "",
     "gender": "male",
     "birthYear": 1997,
     "zodiacSign": "♐ Sagittarius (November 22 - December 21)",
@@ -400,6 +441,9 @@
     "detail": "Personal trainer",
     "howWeMet": "Friend of a friend, same house party",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "d0e16f2a",
@@ -415,6 +459,7 @@
   {
     "id": "j6r3s1k4",
     "name": "Elena",
+    "realName": "",
     "gender": "female",
     "birthYear": 2000,
     "zodiacSign": "♏ Scorpio (October 23 - November 21)",
@@ -422,6 +467,9 @@
     "detail": "Nursing student, part-time at a pharmacy",
     "howWeMet": "Through Hinge, matched and talked for weeks before meeting",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "e1f27a3b",
@@ -482,6 +530,7 @@
   {
     "id": "v9n2w8t5",
     "name": "Zoe",
+    "realName": "",
     "gender": "female",
     "birthYear": 1999,
     "zodiacSign": "♉ Taurus (April 20 - May 20)",
@@ -489,6 +538,9 @@
     "detail": "Yoga instructor and content creator",
     "howWeMet": "At a music festival, we were both in the same queue",
     "birthdayAlreadyHappened": true,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "e7f83a9b",
@@ -513,6 +565,7 @@
   {
     "id": "c4m7y3h6",
     "name": "Lucas",
+    "realName": "",
     "gender": "male",
     "birthYear": 1996,
     "zodiacSign": "♑ Capricorn (December 22 - January 19)",
@@ -520,6 +573,9 @@
     "detail": "Architect at a firm",
     "howWeMet": "Old friend from high school, reconnected at a New Year's party",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "a9b05c1d",
@@ -562,6 +618,7 @@
   {
     "id": "g1p5b9z8",
     "name": "Isabelle",
+    "realName": "",
     "gender": "female",
     "birthYear": 2001,
     "zodiacSign": "♓ Pisces (February 20 - March 20)",
@@ -569,6 +626,9 @@
     "detail": "Literature — second year",
     "howWeMet": "House party, introduced by the host",
     "birthdayAlreadyHappened": true,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "e3f49a5b",
@@ -584,6 +644,7 @@
   {
     "id": "w8k4j2n7",
     "name": "Renata",
+    "realName": "",
     "gender": "female",
     "birthYear": 1999,
     "zodiacSign": "♍ Virgo (August 24 - September 22)",
@@ -591,6 +652,9 @@
     "detail": "Event coordinator",
     "howWeMet": "Through Instagram, she replied to a story",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "f4a50b6c",
@@ -669,6 +733,7 @@
   {
     "id": "d6t9r1v3",
     "name": "Chris",
+    "realName": "",
     "gender": "male",
     "birthYear": 1998,
     "zodiacSign": "♒ Aquarius (January 20 - February 19)",
@@ -676,6 +741,9 @@
     "detail": "Software developer",
     "howWeMet": "New Year's Eve party, same countdown spot on the rooftop",
     "birthdayAlreadyHappened": true,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "b2c38d4e",
@@ -700,6 +768,7 @@
   {
     "id": "n3z5w7q1",
     "name": "Maya",
+    "realName": "",
     "gender": "female",
     "birthYear": 2000,
     "zodiacSign": "♌ Leo (July 23 - August 23)",
@@ -707,6 +776,9 @@
     "detail": "Sports Science — second year",
     "howWeMet": "At the gym, kept running into each other for months",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "d4e50f6a",
@@ -740,6 +812,7 @@
   {
     "id": "y8j2m4b6",
     "name": "Pau",
+    "realName": "",
     "gender": "female",
     "birthYear": 1997,
     "zodiacSign": "♈ Aries (March 21 - April 19)",
@@ -747,6 +820,9 @@
     "detail": "Nurse at a public hospital",
     "howWeMet": "Through a mutual friend at a New Year's Eve party",
     "birthdayAlreadyHappened": true,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "a7b83c9d",
@@ -798,6 +874,7 @@
   {
     "id": "h5v7p3x9",
     "name": "Lily",
+    "realName": "",
     "gender": "female",
     "birthYear": 2002,
     "zodiacSign": "♍ Virgo (August 24 - September 22)",
@@ -805,6 +882,9 @@
     "detail": "Pharmacy — first year",
     "howWeMet": "Through Bumble, she swiped first",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "f2a38b4c",
@@ -838,6 +918,7 @@
   {
     "id": "q1n8s6k4",
     "name": "Dante",
+    "realName": "",
     "gender": "male",
     "birthYear": 1993,
     "zodiacSign": "♏ Scorpio (October 23 - November 21)",
@@ -845,6 +926,9 @@
     "detail": "Bar manager",
     "howWeMet": "Random encounter at a bar, both waiting for friends who never showed",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "b4c50d6e",
@@ -860,6 +944,7 @@
   {
     "id": "x4b2j9m7",
     "name": "Simone",
+    "realName": "",
     "gender": "female",
     "birthYear": 1999,
     "zodiacSign": "♌ Leo (July 23 - August 23)",
@@ -867,6 +952,9 @@
     "detail": "Journalist at a local magazine",
     "howWeMet": "New Year's Eve party, same friend group",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "c5d61e7f",
@@ -918,6 +1006,7 @@
   {
     "id": "f7r5c3w1",
     "name": "Kira",
+    "realName": "",
     "gender": "female",
     "birthYear": 2001,
     "zodiacSign": "♑ Capricorn (December 22 - January 19)",
@@ -925,6 +1014,9 @@
     "detail": "Economics — third year",
     "howWeMet": "Study group, same elective",
     "birthdayAlreadyHappened": true,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "a9b05c1d",
@@ -958,6 +1050,7 @@
   {
     "id": "p9z6v4h2",
     "name": "Noah",
+    "realName": "",
     "gender": "male",
     "birthYear": 1998,
     "zodiacSign": "♉ Taurus (April 20 - May 20)",
@@ -965,6 +1058,9 @@
     "detail": "Music producer",
     "howWeMet": "House party, he was DJing for the night",
     "birthdayAlreadyHappened": true,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "d2e38f4a",
@@ -989,6 +1085,7 @@
   {
     "id": "t2d8n5q7",
     "name": "Bianca",
+    "realName": "",
     "gender": "female",
     "birthYear": 1995,
     "zodiacSign": "♌ Leo (July 23 - August 23)",
@@ -996,6 +1093,9 @@
     "detail": "Brand strategist at an agency",
     "howWeMet": "Friend of a colleague, met at an after-work gathering",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "f4a50b6c",
@@ -1011,6 +1111,7 @@
   {
     "id": "m6y1s9b3",
     "name": "Andrea",
+    "realName": "",
     "gender": "female",
     "birthYear": 2000,
     "zodiacSign": "♎ Libra (September 23 - October 22)",
@@ -1018,6 +1119,9 @@
     "detail": "Sociology — second year",
     "howWeMet": "University, she came to an event I helped organize",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "a5b61c7d",
@@ -1078,6 +1182,7 @@
   {
     "id": "k9w4j7p5",
     "name": "Mateo",
+    "realName": "",
     "gender": "male",
     "birthYear": 1996,
     "zodiacSign": "♉ Taurus (April 20 - May 20)",
@@ -1085,6 +1190,9 @@
     "detail": "Physiotherapist",
     "howWeMet": "Pickup basketball game, we were on opposing teams",
     "birthdayAlreadyHappened": true,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "a1b27c3d",
@@ -1118,6 +1226,7 @@
   {
     "id": "z3h6t1n8",
     "name": "Ines",
+    "realName": "",
     "gender": "female",
     "birthYear": 1999,
     "zodiacSign": "♐ Sagittarius (November 22 - December 21)",
@@ -1125,6 +1234,9 @@
     "detail": "Law student, intern at a firm",
     "howWeMet": "House party, she was a friend of the host's partner",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "d4e50f6a",
@@ -1149,6 +1261,7 @@
   {
     "id": "v7x2m5r4",
     "name": "Cleo",
+    "realName": "",
     "gender": "other",
     "birthYear": 2000,
     "zodiacSign": "♒ Aquarius (January 20 - February 19)",
@@ -1156,6 +1269,9 @@
     "detail": "Tattoo artist",
     "howWeMet": "At an exhibition opening, we were both staring at the same piece",
     "birthdayAlreadyHappened": true,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "f6a72b8c",
@@ -1198,6 +1314,7 @@
   {
     "id": "b1n9q6k3",
     "name": "Vera",
+    "realName": "",
     "gender": "female",
     "birthYear": 1997,
     "zodiacSign": "♎ Libra (September 23 - October 22)",
@@ -1205,6 +1322,9 @@
     "detail": "Primary school teacher",
     "howWeMet": "At a summer festival, near the same stage",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "d0e16f2a",
@@ -1220,6 +1340,7 @@
   {
     "id": "s8z4w7d2",
     "name": "Remi",
+    "realName": "",
     "gender": "female",
     "birthYear": 1998,
     "zodiacSign": "♍ Virgo (August 24 - September 22)",
@@ -1227,6 +1348,9 @@
     "detail": "Copywriter and illustrator",
     "howWeMet": "Through Tinder, we texted for weeks before actually meeting",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "e1f27a3b",
@@ -1323,6 +1447,7 @@
   {
     "id": "j5p3b1y9",
     "name": "Oscar",
+    "realName": "",
     "gender": "male",
     "birthYear": 1994,
     "zodiacSign": "♏ Scorpio (October 23 - November 21)",
@@ -1330,6 +1455,9 @@
     "detail": "Documentary filmmaker",
     "howWeMet": "At a gallery opening, friend of a friend",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "b0c16d2e",
@@ -1345,6 +1473,7 @@
   {
     "id": "r6m8n4v7",
     "name": "Talia",
+    "realName": "",
     "gender": "female",
     "birthYear": 2003,
     "zodiacSign": "♋ Cancer (June 21 - July 22)",
@@ -1352,6 +1481,9 @@
     "detail": "Biology — first year",
     "howWeMet": "Through Hinge, she messaged first",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "c1d27e3f",
@@ -1376,6 +1508,7 @@
   {
     "id": "g4k1z9s6",
     "name": "Nat",
+    "realName": "",
     "gender": "female",
     "birthYear": 1999,
     "zodiacSign": "♑ Capricorn (December 22 - January 19)",
@@ -1383,6 +1516,9 @@
     "detail": "Product manager at a tech startup",
     "howWeMet": "Work conference, both stuck at the same panel",
     "birthdayAlreadyHappened": false,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "e3f49a5b",
@@ -1416,6 +1552,7 @@
   {
     "id": "s1w3z9f7",
     "name": "Lucie",
+    "realName": "",
     "gender": "female",
     "birthYear": 1997,
     "zodiacSign": "♓ Pisces (February 20 - March 20)",
@@ -1423,6 +1560,9 @@
     "detail": "Fine Arts — third year",
     "howWeMet": "Met through a mutual friend while visiting another city that summer",
     "birthdayAlreadyHappened": true,
+    "partnerStatus": "never",
+    "partnerFrom": "",
+    "partnerTo": "",
     "events": [
       {
         "id": "p8t0w6c4",

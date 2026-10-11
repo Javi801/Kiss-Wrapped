@@ -127,7 +127,11 @@ At a glance:
   </tr>
   <tr>
     <td><code>components/app/</code></td>
-    <td>Top-level screens: Home, AddPerson, Intro, Onboarding, the Color selector, ErrorBoundary, and PrivacyScreen</td>
+    <td>Top-level screens: Home, AddPerson, Intro, the Color selector, ErrorBoundary, and PrivacyScreen</td>
+  </tr>
+  <tr>
+    <td><code>components/app/onboarding/</code></td>
+    <td>Onboarding wizard, its steps, the tour player, and the tour scene lists</td>
   </tr>
   <tr>
     <td><code>components/stats/</code></td>
@@ -235,7 +239,7 @@ Tests live in a `__tests__/` folder next to the code they cover. All of them are
 | `src/lib/__tests__/` | `date.js`, `calendar.js`, `format.js`, `helpers.js`, `stats.js`, `constants.js`, `config.js`, `partner.js`, `import-people.js`, `onboarding.js`, `inert.js`, `device-storage.js`, `pdf-export.js`, `open-selects.js`, `utils.js`, and the theme and copy providers |
 | `src/plugins/__tests__/` | The app icon plugin wrapper |
 | `src/__tests__/` | `App.jsx`: boot, persistence, navigation, back button, and data mutations; and the `useScrollFade` hook |
-| `src/components/*/__tests__/` | Screens, forms, the person card, stats screen and tabs, chart cards and the fullscreen wrapper, selectors, shared tiles, the `ui/` dialog, sheet and select wrappers, and `ErrorBoundary` |
+| `src/components/**/__tests__/` | Screens, the onboarding wizard and its tours, forms, the person card, stats screen and tabs, chart cards and the fullscreen wrapper, selectors, shared tiles, the `ui/` dialog, sheet and select wrappers, and `ErrorBoundary` |
 
 `device-storage.js` and `utils.js` are excluded from threshold enforcement since they depend on native plugins or external APIs. Tests outside `src/lib/` run in the suite but do not count towards the thresholds. Decorative visuals have no tests.
 

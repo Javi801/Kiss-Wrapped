@@ -21,15 +21,17 @@ import JsonExportDialogs from '@/components/app/JsonExportDialogs'
 import ImportDialogs from '@/components/app/ImportDialogs'
 import AboutDialog from '@/components/app/AboutDialog'
 import AppGuideDialog from '@/components/app/AppGuideDialog'
-import TutorialDoneDialog from '@/components/app/TutorialDoneDialog'
+import OnboardingDoneDialog from '@/components/app/OnboardingDoneDialog'
+import { TOUR_TARGETS } from '@/lib/onboarding'
 
 /**
  * Renders the main dashboard screen.
  * It shows summary metrics, primary actions, and app-level settings.
- * `onRestartOnboarding` adds the restart-tutorial action to the settings.
- * `tutorialDoneOpen` shows the notice that follows the tutorial; `onCloseTutorialDone` closes it.
- * For the onboarding tour, `guideTarget` names what it points at (`'people'`, `'data'`
- * or `'settings'`) and `guideHint` (`{ title, body }`) is the text for the last two.
+ * `onRestartOnboarding` adds the restart-onboarding action to the settings.
+ * `onboardingDoneOpen` shows the notice that follows the onboarding; `onCloseOnboardingDone` closes it.
+ * For the onboarding tour, `tourTarget` names what it points at (`SCREENS.add`, `SCREENS.people`,
+ * `TOUR_TARGETS.data` or `TOUR_TARGETS.settings`) and `tourHint` (`{ title, body }`) is the
+ * text for the last two.
  */
 export default function MainScreen({
   onNavigate,
@@ -48,10 +50,10 @@ export default function MainScreen({
   includePartnerEvents,
   modalBackRef,
   onRestartOnboarding,
-  tutorialDoneOpen = false,
-  onCloseTutorialDone,
-  guideTarget,
-  guideHint,
+  onboardingDoneOpen = false,
+  onCloseOnboardingDone,
+  tourTarget,
+  tourHint,
 }) {
   const PALETTE = usePalette()
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -70,7 +72,7 @@ export default function MainScreen({
   useEffect(() => {
     if (!modalBackRef) return
     const anyOpen =
-      tutorialDoneOpen ||
+      onboardingDoneOpen ||
       aboutOpen ||
       guideOpen ||
       languageOpen ||
@@ -80,7 +82,7 @@ export default function MainScreen({
       importStatus !== null
     modalBackRef.current = anyOpen
       ? () => {
-          if (tutorialDoneOpen) onCloseTutorialDone()
+          if (onboardingDoneOpen) onCloseOnboardingDone()
           else if (aboutOpen) setAboutOpen(false)
           else if (guideOpen) setGuideOpen(false)
           else if (languageOpen) setLanguageOpen(false)
@@ -93,8 +95,8 @@ export default function MainScreen({
         }
       : null
   }, [
-    tutorialDoneOpen,
-    onCloseTutorialDone,
+    onboardingDoneOpen,
+    onCloseOnboardingDone,
     aboutOpen,
     guideOpen,
     languageOpen,
@@ -181,7 +183,7 @@ export default function MainScreen({
         includePartnerEvents={includePartnerEvents}
         onOpenLanguage={() => setLanguageOpen(true)}
         onOpenSettings={() => setSettingsOpen(true)}
-        settingsHint={guideTarget === 'settings' ? guideHint : undefined}
+        settingsHint={tourTarget === TOUR_TARGETS.settings ? tourHint : undefined}
       />
 
       <HomeSettingsDialogs
@@ -208,8 +210,8 @@ export default function MainScreen({
         onExportJson={handleExportJson}
         onImportJson={() => fileInputRef.current?.click()}
         onClearData={() => setConfirmOpen(true)}
-        guideTarget={guideTarget}
-        dataHint={guideTarget === 'data' ? guideHint : undefined}
+        tourTarget={tourTarget}
+        dataHint={tourTarget === TOUR_TARGETS.data ? tourHint : undefined}
       />
 
       <JsonExportDialogs
@@ -234,7 +236,7 @@ export default function MainScreen({
 
       <AppGuideDialog open={guideOpen} onOpenChange={setGuideOpen} t={t} />
 
-      <TutorialDoneDialog open={tutorialDoneOpen} onClose={onCloseTutorialDone} t={t} />
+      <OnboardingDoneDialog open={onboardingDoneOpen} onClose={onCloseOnboardingDone} t={t} />
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent showCloseButton={false}>
