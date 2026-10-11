@@ -353,7 +353,7 @@ export const es = {
     'Lugar y situación se guardan como etiquetas, para que puedas reutilizarlas en otros eventos.',
   onboardingPracticePlace: 'Café',
   onboardingPracticeSituation: 'Cita',
-  onboardingTourSavedNote: 'El evento quedó guardado. Ahora, de vuelta al inicio',
+  onboardingTourSavedNote: 'El evento quedó guardado. Toca Inicio para volver',
   onboardingDataHintTitle: 'Sin respaldo automático',
   onboardingDataHintBody:
     'Todo queda en este dispositivo. Usa Exportar para guardar una copia e Importar para recuperarla.',

@@ -1,16 +1,7 @@
 import OnboardingTour from '@/components/app/OnboardingTour'
 
-// Back to the home screen through the bottom bar, then the two things to know about it.
+// The two things to know about the home screen.
 const HOME_SCENES = [
-  {
-    screen: 'people',
-    note: 'onboardingTourSavedNote',
-    card: { expanded: true },
-    nav: 'main',
-    auto: true,
-    // Long enough to see the saved event and the tap on the bottom bar.
-    duration: 3000,
-  },
   {
     screen: 'home',
     guideTarget: 'data',
@@ -26,13 +17,13 @@ const HOME_SCENES = [
 ]
 
 /**
- * Last onboarding step: returns to the home screen and points out the data
+ * Last onboarding step: the home screen, where the tour points out the data
  * backup and the settings. Its last button finishes the tutorial.
  *
  * Props:
  *  - t               Active translation dictionary
  *  - language        Active language
- *  - practicePerson  Practice person, with the event of the previous step
+ *  - practicePerson  Practice person, with its event
  *  - settings        Settings the home screen shows
  *  - onNext          Finishes the step
  */

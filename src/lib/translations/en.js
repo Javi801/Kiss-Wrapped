@@ -353,7 +353,7 @@ export const en = {
     'Place and situation are saved as tags, so you can reuse them in other events.',
   onboardingPracticePlace: 'Café',
   onboardingPracticeSituation: 'Date',
-  onboardingTourSavedNote: 'The event is saved. Now, back to the home screen',
+  onboardingTourSavedNote: 'The event is saved. Tap Home to go back',
   onboardingDataHintTitle: 'No automatic backup',
   onboardingDataHintBody:
     'Everything stays on this device. Use Export to save a copy and Import to bring it back.',
