@@ -108,14 +108,7 @@ const SCENE_SCREENS = {
  *  - settings    `theme`, `iconColor`, `statsVisible` and `includePartnerEvents` for the home screen
  *  - onDone      Called when the last scene ends
  */
-export default function OnboardingTour({
-  scenes,
-  person,
-  t,
-  language,
-  settings = {},
-  onDone,
-}) {
+export default function OnboardingTour({ scenes, person, t, language, settings = {}, onDone }) {
   const PALETTE = usePalette()
   const [sceneIndex, setSceneIndex] = useState(0)
   const rootRef = useRef(null)

@@ -46,7 +46,14 @@ export default function IntroScreen({
       />
 
       {/* Hidden entry in the top-left heart. */}
-      <div style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top, 0px) + 1rem)', left: '1rem', zIndex: 10 }}>
+      <div
+        style={{
+          position: 'absolute',
+          top: 'calc(env(safe-area-inset-top, 0px) + 1rem)',
+          left: '1rem',
+          zIndex: 10,
+        }}
+      >
         <button
           type="button"
           onClick={onOpenMain}
@@ -81,20 +88,18 @@ export default function IntroScreen({
       </div>
 
       {/* Dims the bubbles and the visual so the entry guide stands out. Sits below the heart. */}
-      {
-        showEntryGuide ? (
-          <div
-            data-entry-backdrop=""
-            style={{
-              pointerEvents: 'none',
-              position: 'absolute',
-              inset: 0,
-              zIndex: 5,
-              backgroundColor: PALETTE.backdrop,
-            }}
-          />
-        ) : null
-      }
-    </div >
+      {showEntryGuide ? (
+        <div
+          data-entry-backdrop=""
+          style={{
+            pointerEvents: 'none',
+            position: 'absolute',
+            inset: 0,
+            zIndex: 5,
+            backgroundColor: PALETTE.backdrop,
+          }}
+        />
+      ) : null}
+    </div>
   )
 }
