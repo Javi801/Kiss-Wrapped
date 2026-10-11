@@ -7,9 +7,10 @@ import { Share } from '@capacitor/share'
 import { Capacitor } from '@capacitor/core'
 import { usePalette } from '@/lib/theme'
 import { useCopy } from '@/lib/copy'
-import { TEXT } from '@/lib/constants'
+import { TEXT, EXPANDED_VIEW_SIZE } from '@/lib/constants'
 import { FullscreenContext } from '@/components/charts/FullscreenContext'
 import ChartDownloadErrorDialog from '@/components/charts/ChartDownloadErrorDialog'
+import ExpandedViewStage from '@/components/charts/ExpandedViewStage'
 
 function getChartFilename() {
   return `kiss-wrapped-chart-${new Date().toISOString().slice(0, 10)}.png`
@@ -67,7 +68,13 @@ function IconButton({ onClick, disabled, children, palette, title }) {
   )
 }
 
-export default function FullscreenChartWrapper({ children, centerContent = false }) {
+/**
+ * Adds the fullscreen mode and the image export to a chart card.
+ * With `expandedView`, fullscreen shows that node instead of the card, on a canvas
+ * of EXPANDED_VIEW_SIZE that is exported at that exact size.
+ */
+export default function FullscreenChartWrapper({ children, centerContent = false, expandedView }) {
+  const hasExpandedView = expandedView != null
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState('')
@@ -149,7 +156,8 @@ export default function FullscreenChartWrapper({ children, centerContent = false
     const finalFilename = getChartFilename()
 
     // Temporarily expand all overflow/maxHeight constraints so full content is captured.
-    const allEls = [...el.querySelectorAll('*')]
+    // A custom expanded view already has its final size.
+    const allEls = hasExpandedView ? [] : [...el.querySelectorAll('*')]
     const saved = []
     allEls.forEach((s) => {
       const cs = window.getComputedStyle(s)
@@ -184,10 +192,10 @@ export default function FullscreenChartWrapper({ children, centerContent = false
     await new Promise((r) => setTimeout(r, 80))
 
     try {
-      const { width, height } = getCaptureSize(el)
+      const { width, height } = hasExpandedView ? EXPANDED_VIEW_SIZE : getCaptureSize(el)
       const dataUrl = await toPng(el, {
         backgroundColor: PALETTE.cardBg,
-        pixelRatio: 2,
+        pixelRatio: hasExpandedView ? 1 : 2,
         width,
         height,
       })
@@ -208,7 +216,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
       })
       setDownloading(false)
     }
-  }, [downloading, PALETTE.cardBg])
+  }, [downloading, hasExpandedView, PALETTE.cardBg])
 
   if (isFullscreen) {
     return createPortal(
@@ -219,7 +227,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
             inset: 0,
             zIndex: 9999,
             backgroundColor: PALETTE.bg,
-            overflowY: 'auto',
+            overflowY: hasExpandedView ? 'hidden' : 'auto',
             overflowX: 'hidden',
 
             paddingTop: 'env(safe-area-inset-top)',
@@ -254,21 +262,24 @@ export default function FullscreenChartWrapper({ children, centerContent = false
             </IconButton>
           </div>
 
-          {/* Chart content — captureRef wraps everything that goes into the image */}
-          <div
-            ref={captureRef}
-            data-fullscreen-chart
-            data-center-content={centerContent ? 'true' : undefined}
-            style={{
-              padding: 0,
-              minHeight: '100dvh',
-              boxSizing: 'border-box',
-              position: 'relative',
-              display: 'flex',
-            }}
-          >
-            <style>
-              {`
+          {/* Content — captureRef wraps everything that goes into the image */}
+          {hasExpandedView ? (
+            <ExpandedViewStage captureRef={captureRef}>{expandedView}</ExpandedViewStage>
+          ) : (
+            <div
+              ref={captureRef}
+              data-fullscreen-chart
+              data-center-content={centerContent ? 'true' : undefined}
+              style={{
+                padding: 0,
+                minHeight: '100dvh',
+                boxSizing: 'border-box',
+                position: 'relative',
+                display: 'flex',
+              }}
+            >
+              <style>
+                {`
                 [data-fullscreen-chart] > [data-slot="card"] {
                   flex: 1 1 auto;
                   width: 100%;
@@ -340,25 +351,26 @@ export default function FullscreenChartWrapper({ children, centerContent = false
                   }
                 }
               `}
-            </style>
-            {children}
+              </style>
+              {children}
 
-            {/* Watermark — included in download because it lives inside captureRef */}
-            <div
-              data-fullscreen-watermark
-              style={{
-                position: 'absolute',
-                color: PALETTE.accent,
-                opacity: PALETTE.watermarkOpacity ?? 0.5,
-                ...TEXT.bodyStrong,
-                letterSpacing: '0.1em',
-                pointerEvents: 'none',
-                userSelect: 'none',
-              }}
-            >
-              Kiss Wrapped
+              {/* Watermark — included in download because it lives inside captureRef */}
+              <div
+                data-fullscreen-watermark
+                style={{
+                  position: 'absolute',
+                  color: PALETTE.accent,
+                  opacity: PALETTE.watermarkOpacity ?? 0.5,
+                  ...TEXT.bodyStrong,
+                  letterSpacing: '0.1em',
+                  pointerEvents: 'none',
+                  userSelect: 'none',
+                }}
+              >
+                Kiss Wrapped
+              </div>
             </div>
-          </div>
+          )}
 
           <ChartDownloadErrorDialog
             message={downloadError}

@@ -236,6 +236,9 @@ export const PALETTE = PALETTES.pink
 // Width of the app's content column.
 export const CONTENT_MAX_WIDTH = '28rem'
 
+// Size of the image exported from a custom expanded chart view (9:16), the same on every device.
+export const EXPANDED_VIEW_SIZE = { width: 1080, height: 1920 }
+
 // Semantic text scale. Spread into style objects or use directly as style prop.
 export const TEXT = {
   caption: { fontSize: '0.75rem', lineHeight: '1rem' },
