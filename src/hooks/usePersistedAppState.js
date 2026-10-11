@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { detectDeviceLanguage } from '@/lib/constants'
+import { SCREENS, detectDeviceLanguage } from '@/lib/constants'
 import { FEATURES, LANGUAGES, THEMES, ICON_COLORS, DEFAULT_SETTINGS } from '@/lib/config'
 import { normalizePeople, mergeEventTagsFromPeople, mergePeopleFieldTags } from '@/lib/helpers'
 import {
@@ -80,7 +80,7 @@ export function usePersistedAppState(setScreen) {
           // First launch: start in the device language.
           if (needsOnboarding) setLanguage(detectDeviceLanguage())
           setOnboardingDone(!needsOnboarding)
-          setScreen('intro')
+          setScreen(SCREENS.intro)
 
           if (ICON_COLORS.includes(settings.iconColor)) setIconColor(settings.iconColor)
           if (THEMES.includes(settings.theme)) setTheme(settings.theme)
@@ -107,7 +107,7 @@ export function usePersistedAppState(setScreen) {
           // A failed load is not a new install: do not send the user through the onboarding.
           setOnboardingDone(true)
           setLanguage(detectDeviceLanguage())
-          setScreen('intro')
+          setScreen(SCREENS.intro)
         }
       } finally {
         // Mark app as loaded only if the component is still mounted.

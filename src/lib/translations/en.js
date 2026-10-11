@@ -339,9 +339,10 @@ export const en = {
   onboardingZodiacHint:
     'The age updates on its own based on the sign. If the sign is the current one, a question about the birthday appears above to get it right.',
   onboardingPracticeName: 'Example person',
-  onboardingTourHomeNote: 'This is how you get to your people',
-  onboardingTourListNote: 'Here are the people you save',
-  onboardingTourPersonNote: 'Tap Add event to continue',
+  onboardingTourAddInstruction: 'Tap Add new person to continue',
+  onboardingTourHomeInstruction: 'Tap View and edit people to get to your people',
+  onboardingTourListInstruction: 'Here are the people you save. Tap the card to open it',
+  onboardingTourPersonInstruction: 'Tap Add event to continue',
   onboardingEditPersonHint:
     'Edit their details here. A new person starts incomplete: some details are yours to fill in, like how you met.',
   onboardingEventHint:
@@ -352,17 +353,17 @@ export const en = {
     'Place and situation are saved as tags, so you can reuse them in other events.',
   onboardingPracticePlace: 'Café',
   onboardingPracticeSituation: 'Date',
-  onboardingTourSavedNote: 'The event is saved. Now, back to the home screen',
+  onboardingTourSavedInstruction: 'The event is saved. Tap Home to go back',
   onboardingDataHintTitle: 'No automatic backup',
   onboardingDataHintBody:
     'Everything stays on this device. Use Export to save a copy and Import to bring it back.',
   onboardingSettingsHintTitle: 'Make it yours',
   onboardingSettingsHintBody:
     'In Settings you change the theme and the icon color. From there you can also restart this tutorial and open the app guide.',
-  restartTutorial: 'Restart the tutorial',
-  tutorialDoneTitle: 'Tutorial finished',
-  tutorialDoneBody: 'There is more on how to use the app in Settings, under "App guide".',
-  tutorialDoneAction: 'Got it',
+  restartOnboarding: 'Restart the tutorial',
+  onboardingDoneTitle: 'Tutorial finished',
+  onboardingDoneBody: 'There is more on how to use the app in Settings, under "App guide".',
+  onboardingDoneAction: 'Got it',
   appGuide: 'App guide',
   appGuideIntro: 'What the tutorial does not get to show.',
   guideEntryTitle: 'Hidden entrance',

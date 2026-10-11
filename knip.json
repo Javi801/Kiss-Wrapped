@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "ignoreDependencies": ["@capacitor/cli"],
+  "ignoreDependencies": ["@capacitor/cli", "@capacitor/ios"],
   "ignoreIssues": {
     "src/components/ui/**": ["exports"]
   }

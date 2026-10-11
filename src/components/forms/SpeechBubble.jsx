@@ -1,12 +1,13 @@
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
+import { SPEECH_BUBBLE_ROLE, TOUR_LAYERS } from '@/lib/onboarding'
 
 /**
  * Comic-style speech bubble, solid and outlined in the accent color so it stands
  * out from any background. Its tail points at the element right above it,
  * or right below it with `tailSide="bottom"`. `tailOffset` moves the tail along
  * the edge (`{ left }` or `{ right }`) and `title` adds a heading. `raised` lifts
- * it above the backdrop of the onboarding tour.
+ * it above the backdrop of the onboarding tour, which finds the bubbles by their role.
  */
 export default function SpeechBubble({
   children,
@@ -21,16 +22,16 @@ export default function SpeechBubble({
 
   return (
     <div
-      role="note"
+      role={SPEECH_BUBBLE_ROLE}
       style={{
         position: 'relative',
-        zIndex: raised ? 2 : undefined,
+        zIndex: raised ? TOUR_LAYERS.raised : undefined,
         [tailAbove ? 'marginTop' : 'marginBottom']: '0.375rem',
         padding: '0.625rem 0.75rem',
         borderRadius: '0.875rem',
         border,
         backgroundColor: PALETTE.card,
-        boxShadow: '0 6px 18px rgba(0,0,0,0.16)',
+        boxShadow: `0 6px 18px ${PALETTE.shadowStrong}`,
       }}
     >
       <span

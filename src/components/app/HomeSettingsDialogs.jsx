@@ -49,7 +49,7 @@ function SettingsAction({ icon: Icon, label, onClick }) {
 /**
  * Dialogs opened from the hero card of the main screen: the language picker and
  * the settings, which also lead to the app guide, the about dialog and, when
- * `onRestartOnboarding` is given, the tutorial.
+ * `onRestartOnboarding` is given, the onboarding.
  */
 export default function HomeSettingsDialogs({
   t,
@@ -182,7 +182,7 @@ export default function HomeSettingsDialogs({
             {onRestartOnboarding && (
               <SettingsAction
                 icon={RotateCcw}
-                label={t.restartTutorial}
+                label={t.restartOnboarding}
                 onClick={() => {
                   setSettingsOpen(false)
                   onRestartOnboarding()

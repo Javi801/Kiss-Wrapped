@@ -12,8 +12,9 @@ import {
 } from '@/components/ui/select'
 import { DatePicker } from '@/components/ui/date-picker'
 
-import { ZODIAC_OPTIONS, TEXT } from '@/lib/constants'
+import { ACTIVITIES, ZODIAC_OPTIONS, TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
+import { translateActivity } from '@/lib/format'
 
 const MONTH_NUM = {
   january: '01',
@@ -262,15 +263,10 @@ export default function FiltersPanel({
       <div>
         <SectionLabel icon={Briefcase} label={t.activity} />
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-          {[
-            { value: 'studies', label: t.studies },
-            { value: 'works', label: t.works },
-            { value: 'studies and works', label: t.studiesWorks },
-            { value: 'other', label: t.other },
-          ].map(({ value, label }) => (
+          {ACTIVITIES.map((value) => (
             <Chip
               key={value}
-              label={label}
+              label={translateActivity(value, t)}
               selected={filters.activity.includes(value)}
               onClick={() => toggleActivity(value)}
             />

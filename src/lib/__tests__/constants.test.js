@@ -1,5 +1,58 @@
 import { describe, it, expect, afterEach } from 'vitest'
-import { COPY, abbreviateZodiacMonths, detectDeviceLanguage } from '@/lib/constants'
+import {
+  ACTIVITIES,
+  COPY,
+  PALETTES,
+  SCREENS,
+  abbreviateZodiacMonths,
+  detectDeviceLanguage,
+} from '@/lib/constants'
+import { translateActivity } from '@/lib/format'
+
+describe('SCREENS', () => {
+  it('names every screen after its key', () => {
+    for (const [key, value] of Object.entries(SCREENS)) {
+      expect(value).toBe(key)
+    }
+  })
+
+  it('has no duplicated values', () => {
+    const values = Object.values(SCREENS)
+    expect(values).not.toHaveLength(0)
+    expect(new Set(values).size).toBe(values.length)
+  })
+})
+
+describe('ACTIVITIES', () => {
+  it('has no duplicated values', () => {
+    expect(ACTIVITIES).not.toHaveLength(0)
+    expect(new Set(ACTIVITIES).size).toBe(ACTIVITIES.length)
+  })
+
+  it('has a translation of its own for every activity in every language', () => {
+    for (const copy of Object.values(COPY)) {
+      const labels = ACTIVITIES.map((activity) => translateActivity(activity, copy))
+      for (const label of labels) {
+        expect(label).toEqual(expect.any(String))
+        expect(label.trim()).not.toBe('')
+      }
+      // An activity the translation does not handle would repeat the label of 'other'.
+      expect(new Set(labels).size).toBe(ACTIVITIES.length)
+    }
+  })
+})
+
+describe('PALETTES', () => {
+  it.each(['backdrop', 'topGlow', 'calloutBg', 'calloutShadow', 'shadow', 'shadowStrong'])(
+    'defines the color %s in every palette',
+    (key) => {
+      for (const [theme, palette] of Object.entries(PALETTES)) {
+        expect(palette[key], theme).toEqual(expect.any(String))
+        expect(palette[key].trim(), theme).not.toBe('')
+      }
+    }
+  )
+})
 
 describe('abbreviateZodiacMonths', () => {
   it('abbreviates all twelve English month names', () => {
@@ -146,4 +199,25 @@ describe('COPY', () => {
       expect(copy[key].trim()).not.toBe('')
     }
   })
+
+  it.each([
+    'onboardingDoneTitle',
+    'onboardingDoneBody',
+    'onboardingDoneAction',
+    'restartOnboarding',
+  ])('has the onboarding text %s in every language', (key) => {
+    for (const copy of Object.values(COPY)) {
+      expect(copy[key]).toEqual(expect.any(String))
+      expect(copy[key].trim()).not.toBe('')
+    }
+  })
+
+  it.each(['tutorialDoneTitle', 'tutorialDoneBody', 'tutorialDoneAction', 'restartTutorial'])(
+    'no longer has the renamed text %s',
+    (key) => {
+      for (const copy of Object.values(COPY)) {
+        expect(copy).not.toHaveProperty(key)
+      }
+    }
+  )
 })

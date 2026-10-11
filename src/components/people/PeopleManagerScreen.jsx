@@ -28,7 +28,7 @@ export default function PeopleManagerScreen({
   onAddPlaceTag,
   howWeMetTags,
   onAddHowWeMetTag,
-  cardGuide,
+  cardTour,
 }) {
   const PALETTE = usePalette()
   const list = usePeopleList(people, t)
@@ -39,9 +39,7 @@ export default function PeopleManagerScreen({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <div>
-        <h2 style={{ ...TEXT.heading, letterSpacing: '-0.025em', color: PALETTE.text }}>
-          {t.personListTitle}
-        </h2>
+        <h2 style={{ ...TEXT.heading, color: PALETTE.text }}>{t.personListTitle}</h2>
       </div>
 
       <PeopleToolbar
@@ -84,7 +82,7 @@ export default function PeopleManagerScreen({
               onAddPlaceTag,
               howWeMetTags,
               onAddHowWeMetTag,
-              guide: cardGuide,
+              tour: cardTour,
             }}
           />
         </div>

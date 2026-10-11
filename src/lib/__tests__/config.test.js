@@ -10,6 +10,7 @@ import {
   ICON_COLORS,
   DEFAULT_SETTINGS,
   LIMITS,
+  ONBOARDING,
 } from '@/lib/config'
 import { COPY, PALETTES, ZODIAC_OPTIONS } from '@/lib/constants'
 import { ICON_VARIANTS, DEFAULT_ICON_VARIANT } from '@/components/shared/SparkleIcon.constants'
@@ -144,5 +145,24 @@ describe('LIMITS', () => {
       expect(Number.isInteger(value), name).toBe(true)
       expect(value, name).toBeGreaterThan(0)
     }
+  })
+})
+
+describe('ONBOARDING', () => {
+  it('defines every value as a positive integer', () => {
+    for (const [name, value] of Object.entries(ONBOARDING)) {
+      expect(Number.isInteger(value), name).toBe(true)
+      expect(value, name).toBeGreaterThan(0)
+    }
+  })
+
+  it('defines every timing', () => {
+    for (const name of ['sceneMs', 'tapTimeoutMs', 'introSceneMs']) {
+      expect(ONBOARDING[name], name).toEqual(expect.any(Number))
+    }
+  })
+
+  it('uses a practice age within the age limit', () => {
+    expect(ONBOARDING.practiceAge).toBeLessThanOrEqual(LIMITS.maxAge)
   })
 })

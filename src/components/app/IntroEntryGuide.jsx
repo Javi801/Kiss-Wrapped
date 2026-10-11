@@ -1,3 +1,4 @@
+import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
 import TapGuide from '@/components/visuals/TapGuide'
 
@@ -5,9 +6,12 @@ import TapGuide from '@/components/visuals/TapGuide'
  * First-run guide for the hidden entry: the tap guide on the heart, plus a
  * callout explaining it. Must be rendered inside the positioned
  * wrapper of the heart button, which it uses as its anchor.
+ * `showCallout={false}` leaves only the tap guide.
  */
-export default function IntroEntryGuide({ t }) {
+export default function IntroEntryGuide({ t, showCallout = true }) {
   const PALETTE = usePalette()
+
+  if (!showCallout) return <TapGuide />
 
   return (
     <>
@@ -27,27 +31,24 @@ export default function IntroEntryGuide({ t }) {
           border: `1px solid ${PALETTE.line}`,
           padding: '12px 13px',
           textAlign: 'left',
-          background: PALETTE.isDark ? PALETTE.card : 'rgba(255,255,255,0.92)',
-          boxShadow: '0 16px 38px rgba(55,36,61,0.16)',
+          background: PALETTE.calloutBg,
+          boxShadow: `0 16px 38px ${PALETTE.calloutShadow}`,
         }}
       >
         <h2
           style={{
+            ...TEXT.bodyStrong,
             margin: 0,
             color: PALETTE.accentEmphasis2,
-            fontSize: '0.92rem',
-            lineHeight: '1.18rem',
-            fontWeight: 700,
           }}
         >
           {t.entryGuideTitle}
         </h2>
         <p
           style={{
+            ...TEXT.caption,
             margin: '5px 0 0',
             color: PALETTE.textSoft,
-            fontSize: '0.76rem',
-            lineHeight: '1.1rem',
           }}
         >
           {t.entryGuideBody}

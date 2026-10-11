@@ -34,7 +34,7 @@ async function shareImage(dataUrl, filename) {
   })
   const { uri } = await Filesystem.getUri({ path: filename, directory: Directory.Cache })
   await Share.share({ files: [uri] })
-  Filesystem.deleteFile({ path: filename, directory: Directory.Cache }).catch(() => { })
+  Filesystem.deleteFile({ path: filename, directory: Directory.Cache }).catch(() => {})
 }
 
 function IconButton({ onClick, disabled, children, palette, title }) {
@@ -104,7 +104,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
       })
       const { uri } = await Filesystem.getUri({ path: fileName, directory: Directory.Cache })
       await Share.share({ files: [uri] })
-      Filesystem.deleteFile({ path: fileName, directory: Directory.Cache }).catch(() => { })
+      Filesystem.deleteFile({ path: fileName, directory: Directory.Cache }).catch(() => {})
     } catch {
       // sharing failed silently
     } finally {
