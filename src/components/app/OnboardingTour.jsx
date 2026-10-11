@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import HomeScreen from '@/components/app/HomeScreen'
+import IntroScreen from '@/components/app/IntroScreen'
 import PeopleManagerScreen from '@/components/people/PeopleManagerScreen'
 import BottomNav from '@/components/app/BottomNav'
 import OnboardingButton from '@/components/app/OnboardingButton'
@@ -10,6 +11,8 @@ import { setInertExcept } from '@/lib/inert'
 
 // Time an automatic scene stays on screen unless it sets its own `duration`.
 export const TOUR_SCENE_MS = 1800
+// Time a scene waits for its tap before it moves on by itself.
+export const TOUR_TAP_MS = 8000
 
 const noop = () => {}
 
@@ -20,21 +23,23 @@ const TOUR_KEEP_SELECTOR = '[role="note"], [data-tour-target]'
 /**
  * Plays a guided tour over the real screens, fed with the practice person.
  * Nothing on the screens reacts to taps, the keyboard or assistive technology,
- * except the add-event button of a scene that points at it.
+ * except the control a scene waits on.
  *
  * Props:
- *  - scenes      Ordered scenes: `{ screen: 'home' | 'people', note, auto, duration, button,
- *                guideTarget, hint, card, nav }`. `note`, `button` and the `hint` fields
+ *  - scenes      Ordered scenes: `{ screen: 'home' | 'people' | 'intro', note, auto, duration,
+ *                button, guideTarget, hint, card, nav, tapOnly }`. `note`, `button` and the `hint` fields
  *                are translation keys. An `auto` scene moves on by itself, after `duration` ms when given, and a scene
- *                with `button` moves on from that button; any other waits for `onAddEvent`.
+ *                with `button` moves on from that button; any other waits for a tap on the
+ *                control it points at: the `guideTarget` button of the home screen (`'add'`
+ *                or `'people'`), the `card.tapTarget` or the `nav` item. Without that tap
+ *                it moves on by itself after `TOUR_TAP_MS`, unless it is `tapOnly`.
  *                `guideTarget` is what the home screen points at, with `hint`
  *                (`{ title, body }`) as its text; a scene with `hint` dims everything else. `card` guides the person card:
  *                `{ expanded, tapTarget, hints }`. `nav` shows the bottom bar with the
- *                tap guide on that item.
- *  - person      Practice person shown on the screens
+ *                tap guide on that item. The `'intro'` screen shows the tap guide on its heart.
+ *  - person      Practice person shown on the screens, once there is one
  *  - settings    `theme`, `iconColor`, `statsVisible` and `includePartnerEvents` for the home screen
- *  - onAddEvent  Called from the add-event button
- *  - onDone      Called when the last scene ends by itself or from its button
+ *  - onDone      Called when the last scene ends
  */
 export default function OnboardingTour({
   scenes,
@@ -42,7 +47,6 @@ export default function OnboardingTour({
   t,
   language,
   settings = {},
-  onAddEvent,
   onDone,
 }) {
   const PALETTE = usePalette()
@@ -52,22 +56,30 @@ export default function OnboardingTour({
 
   const scene = scenes[sceneIndex]
   const isLast = sceneIndex === scenes.length - 1
-  const people = [person]
+  const people = person ? [person] : []
 
   function endScene() {
     if (isLast) onDone?.()
     else setSceneIndex(sceneIndex + 1)
   }
 
-  // Depends on the scene index so each automatic scene gets its own timer.
+  // Only the control a scene points at is reachable, so any tap comes from it.
+  const onTap = scene.auto || scene.button ? noop : endScene
+
+  // A scene with a button, or `tapOnly`, waits; any other tap scene only for a while.
+  let sceneMs = TOUR_TAP_MS
+  if (scene.auto) sceneMs = scene.duration ?? TOUR_SCENE_MS
+  else if (scene.button || scene.tapOnly) sceneMs = null
+
+  // Depends on the scene index so each timed scene gets its own timer.
   useEffect(() => {
-    if (!scene.auto) return undefined
+    if (sceneMs === null) return undefined
     const timer = setTimeout(() => {
       if (isLast) onDone?.()
       else setSceneIndex((index) => index + 1)
-    }, scene.duration ?? TOUR_SCENE_MS)
+    }, sceneMs)
     return () => clearTimeout(timer)
-  }, [sceneIndex, scene.auto, scene.duration, isLast, onDone])
+  }, [sceneIndex, sceneMs, isLast, onDone])
 
   // Taps are already blocked by the wrapper; this also takes the screens out of the
   // keyboard and of assistive technology. Redone per scene, as each one renders its own.
@@ -125,11 +137,13 @@ export default function OnboardingTour({
         />
       )}
 
-      {/* The tour drives the screens: taps do nothing. */}
+      {/* The tour drives the screens: taps do nothing outside the control a scene waits on. */}
       <div ref={screensRef} style={{ pointerEvents: 'none' }}>
-        {scene.screen === 'home' ? (
+        {scene.screen === 'intro' ? (
+          <IntroScreen onOpenMain={noop} showEntryGuide entryGuideCallout={false} t={t} />
+        ) : scene.screen === 'home' ? (
           <HomeScreen
-            onNavigate={noop}
+            onNavigate={onTap}
             onClearData={noop}
             onImportData={noop}
             people={people}
@@ -169,13 +183,14 @@ export default function OnboardingTour({
                 tapTarget: scene.card.tapTarget,
                 editHint: scene.card.hints ? t.onboardingEditPersonHint : undefined,
                 eventHint: scene.card.hints ? t.onboardingEventHint : undefined,
-                onAddEvent,
+                onToggle: onTap,
+                onAddEvent: onTap,
               }
             }
           />
         )}
         {scene.nav && (
-          <BottomNav screen={scene.screen} onNavigate={noop} guideTarget={scene.nav} t={t} />
+          <BottomNav screen={scene.screen} onNavigate={onTap} guideTarget={scene.nav} t={t} />
         )}
       </div>
 

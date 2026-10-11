@@ -339,8 +339,8 @@ export const en = {
   onboardingZodiacHint:
     'The age updates on its own based on the sign. If the sign is the current one, a question about the birthday appears above to get it right.',
   onboardingPracticeName: 'Example person',
-  onboardingTourHomeNote: 'This is how you get to your people',
-  onboardingTourListNote: 'Here are the people you save',
+  onboardingTourHomeNote: 'Tap View and edit people to get to your people',
+  onboardingTourListNote: 'Here are the people you save. Tap the card to open it',
   onboardingTourPersonNote: 'Tap Add event to continue',
   onboardingEditPersonHint:
     'Edit their details here. A new person starts incomplete: some details are yours to fill in, like how you met.',

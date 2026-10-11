@@ -1,31 +1,30 @@
 import OnboardingTour from '@/components/app/OnboardingTour'
 
-// From the home screen to the practice person's details, where the tour waits.
+// From the home screen to the practice person's details. Each scene waits for its tap.
 const TOUR_SCENES = [
-  // The first scene stays longer: the home screen is new and has more to take in.
   {
     screen: 'home',
     note: 'onboardingTourHomeNote',
     guideTarget: 'people',
-    auto: true,
-    duration: 3000,
   },
   {
     screen: 'people',
     note: 'onboardingTourListNote',
     card: { expanded: false, tapTarget: 'card' },
-    auto: true,
   },
   {
     screen: 'people',
     note: 'onboardingTourPersonNote',
     card: { expanded: true, tapTarget: 'addEvent', hints: true },
+    // Adding the event is the user's to do: this scene never moves on by itself.
+    tapOnly: true,
   },
 ]
 
 /**
- * Third onboarding step: an automatic tour from the home screen to the practice
- * person's details. It stops there and moves on from the add-event button.
+ * Third onboarding step: a guided tour from the home screen to the practice
+ * person's details. The user taps the people button, the person card and then
+ * the add-event button, which moves on.
  *
  * Props:
  *  - t               Active translation dictionary
@@ -42,7 +41,7 @@ export default function OnboardingTourStep({ t, language, practicePerson, settin
       t={t}
       language={language}
       settings={settings}
-      onAddEvent={onNext}
+      onDone={onNext}
     />
   )
 }
