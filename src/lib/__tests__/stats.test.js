@@ -16,6 +16,7 @@ import {
   getScoresByKisses,
   getStatsData,
   getTopPeople,
+  getZodiacOrbit,
   groupByZodiac,
   isInPartnerPeriod,
 } from '@/lib/stats'
@@ -672,6 +673,150 @@ describe('groupByZodiac', () => {
 
   it('labels the signs in the requested language', () => {
     expect(groupByZodiac(people, 'es', undefined, { allSigns: true })[0].label).toBe('Acuario')
+  })
+})
+
+describe('getZodiacOrbit', () => {
+  const ARIES = '♈ Aries (March 21 - April 19)'
+  const TAURUS = '♉ Taurus (April 20 - May 20)'
+  const GEMINI = '♊ Gemini (May 21 - June 20)'
+  const CANCER = '♋ Cancer (June 21 - July 22)'
+  const LEO = '♌ Leo (July 23 - August 23)'
+  const PISCES = '♓ Pisces (February 20 - March 20)'
+
+  const withSign = (name, zodiacSign, events = []) => makePerson(name, events, { zodiacSign })
+
+  it('returns the 12 signs starting at Aries, with glyph, label and people count', () => {
+    const people = [
+      withSign('Ana', GEMINI),
+      withSign('Bob', GEMINI),
+      withSign('Cam', PISCES),
+      withSign('Sam', 'unknown sign'),
+    ]
+    const { signs } = getZodiacOrbit(people, people, 'en')
+
+    expect(signs.map((sign) => sign.glyph).join('')).toBe('♈♉♊♋♌♍♎♏♐♑♒♓')
+    expect(signs.map((sign) => sign.label)).toEqual([
+      'Aries',
+      'Taurus',
+      'Gemini',
+      'Cancer',
+      'Leo',
+      'Virgo',
+      'Libra',
+      'Scorpio',
+      'Sagittarius',
+      'Capricorn',
+      'Aquarius',
+      'Pisces',
+    ])
+    expect(signs[2]).toEqual({ glyph: '♊', label: 'Gemini', value: 2 })
+    expect(signs[11]).toEqual({ glyph: '♓', label: 'Pisces', value: 1 })
+    // Signs outside the zodiac list are left out.
+    expect(signs.reduce((sum, sign) => sum + sign.value, 0)).toBe(3)
+  })
+
+  it('labels the signs in the requested language and merges stored languages', () => {
+    const people = [withSign('Ana', GEMINI), withSign('Bob', '♊ Géminis (21 mayo - 20 junio)')]
+    const { signs, topSigns } = getZodiacOrbit(people, people, 'es')
+
+    expect(signs[0]).toEqual({ glyph: '♈', label: 'Aries', value: 0 })
+    expect(signs[2]).toEqual({ glyph: '♊', label: 'Géminis', value: 2 })
+    expect(signs[11].label).toBe('Piscis')
+    expect(topSigns).toEqual([{ glyph: '♊', label: 'Géminis' }])
+  })
+
+  it('counts people once, whatever their number of events', () => {
+    const people = [
+      withSign('Ana', ARIES, [makeEvent('2024.01.01'), makeEvent('2024.02.01')]),
+      withSign('Bob', TAURUS),
+      withSign('Cam', TAURUS),
+    ]
+    const { signs, topSigns } = getZodiacOrbit(people, people, 'en')
+
+    expect(signs[0].value).toBe(1)
+    expect(topSigns).toEqual([{ glyph: '♉', label: 'Taurus' }])
+  })
+
+  it('returns every sign tied for the most people', () => {
+    const people = [withSign('Ana', LEO), withSign('Bob', ARIES), withSign('Cam', PISCES)]
+    people.push(withSign('Dan', LEO), withSign('Eva', ARIES))
+
+    expect(getZodiacOrbit(people, people, 'en').topSigns).toEqual([
+      { glyph: '♈', label: 'Aries' },
+      { glyph: '♌', label: 'Leo' },
+    ])
+  })
+
+  it('caps the tied signs at three', () => {
+    const people = [ARIES, TAURUS, GEMINI, CANCER, LEO].map((sign, i) => withSign(`P${i}`, sign))
+
+    expect(getZodiacOrbit(people, people, 'en').topSigns.map((sign) => sign.label)).toEqual([
+      'Aries',
+      'Taurus',
+      'Gemini',
+    ])
+  })
+
+  it('orders tied signs by number of events', () => {
+    const people = [
+      withSign('Ana', ARIES, [makeEvent('2024.05.01')]),
+      withSign('Bob', LEO, [makeEvent('2023.01.01'), makeEvent('2023.02.01')]),
+    ]
+
+    expect(getZodiacOrbit(people, people, 'en').topSigns.map((sign) => sign.label)).toEqual([
+      'Leo',
+      'Aries',
+    ])
+  })
+
+  it('orders signs tied on events by their latest event', () => {
+    const people = [
+      withSign('Ana', ARIES, [makeEvent('2024.01.01')]),
+      withSign('Bob', TAURUS),
+      withSign('Cam', LEO, [makeEvent('2023.01.01')]),
+      withSign('Dan', LEO),
+      withSign('Eva', ARIES),
+      withSign('Fay', TAURUS, [makeEvent('2024.06.01')]),
+    ]
+
+    expect(getZodiacOrbit(people, people, 'en').topSigns.map((sign) => sign.label)).toEqual([
+      'Taurus',
+      'Aries',
+      'Leo',
+    ])
+  })
+
+  it('breaks the ties with the events of eventPeople', () => {
+    const people = [
+      withSign('Ana', ARIES, [makeEvent('2024.01.01'), makeEvent('2024.02.01')]),
+      withSign('Bob', LEO, [makeEvent('2023.01.01')]),
+    ]
+    // Ana's events fall inside a partner period, so she is not in the event list.
+    const eventPeople = [people[1]]
+
+    expect(getZodiacOrbit(people, eventPeople, 'en').topSigns.map((sign) => sign.label)).toEqual([
+      'Leo',
+      'Aries',
+    ])
+  })
+
+  it('uses the people as event list and the default language when they are omitted', () => {
+    const people = [withSign('Ana', ARIES), withSign('Bob', LEO, [makeEvent('2023.01.01')])]
+    const { signs, topSigns } = getZodiacOrbit(people)
+
+    expect(signs[0].label).toBe(
+      getZodiacOrbit(people, people, DEFAULT_SETTINGS.language).signs[0].label
+    )
+    expect(topSigns.map((sign) => sign.glyph)).toEqual(['♌', '♈'])
+  })
+
+  it('returns no top sign without people', () => {
+    const { signs, topSigns } = getZodiacOrbit([], [], 'en')
+
+    expect(signs).toHaveLength(12)
+    expect(signs.every((sign) => sign.value === 0)).toBe(true)
+    expect(topSigns).toEqual([])
   })
 })
 
