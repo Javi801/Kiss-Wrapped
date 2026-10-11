@@ -339,6 +339,7 @@ export const es = {
   onboardingZodiacHint:
     'La edad se actualiza sola según el signo. Si el signo es el de estas fechas, arriba aparecerá una pregunta sobre el cumpleaños para calcularla bien.',
   onboardingPracticeName: 'Persona de ejemplo',
+  onboardingTourAddNote: 'Toca Agregar persona para continuar',
   onboardingTourHomeNote: 'Toca Ver y editar personas para llegar a tus personas',
   onboardingTourListNote: 'Aquí están las personas que guardas. Toca la tarjeta para abrirla',
   onboardingTourPersonNote: 'Toca Agregar evento para continuar',
