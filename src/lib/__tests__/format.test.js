@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { COPY, GENDER_COLORS } from '@/lib/constants'
 import {
+  activityDetailPlaceholder,
   translateActivity,
   translateGender,
   translatePartnerError,
@@ -66,6 +67,20 @@ describe('renderKisses', () => {
   })
   it('returns noScore text for an invalid score', () => {
     expect(renderKisses(99, t)).toBe(t.noScore)
+  })
+})
+
+describe('activityDetailPlaceholder', () => {
+  it('returns the placeholder of each activity that asks for a detail', () => {
+    expect(activityDetailPlaceholder('studies', t)).toBe(t.specificStudies)
+    expect(activityDetailPlaceholder('works', t)).toBe(t.specificWorks)
+    expect(activityDetailPlaceholder('studies and works', t)).toBe(t.specificStudiesWorks)
+  })
+
+  it('returns an empty placeholder for any other value', () => {
+    expect(activityDetailPlaceholder('other', t)).toBe('')
+    expect(activityDetailPlaceholder('', t)).toBe('')
+    expect(activityDetailPlaceholder(undefined, t)).toBe('')
   })
 })
 
