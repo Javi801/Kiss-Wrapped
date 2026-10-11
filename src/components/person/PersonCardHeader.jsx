@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 
 import { TEXT, abbreviateZodiacMonths } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
+import { tourTargetProps } from '@/lib/onboarding'
 import { effectiveDisplayAge } from '@/lib/date'
 import { translateActivity, translateGender } from '@/lib/format'
 import TapGuide from '@/components/visuals/TapGuide'
@@ -25,7 +26,7 @@ export default function PersonCardHeader({
 
   return (
     <button
-      style={{
+      {...tourTargetProps(showTapGuide, {
         display: 'flex',
         width: '100%',
         alignItems: 'flex-start',
@@ -33,9 +34,7 @@ export default function PersonCardHeader({
         gap: '0.75rem',
         padding: '1.25rem',
         textAlign: 'left',
-        ...(showTapGuide ? { position: 'relative', pointerEvents: 'auto' } : null),
-      }}
-      data-tour-target={showTapGuide ? '' : undefined}
+      })}
       onClick={onToggle}
     >
       {showTapGuide && <TapGuide />}

@@ -1,24 +1,87 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import HomeScreen from '@/components/app/HomeScreen'
 import IntroScreen from '@/components/app/IntroScreen'
 import PeopleManagerScreen from '@/components/people/PeopleManagerScreen'
 import BottomNav from '@/components/app/BottomNav'
 import OnboardingButton from '@/components/app/OnboardingButton'
-import { TEXT } from '@/lib/constants'
+import { TEXT, SCREENS } from '@/lib/constants'
+import { ONBOARDING } from '@/lib/config'
 import { usePalette } from '@/lib/theme'
 import { setInertExcept } from '@/lib/inert'
-
-// Time an automatic scene stays on screen unless it sets its own `duration`.
-export const TOUR_SCENE_MS = 1800
-// Time a scene waits for its tap before it moves on by itself.
-export const TOUR_TAP_MS = 8000
+import { SPEECH_BUBBLE_SELECTOR, TOUR_KEEP_SELECTOR, TOUR_LAYERS } from '@/lib/onboarding'
 
 const noop = () => {}
 
-// What stays reachable on the screens: the speech bubbles, so they are still read
-// aloud, and the control a scene asks the user to tap.
-const TOUR_KEEP_SELECTOR = '[role="note"], [data-tour-target]'
+/** The intro screen of a tour scene, with the tap guide on its heart. */
+function IntroScene({ t }) {
+  return <IntroScreen onOpenMain={noop} showEntryGuide entryGuideCallout={false} t={t} />
+}
+
+/** The home screen of a tour scene, pointing at `scene.tourTarget`. */
+function HomeScene({ scene, people, t, language, settings, onTap }) {
+  return (
+    <HomeScreen
+      onNavigate={onTap}
+      onClearData={noop}
+      onImportData={noop}
+      people={people}
+      t={t}
+      language={language}
+      setLanguage={noop}
+      iconColor={settings.iconColor}
+      setIconColor={noop}
+      theme={settings.theme}
+      setTheme={noop}
+      statsVisible={settings.statsVisible}
+      setStatsVisible={noop}
+      includePartnerEvents={settings.includePartnerEvents}
+      tourTarget={scene.tourTarget}
+      tourHint={scene.hint && { title: t[scene.hint.title], body: t[scene.hint.body] }}
+    />
+  )
+}
+
+/** The people screen of a tour scene, with the person card guided by `scene.card`. */
+function PeopleScene({ scene, people, t, language, onTap }) {
+  return (
+    <PeopleManagerScreen
+      people={people}
+      onUpdatePerson={noop}
+      onDeletePerson={noop}
+      onAddEvent={noop}
+      onUpdateEvent={noop}
+      onDeleteEvent={noop}
+      onDeleteAllEvents={noop}
+      t={t}
+      language={language}
+      situationTags={[]}
+      onAddSituationTag={noop}
+      placeTags={[]}
+      onAddPlaceTag={noop}
+      howWeMetTags={[]}
+      onAddHowWeMetTag={noop}
+      cardTour={
+        scene.card && {
+          expanded: scene.card.expanded,
+          tapTarget: scene.card.tapTarget,
+          editHint: scene.card.hints ? t[scene.card.hints.edit] : undefined,
+          eventHint: scene.card.hints ? t[scene.card.hints.event] : undefined,
+          onToggle: onTap,
+          onAddEvent: onTap,
+        }
+      }
+    />
+  )
+}
+
+// What renders each screen a scene can name: the real screen fed with the practice person,
+// every handler inert except `onTap`, which goes to the control the scene waits on.
+const SCENE_SCREENS = {
+  [SCREENS.intro]: IntroScene,
+  [SCREENS.main]: HomeScene,
+  [SCREENS.people]: PeopleScene,
+}
 
 /**
  * Plays a guided tour over the real screens, fed with the practice person.
@@ -26,17 +89,21 @@ const TOUR_KEEP_SELECTOR = '[role="note"], [data-tour-target]'
  * except the control a scene waits on.
  *
  * Props:
- *  - scenes      Ordered scenes: `{ screen: 'home' | 'people' | 'intro', note, auto, duration,
- *                button, guideTarget, hint, card, nav, tapOnly }`. `note`, `button` and the `hint` fields
- *                are translation keys. An `auto` scene moves on by itself, after `duration` ms when given, and a scene
+ *  - scenes      Ordered scenes: `{ screen: SCREENS.main | SCREENS.people | SCREENS.intro,
+ *                instruction, auto, duration, button, tourTarget, hint, card, nav, tapOnly }`.
+ *                `instruction`, `button` and the fields of `hint` and `card.hints` are
+ *                translation keys. An `auto` scene moves on by itself, after `duration` ms when given, and a scene
  *                with `button` moves on from that button; any other waits for a tap on the
- *                control it points at: the `guideTarget` button of the home screen (`'add'`
- *                or `'people'`), the `card.tapTarget` or the `nav` item. Without that tap
- *                it moves on by itself after `TOUR_TAP_MS`, unless it is `tapOnly`.
- *                `guideTarget` is what the home screen points at, with `hint`
+ *                control it points at: the `tourTarget` button of the home screen (`SCREENS.add`
+ *                or `SCREENS.people`), the `card.tapTarget` or the `nav` item. Without that tap
+ *                it moves on by itself after `ONBOARDING.tapTimeoutMs`, unless it is `tapOnly`.
+ *                `tourTarget` is what the home screen points at: one of those two buttons, or
+ *                `TOUR_TARGETS.data` or `TOUR_TARGETS.settings` with `hint`
  *                (`{ title, body }`) as its text; a scene with `hint` dims everything else. `card` guides the person card:
- *                `{ expanded, tapTarget, hints }`. `nav` shows the bottom bar with the
- *                tap guide on that item. The `'intro'` screen shows the tap guide on its heart.
+ *                `{ expanded, tapTarget, hints }`, where `tapTarget` is `TOUR_TARGETS.card` or
+ *                `TOUR_TARGETS.addEvent` and `hints` is `{ edit, event }`. `nav` shows the bottom
+ *                bar with the tap guide on the item of that screen. The intro screen shows the
+ *                tap guide on its heart. A scene naming any other screen renders no screen.
  *  - person      Practice person shown on the screens, once there is one
  *  - settings    `theme`, `iconColor`, `statsVisible` and `includePartnerEvents` for the home screen
  *  - onDone      Called when the last scene ends
@@ -58,28 +125,35 @@ export default function OnboardingTour({
   const isLast = sceneIndex === scenes.length - 1
   const people = person ? [person] : []
 
-  function endScene() {
-    if (isLast) onDone?.()
+  // Latest `onDone`, read when the tour ends, so a new one does not restart a scene's timer.
+  const onDoneRef = useRef(onDone)
+  useEffect(() => {
+    onDoneRef.current = onDone
+  }, [onDone])
+
+  // Ends the scene, whether from its tap, its button or its timer.
+  const advance = useCallback(() => {
+    if (isLast) onDoneRef.current?.()
     else setSceneIndex(sceneIndex + 1)
-  }
+  }, [isLast, sceneIndex])
 
   // Only the control a scene points at is reachable, so any tap comes from it.
-  const onTap = scene.auto || scene.button ? noop : endScene
+  const onTap = scene.auto || scene.button ? noop : advance
 
   // A scene with a button, or `tapOnly`, waits; any other tap scene only for a while.
-  let sceneMs = TOUR_TAP_MS
-  if (scene.auto) sceneMs = scene.duration ?? TOUR_SCENE_MS
+  let sceneMs = ONBOARDING.tapTimeoutMs
+  if (scene.auto) sceneMs = scene.duration ?? ONBOARDING.sceneMs
   else if (scene.button || scene.tapOnly) sceneMs = null
 
-  // Depends on the scene index so each timed scene gets its own timer.
+  // `advance` changes with the scene index, so each timed scene gets its own timer.
   useEffect(() => {
     if (sceneMs === null) return undefined
-    const timer = setTimeout(() => {
-      if (isLast) onDone?.()
-      else setSceneIndex((index) => index + 1)
-    }, sceneMs)
+    const timer = setTimeout(advance, sceneMs)
     return () => clearTimeout(timer)
-  }, [sceneIndex, sceneMs, isLast, onDone])
+  }, [advance, sceneMs])
+
+  // Undefined for a screen the tour does not know, which then renders none.
+  const SceneScreen = SCENE_SCREENS[scene.screen]
 
   // Taps are already blocked by the wrapper; this also takes the screens out of the
   // keyboard and of assistive technology. Redone per scene, as each one renders its own.
@@ -88,7 +162,7 @@ export default function OnboardingTour({
   // Brings the first speech bubble of the scene into view, or its top when it has none.
   useEffect(() => {
     const root = rootRef.current
-    const bubble = root.querySelector('[role="note"]')
+    const bubble = root.querySelector(SPEECH_BUBBLE_SELECTOR)
     const target = bubble ?? root
     target.scrollIntoView?.({ block: bubble ? 'center' : 'start', behavior: 'smooth' })
   }, [sceneIndex])
@@ -105,7 +179,7 @@ export default function OnboardingTour({
         margin: '0 auto',
       }}
     >
-      {scene.note && (
+      {scene.instruction && (
         <p
           role="status"
           style={{
@@ -119,7 +193,7 @@ export default function OnboardingTour({
             backgroundColor: PALETTE.card,
           }}
         >
-          {t[scene.note]}
+          {t[scene.instruction]}
         </p>
       )}
 
@@ -131,72 +205,32 @@ export default function OnboardingTour({
             pointerEvents: 'none',
             position: 'fixed',
             inset: 0,
-            zIndex: 1,
-            backgroundColor: 'rgba(24,14,34,0.6)',
+            zIndex: TOUR_LAYERS.backdrop,
+            backgroundColor: PALETTE.backdrop,
           }}
         />
       )}
 
       {/* The tour drives the screens: taps do nothing outside the control a scene waits on. */}
       <div ref={screensRef} style={{ pointerEvents: 'none' }}>
-        {scene.screen === 'intro' ? (
-          <IntroScreen onOpenMain={noop} showEntryGuide entryGuideCallout={false} t={t} />
-        ) : scene.screen === 'home' ? (
-          <HomeScreen
-            onNavigate={onTap}
-            onClearData={noop}
-            onImportData={noop}
+        {SceneScreen && (
+          <SceneScreen
+            scene={scene}
             people={people}
             t={t}
             language={language}
-            setLanguage={noop}
-            iconColor={settings.iconColor}
-            setIconColor={noop}
-            theme={settings.theme}
-            setTheme={noop}
-            statsVisible={settings.statsVisible}
-            setStatsVisible={noop}
-            includePartnerEvents={settings.includePartnerEvents}
-            guideTarget={scene.guideTarget}
-            guideHint={scene.hint && { title: t[scene.hint.title], body: t[scene.hint.body] }}
-          />
-        ) : (
-          <PeopleManagerScreen
-            people={people}
-            onUpdatePerson={noop}
-            onDeletePerson={noop}
-            onAddEvent={noop}
-            onUpdateEvent={noop}
-            onDeleteEvent={noop}
-            onDeleteAllEvents={noop}
-            t={t}
-            language={language}
-            situationTags={[]}
-            onAddSituationTag={noop}
-            placeTags={[]}
-            onAddPlaceTag={noop}
-            howWeMetTags={[]}
-            onAddHowWeMetTag={noop}
-            cardGuide={
-              scene.card && {
-                expanded: scene.card.expanded,
-                tapTarget: scene.card.tapTarget,
-                editHint: scene.card.hints ? t.onboardingEditPersonHint : undefined,
-                eventHint: scene.card.hints ? t.onboardingEventHint : undefined,
-                onToggle: onTap,
-                onAddEvent: onTap,
-              }
-            }
+            settings={settings}
+            onTap={onTap}
           />
         )}
         {scene.nav && (
-          <BottomNav screen={scene.screen} onNavigate={onTap} guideTarget={scene.nav} t={t} />
+          <BottomNav screen={scene.screen} onNavigate={onTap} tourTarget={scene.nav} t={t} />
         )}
       </div>
 
       {scene.button && (
-        <div style={{ position: 'sticky', bottom: 0, zIndex: 3 }}>
-          <OnboardingButton onClick={endScene}>{t[scene.button]}</OnboardingButton>
+        <div style={{ position: 'sticky', bottom: 0, zIndex: TOUR_LAYERS.button }}>
+          <OnboardingButton onClick={advance}>{t[scene.button]}</OnboardingButton>
         </div>
       )}
     </div>

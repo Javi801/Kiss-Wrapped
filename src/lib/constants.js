@@ -236,7 +236,12 @@ export const TEXT = {
   base: { fontSize: '1rem', lineHeight: '1.5rem' },
   title: { fontSize: '1rem', lineHeight: '1.5rem', fontWeight: '600' },
   subheading: { fontSize: '1.125rem', lineHeight: '1.75rem', fontWeight: '700' },
-  heading: { fontSize: '1.5rem', lineHeight: '2rem', fontWeight: '700' },
+  heading: {
+    fontSize: '1.5rem',
+    lineHeight: '2rem',
+    fontWeight: '700',
+    letterSpacing: '-0.025em',
+  },
 }
 
 // Generic colors for graphics.

@@ -3,7 +3,7 @@ import { TEXT } from '@/lib/constants'
 import HeroVisualPlaceholder from '@/components/visuals/HeroVisualPlaceholder'
 
 /**
- * First onboarding step: welcomes the user and states that the data stays on the device.
+ * Welcome step of the onboarding: welcomes the user and states that the data stays on the device.
  *
  * Props:
  *  - t  Active translation dictionary
@@ -31,14 +31,7 @@ export default function OnboardingWelcomeStep({ t }) {
           maxWidth: '20rem',
         }}
       >
-        <h1
-          style={{
-            ...TEXT.heading,
-            margin: 0,
-            letterSpacing: '-0.025em',
-            color: PALETTE.accentEmphasis2,
-          }}
-        >
+        <h1 style={{ ...TEXT.heading, margin: 0, color: PALETTE.accentEmphasis2 }}>
           {t.onboardingWelcomeTitle}
         </h1>
         <p style={leadStyle}>{t.onboardingWelcomeLead}</p>

@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/alert-dialog'
 
 import { usePalette } from '@/lib/theme'
+import { tourTargetProps } from '@/lib/onboarding'
 import SpeechBubble from '@/components/forms/SpeechBubble'
 import TapGuide from '@/components/visuals/TapGuide'
 
@@ -54,13 +55,11 @@ export default function PersonCardActions({
 
       <Button
         onClick={onAddEvent}
-        data-tour-target={showTapGuide ? '' : undefined}
-        style={{
+        {...tourTargetProps(showTapGuide, {
           background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
           color: PALETTE.textOnAccent,
           border: 'none',
-          ...(showTapGuide ? { position: 'relative', pointerEvents: 'auto' } : null),
-        }}
+        })}
       >
         {showTapGuide && <TapGuide />}
         <Plus style={{ marginRight: '0.5rem', height: '1rem', width: '1rem' }} />

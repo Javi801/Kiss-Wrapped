@@ -1,24 +1,17 @@
 import { useState } from 'react'
 
-import { Card, CardContent } from '@/components/ui/card'
 import EventForm from '@/components/forms/EventForm'
+import FormCard from '@/components/app/FormCard'
+import OnboardingFormStep from '@/components/app/OnboardingFormStep'
 import OnboardingTour from '@/components/app/OnboardingTour'
-import { usePalette } from '@/lib/theme'
-import { TEXT } from '@/lib/constants'
 import { completePracticeEvent } from '@/lib/onboarding'
+import { SAVED_EVENT_SCENES } from '@/components/app/onboardingScenes'
 
-// The person card with the saved event, waiting for a tap on the home item of the bottom bar.
-const SAVED_SCENES = [
-  {
-    screen: 'people',
-    note: 'onboardingTourSavedNote',
-    card: { expanded: true },
-    nav: 'main',
-  },
-]
+// Phases of the step, in order: the form, the tour after it. This step has no tour before the form.
+const PHASES = { form: 'form', tourAfter: 'tourAfter' }
 
 /**
- * Fourth onboarding step, in two phases: the event form, empty, and the person
+ * Onboarding step for the practice event, in two phases: the event form, empty, and the person
  * card with the saved event, where the user taps the home item of the bottom bar.
  * Saving or skipping hands the practice event to the wizard and shows the card;
  * skipping keeps what was typed and fills the rest.
@@ -39,21 +32,20 @@ export default function OnboardingEventStep({
   onPracticeEvent,
   onNext,
 }) {
-  const PALETTE = usePalette()
-  const [saved, setSaved] = useState(false)
+  const [phase, setPhase] = useState(PHASES.form)
   // Tags added while practicing live only in this step.
   const [placeTags, setPlaceTags] = useState([])
   const [situationTags, setSituationTags] = useState([])
 
   function finish(event) {
     onPracticeEvent(event)
-    setSaved(true)
+    setPhase(PHASES.tourAfter)
   }
 
-  if (saved) {
+  if (phase === PHASES.tourAfter) {
     return (
       <OnboardingTour
-        scenes={SAVED_SCENES}
+        scenes={SAVED_EVENT_SCENES}
         person={practicePerson}
         t={t}
         language={language}
@@ -64,54 +56,20 @@ export default function OnboardingEventStep({
   }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1rem',
-        width: '100%',
-        maxWidth: '28rem',
-        margin: '0 auto',
-      }}
-    >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', textAlign: 'center' }}>
-        <h1
-          style={{
-            ...TEXT.heading,
-            margin: 0,
-            letterSpacing: '-0.025em',
-            color: PALETTE.accentEmphasis2,
-          }}
-        >
-          {t.onboardingEventTitle}
-        </h1>
-        <p style={{ ...TEXT.body, margin: 0, color: PALETTE.textSoft }}>{t.onboardingEventBody}</p>
-      </div>
-
-      {/* Same container as the person step */}
-      <Card
-        className="rounded-3xl"
-        style={{
-          boxShadow: `0 4px 24px rgba(0,0,0,0.12), 0 0 0 1px ${PALETTE.cardBorder}`,
-          backdropFilter: 'blur(12px)',
-          border: 'none',
-          background: `linear-gradient(160deg, ${PALETTE.card} 0%, ${PALETTE.cardSoft} 100%)`,
-        }}
-      >
-        <CardContent style={{ padding: '1.25rem' }}>
-          <EventForm
-            onSave={finish}
-            onSkip={(values) => finish(completePracticeEvent(values, t))}
-            skipLabel={t.onboardingSkip}
-            tagsHint={t.onboardingTagsHint}
-            t={t}
-            placeTags={placeTags}
-            onAddPlaceTag={(tag) => setPlaceTags((prev) => [...prev, tag])}
-            situationTags={situationTags}
-            onAddSituationTag={(tag) => setSituationTags((prev) => [...prev, tag])}
-          />
-        </CardContent>
-      </Card>
-    </div>
+    <OnboardingFormStep title={t.onboardingEventTitle} body={t.onboardingEventBody}>
+      <FormCard>
+        <EventForm
+          onSave={finish}
+          onSkip={(values) => finish(completePracticeEvent(values, t))}
+          skipLabel={t.onboardingSkip}
+          tagsHint={t.onboardingTagsHint}
+          t={t}
+          placeTags={placeTags}
+          onAddPlaceTag={(tag) => setPlaceTags((prev) => [...prev, tag])}
+          situationTags={situationTags}
+          onAddSituationTag={(tag) => setSituationTags((prev) => [...prev, tag])}
+        />
+      </FormCard>
+    </OnboardingFormStep>
   )
 }

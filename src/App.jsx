@@ -39,9 +39,9 @@ const StatsScreen = lazy(loadStatsScreen)
 export default function KissWrappedApp() {
   const { screen, setScreen, navigateTo, resetTo, modalBackRef } = useAppNavigation()
 
-  // Notice shown on the dashboard right after the tutorial ends.
-  const [tutorialDoneOpen, setTutorialDoneOpen] = useState(false)
-  const closeTutorialDone = useCallback(() => setTutorialDoneOpen(false), [])
+  // Notice shown on the dashboard right after the onboarding ends.
+  const [onboardingDoneOpen, setOnboardingDoneOpen] = useState(false)
+  const closeOnboardingDone = useCallback(() => setOnboardingDoneOpen(false), [])
 
   const scrollRef = useRef(null)
 
@@ -246,7 +246,7 @@ export default function KissWrappedApp() {
    */
   function handleOnboardingComplete() {
     completeOnboarding()
-    setTutorialDoneOpen(true)
+    setOnboardingDoneOpen(true)
     resetTo(SCREENS.main)
   }
 
@@ -328,8 +328,8 @@ export default function KissWrappedApp() {
                   onRestartOnboarding={
                     FEATURES.onboarding ? () => navigateTo(SCREENS.onboarding) : undefined
                   }
-                  tutorialDoneOpen={tutorialDoneOpen}
-                  onCloseTutorialDone={closeTutorialDone}
+                  onboardingDoneOpen={onboardingDoneOpen}
+                  onCloseOnboardingDone={closeOnboardingDone}
                 />
               ) : null}
 

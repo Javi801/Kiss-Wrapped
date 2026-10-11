@@ -25,6 +25,13 @@ export function translatePartnerError(code, t) {
   return t.validDateMsg
 }
 
+// Fill the `{name}` placeholders of a text with the matching values. A placeholder without a value stays as written.
+export function fillPlaceholders(text, values) {
+  return text.replace(/\{(\w+)\}/g, (placeholder, name) =>
+    Object.prototype.hasOwnProperty.call(values, name) ? String(values[name]) : placeholder
+  )
+}
+
 // Check if an event is missing any required field.
 export function eventIsMissingRequired(event) {
   return !event.place?.trim() || !event.situation?.trim()

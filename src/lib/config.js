@@ -59,3 +59,15 @@ export const LIMITS = {
   // Entries in the "people with most events" ranking.
   topPeopleCount: 8,
 }
+
+// Onboarding tutorial timings, in milliseconds, and practice values.
+export const ONBOARDING = {
+  // Time an automatic tour scene stays on screen unless it sets its own `duration`.
+  sceneMs: 1800,
+  // Time a tour scene waits for its tap before it moves on by itself.
+  tapTimeoutMs: 8000,
+  // Time the intro stays on screen after the practice person is saved.
+  introSceneMs: 2000,
+  // Age of the practice person when the form has no valid one.
+  practiceAge: 25,
+}
