@@ -33,6 +33,7 @@ export const SCREENS = {
 // Reusable option lists used across forms and analytics.
 export const GENDERS = ['male', 'female', 'other']
 export const SCORE_OPTIONS = [0, 1, 2, 3, 4, 5]
+export const ACTIVITIES = ['studies', 'works', 'studies and works', 'other']
 
 // All available UI themes.
 export const PALETTES = {
