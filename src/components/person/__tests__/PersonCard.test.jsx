@@ -517,4 +517,32 @@ describe('PersonCard — onboarding guide', () => {
     expect(onAddEvent).toHaveBeenCalledOnce()
     expect(dialog()).toBeNull()
   })
+
+  it('hands the card tap to the guide', () => {
+    const onToggle = vi.fn()
+    renderCard({}, { guide: { expanded: false, tapTarget: 'card', onToggle } })
+    toggle()
+    expect(onToggle).toHaveBeenCalledOnce()
+    expect(actions.props).toBeNull()
+  })
+
+  it('leaves the card header reachable for the tour only while it points at it', () => {
+    const header = () => container.querySelector('button')
+    renderCard()
+    expect(header().hasAttribute('data-tour-target')).toBe(false)
+    expect(header().style.pointerEvents).toBe('')
+    act(() => root.unmount())
+    container.remove()
+
+    renderCard({}, { guide: { expanded: false, tapTarget: 'card' } })
+    expect(header().hasAttribute('data-tour-target')).toBe(true)
+    expect(header().style.pointerEvents).toBe('auto')
+    expect(header().style.position).toBe('relative')
+    act(() => root.unmount())
+    container.remove()
+
+    renderCard({}, { guide: { expanded: true, tapTarget: 'addEvent' } })
+    expect(header().hasAttribute('data-tour-target')).toBe(false)
+    expect(header().style.pointerEvents).toBe('')
+  })
 })

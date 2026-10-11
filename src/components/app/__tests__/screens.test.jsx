@@ -5,8 +5,15 @@ import { createRoot } from 'react-dom/client'
 import { COPY } from '@/lib/constants'
 
 const form = vi.hoisted(() => ({ props: null }))
+const tour = vi.hoisted(() => ({ props: null }))
 
 vi.mock('@/lib/theme', () => ({ usePalette: () => ({}) }))
+vi.mock('@/components/app/OnboardingTour', () => ({
+  default: (props) => {
+    tour.props = props
+    return <section data-tour="" />
+  },
+}))
 vi.mock('@/components/visuals/HeroVisualPlaceholder', () => ({ default: () => null }))
 vi.mock('@/components/visuals/InteractiveBubbles', () => ({ default: () => null }))
 vi.mock('@/components/forms/PersonForm', () => ({
@@ -42,8 +49,12 @@ const click = (node) =>
     node.dispatchEvent(new MouseEvent('click', { bubbles: true }))
   })
 
+// Ends the tour on screen, as its last scene does.
+const endTour = () => act(() => tour.props.onDone())
+
 beforeEach(() => {
   form.props = null
+  tour.props = null
 })
 
 afterEach(() => {
@@ -105,6 +116,24 @@ describe('IntroScreen', () => {
     expect(container.querySelectorAll('button, a')).toHaveLength(1)
     click(container.querySelector(`button[aria-label="${t.hiddenAccess}"]`))
     expect(onOpenMain).toHaveBeenCalledOnce()
+  })
+
+  it('leaves only the tapping hand of the entry guide when its callout is turned off', () => {
+    const onOpenMain = vi.fn()
+    render(<IntroScreen onOpenMain={onOpenMain} showEntryGuide entryGuideCallout={false} t={t} />)
+    expect(container.querySelector('h2')).toBeNull()
+    expect(container.textContent).not.toContain(t.entryGuideTitle)
+    expect(container.textContent).not.toContain(t.entryGuideBody)
+    expect(container.textContent).toContain('👆')
+    expect(container.querySelector('[data-entry-backdrop]')).not.toBeNull()
+    click(container.querySelector(`button[aria-label="${t.hiddenAccess}"]`))
+    expect(onOpenMain).toHaveBeenCalledOnce()
+  })
+
+  it('ignores the callout setting while the entry guide is hidden', () => {
+    render(<IntroScreen onOpenMain={() => {}} entryGuideCallout t={t} />)
+    expect(container.textContent).not.toContain(t.entryGuideTitle)
+    expect(container.textContent).not.toContain('👆')
   })
 })
 
@@ -261,9 +290,16 @@ describe('OnboardingWizard', () => {
     expect(container.querySelector('i').textContent).toBe('dark')
   })
 
-  it('shows the person form as the second step', () => {
-    render(<OnboardingWizard t={t} language="en" onComplete={() => {}} />)
+  it('shows the person step second: the home tour, then the person form', () => {
+    const wizardSettings = { theme: 'dark' }
+    render(<OnboardingWizard t={t} language="en" settings={wizardSettings} onComplete={() => {}} />)
     click(container.querySelector('button'))
+    expect(container.querySelector('[data-tour]')).not.toBeNull()
+    expect(container.querySelectorAll('button')).toHaveLength(0)
+    expect(tour.props).toMatchObject({ language: 'en', settings: wizardSettings })
+    expect(form.props).toBeNull()
+
+    endTour()
     expect(container.querySelector('h1').textContent).toBe(t.onboardingPersonTitle)
     expect(container.querySelectorAll('button')).toHaveLength(0)
     expect(form.props.language).toBe('en')
@@ -271,6 +307,8 @@ describe('OnboardingWizard', () => {
 })
 
 describe('OnboardingPersonStep', () => {
+  const settings = { theme: 'dark', iconColor: 'darkPink', statsVisible: false }
+
   function renderStep() {
     const onPracticePerson = vi.fn()
     const onNext = vi.fn()
@@ -278,6 +316,7 @@ describe('OnboardingPersonStep', () => {
       <OnboardingPersonStep
         t={t}
         language="en"
+        settings={settings}
         onPracticePerson={onPracticePerson}
         onNext={onNext}
       />
@@ -285,14 +324,53 @@ describe('OnboardingPersonStep', () => {
     return { onPracticePerson, onNext }
   }
 
-  it('explains the form above it', () => {
+  // Leaves the home phase, as the tap on the add-person button does.
+  function renderForm() {
+    const handlers = renderStep()
+    endTour()
+    return handlers
+  }
+
+  it('starts on the home screen, waiting for a tap on its add-person button', () => {
+    const { onPracticePerson, onNext } = renderStep()
+    expect(container.querySelector('[data-tour]')).not.toBeNull()
+    expect(container.querySelector('h1')).toBeNull()
+    expect(form.props).toBeNull()
+    expect(tour.props.scenes).toEqual([
+      { screen: 'home', note: 'onboardingTourAddNote', guideTarget: 'add' },
+    ])
+    expect(tour.props).toMatchObject({ t, language: 'en', settings })
+    expect(tour.props.person).toBeUndefined()
+    expect(onPracticePerson).not.toHaveBeenCalled()
+    expect(onNext).not.toHaveBeenCalled()
+  })
+
+  it('opens the form when the home tour ends, without moving on', () => {
+    const { onNext } = renderForm()
+    expect(container.querySelector('[data-tour]')).toBeNull()
+    expect(form.props).not.toBeNull()
+    expect(onNext).not.toHaveBeenCalled()
+  })
+
+  it('starts the form at its top', () => {
+    const scrollIntoView = vi.fn()
+    Element.prototype.scrollIntoView = scrollIntoView
     renderStep()
+    expect(scrollIntoView).not.toHaveBeenCalled()
+    endTour()
+    expect(scrollIntoView).toHaveBeenCalledExactlyOnceWith({ block: 'start' })
+    expect(scrollIntoView.mock.contexts[0].contains(container.querySelector('h1'))).toBe(true)
+    delete Element.prototype.scrollIntoView
+  })
+
+  it('explains the form above it', () => {
+    renderForm()
     expect(container.querySelector('h1').textContent).toBe(t.onboardingPersonTitle)
     expect(container.querySelector('p').textContent).toBe(t.onboardingPersonBody)
   })
 
   it('shows the empty add form with the skip action and the zodiac hint', () => {
-    renderStep()
+    renderForm()
     expect(form.props.initialValues).toBeUndefined()
     expect(form.props.mode).toBe('add')
     expect(form.props.includeHowWeMet).toBe(false)
@@ -302,16 +380,27 @@ describe('OnboardingPersonStep', () => {
     expect(form.props.zodiacHint).toBe(t.onboardingZodiacHint)
   })
 
-  it('keeps the saved person and moves on', () => {
-    const { onPracticePerson, onNext } = renderStep()
+  it('keeps the saved person and returns to the intro, which plays by itself', () => {
+    const { onPracticePerson, onNext } = renderForm()
     const person = { name: 'Mia' }
     act(() => form.props.onSave(person))
     expect(onPracticePerson).toHaveBeenCalledWith(person)
+    expect(onNext).not.toHaveBeenCalled()
+    expect(container.querySelector('h1')).toBeNull()
+    expect(container.querySelector('[data-tour]')).not.toBeNull()
+    expect(tour.props.scenes).toEqual([{ screen: 'intro', auto: true, duration: 2000 }])
+    expect(tour.props).toMatchObject({ t, language: 'en' })
+  })
+
+  it('moves on when the intro ends', () => {
+    const { onNext } = renderForm()
+    act(() => form.props.onSave({ name: 'Mia' }))
+    endTour()
     expect(onNext).toHaveBeenCalledOnce()
   })
 
-  it('completes what was typed when it is skipped', () => {
-    const { onPracticePerson, onNext } = renderStep()
+  it('completes what was typed when it is skipped, then returns to the intro', () => {
+    const { onPracticePerson, onNext } = renderForm()
     act(() => form.props.onSkip({ name: 'Mia', age: '', gender: 'female' }))
     expect(onPracticePerson).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -322,7 +411,8 @@ describe('OnboardingPersonStep', () => {
         zodiacSign: expect.any(String),
       })
     )
-    expect(onNext).toHaveBeenCalledOnce()
+    expect(onNext).not.toHaveBeenCalled()
+    expect(tour.props.scenes).toEqual([{ screen: 'intro', auto: true, duration: 2000 }])
   })
 })
 

@@ -71,4 +71,18 @@ describe('BottomNav', () => {
     expect(buttons()[0].style.position).toBe('relative')
     expect(buttons()[2].textContent).not.toContain('👆')
   })
+
+  it('marks no item as a tour target by default', () => {
+    render()
+    expect(container.querySelector('[data-tour-target]')).toBeNull()
+    expect(buttons().map((button) => button.style.pointerEvents)).toEqual(['', '', '', ''])
+  })
+
+  it('leaves only the guided item reachable for the tour, and still tappable', () => {
+    const onNavigate = render({ screen: 'people', guideTarget: 'main' })
+    expect([...container.querySelectorAll('[data-tour-target]')]).toEqual([buttons()[0]])
+    expect(buttons().map((button) => button.style.pointerEvents)).toEqual(['auto', '', '', ''])
+    act(() => buttons()[0].click())
+    expect(onNavigate).toHaveBeenCalledWith('main')
+  })
 })

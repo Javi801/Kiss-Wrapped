@@ -498,6 +498,35 @@ describe('HomeScreen — onboarding guide', () => {
     expect(find(t.viewEditPeople).style.position).toBe('relative')
     expect(find(t.addNewPerson).textContent).not.toContain('👆')
   })
+
+  it('puts the tap guide on the add-person button', () => {
+    render({ guideTarget: 'add' })
+    expect(find(t.addNewPerson).textContent).toContain('👆')
+    expect(find(t.addNewPerson).style.position).toBe('relative')
+    expect(find(t.viewEditPeople).textContent).not.toContain('👆')
+  })
+
+  it('marks no button as a tour target by default', () => {
+    render()
+    expect(container.querySelector('[data-tour-target]')).toBeNull()
+    expect(find(t.addNewPerson).style.pointerEvents).toBe('')
+    expect(find(t.viewEditPeople).style.pointerEvents).toBe('')
+  })
+
+  it.each([
+    ['add', t.addNewPerson, t.viewEditPeople],
+    ['people', t.viewEditPeople, t.addNewPerson],
+  ])(
+    'leaves only the guided %s button reachable for the tour, and still tappable',
+    async (guideTarget, guided, other) => {
+      render({ guideTarget })
+      expect([...container.querySelectorAll('[data-tour-target]')]).toEqual([find(guided)])
+      expect(find(guided).style.pointerEvents).toBe('auto')
+      expect(find(other).style.pointerEvents).toBe('')
+      await click(guided)
+      expect(handlers.onNavigate).toHaveBeenCalledWith(guideTarget)
+    }
+  )
 })
 
 describe('HomeScreen — app guide and tutorial', () => {
