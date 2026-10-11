@@ -19,6 +19,17 @@ export const ONBOARDING_DONE_KEY = 'kiss-wrapped-onboarding-done-v1'
 export const PEOPLE_FILE_NAME = 'kiss-wrapped-people.json'
 export const SETTINGS_FILE_NAME = 'kiss-wrapped-settings.json'
 
+// Screen names the app navigates between.
+export const SCREENS = {
+  boot: 'boot',
+  intro: 'intro',
+  main: 'main',
+  add: 'add',
+  people: 'people',
+  stats: 'stats',
+  onboarding: 'onboarding',
+}
+
 // Reusable option lists used across forms and analytics.
 export const GENDERS = ['male', 'female', 'other']
 export const SCORE_OPTIONS = [0, 1, 2, 3, 4, 5]

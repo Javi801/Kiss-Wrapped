@@ -2,7 +2,7 @@ import React, { Suspense, lazy, useEffect, useCallback, useRef, useState } from 
 import { motion, AnimatePresence } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 
-import { PALETTES, TEXT, COPY } from '@/lib/constants'
+import { PALETTES, TEXT, COPY, SCREENS } from '@/lib/constants'
 import { FEATURES } from '@/lib/config'
 import { ThemeProvider } from '@/lib/theme'
 import { CopyProvider } from '@/lib/copy'
@@ -126,7 +126,7 @@ export default function KissWrappedApp() {
     }
 
     setPeople([])
-    resetTo('intro')
+    resetTo(SCREENS.intro)
   }
 
   // Registers the place and situation values used by the given people's events as tags.
@@ -156,7 +156,7 @@ export default function KissWrappedApp() {
     registerHowWeMetTags([newPerson])
 
     // Return to the entry screen after saving.
-    resetTo('intro')
+    resetTo(SCREENS.intro)
   }
 
   // Updates a person's main profile fields.
@@ -247,12 +247,15 @@ export default function KissWrappedApp() {
   function handleOnboardingComplete() {
     completeOnboarding()
     setTutorialDoneOpen(true)
-    resetTo('main')
+    resetTo(SCREENS.main)
   }
 
   // Hide bottom navigation on screens that use a focused layout.
   const hideBottomBar =
-    screen === 'boot' || screen === 'add' || screen === 'intro' || screen === 'onboarding'
+    screen === SCREENS.boot ||
+    screen === SCREENS.add ||
+    screen === SCREENS.intro ||
+    screen === SCREENS.onboarding
 
   const palette = PALETTES[theme] ?? PALETTES.pink
 
@@ -305,7 +308,7 @@ export default function KissWrappedApp() {
               }}
             >
               {/* Main dashboard */}
-              {screen === 'main' ? (
+              {screen === SCREENS.main ? (
                 <HomeScreen
                   onNavigate={navigateTo}
                   onClearData={clearAllAppData}
@@ -323,7 +326,7 @@ export default function KissWrappedApp() {
                   includePartnerEvents={includePartnerEvents}
                   modalBackRef={modalBackRef}
                   onRestartOnboarding={
-                    FEATURES.onboarding ? () => navigateTo('onboarding') : undefined
+                    FEATURES.onboarding ? () => navigateTo(SCREENS.onboarding) : undefined
                   }
                   tutorialDoneOpen={tutorialDoneOpen}
                   onCloseTutorialDone={closeTutorialDone}
@@ -331,17 +334,17 @@ export default function KissWrappedApp() {
               ) : null}
 
               {/* Add person flow */}
-              {screen === 'add' ? (
+              {screen === SCREENS.add ? (
                 <AddPersonScreen
                   onSave={addPerson}
-                  onBack={() => setScreen('intro')}
+                  onBack={() => setScreen(SCREENS.intro)}
                   t={t}
                   language={language}
                 />
               ) : null}
 
               {/* People management screen */}
-              {screen === 'people' ? (
+              {screen === SCREENS.people ? (
                 <PeopleManagerScreen
                   people={people}
                   onUpdatePerson={updatePerson}
@@ -363,7 +366,7 @@ export default function KissWrappedApp() {
               ) : null}
 
               {/* Statistics screen */}
-              {screen === 'stats' ? (
+              {screen === SCREENS.stats ? (
                 <Suspense
                   fallback={
                     <div role="status" className="flex h-full items-center justify-center">
@@ -388,7 +391,7 @@ export default function KissWrappedApp() {
           </div>
         </div>
         {/* Full-screen overlays rendered outside the masked scroll area */}
-        {screen === 'onboarding' ? (
+        {screen === SCREENS.onboarding ? (
           <OnboardingWizard
             t={t}
             language={language}
@@ -396,7 +399,7 @@ export default function KissWrappedApp() {
             onComplete={handleOnboardingComplete}
           />
         ) : null}
-        {screen === 'intro' ? (
+        {screen === SCREENS.intro ? (
           <IntroScreen
             onOpenMain={() => navigateTo(onboardingPending ? 'onboarding' : 'main')}
             showEntryGuide={onboardingPending}
