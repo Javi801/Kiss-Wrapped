@@ -76,7 +76,7 @@ export default function BottomNav({ screen, onNavigate, tourTarget, t }) {
                 background: active
                   ? `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`
                   : 'transparent',
-                color: active ? '#ffffff' : PALETTE.textSoft,
+                color: active ? PALETTE.textOnAccent : PALETTE.textSoft,
               })}
             >
               {guided && <TapGuide />}

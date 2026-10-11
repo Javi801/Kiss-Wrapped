@@ -4,7 +4,7 @@ import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { COPY, SCREENS } from '@/lib/constants'
 
-vi.mock('@/lib/theme', () => ({ usePalette: () => ({}) }))
+vi.mock('@/lib/theme', () => ({ usePalette: () => ({ textOnAccent: 'rgb(255, 255, 255)' }) }))
 
 import BottomNav from '@/components/app/BottomNav'
 
