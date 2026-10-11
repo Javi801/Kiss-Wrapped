@@ -81,6 +81,23 @@ describe('DialogContent', () => {
     expect(overlay).not.toContain('z-[10003]')
   })
 
+  it('passes the overlay style to the overlay only', () => {
+    renderDialog({ overlayStyle: { backgroundColor: 'rgb(1, 2, 3)' } })
+    expect(slot('dialog-overlay').style.backgroundColor).toBe('rgb(1, 2, 3)')
+    expect(slot('dialog-content').style.backgroundColor).toBe('')
+  })
+
+  it('combines the overlay style with the overlay class name', () => {
+    renderDialog({ overlayClassName: 'z-[10002]', overlayStyle: { opacity: 0.5 } })
+    expect(slot('dialog-overlay').className.split(' ')).toContain('z-[10002]')
+    expect(slot('dialog-overlay').style.opacity).toBe('0.5')
+  })
+
+  it('leaves the overlay color to its class names by default', () => {
+    renderDialog()
+    expect(slot('dialog-overlay').style.backgroundColor).toBe('')
+  })
+
   it('keeps the default layer when no class names are given', () => {
     renderDialog()
     expect(slot('dialog-content').className.split(' ')).toContain('z-50')

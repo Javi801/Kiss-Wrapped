@@ -44,6 +44,7 @@ function focusContent(event) {
 function DialogContent({
   className,
   overlayClassName,
+  overlayStyle,
   children,
   showCloseButton = true,
   ...props
@@ -52,7 +53,7 @@ function DialogContent({
 
   return (
     <DialogPortal>
-      <DialogOverlay className={overlayClassName} />
+      <DialogOverlay className={overlayClassName} style={overlayStyle} />
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(

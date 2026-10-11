@@ -41,7 +41,7 @@ export default function IntroScreen({
           right: 0,
           bottom: 0,
           left: 0,
-          background: 'radial-gradient(circle at top, rgba(255,255,255,0.95), transparent 45%)',
+          background: `radial-gradient(circle at top, ${PALETTE.topGlow}, transparent 45%)`,
         }}
       />
 
@@ -90,7 +90,7 @@ export default function IntroScreen({
               position: 'absolute',
               inset: 0,
               zIndex: 5,
-              backgroundColor: 'rgba(24,14,34,0.6)',
+              backgroundColor: PALETTE.backdrop,
             }}
           />
         ) : null
