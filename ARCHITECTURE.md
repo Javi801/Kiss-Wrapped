@@ -33,9 +33,9 @@ src/
   shadcn-tailwind.css   Vendored copy of shadcn's `tailwind.css`, imported by index.css
   components/
     app/                Top-level screens and app-level widgets (Home, AddPerson, Intro,
-                        Onboarding, Privacy, ErrorBoundary, Color selector),
+                        Onboarding, Privacy, ErrorBoundary, Color selector), FormCard,
                         plus the sections and dialogs of the Home screen (HomeHeroCard,
-                        HomeActions, HomeSettingsDialogs, AboutDialog, AppGuideDialog, TutorialDoneDialog,
+                        HomeActions, HomeSettingsDialogs, AboutDialog, AppGuideDialog, OnboardingDoneDialog,
                         BottomNav, JsonExportDialogs, ImportDialogs, ImportPartnerDialogs)
     people/             People list screen (PeopleManagerScreen) and its parts: PeopleToolbar
                         (search, filter sheet), AlphabetIndex, PeopleGroupList, EmptyState, the
@@ -103,6 +103,7 @@ Rules that hold today and should be preserved:
 | `LANGUAGES`, `THEMES`, `ICON_COLORS` | Supported setting values. A persisted value outside these lists is ignored at boot |
 | `DEFAULT_SETTINGS` | Initial `language`, `theme`, `iconColor`, `statsVisible`, `includePartnerEvents` |
 | `LIMITS` | Input lengths, maximum age, and the size of the top-people ranking |
+| `ONBOARDING` | Tour scene timings in milliseconds (`sceneMs`, `tapTimeoutMs`, `introSceneMs`) and the age of the practice person (`practiceAge`) |
 
 Rules:
 
@@ -138,7 +139,7 @@ In practice the dictionary is passed down as a `t` prop almost everywhere; `useC
 
 ## Navigation
 
-There is no router. `screen` is a string and `App.jsx` conditionally renders one screen.
+There is no router. `screen` is one of the names in `SCREENS` (`lib/constants.js`) and `App.jsx` conditionally renders one screen. Code refers to a screen through `SCREENS`, never through a string literal.
 
 | Key | Screen | Notes |
 |---|---|---|
@@ -148,7 +149,7 @@ There is no router. `screen` is a string and `App.jsx` conditionally renders one
 | `add` | `AddPersonScreen` | Focused layout, no bottom bar |
 | `people` | `PeopleManagerScreen` | List, filters, person cards, event editing |
 | `stats` | `StatsScreen` | Four tabs: overview, time, people, scores |
-| `onboarding` | `OnboardingWizard` | Opened by the intro heart, instead of `main`, while the onboarding is pending, and from the settings to repeat it. Cannot be skipped; finishing it goes to `main` and opens `TutorialDoneDialog`. See [Onboarding](#onboarding) |
+| `onboarding` | `OnboardingWizard` | Opened by the intro heart, instead of `main`, while the onboarding is pending, and from the settings to repeat it. Cannot be skipped; finishing it goes to `main` and opens `OnboardingDoneDialog`. See [Onboarding](#onboarding) |
 
 - `useAppNavigation` (`hooks/useAppNavigation.js`) owns `screen`, the history stack, and `modalBackRef`.
 - `StatsScreen` is the only screen loaded on demand (`React.lazy` in `App.jsx`), which keeps the charting libraries out of the initial chunk. `App.jsx` fetches its chunk after the first render and renders a spinner as the `Suspense` fallback when the screen is opened before the chunk arrives.
@@ -165,10 +166,11 @@ There is no router. `screen` is a string and `App.jsx` conditionally renders one
 
 `OnboardingWizard` is a sandbox: it never reads or writes the saved people, so it can run on a new install and be repeated from the settings with real data present.
 
-- **Steps** are listed in `ONBOARDING_STEPS` and the step counter total follows that list. A step marked `ownsActions` renders its own buttons and advances through `onNext`; otherwise the wizard shows its next/finish button. The steps are the welcome (`OnboardingWelcomeStep`), the person form (`OnboardingPersonStep`), the tour to the person card (`OnboardingTourStep`), the event form (`OnboardingEventStep`), and the return to the home screen (`OnboardingHomeStep`).
-- **Practice data** lives only in the wizard state and is discarded when the wizard unmounts. The person and event steps reuse `PersonForm` and `EventForm` with a skip action; skipping completes what was typed through `completePracticePerson` and `completePracticeEvent` (`lib/onboarding.js`).
-- **Tours** (`OnboardingTour`) play a list of scenes over the real `HomeScreen` and `PeopleManagerScreen`, fed with the practice person. The screens are out of reach: taps are disabled and `setInertExcept` (`lib/inert.js`) makes everything inert per scene, except the speech bubbles and the control marked `data-tour-target`. A scene moves on by itself, from its own button, or from the add-event button of the person card. The screens take optional guide props (`guideTarget` and `guideHint` on `HomeScreen`, `cardGuide` on `PeopleManagerScreen`, `guide` on `PersonCard`, `guideTarget` on `BottomNav`) that show the tap guide (`visuals/TapGuide`) and speech bubbles (`forms/SpeechBubble`). None of them has any effect when it is not passed.
-- **Finish.** `handleOnboardingComplete` in `App.jsx` calls `completeOnboarding()`, resets the history to `main`, and opens `TutorialDoneDialog` on `HomeScreen` (`tutorialDoneOpen` / `onCloseTutorialDone`), a notice that points to the app guide in the settings. It runs on the first run and after a restart alike.
+- **Steps** are listed in `ONBOARDING_STEPS` and the step counter total follows that list. An entry is either a component, `{ Component, ownsActions }`, or a tour, `{ scenes }`. A component marked `ownsActions` renders its own buttons and advances through `onNext`; otherwise the wizard shows its next/finish button. A tour is played by `OnboardingTour` and advances when its last scene ends. The steps are the welcome (`OnboardingWelcomeStep`), the person form (`OnboardingPersonStep`), the tour to the person card (`PERSON_CARD_SCENES`), the event form (`OnboardingEventStep`), and the return to the home screen (`HOME_HINT_SCENES`).
+- **Practice data** lives only in the wizard state and is discarded when the wizard unmounts. The person and event steps reuse `PersonForm` and `EventForm` with a skip action; skipping completes what was typed through `completePracticePerson` and `completePracticeEvent` (`lib/onboarding.js`). Both steps share their layout (`OnboardingFormStep`, with the `FormCard` that `AddPersonScreen` also uses) and play a tour before or after the form.
+- **Tours** (`OnboardingTour`) play a list of scenes over the real `HomeScreen`, `PeopleManagerScreen` and `IntroScreen`, fed with the practice person, with `BottomNav` when a scene asks for it. Every scene list lives in `components/app/onboardingScenes.js`; the scene shape is documented in `OnboardingTour`. A scene names its screen with `SCREENS`, and what it points at with the screen a button or bottom-bar item leads to, or with `TOUR_TARGETS` (`lib/onboarding.js`) for what is not a screen; its texts are translation keys. A scene naming a screen the tour does not know renders none. The screens are out of reach: taps are disabled and `setInertExcept` (`lib/inert.js`) makes everything inert per scene, except the speech bubbles and the control marked `data-tour-target`. A scene moves on by itself after `duration` or `ONBOARDING.sceneMs`, from its own button, or from a tap on the control it points at; a scene waiting for a tap moves on by itself after `ONBOARDING.tapTimeoutMs` unless it is `tapOnly`. The screens take optional tour props (`tourTarget` and `tourHint` on `HomeScreen`, `cardTour` on `PeopleManagerScreen`, `tour` on `PersonCard`, `tourTarget` on `BottomNav`) that show the tap guide (`visuals/TapGuide`) and speech bubbles (`forms/SpeechBubble`). None of them has any effect when it is not passed.
+- **Tour hooks** are defined once in `lib/onboarding.js`: `tourTargetProps(guided, style)` returns the `style` and the `data-tour-target` attribute of a control the tour can point at, `SPEECH_BUBBLE_ROLE` is the role of the speech bubbles, `TOUR_KEEP_SELECTOR` is what stays reachable, and `TOUR_LAYERS` is the stacking order of the wizard, the backdrop of a hinted scene, the raised controls and bubbles, and the tour button.
+- **Finish.** `handleOnboardingComplete` in `App.jsx` calls `completeOnboarding()`, resets the history to `main`, and opens `OnboardingDoneDialog` on `HomeScreen` (`onboardingDoneOpen` / `onCloseOnboardingDone`), a notice that points to the app guide in the settings. It runs on the first run and after a restart alike.
 - **Restart.** `HomeScreen` receives `onRestartOnboarding` only while `FEATURES.onboarding` is on; it navigates to `onboarding` without touching `onboardingDone`, so the hardware back button returns to `main`.
 - **App guide.** `AppGuideDialog`, opened from the settings, renders `APP_GUIDE_SECTIONS` (`components/app/appGuideSections.js`): each entry is an icon plus translation keys for a title and its texts.
 
@@ -209,7 +211,7 @@ Invariants:
 
 - **Dates are `yyyy.MM.dd` strings everywhere.** They sort and compare correctly as plain strings; the code relies on this. Parse and validate only through `lib/date.js` and `lib/calendar.js`.
 - **Age is never stored.** It is computed at runtime from `birthYear` and the zodiac sign's end date (`calculateAge`, `calculateAgeAtEvent`). Use the `effectiveAge*` helpers in `lib/date.js` from UI code; they also handle legacy records that still carry a static `age`.
-- **Gender and activity are stored as language-neutral keys** and translated at render time with `translateGender` / `translateActivity`.
+- **Gender and activity are stored as language-neutral keys** (`GENDERS` and `ACTIVITIES` in `lib/constants.js`) and translated at render time with `translateGender` / `translateActivity`.
 - **`zodiacSign` is stored as the full localized string.** Its leading emoji is the language-independent key; convert between languages with `getZodiacForLanguage`, and get a display label with `getShortZodiacLabel`.
 - **Scores are validated with `hasScore`.** Anything that is not an integer 0–5 is normalized to `null` on write and on load.
 - **Partner fields are validated in `lib/partner.js`.** `validatePartnerFields` is the single set of rules (valid `yyyy.MM.dd` dates, none in the future, `partnerFrom` on or before `partnerTo`, and `past` requires `partnerTo`). It returns error codes, which `translatePartnerError` in `lib/format.js` turns into text. `PersonForm` and the import fix table both use it through `PartnerFields`. `PersonForm` renders `PartnerFields` only when it receives `includePartner`, which the edit dialog in `PersonCardDialogs` passes and `AddPersonScreen` does not: every person is created as `never`, and the status is changed only by editing the person from the people list. `never` is a complete value, so it never marks a person as incomplete. `partnerFrom` is kept only for `current` and `past`, and `partnerTo` only for `past`.
@@ -254,7 +256,7 @@ All of these follow the same sequence: write to `Directory.Cache` → `Filesyste
 ## Theming and styling
 
 - Three palettes: `pink`, `green`, `dark`, defined in `PALETTES` in `lib/constants.js`. Every palette must define the same keys. The default theme is `DEFAULT_SETTINGS.theme` in `lib/config.js`.
-- Components read colors with `usePalette()` and apply them through inline `style` objects. Typography uses the `TEXT` scale from `lib/constants.js`, spread into styles. Do not hardcode colors or font sizes in components.
+- Components read colors with `usePalette()` and apply them through inline `style` objects. Typography uses the `TEXT` scale from `lib/constants.js`, spread into styles. Do not hardcode colors or font sizes in components. Overlay and shadow colors are palette keys too (`backdrop`, `topGlow`, `calloutBg`, `calloutShadow`, `shadow`, `shadowStrong`); `DialogContent` takes `overlayStyle` to color its overlay from the palette.
 - Tailwind classes are used mainly inside `components/ui/` and for a few utilities such as border radius. `cn()` from `lib/utils.js` merges class names.
 - When the theme is `dark`, `App.jsx` also toggles the `dark` class on `<html>` so shadcn components rendered in portals pick up dark styles.
 - `PALETTE` (the pink palette) is exported for non-React modules such as `pdf-export.js`.
@@ -296,7 +298,7 @@ Privacy mechanisms, in addition to the above:
 | Task | Touch |
 |---|---|
 | Enable, disable, or add a feature flag | `FEATURES` in `lib/config.js`, plus its pinned value in `config.test.js` |
-| Change a default setting, a length limit, or app metadata | `lib/config.js` |
+| Change a default setting, a length limit, an onboarding timing, or app metadata | `lib/config.js` |
 | Add or change a UI string | `lib/translations/en.js` and `lib/translations/es.js` |
 | Add a palette color token | Every palette in `PALETTES` |
 | Add a theme or a language | `PALETTES` in `lib/constants.js`, or a new file in `lib/translations/` added to `COPY` plus `ZODIAC_OPTIONS` in `lib/constants.js`, and the matching list in `lib/config.js` |
@@ -305,8 +307,9 @@ Privacy mechanisms, in addition to the above:
 | Add a persisted setting | Default in `DEFAULT_SETTINGS` (`lib/config.js`), state, boot validation, and the save effect in `hooks/usePersistedAppState.js`, the prop wiring in `App.jsx`, and `loadSettings` + `saveSettings` (both native and web branches) in `lib/device-storage.js` |
 | Add a statistic | Aggregation function in `lib/stats.js` with unit tests, called from the relevant stats tab (and from `getStatsData` if the PDF should show it); choose `people` vs `eventPeople` deliberately |
 | Add a chart type | New generic card in `components/charts/`, wrapped in `FullscreenChartWrapper` |
-| Add a screen | New key in the `screen` conditional in `App.jsx`, `navItems` and `hideBottomBar` if relevant |
-| Add an onboarding step | A step component in `components/app/`, added to `ONBOARDING_STEPS` in `OnboardingWizard.jsx`; a tour step is a scene list handed to `OnboardingTour` |
+| Add a screen | New name in `SCREENS` (`lib/constants.js`), its branch in the `screen` conditional in `App.jsx`, `navItems` and `hideBottomBar` if relevant |
+| Add an onboarding step | A step component in `components/app/`, added to `ONBOARDING_STEPS` in `OnboardingWizard.jsx`; a tour step is a scene list in `onboardingScenes.js`, added as a `{ scenes }` entry |
+| Let the onboarding tour point at a new control | `tourTargetProps` and `TapGuide` on the control, a name in `TOUR_TARGETS` when it is not a screen, and a scene in `onboardingScenes.js` |
 | Add a section to the app guide | An entry in `APP_GUIDE_SECTIONS` and its texts in every file of `lib/translations/` |
 | Add a dialog or sheet | Register a close callback on `modalBackRef` while open |
 | Add date or age logic | `lib/date.js` with unit tests; never inline date parsing in components |
