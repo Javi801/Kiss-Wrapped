@@ -17,7 +17,7 @@ import usePersonCardModals from '@/components/person/usePersonCardModals'
  * Displays a person card with expandable event history.
  * Handles editing, deleting, and event management.
  * `guide` puts the card under the onboarding tour, which then decides whether it is
- * expanded: `{ expanded, tapTarget: 'card' | 'addEvent', editHint, eventHint, onAddEvent }`.
+ * expanded: `{ expanded, tapTarget: 'card' | 'addEvent', editHint, eventHint, onToggle, onAddEvent }`.
  */
 export default function PersonCard({
   person,
@@ -74,7 +74,7 @@ export default function PersonCard({
             <PersonCardHeader
               person={person}
               expanded={expanded}
-              onToggle={() => setExpanded((v) => !v)}
+              onToggle={guide?.onToggle ?? (() => setExpanded((v) => !v))}
               hasIncompleteEvent={hasIncompleteEvent}
               showTapGuide={guide?.tapTarget === 'card'}
               t={t}

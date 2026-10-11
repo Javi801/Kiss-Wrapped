@@ -28,8 +28,8 @@ import TutorialDoneDialog from '@/components/app/TutorialDoneDialog'
  * It shows summary metrics, primary actions, and app-level settings.
  * `onRestartOnboarding` adds the restart-tutorial action to the settings.
  * `tutorialDoneOpen` shows the notice that follows the tutorial; `onCloseTutorialDone` closes it.
- * For the onboarding tour, `guideTarget` names what it points at (`'people'`, `'data'`
- * or `'settings'`) and `guideHint` (`{ title, body }`) is the text for the last two.
+ * For the onboarding tour, `guideTarget` names what it points at (`'add'`, `'people'`,
+ * `'data'` or `'settings'`) and `guideHint` (`{ title, body }`) is the text for the last two.
  */
 export default function MainScreen({
   onNavigate,

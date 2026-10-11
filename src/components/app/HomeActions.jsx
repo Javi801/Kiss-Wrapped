@@ -17,7 +17,8 @@ const dataButtonLabelStyle = {
 /**
  * Action buttons of the main screen: navigation to the other screens and the
  * data section (export, import and clear). For the onboarding tour,
- * `guideTarget="people"` shows the tap guide on the people button and
+ * `guideTarget` (`'add'` or `'people'`) shows the tap guide on that button, the
+ * only one the tour then leaves reachable (`data-tour-target`), and
  * `dataHint` (`{ title, body }`) a speech bubble over export and import, which
  * are then lifted above the tour backdrop.
  */
@@ -51,6 +52,9 @@ export default function HomeActions({
     backgroundColor: PALETTE.controlBg,
   }
 
+  // The button the tour points at holds the tap guide and still takes taps.
+  const guidedStyle = { position: 'relative', pointerEvents: 'auto' }
+
   // Solid and above the tour backdrop while the data hint points at them.
   const hintedButtonStyle = dataHint
     ? { ...dataButtonStyle, position: 'relative', zIndex: 2, backgroundColor: PALETTE.card }
@@ -67,9 +71,12 @@ export default function HomeActions({
           color: PALETTE.textOnAccent,
           boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
           background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
+          ...(guideTarget === 'add' ? guidedStyle : null),
         }}
+        data-tour-target={guideTarget === 'add' ? '' : undefined}
         onClick={() => onNavigate('add')}
       >
+        {guideTarget === 'add' && <TapGuide />}
         <UserPlus style={{ marginRight: '0.75rem', height: '1.25rem', width: '1.25rem' }} />
         {t.addNewPerson}
       </Button>
@@ -78,10 +85,9 @@ export default function HomeActions({
         variant="outline"
         className="rounded-3xl"
         style={
-          guideTarget === 'people'
-            ? { ...outlineActionStyle, position: 'relative' }
-            : outlineActionStyle
+          guideTarget === 'people' ? { ...outlineActionStyle, ...guidedStyle } : outlineActionStyle
         }
+        data-tour-target={guideTarget === 'people' ? '' : undefined}
         onClick={() => onNavigate('people')}
       >
         {guideTarget === 'people' && <TapGuide />}

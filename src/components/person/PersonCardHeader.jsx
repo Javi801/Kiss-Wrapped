@@ -10,7 +10,8 @@ import TapGuide from '@/components/visuals/TapGuide'
 
 /**
  * Always-visible header of a person card: name, badges, basic info and the
- * expand/collapse toggle.
+ * expand/collapse toggle. For the onboarding tour, `showTapGuide` puts the tap
+ * guide on it and leaves it reachable (`data-tour-target`).
  */
 export default function PersonCardHeader({
   person,
@@ -32,8 +33,9 @@ export default function PersonCardHeader({
         gap: '0.75rem',
         padding: '1.25rem',
         textAlign: 'left',
-        position: showTapGuide ? 'relative' : undefined,
+        ...(showTapGuide ? { position: 'relative', pointerEvents: 'auto' } : null),
       }}
+      data-tour-target={showTapGuide ? '' : undefined}
       onClick={onToggle}
     >
       {showTapGuide && <TapGuide />}

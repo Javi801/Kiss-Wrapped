@@ -10,7 +10,8 @@ import TapGuide from '@/components/visuals/TapGuide'
  * Props:
  *  - screen       Active screen key
  *  - onNavigate   Called with the key of the tapped item
- *  - guideTarget  Key of the item the onboarding tour points at
+ *  - guideTarget  Key of the item the onboarding tour points at, the only one it
+ *                 leaves reachable (`data-tour-target`)
  */
 export default function BottomNav({ screen, onNavigate, guideTarget, t }) {
   const PALETTE = usePalette()
@@ -57,6 +58,7 @@ export default function BottomNav({ screen, onNavigate, guideTarget, t }) {
             <button
               key={item.key}
               onClick={() => onNavigate(item.key)}
+              data-tour-target={guided ? '' : undefined}
               className="rounded-2xl"
               style={{
                 display: 'flex',
@@ -75,7 +77,7 @@ export default function BottomNav({ screen, onNavigate, guideTarget, t }) {
                   ? `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`
                   : 'transparent',
                 color: active ? '#ffffff' : PALETTE.textSoft,
-                position: guided ? 'relative' : undefined,
+                ...(guided ? { position: 'relative', pointerEvents: 'auto' } : null),
               }}
             >
               {guided && <TapGuide />}
