@@ -401,7 +401,7 @@ export default function KissWrappedApp() {
         ) : null}
         {screen === SCREENS.intro ? (
           <IntroScreen
-            onOpenMain={() => navigateTo(onboardingPending ? 'onboarding' : 'main')}
+            onOpenMain={() => navigateTo(onboardingPending ? SCREENS.onboarding : SCREENS.main)}
             showEntryGuide={onboardingPending}
             t={t}
           />

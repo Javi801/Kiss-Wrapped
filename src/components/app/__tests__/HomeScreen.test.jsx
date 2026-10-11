@@ -2,14 +2,15 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
-import { COPY } from '@/lib/constants'
+import { COPY, SCREENS } from '@/lib/constants'
 import { APP_GITHUB_REPO, APP_VERSION } from '@/lib/config'
+import { TOUR_LAYERS, TOUR_TARGETS } from '@/lib/onboarding'
 
 const mockStorage = vi.hoisted(() => ({ exportPeopleJson: vi.fn() }))
 const mockPdf = vi.hoisted(() => ({ saveErrorLog: vi.fn() }))
-const seen = vi.hoisted(() => ({ tiles: [], colors: null, openDialogs: [] }))
+const seen = vi.hoisted(() => ({ tiles: [], colors: null, openDialogs: [], dialogContent: null }))
 
-vi.mock('@/lib/theme', () => ({ usePalette: () => ({}) }))
+vi.mock('@/lib/theme', () => ({ usePalette: () => ({ backdrop: 'rgb(1, 2, 3)' }) }))
 vi.mock('@/lib/device-storage', () => mockStorage)
 vi.mock('@/lib/pdf-export', () => mockPdf)
 vi.mock('@/components/app/ColorSelector', () => ({
@@ -24,7 +25,7 @@ vi.mock('@/components/shared/StatTile', () => ({
     return null
   },
 }))
-// Only open dialogs render, each exposing its onOpenChange handler.
+// Only open dialogs render, each exposing its onOpenChange handler and the props of its content.
 vi.mock('@/components/ui/dialog', async () => {
   const { createElement } = await import('react')
   const passthrough = ({ children }) => children
@@ -34,7 +35,10 @@ vi.mock('@/components/ui/dialog', async () => {
       seen.openDialogs.push(onOpenChange)
       return createElement('div', { 'data-dialog': true }, children)
     },
-    DialogContent: passthrough,
+    DialogContent: ({ children, ...props }) => {
+      seen.dialogContent = props
+      return children
+    },
     DialogHeader: passthrough,
     DialogTitle: passthrough,
     DialogDescription: passthrough,
@@ -116,6 +120,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   seen.colors = null
   seen.openDialogs = []
+  seen.dialogContent = null
   mockStorage.exportPeopleJson.mockResolvedValue({
     fileName: 'kiss-wrapped-data-2024-01-01.json',
     isNative: true,
@@ -166,9 +171,9 @@ describe('HomeScreen — summary', () => {
 
 describe('HomeScreen — navigation', () => {
   it.each([
-    ['add', t.addNewPerson],
-    ['people', t.viewEditPeople],
-    ['stats', t.viewStatistics],
+    [SCREENS.add, t.addNewPerson],
+    [SCREENS.people, t.viewEditPeople],
+    [SCREENS.stats, t.viewStatistics],
   ])('opens the %s screen', async (screen, label) => {
     render()
     await click(label)
@@ -486,21 +491,21 @@ describe('HomeScreen — hardware back button and dismissal', () => {
   })
 })
 
-describe('HomeScreen — onboarding guide', () => {
+describe('HomeScreen — onboarding tour', () => {
   it('shows no tap guide by default', () => {
     render()
     expect(container.textContent).not.toContain('👆')
   })
 
   it('puts the tap guide on the people button', () => {
-    render({ guideTarget: 'people' })
+    render({ tourTarget: SCREENS.people })
     expect(find(t.viewEditPeople).textContent).toContain('👆')
     expect(find(t.viewEditPeople).style.position).toBe('relative')
     expect(find(t.addNewPerson).textContent).not.toContain('👆')
   })
 
   it('puts the tap guide on the add-person button', () => {
-    render({ guideTarget: 'add' })
+    render({ tourTarget: SCREENS.add })
     expect(find(t.addNewPerson).textContent).toContain('👆')
     expect(find(t.addNewPerson).style.position).toBe('relative')
     expect(find(t.viewEditPeople).textContent).not.toContain('👆')
@@ -514,22 +519,22 @@ describe('HomeScreen — onboarding guide', () => {
   })
 
   it.each([
-    ['add', t.addNewPerson, t.viewEditPeople],
-    ['people', t.viewEditPeople, t.addNewPerson],
+    [SCREENS.add, t.addNewPerson, t.viewEditPeople],
+    [SCREENS.people, t.viewEditPeople, t.addNewPerson],
   ])(
     'leaves only the guided %s button reachable for the tour, and still tappable',
-    async (guideTarget, guided, other) => {
-      render({ guideTarget })
+    async (tourTarget, guided, other) => {
+      render({ tourTarget })
       expect([...container.querySelectorAll('[data-tour-target]')]).toEqual([find(guided)])
       expect(find(guided).style.pointerEvents).toBe('auto')
       expect(find(other).style.pointerEvents).toBe('')
       await click(guided)
-      expect(handlers.onNavigate).toHaveBeenCalledWith(guideTarget)
+      expect(handlers.onNavigate).toHaveBeenCalledWith(tourTarget)
     }
   )
 })
 
-describe('HomeScreen — app guide and tutorial', () => {
+describe('HomeScreen — app guide and onboarding restart', () => {
   it('moves from settings to the app guide', async () => {
     render()
     await click(t.settings)
@@ -553,17 +558,17 @@ describe('HomeScreen — app guide and tutorial', () => {
     expect(modalBackRef.current).toBeNull()
   })
 
-  it('offers no tutorial restart unless it can be restarted', async () => {
+  it('offers no onboarding restart unless it can be restarted', async () => {
     render()
     await click(t.settings)
-    expect(find(t.restartTutorial, dialog())).toBeUndefined()
+    expect(find(t.restartOnboarding, dialog())).toBeUndefined()
   })
 
-  it('restarts the tutorial from settings and closes them', async () => {
+  it('restarts the onboarding from settings and closes them', async () => {
     const onRestartOnboarding = vi.fn()
     render({ onRestartOnboarding })
     await click(t.settings)
-    await click(t.restartTutorial, dialog())
+    await click(t.restartOnboarding, dialog())
     expect(onRestartOnboarding).toHaveBeenCalledOnce()
     expect(dialog()).toBeNull()
   })
@@ -574,19 +579,19 @@ describe('HomeScreen — onboarding hints', () => {
   const notes = () => [...container.querySelectorAll('[role="note"]')]
 
   it('shows no hint by default, even with a hint text', () => {
-    render({ guideHint: hint })
+    render({ tourHint: hint })
     expect(notes()).toHaveLength(0)
   })
 
   it('shows the data hint right above the data buttons', () => {
-    render({ guideTarget: 'data', guideHint: hint })
+    render({ tourTarget: TOUR_TARGETS.data, tourHint: hint })
     expect(notes()).toHaveLength(1)
     expect(notes()[0].textContent).toBe('Hint titleHint body')
     expect(notes()[0].nextElementSibling.contains(find(t.exportJsonLabel))).toBe(true)
   })
 
   it('shows the settings hint inside the hero card, pointing at its right side', () => {
-    render({ guideTarget: 'settings', guideHint: hint })
+    render({ tourTarget: TOUR_TARGETS.settings, tourHint: hint })
     expect(notes()).toHaveLength(1)
     expect(notes()[0].textContent).toBe('Hint titleHint body')
     expect(notes()[0].querySelector('[aria-hidden="true"]').style.right).not.toBe('')
@@ -598,7 +603,7 @@ describe('HomeScreen — onboarding hints', () => {
 
 describe('HomeScreen — onboarding spotlight', () => {
   const hint = { title: 'Hint title', body: 'Hint body' }
-  const lifted = (node) => node.style.zIndex === '2'
+  const lifted = (node) => node.style.zIndex === String(TOUR_LAYERS.raised)
 
   it('lifts nothing by default', () => {
     render()
@@ -606,7 +611,7 @@ describe('HomeScreen — onboarding spotlight', () => {
   })
 
   it('lifts the data hint with export and import, but not clear', () => {
-    render({ guideTarget: 'data', guideHint: hint })
+    render({ tourTarget: TOUR_TARGETS.data, tourHint: hint })
     expect(lifted(container.querySelector('[role="note"]'))).toBe(true)
     expect(lifted(find(t.exportJsonLabel))).toBe(true)
     expect(lifted(find(t.importJsonLabel))).toBe(true)
@@ -615,7 +620,7 @@ describe('HomeScreen — onboarding spotlight', () => {
   })
 
   it('lifts the settings hint with the settings button only', () => {
-    render({ guideTarget: 'settings', guideHint: hint })
+    render({ tourTarget: TOUR_TARGETS.settings, tourHint: hint })
     expect(lifted(container.querySelector('[role="note"]'))).toBe(true)
     expect(lifted(find(t.settings))).toBe(true)
     expect(lifted(find(t.language))).toBe(false)
@@ -623,28 +628,34 @@ describe('HomeScreen — onboarding spotlight', () => {
   })
 })
 
-describe('HomeScreen — tutorial done notice', () => {
+describe('HomeScreen — onboarding done notice', () => {
   it('stays hidden by default', () => {
     render()
     expect(dialog()).toBeNull()
   })
 
   it('shows the notice and closes it from its button', async () => {
-    const onCloseTutorialDone = vi.fn()
-    render({ tutorialDoneOpen: true, onCloseTutorialDone })
-    expect(dialog().textContent).toContain(t.tutorialDoneTitle)
-    expect(dialog().textContent).toContain(t.tutorialDoneBody)
-    await click(t.tutorialDoneAction, dialog())
-    expect(onCloseTutorialDone).toHaveBeenCalledOnce()
+    const onCloseOnboardingDone = vi.fn()
+    render({ onboardingDoneOpen: true, onCloseOnboardingDone })
+    expect(dialog().textContent).toContain(t.onboardingDoneTitle)
+    expect(dialog().textContent).toContain(t.onboardingDoneBody)
+    await click(t.onboardingDoneAction, dialog())
+    expect(onCloseOnboardingDone).toHaveBeenCalledOnce()
+  })
+
+  it('dims the screen behind the notice with the tour backdrop and offers no close button', () => {
+    render({ onboardingDoneOpen: true, onCloseOnboardingDone: vi.fn() })
+    expect(seen.dialogContent.overlayStyle).toEqual({ backgroundColor: 'rgb(1, 2, 3)' })
+    expect(seen.dialogContent.showCloseButton).toBe(false)
   })
 
   it('closes the notice when it is dismissed or from the back button', () => {
-    const onCloseTutorialDone = vi.fn()
-    render({ tutorialDoneOpen: true, onCloseTutorialDone })
+    const onCloseOnboardingDone = vi.fn()
+    render({ onboardingDoneOpen: true, onCloseOnboardingDone })
     act(() => seen.openDialogs.at(-1)(true))
-    expect(onCloseTutorialDone).not.toHaveBeenCalled()
+    expect(onCloseOnboardingDone).not.toHaveBeenCalled()
     act(() => seen.openDialogs.at(-1)(false))
     act(() => modalBackRef.current())
-    expect(onCloseTutorialDone).toHaveBeenCalledTimes(2)
+    expect(onCloseOnboardingDone).toHaveBeenCalledTimes(2)
   })
 })

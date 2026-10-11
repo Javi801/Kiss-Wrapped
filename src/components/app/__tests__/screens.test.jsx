@@ -2,10 +2,12 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
-import { COPY } from '@/lib/constants'
+import { COPY, SCREENS } from '@/lib/constants'
+import { ONBOARDING } from '@/lib/config'
 
 const form = vi.hoisted(() => ({ props: null }))
 const tour = vi.hoisted(() => ({ props: null }))
+const eventForm = vi.hoisted(() => ({ props: null }))
 
 vi.mock('@/lib/theme', () => ({ usePalette: () => ({}) }))
 vi.mock('@/components/app/OnboardingTour', () => ({
@@ -23,10 +25,24 @@ vi.mock('@/components/forms/PersonForm', () => ({
   },
 }))
 
+vi.mock('@/components/forms/EventForm', () => ({
+  default: (props) => {
+    eventForm.props = props
+    return null
+  },
+}))
+
 import IntroScreen from '@/components/app/IntroScreen'
 import AddPersonScreen from '@/components/app/AddPersonScreen'
 import OnboardingWizard from '@/components/app/OnboardingWizard'
 import OnboardingPersonStep from '@/components/app/OnboardingPersonStep'
+import {
+  ADD_PERSON_SCENES,
+  HOME_HINT_SCENES,
+  INTRO_SCENES,
+  PERSON_CARD_SCENES,
+  SAVED_EVENT_SCENES,
+} from '@/components/app/onboardingScenes'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
@@ -55,6 +71,7 @@ const endTour = () => act(() => tour.props.onDone())
 beforeEach(() => {
   form.props = null
   tour.props = null
+  eventForm.props = null
 })
 
 afterEach(() => {
@@ -304,6 +321,153 @@ describe('OnboardingWizard', () => {
     expect(container.querySelectorAll('button')).toHaveLength(0)
     expect(form.props.language).toBe('en')
   })
+
+  it('plays its steps in order: the person, its card, the event and the home hints', () => {
+    const onComplete = vi.fn()
+    const wizardSettings = { theme: 'dark' }
+    render(
+      <OnboardingWizard t={t} language="en" settings={wizardSettings} onComplete={onComplete} />
+    )
+    click(container.querySelector('button'))
+    expect(tour.props.scenes).toBe(ADD_PERSON_SCENES)
+    endTour()
+    act(() => form.props.onSave({ name: 'Mia' }))
+    expect(tour.props.scenes).toBe(INTRO_SCENES)
+    endTour()
+
+    // The tour of the person card, played by the wizard itself.
+    expect(tour.props).toMatchObject({
+      scenes: PERSON_CARD_SCENES,
+      person: { name: 'Mia' },
+      t,
+      language: 'en',
+      settings: wizardSettings,
+    })
+    expect(container.querySelectorAll('button')).toHaveLength(0)
+    expect(eventForm.props).toBeNull()
+    endTour()
+
+    expect(container.querySelector('h1').textContent).toBe(t.onboardingEventTitle)
+    const eventsBefore = tour.props.person.events.length
+    act(() => eventForm.props.onSave({ place: 'Park' }))
+    expect(tour.props.scenes).toBe(SAVED_EVENT_SCENES)
+    endTour()
+
+    // The tour of the home hints, last: its end completes the wizard.
+    expect(tour.props.scenes).toBe(HOME_HINT_SCENES)
+    expect(tour.props.person.events).toHaveLength(eventsBefore + 1)
+    expect(tour.props.person.events[0]).toMatchObject({ place: 'Park' })
+    expect(container.querySelectorAll('button')).toHaveLength(0)
+    expect(onComplete).not.toHaveBeenCalled()
+    endTour()
+    expect(onComplete).toHaveBeenCalledOnce()
+  })
+})
+
+describe('OnboardingWizard — tour steps', () => {
+  const step = (Component, ownsActions = false) => ({ Component, ownsActions })
+  const scenes = [{ screen: SCREENS.main, auto: true }]
+  const otherScenes = [{ screen: SCREENS.people, auto: true }]
+
+  it('plays the scenes of a tour step, leaving the buttons to the tour', () => {
+    const wizardSettings = { theme: 'dark' }
+    render(
+      <OnboardingWizard
+        t={t}
+        language="es"
+        settings={wizardSettings}
+        onComplete={() => {}}
+        steps={[{ scenes }, step(() => <i>two</i>)]}
+      />
+    )
+    expect(container.querySelector('[data-tour]')).not.toBeNull()
+    expect(container.querySelectorAll('button')).toHaveLength(0)
+    expect(tour.props.scenes).toBe(scenes)
+    expect(tour.props).toMatchObject({ t, language: 'es', settings: wizardSettings })
+    expect(tour.props.person).toBeNull()
+  })
+
+  it('counts a tour step as any other step', () => {
+    render(
+      <OnboardingWizard t={t} onComplete={() => {}} steps={[{ scenes }, { scenes: otherScenes }]} />
+    )
+    expect(container.textContent).toContain(
+      t.onboardingStepCount.replace('{current}', 1).replace('{total}', 2)
+    )
+    endTour()
+    expect(container.textContent).toContain(
+      t.onboardingStepCount.replace('{current}', 2).replace('{total}', 2)
+    )
+  })
+
+  it('advances when the tour ends', () => {
+    const onComplete = vi.fn()
+    render(
+      <OnboardingWizard
+        t={t}
+        onComplete={onComplete}
+        steps={[{ scenes }, step(() => <i>two</i>)]}
+      />
+    )
+    endTour()
+    expect(onComplete).not.toHaveBeenCalled()
+    expect(container.querySelector('[data-tour]')).toBeNull()
+    expect(container.querySelector('i').textContent).toBe('two')
+    expect(container.querySelector('button').textContent).toBe(t.onboardingFinish)
+  })
+
+  it('moves from one tour step to the next', () => {
+    const onComplete = vi.fn()
+    render(
+      <OnboardingWizard
+        t={t}
+        onComplete={onComplete}
+        steps={[{ scenes }, { scenes: otherScenes }]}
+      />
+    )
+    endTour()
+    expect(tour.props.scenes).toBe(otherScenes)
+    expect(container.querySelectorAll('button')).toHaveLength(0)
+    expect(onComplete).not.toHaveBeenCalled()
+  })
+
+  it('completes when the tour of the last step ends', () => {
+    const onComplete = vi.fn()
+    render(
+      <OnboardingWizard
+        t={t}
+        onComplete={onComplete}
+        steps={[step(() => <i>one</i>), { scenes }]}
+      />
+    )
+    click(container.querySelector('button'))
+    expect(container.querySelectorAll('button')).toHaveLength(0)
+    expect(onComplete).not.toHaveBeenCalled()
+    endTour()
+    expect(onComplete).toHaveBeenCalledOnce()
+  })
+
+  it('hands the practice person to the tour', () => {
+    const steps = [
+      step(
+        ({ onPracticePerson, onNext }) => (
+          <button
+            onClick={() => {
+              onPracticePerson({ name: 'Mia' })
+              onNext()
+            }}
+          >
+            own
+          </button>
+        ),
+        true
+      ),
+      { scenes },
+    ]
+    render(<OnboardingWizard t={t} onComplete={() => {}} steps={steps} />)
+    click(container.querySelector('button'))
+    expect(tour.props.person).toMatchObject({ name: 'Mia', id: expect.any(String) })
+  })
 })
 
 describe('OnboardingPersonStep', () => {
@@ -336,8 +500,9 @@ describe('OnboardingPersonStep', () => {
     expect(container.querySelector('[data-tour]')).not.toBeNull()
     expect(container.querySelector('h1')).toBeNull()
     expect(form.props).toBeNull()
+    expect(tour.props.scenes).toBe(ADD_PERSON_SCENES)
     expect(tour.props.scenes).toEqual([
-      { screen: 'home', note: 'onboardingTourAddNote', guideTarget: 'add' },
+      { screen: SCREENS.main, instruction: 'onboardingTourAddNote', tourTarget: SCREENS.add },
     ])
     expect(tour.props).toMatchObject({ t, language: 'en', settings })
     expect(tour.props.person).toBeUndefined()
@@ -388,7 +553,10 @@ describe('OnboardingPersonStep', () => {
     expect(onNext).not.toHaveBeenCalled()
     expect(container.querySelector('h1')).toBeNull()
     expect(container.querySelector('[data-tour]')).not.toBeNull()
-    expect(tour.props.scenes).toEqual([{ screen: 'intro', auto: true, duration: 2000 }])
+    expect(tour.props.scenes).toBe(INTRO_SCENES)
+    expect(tour.props.scenes).toEqual([
+      { screen: SCREENS.intro, auto: true, duration: ONBOARDING.introSceneMs },
+    ])
     expect(tour.props).toMatchObject({ t, language: 'en' })
   })
 
@@ -412,7 +580,7 @@ describe('OnboardingPersonStep', () => {
       })
     )
     expect(onNext).not.toHaveBeenCalled()
-    expect(tour.props.scenes).toEqual([{ screen: 'intro', auto: true, duration: 2000 }])
+    expect(tour.props.scenes).toBe(INTRO_SCENES)
   })
 })
 

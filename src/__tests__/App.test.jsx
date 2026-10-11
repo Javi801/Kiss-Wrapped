@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
-import { COPY } from '@/lib/constants'
+import { COPY, SCREENS } from '@/lib/constants'
 import { todayString } from '@/lib/date'
 
 const mockFeatures = vi.hoisted(() => ({ onboarding: false, pdfExport: false }))
@@ -111,7 +111,7 @@ const settleLazyScreens = () => act(async () => vi.dynamicImportSettled())
 async function bootOnPeople(options) {
   await boot(options)
   openMain()
-  go('people')
+  go(SCREENS.people)
 }
 
 beforeEach(() => {
@@ -198,7 +198,7 @@ describe('App — boot', () => {
     await boot({ settings: { includePartnerEvents: true } })
     openMain()
     expect(screens.main.includePartnerEvents).toBe(true)
-    go('stats')
+    go(SCREENS.stats)
     await settleLazyScreens()
     expect(screens.stats.includePartnerEvents).toBe(true)
   })
@@ -327,20 +327,20 @@ describe('App — onboarding', () => {
     expect(savedSettings()).toMatchObject({ onboardingDone: true })
   })
 
-  it('shows the tutorial notice on the dashboard only after finishing, until it is closed', async () => {
+  it('shows the onboarding notice on the dashboard only after finishing, until it is closed', async () => {
     mockFeatures.onboarding = true
     await boot({ settings: { onboardingDone: false } })
     openMain()
     await act(async () => screens.onboarding.onComplete())
-    expect(screens.main.tutorialDoneOpen).toBe(true)
-    act(() => screens.main.onCloseTutorialDone())
-    expect(screens.main.tutorialDoneOpen).toBe(false)
+    expect(screens.main.onboardingDoneOpen).toBe(true)
+    act(() => screens.main.onCloseOnboardingDone())
+    expect(screens.main.onboardingDoneOpen).toBe(false)
   })
 
-  it('shows no tutorial notice on a normal entry', async () => {
+  it('shows no onboarding notice on a normal entry', async () => {
     await boot()
     openMain()
-    expect(screens.main.tutorialDoneOpen).toBe(false)
+    expect(screens.main.onboardingDoneOpen).toBe(false)
   })
 
   it('skips the onboarding when people are already saved', async () => {
@@ -425,7 +425,7 @@ describe('App — navigation', () => {
   it('hides the bottom bar on the add screen', async () => {
     await boot()
     openMain()
-    go('add')
+    go(SCREENS.add)
     expect(visibleScreens()).toEqual(['add'])
     expect(navButtons()).toHaveLength(0)
   })
@@ -433,7 +433,7 @@ describe('App — navigation', () => {
   it('returns to the intro when leaving the add screen', async () => {
     await boot()
     openMain()
-    go('add')
+    go(SCREENS.add)
     act(() => screens.add.onBack())
     expect(visibleScreens()).toEqual(['intro'])
   })
@@ -443,7 +443,7 @@ describe('App — hardware back button', () => {
   it('walks back through the visited screens and then exits', async () => {
     await boot()
     openMain()
-    go('people')
+    go(SCREENS.people)
 
     pressBack()
     expect(visibleScreens()).toEqual(['main'])
@@ -464,7 +464,7 @@ describe('App — hardware back button', () => {
   it('always goes from the add screen to the intro and forgets the history', async () => {
     await boot()
     openMain()
-    go('add')
+    go(SCREENS.add)
     pressBack()
     expect(visibleScreens()).toEqual(['intro'])
     pressBack()
@@ -474,7 +474,7 @@ describe('App — hardware back button', () => {
   it('closes an open dialog instead of navigating', async () => {
     await boot()
     openMain()
-    go('stats')
+    go(SCREENS.stats)
     await settleLazyScreens()
     const closeDialog = vi.fn()
     screens.stats.modalBackRef.current = closeDialog
@@ -491,7 +491,7 @@ describe('App — hardware back button', () => {
   it('closes an open select before an open dialog and before navigating', async () => {
     await boot()
     openMain()
-    go('stats')
+    go(SCREENS.stats)
     await settleLazyScreens()
     const closeDialog = vi.fn()
     screens.stats.modalBackRef.current = closeDialog
@@ -523,7 +523,7 @@ describe('App — people mutations', () => {
   it('adds a person on top with a first event dated today and returns to the intro', async () => {
     await boot({ people: [ana] })
     openMain()
-    go('add')
+    go(SCREENS.add)
     await act(async () => screens.add.onSave({ name: 'Mia', gender: 'female' }))
 
     const [mia, ...rest] = savedPeople()
@@ -538,7 +538,7 @@ describe('App — people mutations', () => {
   it('keeps the real name and how-we-met given for a new person', async () => {
     await boot()
     openMain()
-    go('add')
+    go(SCREENS.add)
     await act(async () =>
       screens.add.onSave({ name: 'Mia', realName: 'Maria', howWeMet: 'School' })
     )
@@ -548,7 +548,7 @@ describe('App — people mutations', () => {
   it('forgets the navigation history after adding a person', async () => {
     await boot()
     openMain()
-    go('add')
+    go(SCREENS.add)
     await act(async () => screens.add.onSave({ name: 'Mia' }))
     pressBack()
     expect(mockCapacitorApp.exitApp).toHaveBeenCalledOnce()
@@ -558,7 +558,7 @@ describe('App — people mutations', () => {
     await boot()
     for (const name of ['Mia', 'Lia']) {
       openMain()
-      go('add')
+      go(SCREENS.add)
       await act(async () => screens.add.onSave({ name }))
     }
     const ids = savedPeople().flatMap((person) => [person.id, ...person.events.map((e) => e.id)])
@@ -622,7 +622,7 @@ describe('App — people mutations', () => {
   it('registers the how-we-met of a new person as a tag', async () => {
     await boot({ settings: { howWeMetTags: ['App'] } })
     openMain()
-    go('add')
+    go(SCREENS.add)
     await act(async () => screens.add.onSave({ name: 'Mia', howWeMet: ' School ' }))
     expect(savedSettings().howWeMetTags).toEqual(['App', 'School'])
   })
@@ -630,7 +630,7 @@ describe('App — people mutations', () => {
   it('registers no how-we-met tag for a new person without one', async () => {
     await boot({ settings: { howWeMetTags: ['App'] } })
     openMain()
-    go('add')
+    go(SCREENS.add)
     await act(async () => screens.add.onSave({ name: 'Mia' }))
     expect(savedSettings().howWeMetTags).toEqual(['App'])
   })
@@ -812,7 +812,7 @@ describe('App — settings', () => {
   it('saves the partner events choice made on the stats screen and applies it to home', async () => {
     await boot()
     openMain()
-    go('stats')
+    go(SCREENS.stats)
     await settleLazyScreens()
     expect(screens.stats.includePartnerEvents).toBe(false)
 

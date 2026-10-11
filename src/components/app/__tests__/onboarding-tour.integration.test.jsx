@@ -8,9 +8,10 @@ import { createPerson } from '@/lib/helpers'
 // Only the theme is mocked: the tour runs over the real screens.
 vi.mock('@/lib/theme', () => ({ usePalette: () => ({}) }))
 
-import { TOUR_SCENE_MS } from '@/components/app/OnboardingTour'
-import OnboardingTourStep from '@/components/app/OnboardingTourStep'
-import OnboardingHomeStep from '@/components/app/OnboardingHomeStep'
+import OnboardingTour from '@/components/app/OnboardingTour'
+import { HOME_HINT_SCENES, PERSON_CARD_SCENES } from '@/components/app/onboardingScenes'
+import { ONBOARDING } from '@/lib/config'
+import { SPEECH_BUBBLE_SELECTOR } from '@/lib/onboarding'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
@@ -28,17 +29,24 @@ const person = createPerson({
 let container
 let root
 
-function render(Step) {
-  const onNext = vi.fn()
+function render(scenes) {
+  const onDone = vi.fn()
   container = document.createElement('div')
   document.body.appendChild(container)
   root = createRoot(container)
   act(() => {
     root.render(
-      <Step t={t} language="en" practicePerson={person} settings={settings} onNext={onNext} />
+      <OnboardingTour
+        scenes={scenes}
+        person={person}
+        t={t}
+        language="en"
+        settings={settings}
+        onDone={onDone}
+      />
     )
   })
-  return onNext
+  return onDone
 }
 
 const wait = (ms) => act(() => vi.advanceTimersByTime(ms))
@@ -48,7 +56,8 @@ const reachableLabels = () =>
   buttons()
     .filter(reachable)
     .map((button) => button.textContent.replace('👆', ''))
-const notes = () => [...container.querySelectorAll('[role="note"]')]
+const notes = () => [...container.querySelectorAll(SPEECH_BUBBLE_SELECTOR)]
+const tapReachable = () => act(() => buttons().find(reachable).click())
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
@@ -60,51 +69,72 @@ afterEach(() => {
   vi.useRealTimers()
 })
 
-describe('OnboardingTourStep over the real screens', () => {
-  it('leaves nothing reachable on the home and list scenes', () => {
-    render(OnboardingTourStep)
-    expect(buttons().length).toBeGreaterThan(0)
-    expect(reachableLabels()).toEqual([])
+describe('the person card tour over the real screens', () => {
+  it('leaves only the people button reachable on the home scene', () => {
+    render(PERSON_CARD_SCENES)
+    expect(buttons().length).toBeGreaterThan(1)
+    expect(reachableLabels()).toEqual([t.viewEditPeople])
+    expect(notes()).toEqual([])
+  })
 
-    wait(3000)
+  it('leaves only the person card reachable on the list scene', () => {
+    render(PERSON_CARD_SCENES)
+    tapReachable()
     expect(container.textContent).toContain(t.personListTitle)
-    expect(buttons().length).toBeGreaterThan(0)
-    expect(reachableLabels()).toEqual([])
+    expect(buttons().length).toBeGreaterThan(1)
+    expect(buttons().filter(reachable)).toHaveLength(1)
+    expect(reachableLabels()[0]).toContain(person.name)
+    expect(notes()).toEqual([])
   })
 
   it('leaves only the add-event button and the hints reachable on the person card', () => {
-    const onNext = render(OnboardingTourStep)
-    wait(3000)
-    wait(TOUR_SCENE_MS)
+    const onDone = render(PERSON_CARD_SCENES)
+    tapReachable()
+    tapReachable()
     expect(reachableLabels()).toEqual([t.addEvent])
     expect(notes().map((note) => note.textContent)).toEqual([
       t.onboardingEditPersonHint,
       t.onboardingEventHint,
     ])
     expect(notes().every(reachable)).toBe(true)
+    expect(onDone).not.toHaveBeenCalled()
 
-    act(() => buttons().find(reachable).click())
-    expect(onNext).toHaveBeenCalledOnce()
+    tapReachable()
+    expect(onDone).toHaveBeenCalledOnce()
+  })
+
+  it('reaches the person card by itself when nothing is tapped, and waits there', () => {
+    const onDone = render(PERSON_CARD_SCENES)
+    wait(ONBOARDING.tapTimeoutMs)
+    expect(container.textContent).toContain(t.personListTitle)
+    wait(ONBOARDING.tapTimeoutMs)
+    expect(reachableLabels()).toEqual([t.addEvent])
+
+    wait(ONBOARDING.tapTimeoutMs * 10)
+    expect(reachableLabels()).toEqual([t.addEvent])
+    expect(onDone).not.toHaveBeenCalled()
   })
 })
 
-describe('OnboardingHomeStep over the real screens', () => {
+describe('the home hints tour over the real screens', () => {
   it('leaves only its own button and the hint reachable on each home scene', () => {
-    const onNext = render(OnboardingHomeStep)
-    expect(reachableLabels()).toEqual([])
-
-    wait(3000)
+    const onDone = render(HOME_HINT_SCENES)
     expect(reachableLabels()).toEqual([t.onboardingNext])
     expect(notes()).toHaveLength(1)
+    expect(notes()[0].textContent).toContain(t.onboardingDataHintTitle)
     expect(notes().every(reachable)).toBe(true)
 
-    act(() => buttons().find(reachable).click())
+    wait(ONBOARDING.tapTimeoutMs * 10)
+    expect(reachableLabels()).toEqual([t.onboardingNext])
+
+    tapReachable()
     expect(reachableLabels()).toEqual([t.onboardingFinish])
     expect(notes()).toHaveLength(1)
     expect(notes()[0].textContent).toContain(t.onboardingSettingsHintTitle)
     expect(notes().every(reachable)).toBe(true)
+    expect(onDone).not.toHaveBeenCalled()
 
-    act(() => buttons().find(reachable).click())
-    expect(onNext).toHaveBeenCalledOnce()
+    tapReachable()
+    expect(onDone).toHaveBeenCalledOnce()
   })
 })

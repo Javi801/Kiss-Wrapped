@@ -4,6 +4,7 @@ import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { COPY, ZODIAC_OPTIONS } from '@/lib/constants'
 import { formatShortDate } from '@/lib/date'
+import { TOUR_TARGETS } from '@/lib/onboarding'
 
 // Props of the forms currently mounted inside an open dialog.
 const forms = vi.hoisted(() => ({ person: null, event: null }))
@@ -473,7 +474,7 @@ describe('PersonCard — hardware back button', () => {
   })
 })
 
-describe('PersonCard — onboarding guide', () => {
+describe('PersonCard — onboarding tour', () => {
   const tapGuide = () => container.querySelector('[data-tap-guide]')
   const notes = () =>
     [...container.querySelectorAll('[role="note"]')].map((item) => item.textContent)
@@ -486,7 +487,7 @@ describe('PersonCard — onboarding guide', () => {
   })
 
   it('stays collapsed and points at the card', () => {
-    renderCard({}, { guide: { expanded: false, tapTarget: 'card' } })
+    renderCard({}, { tour: { expanded: false, tapTarget: TOUR_TARGETS.card } })
     expect(tapGuide().closest('button')).toBe(container.querySelector('button'))
     toggle()
     expect(actions.props).toBeNull()
@@ -496,9 +497,9 @@ describe('PersonCard — onboarding guide', () => {
     renderCard(
       { events: [complete(), complete({ id: 'e2', date: '2023.05.01' })] },
       {
-        guide: {
+        tour: {
           expanded: true,
-          tapTarget: 'addEvent',
+          tapTarget: TOUR_TARGETS.addEvent,
           editHint: 'About editing',
           eventHint: 'About events',
         },
@@ -510,17 +511,17 @@ describe('PersonCard — onboarding guide', () => {
     expect(eventRows()[0].previousElementSibling.textContent).toBe('About events')
   })
 
-  it('hands the add-event tap to the guide instead of opening the form', () => {
+  it('hands the add-event tap to the tour instead of opening the form', () => {
     const onAddEvent = vi.fn()
-    renderCard({}, { guide: { expanded: true, tapTarget: 'addEvent', onAddEvent } })
+    renderCard({}, { tour: { expanded: true, tapTarget: TOUR_TARGETS.addEvent, onAddEvent } })
     click(t.addEvent)
     expect(onAddEvent).toHaveBeenCalledOnce()
     expect(dialog()).toBeNull()
   })
 
-  it('hands the card tap to the guide', () => {
+  it('hands the card tap to the tour', () => {
     const onToggle = vi.fn()
-    renderCard({}, { guide: { expanded: false, tapTarget: 'card', onToggle } })
+    renderCard({}, { tour: { expanded: false, tapTarget: TOUR_TARGETS.card, onToggle } })
     toggle()
     expect(onToggle).toHaveBeenCalledOnce()
     expect(actions.props).toBeNull()
@@ -534,14 +535,14 @@ describe('PersonCard — onboarding guide', () => {
     act(() => root.unmount())
     container.remove()
 
-    renderCard({}, { guide: { expanded: false, tapTarget: 'card' } })
+    renderCard({}, { tour: { expanded: false, tapTarget: TOUR_TARGETS.card } })
     expect(header().hasAttribute('data-tour-target')).toBe(true)
     expect(header().style.pointerEvents).toBe('auto')
     expect(header().style.position).toBe('relative')
     act(() => root.unmount())
     container.remove()
 
-    renderCard({}, { guide: { expanded: true, tapTarget: 'addEvent' } })
+    renderCard({}, { tour: { expanded: true, tapTarget: TOUR_TARGETS.addEvent } })
     expect(header().hasAttribute('data-tour-target')).toBe(false)
     expect(header().style.pointerEvents).toBe('')
   })
