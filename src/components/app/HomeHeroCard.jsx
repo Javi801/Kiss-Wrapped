@@ -98,14 +98,7 @@ export default function HomeHeroCard({
           }}
         />
 
-        <h1
-          style={{
-            ...TEXT.heading,
-            letterSpacing: '-0.025em',
-          }}
-        >
-          {t.heroTitle}
-        </h1>
+        <h1 style={TEXT.heading}>{t.heroTitle}</h1>
 
         <div
           style={{
