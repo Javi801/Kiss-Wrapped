@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import * as sceneLists from '@/components/app/onboardingScenes'
+import * as sceneLists from '@/components/app/onboarding/onboardingScenes'
 import { COPY, SCREENS } from '@/lib/constants'
 import { TOUR_TARGETS } from '@/lib/onboarding'
 

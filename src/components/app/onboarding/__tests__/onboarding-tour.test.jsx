@@ -50,9 +50,9 @@ vi.mock('@/components/forms/EventForm', () => ({
   },
 }))
 
-import OnboardingTour from '@/components/app/OnboardingTour'
-import OnboardingEventStep from '@/components/app/OnboardingEventStep'
-import { HOME_HINT_SCENES, PERSON_CARD_SCENES } from '@/components/app/onboardingScenes'
+import OnboardingTour from '@/components/app/onboarding/OnboardingTour'
+import OnboardingEventStep from '@/components/app/onboarding/OnboardingEventStep'
+import { HOME_HINT_SCENES, PERSON_CARD_SCENES } from '@/components/app/onboarding/onboardingScenes'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 

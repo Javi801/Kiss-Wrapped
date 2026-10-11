@@ -60,7 +60,7 @@ function mockScreen(name) {
 vi.mock('@/components/app/HomeScreen', mockScreen('main'))
 vi.mock('@/components/app/AddPersonScreen', mockScreen('add'))
 vi.mock('@/components/app/IntroScreen', mockScreen('intro'))
-vi.mock('@/components/app/OnboardingWizard', mockScreen('onboarding'))
+vi.mock('@/components/app/onboarding/OnboardingWizard', mockScreen('onboarding'))
 vi.mock('@/components/app/PrivacyScreen', mockScreen('privacy'))
 vi.mock('@/components/people/PeopleManagerScreen', mockScreen('people'))
 vi.mock('@/components/stats/StatsScreen', mockScreen('stats'))

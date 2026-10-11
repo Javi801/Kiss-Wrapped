@@ -2,10 +2,10 @@ import { useState } from 'react'
 
 import EventForm from '@/components/forms/EventForm'
 import FormCard from '@/components/app/FormCard'
-import OnboardingFormStep from '@/components/app/OnboardingFormStep'
-import OnboardingTour from '@/components/app/OnboardingTour'
+import OnboardingFormStep from '@/components/app/onboarding/OnboardingFormStep'
+import OnboardingTour from '@/components/app/onboarding/OnboardingTour'
 import { completePracticeEvent } from '@/lib/onboarding'
-import { SAVED_EVENT_SCENES } from '@/components/app/onboardingScenes'
+import { SAVED_EVENT_SCENES } from '@/components/app/onboarding/onboardingScenes'
 
 // Phases of the step, in order: the form, the tour after it. This step has no tour before the form.
 const PHASES = { form: 'form', tourAfter: 'tourAfter' }

@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 
 import PersonForm from '@/components/forms/PersonForm'
 import FormCard from '@/components/app/FormCard'
-import OnboardingFormStep from '@/components/app/OnboardingFormStep'
-import OnboardingTour from '@/components/app/OnboardingTour'
+import OnboardingFormStep from '@/components/app/onboarding/OnboardingFormStep'
+import OnboardingTour from '@/components/app/onboarding/OnboardingTour'
 import { completePracticePerson } from '@/lib/onboarding'
-import { ADD_PERSON_SCENES, INTRO_SCENES } from '@/components/app/onboardingScenes'
+import { ADD_PERSON_SCENES, INTRO_SCENES } from '@/components/app/onboarding/onboardingScenes'
 
 // Phases of the step, in order: the tour before the form, the form, the tour after it.
 const PHASES = { tourBefore: 'tourBefore', form: 'form', tourAfter: 'tourAfter' }

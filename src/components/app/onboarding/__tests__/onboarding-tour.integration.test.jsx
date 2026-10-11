@@ -8,8 +8,8 @@ import { createPerson } from '@/lib/helpers'
 // Only the theme is mocked: the tour runs over the real screens.
 vi.mock('@/lib/theme', () => ({ usePalette: () => ({}) }))
 
-import OnboardingTour from '@/components/app/OnboardingTour'
-import { HOME_HINT_SCENES, PERSON_CARD_SCENES } from '@/components/app/onboardingScenes'
+import OnboardingTour from '@/components/app/onboarding/OnboardingTour'
+import { HOME_HINT_SCENES, PERSON_CARD_SCENES } from '@/components/app/onboarding/onboardingScenes'
 import { ONBOARDING } from '@/lib/config'
 import { SPEECH_BUBBLE_SELECTOR } from '@/lib/onboarding'
 

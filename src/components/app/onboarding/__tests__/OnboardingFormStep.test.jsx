@@ -10,7 +10,7 @@ const palette = vi.hoisted(() => ({
 
 vi.mock('@/lib/theme', () => ({ usePalette: () => palette }))
 
-import OnboardingFormStep from '@/components/app/OnboardingFormStep'
+import OnboardingFormStep from '@/components/app/onboarding/OnboardingFormStep'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 

@@ -25,7 +25,7 @@ import HomeScreen from './components/app/HomeScreen'
 import AddPersonScreen from './components/app/AddPersonScreen'
 import IntroScreen from './components/app/IntroScreen'
 import BottomNav from './components/app/BottomNav'
-import OnboardingWizard from './components/app/OnboardingWizard'
+import OnboardingWizard from './components/app/onboarding/OnboardingWizard'
 import PrivacyScreen from './components/app/PrivacyScreen'
 
 // Loaded on demand so the charting libraries stay out of the initial chunk.

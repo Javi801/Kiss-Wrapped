@@ -10,7 +10,7 @@ const tour = vi.hoisted(() => ({ props: null }))
 const eventForm = vi.hoisted(() => ({ props: null }))
 
 vi.mock('@/lib/theme', () => ({ usePalette: () => ({}) }))
-vi.mock('@/components/app/OnboardingTour', () => ({
+vi.mock('@/components/app/onboarding/OnboardingTour', () => ({
   default: (props) => {
     tour.props = props
     return <section data-tour="" />
@@ -34,15 +34,15 @@ vi.mock('@/components/forms/EventForm', () => ({
 
 import IntroScreen from '@/components/app/IntroScreen'
 import AddPersonScreen from '@/components/app/AddPersonScreen'
-import OnboardingWizard from '@/components/app/OnboardingWizard'
-import OnboardingPersonStep from '@/components/app/OnboardingPersonStep'
+import OnboardingWizard from '@/components/app/onboarding/OnboardingWizard'
+import OnboardingPersonStep from '@/components/app/onboarding/OnboardingPersonStep'
 import {
   ADD_PERSON_SCENES,
   HOME_HINT_SCENES,
   INTRO_SCENES,
   PERSON_CARD_SCENES,
   SAVED_EVENT_SCENES,
-} from '@/components/app/onboardingScenes'
+} from '@/components/app/onboarding/onboardingScenes'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
