@@ -67,6 +67,7 @@ const EMPTY_FILTERS = {
   minAge: '',
   maxAge: '',
   activity: [],
+  howWeMet: [],
   zodiacSign: [],
   eventDateFrom: '',
   eventDateTo: '',
@@ -138,6 +139,7 @@ export default function FiltersPanel({
   peopleCount,
   t,
   language,
+  howWeMetTags = [],
 }) {
   const PALETTE = usePalette()
   const inputStyle = {
@@ -152,6 +154,18 @@ export default function FiltersPanel({
         ? prev.activity.filter((a) => a !== value)
         : [...prev.activity, value],
     }))
+  }
+
+  function toggleHowWeMet(value) {
+    setFilters((prev) => {
+      const selected = prev.howWeMet ?? []
+      return {
+        ...prev,
+        howWeMet: selected.includes(value)
+          ? selected.filter((tag) => tag !== value)
+          : [...selected, value],
+      }
+    })
   }
 
   function toggleZodiac(value) {
@@ -273,6 +287,27 @@ export default function FiltersPanel({
           ))}
         </div>
       </div>
+
+      {howWeMetTags.length > 0 && (
+        <>
+          <Divider />
+
+          {/* How we met */}
+          <div>
+            <SectionLabel icon={Star} label={t.howWeMet} />
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+              {howWeMetTags.map((value) => (
+                <Chip
+                  key={value}
+                  label={value}
+                  selected={filters.howWeMet.includes(value)}
+                  onClick={() => toggleHowWeMet(value)}
+                />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       <Divider />
 

@@ -204,6 +204,7 @@ describe('PeopleManagerScreen — search', () => {
       minAge: '',
       maxAge: '',
       activity: [],
+      howWeMet: [],
       zodiacSign: [],
       eventDateFrom: '',
       eventDateTo: '',
@@ -261,6 +262,17 @@ describe('PeopleManagerScreen — filters', () => {
     render(people)
     setFilters({ zodiacSign: [ZODIAC_OPTIONS.en[1]] })
     expect(shown()).toEqual(['cy'])
+  })
+
+  it('keeps people whose how-we-met tag matches the selected tag', () => {
+    const taggedPeople = [
+      person('Ana', { howWeMet: 'School' }),
+      person('Bob', { howWeMet: 'Work' }),
+      person('Cy', { howWeMet: 'school' }),
+    ]
+    render(taggedPeople)
+    setFilters({ howWeMet: ['School'] })
+    expect(shown()).toEqual(['ana', 'cy'])
   })
 
   it('keeps people with an event on or after the start date', () => {

@@ -38,6 +38,7 @@ const EMPTY = {
   minAge: '',
   maxAge: '',
   activity: [],
+  howWeMet: [],
   zodiacSign: [],
   eventDateFrom: '',
   eventDateTo: '',
@@ -71,7 +72,7 @@ function Harness({ initial, setGroupBy, setSortBy, ...props }) {
   )
 }
 
-function render({ filters = {}, ...props } = {}) {
+function render({ filters = {}, howWeMetTags = ['School', 'Work'], ...props } = {}) {
   const handlers = { setGroupBy: vi.fn(), setSortBy: vi.fn() }
   fields.selects = []
   fields.dates = []
@@ -79,7 +80,9 @@ function render({ filters = {}, ...props } = {}) {
   document.body.appendChild(container)
   root = createRoot(container)
   act(() => {
-    root.render(<Harness initial={{ ...EMPTY, ...filters }} {...handlers} {...props} />)
+    root.render(
+      <Harness initial={{ ...EMPTY, ...filters }} howWeMetTags={howWeMetTags} {...handlers} {...props} />
+    )
   })
   return handlers
 }
@@ -158,6 +161,20 @@ describe('FiltersPanel — activity', () => {
     render({ filters: { minAge: '20', zodiacSign: [ZODIAC_OPTIONS.en[0]] } })
     click(t.other)
     expect(current).toMatchObject({ minAge: '20', zodiacSign: [ZODIAC_OPTIONS.en[0]] })
+  })
+})
+
+describe('FiltersPanel — how we met', () => {
+  it('filters by a stored how-we-met tag', () => {
+    render({ filters: { howWeMet: ['School'] }, language: 'en' })
+    click('School')
+    expect(current.howWeMet).toEqual([])
+  })
+
+  it('keeps the selected how-we-met tags in the filter state', () => {
+    render({ filters: { howWeMet: ['School'] }, language: 'en' })
+    click('Work')
+    expect(current.howWeMet).toEqual(['School', 'Work'])
   })
 })
 
