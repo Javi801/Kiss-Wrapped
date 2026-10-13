@@ -220,6 +220,54 @@ export function groupByZodiac(
     .map((label) => ({ label, value: map.get(label) || 0 }))
 }
 
+const ARIES_GLYPH = '♈'
+const MAX_TOP_SIGNS = 3
+
+/**
+ * Data for the zodiac orbit story.
+ * `signs` holds the 12 signs as { glyph, label, value }, where value is the number
+ * of people, starting at Aries. `topSigns` holds the signs tied for the most people
+ * as { glyph, label }, capped at MAX_TOP_SIGNS. Ties are ordered by number of
+ * events, then by latest event, then by story order; both come from `eventPeople`.
+ */
+export function getZodiacOrbit(people, eventPeople = people, language = DEFAULT_SETTINGS.language) {
+  const persons = groupByZodiac(people, language, countPeople, { allSigns: true })
+  const events = groupByZodiac(eventPeople, language, countEvents, { allSigns: true })
+
+  const lastDates = new Map()
+  for (const person of eventPeople) {
+    const label = getShortZodiacLabel(getZodiacForLanguage(person.zodiacSign, language))
+    const date = getLastEventDate(person)
+    if (date && date > (lastDates.get(label) || '')) lastDates.set(label, date)
+  }
+
+  // The emoji that starts each option is the language-independent key of the sign.
+  const rows = ZODIAC_OPTIONS[language].map((option, i) => ({
+    glyph: option.charAt(0),
+    label: persons[i].label,
+    value: persons[i].value,
+    events: events[i].value,
+    lastDate: lastDates.get(persons[i].label) || '',
+  }))
+  const start = Math.max(
+    0,
+    rows.findIndex((row) => row.glyph === ARIES_GLYPH)
+  )
+  const ordered = [...rows.slice(start), ...rows.slice(0, start)]
+
+  const max = Math.max(...ordered.map((row) => row.value))
+  // The sort is stable, so signs still tied keep the story order.
+  const top = ordered
+    .filter((row) => max > 0 && row.value === max)
+    .sort((a, b) => b.events - a.events || b.lastDate.localeCompare(a.lastDate))
+    .slice(0, MAX_TOP_SIGNS)
+
+  return {
+    signs: ordered.map(({ glyph, label, value }) => ({ glyph, label, value })),
+    topSigns: top.map(({ glyph, label }) => ({ glyph, label })),
+  }
+}
+
 /**
  * Groups people by translated activity label, highest value first.
  */

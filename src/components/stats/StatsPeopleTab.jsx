@@ -8,6 +8,7 @@ import {
   getPersonsByAge,
   getPersonsByAgeAtEvent,
   getPersonsByFirstLetter,
+  getZodiacOrbit,
   groupByActivity,
   groupByGender,
   groupByZodiac,
@@ -42,6 +43,12 @@ export default function StatsPeopleTab({ people, eventPeople = people, t, langua
   const eventsByZodiacOrdered = useMemo(
     () => groupByZodiac(eventPeople, language, countEvents, { allSigns: true }),
     [eventPeople, language]
+  )
+
+  // Signs starting at Aries and the most repeated ones, for the expanded zodiac view.
+  const zodiacOrbit = useMemo(
+    () => getZodiacOrbit(people, eventPeople, language),
+    [people, eventPeople, language]
   )
 
   // Sums total events by translated activity label.
@@ -85,6 +92,7 @@ export default function StatsPeopleTab({ people, eventPeople = people, t, langua
       <ZodiacRadarCard
         personsByZodiac={personsByZodiac}
         eventsByZodiac={eventsByZodiacOrdered}
+        zodiacOrbit={zodiacOrbit}
         emptyText={t.noDataYet}
         t={t}
       />

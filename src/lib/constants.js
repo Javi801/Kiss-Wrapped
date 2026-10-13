@@ -103,6 +103,14 @@ export const PALETTES = {
       '#c472c8',
     ],
     chartHeatmapRgb: '226, 115, 150',
+    // Shareable story images (dark in every theme)
+    storyBgFrom: '#2b1820',
+    storyBgTo: '#4c2930',
+    storyAccent: '#ffc4ad',
+    storyWarm: '#ffe0a5',
+    storyText: '#fff2ef',
+    storyTextMuted: '#eee0ed',
+    storyTextSoft: '#bd9698',
   },
   green: {
     bg: '#f6fbf8',
@@ -165,6 +173,14 @@ export const PALETTES = {
     chartHeatmapRgb: '46, 125, 80',
     chartHeatmapAlphaBase: 0.12,
     chartHeatmapExponent: 1.45,
+    // Shareable story images (dark in every theme)
+    storyBgFrom: '#102829',
+    storyBgTo: '#203e40',
+    storyAccent: '#b6eee0',
+    storyWarm: '#e4e7b8',
+    storyText: '#fff2ef',
+    storyTextMuted: '#eee0ed',
+    storyTextSoft: '#8bb4b1',
   },
   dark: {
     bg: '#0f0d1a',
@@ -227,6 +243,14 @@ export const PALETTES = {
     chartHeatmapRgb: '167, 139, 250',
     chartHeatmapAlphaBase: 0.14,
     chartHeatmapExponent: 1.5,
+    // Shareable story images (dark in every theme)
+    storyBgFrom: '#211329',
+    storyBgTo: '#39213e',
+    storyAccent: '#d6b2ff',
+    storyWarm: '#ffd0b4',
+    storyText: '#fff2ef',
+    storyTextMuted: '#eee0ed',
+    storyTextSoft: '#ab8eba',
   },
 }
 
@@ -235,6 +259,9 @@ export const PALETTE = PALETTES.pink
 
 // Width of the app's content column.
 export const CONTENT_MAX_WIDTH = '28rem'
+
+// Size of the image exported from a custom expanded chart view (9:16), the same on every device.
+export const EXPANDED_VIEW_SIZE = { width: 1080, height: 1920 }
 
 // Semantic text scale. Spread into style objects or use directly as style prop.
 export const TEXT = {
