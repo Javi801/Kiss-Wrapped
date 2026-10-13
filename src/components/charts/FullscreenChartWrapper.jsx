@@ -71,9 +71,15 @@ function IconButton({ onClick, disabled, children, palette, title }) {
 /**
  * Adds the fullscreen mode and the image export to a chart card.
  * With `expandedView`, fullscreen shows that node instead of the card, on a canvas
- * of EXPANDED_VIEW_SIZE that is exported at that exact size.
+ * of EXPANDED_VIEW_SIZE that is exported at that exact size. `expandedBackground`
+ * fills the space around that canvas when the screen has other proportions.
  */
-export default function FullscreenChartWrapper({ children, centerContent = false, expandedView }) {
+export default function FullscreenChartWrapper({
+  children,
+  centerContent = false,
+  expandedView,
+  expandedBackground,
+}) {
   const hasExpandedView = expandedView != null
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [downloading, setDownloading] = useState(false)
@@ -226,7 +232,7 @@ export default function FullscreenChartWrapper({ children, centerContent = false
             position: 'fixed',
             inset: 0,
             zIndex: 9999,
-            backgroundColor: PALETTE.bg,
+            background: (hasExpandedView && expandedBackground) || PALETTE.bg,
             overflowY: hasExpandedView ? 'hidden' : 'auto',
             overflowX: 'hidden',
 
