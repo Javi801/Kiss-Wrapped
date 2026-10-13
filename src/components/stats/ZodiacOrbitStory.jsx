@@ -1,4 +1,3 @@
-import { PALETTES } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
 import {
   getRadarPoint,
@@ -8,29 +7,27 @@ import {
   toSvgPoints,
 } from '@/components/stats/radarGeometry'
 
-// Colors, sizes and fonts are fixed here on purpose while the story design is not
-// final: they are not palette tokens and do not follow the TEXT scale.
+// Sizes and fonts are fixed on purpose while the story design is not final:
+// they are in viewBox units and do not follow the TEXT scale.
 const WIDTH = 1080
 const HEIGHT = 1920
-
-const STORY_COLORS = {
-  dark: { top: '#211329', bottom: '#39213e', accent: '#d6b2ff', soft: '#ab8eba', warm: '#ffd0b4' },
-  pink: { top: '#2b1820', bottom: '#4c2930', accent: '#ffc4ad', soft: '#bd9698', warm: '#ffe0a5' },
-  green: { top: '#102829', bottom: '#203e40', accent: '#b6eee0', soft: '#8bb4b1', warm: '#e4e7b8' },
-}
-const HEADLINE_COLOR = '#fff2ef'
-const SIGN_NAME_COLOR = '#eee0ed'
 
 const SERIF = "Georgia, 'Noto Serif', serif"
 const SANS = 'Inter, Arial, sans-serif'
 
-const BRAND = 'KISSWRAPPED'
+const BRAND = 'KissWrapped'
 
-const CENTER = { x: 540, y: 965 }
-const RADIUS = 302
-const LABEL_RADIUS = 394
+// Enlarges everything but the background, from the center of the canvas.
+const CONTENT_SCALE = 1.05
+const CONTENT_TRANSFORM = `translate(${WIDTH / 2} ${HEIGHT / 2}) scale(${CONTENT_SCALE}) translate(${-WIDTH / 2} ${-HEIGHT / 2})`
+
+const CENTER = { x: 540, y: 1050 }
+const RADIUS = 285
+// Sign labels: distance from the outer ring, and half the height of the glyph + name block.
+const LABEL_GAP = 26
+const LABEL_HALF_HEIGHT = 42
 const RING_COUNT = 4
-const TOP_SIGN_SIZES = [43, 40, 34]
+const TOP_SIGN_SIZES = [58, 50, 40]
 
 // Deterministic stardust, so the preview and the exported image are identical.
 const STARDUST = (() => {
@@ -62,8 +59,13 @@ function Star({ x, y, r, fill }) {
  */
 export default function ZodiacOrbitStory({ signs = [], topSigns = [], t }) {
   const P = usePalette()
-  const theme = Object.keys(PALETTES).find((key) => PALETTES[key] === P)
-  const C = STORY_COLORS[theme] ?? STORY_COLORS.pink
+  const C = {
+    top: P.storyBgFrom,
+    bottom: P.storyBgTo,
+    accent: P.storyAccent,
+    warm: P.storyWarm,
+    soft: P.storyTextSoft,
+  }
 
   const values = signs.map((sign) => sign.value)
   const scaleMax = getRadarScaleMax(values, RING_COUNT)
@@ -118,7 +120,7 @@ export default function ZodiacOrbitStory({ signs = [], topSigns = [], t }) {
         </filter>
       </defs>
 
-      {/* Background, stardust and frame */}
+      {/* Background and stardust */}
       <rect width={WIDTH} height={HEIGHT} fill="url(#zodiac-orbit-bg)" />
       <rect width={WIDTH} height={HEIGHT} fill="url(#zodiac-orbit-glow)" />
       {STARDUST.map((dust, i) => (
@@ -132,143 +134,129 @@ export default function ZodiacOrbitStory({ signs = [], topSigns = [], t }) {
           fillOpacity={dust.opacity}
         />
       ))}
-      <rect
-        x="35"
-        y="35"
-        width="1010"
-        height="1850"
-        fill="none"
-        stroke={C.accent}
-        strokeOpacity="0.16"
-      />
 
-      {/* Brand and heading */}
-      <text x="540" y="122" fontSize="25" letterSpacing="0.45em" fill={C.accent}>
-        {BRAND}
-      </text>
-      <Star x={185} y={112} r={9} fill={C.accent} />
-      <Star x={895} y={112} r={9} fill={C.accent} />
-      <text x="540" y="235" fontSize="31" fontFamily={SERIF} fill={C.warm}>
-        {t.zodiacOrbitKicker}
-      </text>
-      <text x="540" y="365" fontSize="112" fontFamily={SERIF} fill={HEADLINE_COLOR}>
-        {t.zodiacOrbitTitleTop}
-      </text>
-      <text x="540" y="477" fontSize="112" fontFamily={SERIF} fill={HEADLINE_COLOR}>
-        {t.zodiacOrbitTitleBottom}
-      </text>
-      <text x="540" y="550" fontSize="25" fill={C.soft}>
-        {t.zodiacOrbitSubtitle}
-      </text>
-      <Star x={141} y={368} r={25} fill={C.warm} />
-      <Star x={927} y={440} r={19} fill={C.accent} />
-
-      {/* Radar grid */}
-      {rings.map((ring, i) => {
-        const outer = i === rings.length - 1
-        return (
-          <polygon
-            key={i}
-            points={toSvgPoints(ring)}
-            fill="none"
-            stroke={C.accent}
-            strokeOpacity={outer ? 0.33 : 0.15}
-            strokeWidth={outer ? 2 : 1}
-          />
-        )
-      })}
-      {signs.map((sign, i) => {
-        const end = getRadarPoint(i, signs.length, RADIUS, CENTER)
-        const label = getRadarPoint(i, signs.length, LABEL_RADIUS, CENTER)
-        return (
-          <g key={sign.glyph} data-zodiac-sign={sign.glyph}>
-            <line
-              x1={CENTER.x}
-              y1={CENTER.y}
-              x2={end.x.toFixed(2)}
-              y2={end.y.toFixed(2)}
-              stroke={C.accent}
-              strokeOpacity="0.14"
-            />
-            <text
-              x={label.x.toFixed(2)}
-              y={(label.y - 10).toFixed(2)}
-              fontSize="39"
-              fill={C.accent}
-            >
-              {sign.glyph}
-            </text>
-            <text
-              x={label.x.toFixed(2)}
-              y={(label.y + 25).toFixed(2)}
-              fontSize="24"
-              fill={SIGN_NAME_COLOR}
-            >
-              {sign.label}
-            </text>
-            <text x={label.x.toFixed(2)} y={(label.y + 57).toFixed(2)} fontSize="22" fill={C.soft}>
-              {sign.value}
-            </text>
-          </g>
-        )
-      })}
-      {rings.map((_, i) => (
-        <text
-          key={i}
-          x={CENTER.x + 13}
-          y={CENTER.y - (RADIUS * (i + 1)) / RING_COUNT + 20}
-          fontSize="16"
-          textAnchor="start"
-          fill={C.soft}
-        >
-          {(scaleMax * (i + 1)) / RING_COUNT}
+      <g transform={CONTENT_TRANSFORM}>
+        {/* Brand and heading */}
+        <text x="540" y="122" fontSize="27" letterSpacing="0.12em" fill={C.accent}>
+          {BRAND}
         </text>
-      ))}
+        <Star x={405} y={112} r={9} fill={C.accent} />
+        <Star x={675} y={112} r={9} fill={C.accent} />
+        <text x="540" y="235" fontSize="38" fontFamily={SERIF} fill={C.warm}>
+          {t.zodiacOrbitKicker}
+        </text>
+        <text x="540" y="365" fontSize="112" fontFamily={SERIF} fill={P.storyText}>
+          {t.zodiacOrbitTitleTop}
+        </text>
+        <text x="540" y="477" fontSize="112" fontFamily={SERIF} fill={P.storyText}>
+          {t.zodiacOrbitTitleBottom}
+        </text>
+        <text x="540" y="552" fontSize="31" fill={C.soft}>
+          {t.zodiacOrbitSubtitle}
+        </text>
+        <Star x={141} y={368} r={25} fill={C.warm} />
+        <Star x={927} y={440} r={19} fill={C.accent} />
 
-      {/* Values: a blurred copy of the outline gives the glow */}
-      <polygon
-        points={polygon}
-        fill="none"
-        stroke={C.accent}
-        strokeWidth="4"
-        filter="url(#zodiac-orbit-blur)"
-      />
-      <polygon
-        points={polygon}
-        fill={C.accent}
-        fillOpacity="0.2"
-        stroke={C.accent}
-        strokeWidth="4"
-        strokeLinejoin="round"
-      />
-      {valuePoints.map((point, i) => (
-        <circle key={i} cx={point.x.toFixed(2)} cy={point.y.toFixed(2)} r="6" fill={C.warm} />
-      ))}
+        {/* Radar grid */}
+        {rings.map((ring, i) => {
+          const outer = i === rings.length - 1
+          return (
+            <polygon
+              key={i}
+              points={toSvgPoints(ring)}
+              fill="none"
+              stroke={C.accent}
+              strokeOpacity={outer ? 0.33 : 0.15}
+              strokeWidth={outer ? 2 : 1}
+            />
+          )
+        })}
+        {signs.map((sign, i) => {
+          const end = getRadarPoint(i, signs.length, RADIUS, CENTER)
+          // The block hangs from the point next to the ring, growing away from the chart.
+          const direction = getRadarPoint(i, signs.length, 1)
+          const anchor = getRadarPoint(i, signs.length, RADIUS + LABEL_GAP, CENTER)
+          const labelX = anchor.x.toFixed(2)
+          const labelY = anchor.y + direction.y * LABEL_HALF_HEIGHT
+          const textAnchor =
+            Math.abs(direction.x) < 0.2 ? 'middle' : direction.x > 0 ? 'start' : 'end'
+          return (
+            <g key={sign.glyph} data-zodiac-sign={sign.glyph} textAnchor={textAnchor}>
+              <line
+                x1={CENTER.x}
+                y1={CENTER.y}
+                x2={end.x.toFixed(2)}
+                y2={end.y.toFixed(2)}
+                stroke={C.accent}
+                strokeOpacity="0.14"
+              />
+              <text x={labelX} y={(labelY - 8).toFixed(2)} fontSize="42" fill={C.accent}>
+                {sign.glyph}
+              </text>
+              <text x={labelX} y={(labelY + 40).toFixed(2)} fontSize="28" fill={P.storyTextMuted}>
+                {sign.label}
+              </text>
+            </g>
+          )
+        })}
+        {rings.map((_, i) => (
+          <text
+            key={i}
+            x={CENTER.x + 13}
+            y={CENTER.y - (RADIUS * (i + 1)) / RING_COUNT + 20}
+            fontSize="18"
+            textAnchor="start"
+            fill={C.soft}
+          >
+            {(scaleMax * (i + 1)) / RING_COUNT}
+          </text>
+        ))}
 
-      <line x1="125" y1="1457" x2="955" y2="1457" stroke={C.accent} strokeOpacity="0.25" />
+        {/* Values: a blurred copy of the outline gives the glow */}
+        <polygon
+          points={polygon}
+          fill="none"
+          stroke={C.accent}
+          strokeWidth="4"
+          filter="url(#zodiac-orbit-blur)"
+        />
+        <polygon
+          points={polygon}
+          fill={C.accent}
+          fillOpacity="0.2"
+          stroke={C.accent}
+          strokeWidth="4"
+          strokeLinejoin="round"
+        />
+        {valuePoints.map((point, i) => (
+          <circle key={i} cx={point.x.toFixed(2)} cy={point.y.toFixed(2)} r="6" fill={C.warm} />
+        ))}
 
-      {/* Most repeated signs */}
-      <text
-        x="540"
-        y="1545"
-        fontSize={topSignSize}
-        fontFamily={SERIF}
-        fill={C.warm}
-        data-zodiac-top-signs
-      >
-        {topSignText}
-      </text>
-      <text x="540" y="1590" fontSize="21" fill={C.soft}>
-        {topSigns.length > 1 ? t.zodiacOrbitTopSigns : t.zodiacOrbitTopSign}
-      </text>
+        <line x1="125" y1="1517" x2="955" y2="1517" stroke={C.accent} strokeOpacity="0.25" />
 
-      {/* Closing lines */}
-      <text x="540" y="1703" fontSize="40" fontFamily={SERIF} fill={HEADLINE_COLOR}>
-        {t.zodiacOrbitClosingTop}
-      </text>
-      <text x="540" y="1751" fontSize="34" fontFamily={SERIF} fill={C.soft}>
-        {t.zodiacOrbitClosingBottom}
-      </text>
+        {/* Most repeated signs */}
+        <text
+          x="540"
+          y="1605"
+          fontSize={topSignSize}
+          fontFamily={SERIF}
+          fill={C.warm}
+          data-zodiac-top-signs
+        >
+          {topSignText}
+        </text>
+        <text x="540" y="1656" fontSize="28" fill={C.soft}>
+          {topSigns.length > 1 ? t.zodiacOrbitTopSigns : t.zodiacOrbitTopSign}
+        </text>
+
+        {/* Closing lines */}
+        <text x="540" y="1763" fontSize="40" fontFamily={SERIF} fill={P.storyText}>
+          {t.zodiacOrbitClosingTop}
+        </text>
+        <text x="540" y="1811" fontSize="34" fontFamily={SERIF} fill={C.soft}>
+          {t.zodiacOrbitClosingBottom}
+        </text>
+      </g>
     </svg>
   )
 }

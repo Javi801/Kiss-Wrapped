@@ -70,7 +70,10 @@ export default function ZodiacRadarCard({
     mode === 'persons' && hasData ? <ZodiacOrbitStory {...zodiacOrbit} t={t} /> : undefined
 
   return (
-    <FullscreenChartWrapper expandedView={expandedView}>
+    <FullscreenChartWrapper
+      expandedView={expandedView}
+      expandedBackground={`linear-gradient(to bottom right, ${P.storyBgFrom}, ${P.storyBgTo})`}
+    >
       <Card
         className="rounded-3xl"
         style={{
