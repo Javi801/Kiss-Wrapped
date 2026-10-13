@@ -6,10 +6,17 @@ import { COPY } from '@/lib/constants'
 
 // What the mocked chart received, and the hover state fed to its tooltip.
 const chart = vi.hoisted(() => ({ data: null, hover: null }))
+// The props the mocked fullscreen wrapper received last.
+const wrapper = vi.hoisted(() => ({ props: null }))
 
-vi.mock('@/lib/theme', () => ({ usePalette: () => ({}) }))
+vi.mock('@/lib/theme', () => ({
+  usePalette: () => ({ storyBgFrom: '#111111', storyBgTo: '#222222' }),
+}))
 vi.mock('@/components/charts/FullscreenChartWrapper', () => ({
-  default: ({ children }) => children,
+  default: (props) => {
+    wrapper.props = props
+    return props.children
+  },
 }))
 vi.mock('recharts', async () => {
   const { createElement, cloneElement } = await import('react')
@@ -28,10 +35,18 @@ vi.mock('recharts', async () => {
 })
 
 import ZodiacRadarCard from '@/components/stats/ZodiacRadarCard'
+import ZodiacOrbitStory from '@/components/stats/ZodiacOrbitStory'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
 const t = COPY.en
+const orbit = {
+  signs: [
+    { glyph: '♈', label: 'Aries', value: 2 },
+    { glyph: '♌', label: 'Leo', value: 0 },
+  ],
+  topSigns: [{ glyph: '♈', label: 'Aries' }],
+}
 const persons = [
   { label: 'Aries', value: 2 },
   { label: 'Leo', value: 0 },
@@ -57,6 +72,7 @@ function render(props = {}) {
       <ZodiacRadarCard
         personsByZodiac={persons}
         eventsByZodiac={events}
+        zodiacOrbit={orbit}
         emptyText="No signs yet"
         t={t}
         {...props}
@@ -72,6 +88,7 @@ const tooltip = () => container.querySelector('[data-chart]').textContent
 beforeEach(() => {
   chart.data = null
   chart.hover = null
+  wrapper.props = null
 })
 
 afterEach(() => {
@@ -119,6 +136,36 @@ describe('ZodiacRadarCard', () => {
   it('shows the empty text without any signs', () => {
     render({ personsByZodiac: [] })
     expect(container.textContent).toContain('No signs yet')
+  })
+})
+
+describe('ZodiacRadarCard — expanded view', () => {
+  it('expands into the zodiac orbit story in the people mode', () => {
+    render()
+    const { expandedView } = wrapper.props
+    expect(expandedView.type).toBe(ZodiacOrbitStory)
+    expect(expandedView.props).toEqual({ ...orbit, t })
+  })
+
+  it('expands the card itself in the events mode', () => {
+    render()
+    showEvents()
+    expect(wrapper.props.expandedView).toBeUndefined()
+
+    act(() => buttons()[0].click())
+    expect(wrapper.props.expandedView.type).toBe(ZodiacOrbitStory)
+  })
+
+  it('expands the card itself without people', () => {
+    render({ personsByZodiac: empty })
+    expect(wrapper.props.expandedView).toBeUndefined()
+  })
+
+  it('surrounds the story with the story background of the palette', () => {
+    render()
+    expect(wrapper.props.expandedBackground).toBe(
+      'linear-gradient(to bottom right, #111111, #222222)'
+    )
   })
 })
 
