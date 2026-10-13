@@ -66,7 +66,7 @@ At a glance:
     <td width="50%" valign="top">
       <picture><source media="(prefers-color-scheme: dark)" srcset="assets/readme/feature-stats-dark.svg"><img src="assets/readme/feature-stats-light.svg" width="55" alt="Stats icon"></picture><br>
       <strong>Analytics dashboard</strong><br>
-      Four stat tabs: Overview, Time, People, and Scores. Includes heatmaps, area charts, zodiac distributions, score dumbbells, and age-range boxplots. Any chart can be expanded to fullscreen and exported as a PNG. A toggle on the screen chooses whether events from a partner period count, and every chart follows it.<br><br>
+      Four stat tabs: Overview, Time, People, and Scores. Includes heatmaps, area charts, zodiac distributions, score dumbbells, and age-range boxplots. Any chart can be expanded to fullscreen and exported as a PNG. The zodiac radar of people expands into its own story-sized view, exported at 1080 × 1920 on every device. A toggle on the screen chooses whether events from a partner period count, and every chart follows it.<br><br>
       <code>Heatmap</code> <code>Distributions</code> <code>Age at event</code> <code>Fullscreen</code> <code>PNG export</code>
     </td>
     <td width="50%" valign="top">
@@ -135,7 +135,7 @@ At a glance:
   </tr>
   <tr>
     <td><code>components/stats/</code></td>
-    <td>Stats screen and its four tab components: Overview, Time, People, Scores, plus AgeRangeCard</td>
+    <td>Stats screen and its four tab components: Overview, Time, People, Scores, plus AgeRangeCard and ZodiacOrbitStory, the expanded view of the zodiac radar</td>
   </tr>
   <tr>
     <td><code>components/forms/</code></td>
@@ -151,7 +151,7 @@ At a glance:
   </tr>
   <tr>
     <td><code>components/charts/</code></td>
-    <td>Generic reusable chart cards: Bar, Pie, Donut, Area, Heatmap, Dumbbell, and the timeline cards. FullscreenChartWrapper and FullscreenContext enable fullscreen expansion and PNG export for any chart</td>
+    <td>Generic reusable chart cards: Bar, Pie, Donut, Area, Heatmap, Dumbbell, and the timeline cards. FullscreenChartWrapper and FullscreenContext enable fullscreen expansion and PNG export for any chart; its optional <code>expandedView</code> prop swaps the expanded card for a custom fixed-size view</td>
   </tr>
   <tr>
     <td><code>lib/</code></td>
