@@ -377,3 +377,111 @@ describe('FullscreenChartWrapper — download errors', () => {
     })
   })
 })
+
+describe('FullscreenChartWrapper — custom expanded view', () => {
+  // An expanded view stand-in with a scroll area that clips its content.
+  const story = (
+    <div data-testid="story">
+      <div data-testid="story-scroll" style={{ overflow: 'auto', maxHeight: '100px' }}>
+        story
+      </div>
+    </div>
+  )
+  const stage = () => document.body.querySelector('[data-expanded-view]')
+  const storyNode = () => document.body.querySelector('[data-testid="story"]')
+  const storyScroll = () => document.body.querySelector('[data-testid="story-scroll"]')
+  const layer = () => [...document.body.children].find((node) => node !== container)
+
+  it('keeps the chart in place until fullscreen opens', () => {
+    render({ expandedView: story })
+    expect(container.querySelector('[data-testid="chart"]')).not.toBeNull()
+    expect(storyNode()).toBeNull()
+  })
+
+  it('shows the expanded view instead of the chart in fullscreen', () => {
+    render({ expandedView: story })
+    openFullscreen()
+    expect(stage().contains(storyNode())).toBe(true)
+    expect(chartNode()).toBeNull()
+    expect(capture()).toBeNull()
+  })
+
+  it('adds no watermark', () => {
+    render({ expandedView: story })
+    openFullscreen()
+    expect(document.body.querySelector('[data-fullscreen-watermark]')).toBeNull()
+  })
+
+  it('scales a parent to fit the screen and leaves the captured node at full size', () => {
+    render({ expandedView: story })
+    openFullscreen()
+    expect(stage().style.width).toBe('1080px')
+    expect(stage().style.height).toBe('1920px')
+    expect(stage().style.transform).toBe('')
+    expect(stage().parentElement.style.transform).toMatch(/^scale\(/)
+  })
+
+  it('captures the expanded view at 1080 × 1920 without upscaling', async () => {
+    render({ expandedView: story })
+    openFullscreen()
+    await download()
+    expect(mockToPng).toHaveBeenCalledOnce()
+    const [element, options] = mockToPng.mock.calls[0]
+    expect(element).toBe(stage())
+    expect(options).toMatchObject({ width: 1080, height: 1920, pixelRatio: 1 })
+  })
+
+  it('leaves scroll areas clipped during the capture', async () => {
+    let during
+    mockToPng.mockImplementation(async () => {
+      const { overflow, maxHeight } = storyScroll().style
+      during = { overflow, maxHeight }
+      return 'data:image/png;base64,PNGDATA'
+    })
+    render({ expandedView: story })
+    openFullscreen()
+    await download()
+    expect(during).toEqual({ overflow: 'auto', maxHeight: '100px' })
+  })
+
+  it('shares the image under the usual dated name', async () => {
+    render({ expandedView: story })
+    openFullscreen()
+    await download()
+    const written = mockFilesystem.writeFile.mock.calls[0][0]
+    expect(written.path).toMatch(/^kiss-wrapped-chart-\d{4}-\d{2}-\d{2}\.png$/)
+    expect(mockShare.share).toHaveBeenCalledWith({ files: ['file:///mock/chart.png'] })
+  })
+
+  it('shows the reason when the capture fails', async () => {
+    mockToPng.mockRejectedValue(new Error('canvas too large'))
+    render({ expandedView: story })
+    openFullscreen()
+    await download()
+    expect(errorDialog().textContent).toContain('Error: canvas too large')
+  })
+
+  it('closes with the close button and on Escape', () => {
+    render({ expandedView: story })
+    openFullscreen()
+    act(() => byTitle(t.close).click())
+    expect(stage()).toBeNull()
+    expect(container.querySelector('[data-testid="chart"]')).not.toBeNull()
+
+    openFullscreen()
+    pressKey('Escape')
+    expect(stage()).toBeNull()
+  })
+
+  it('fills the space around the expanded view with the given background', () => {
+    render({ expandedView: story, expandedBackground: 'rgb(1, 2, 3)' })
+    openFullscreen()
+    expect(layer().style.background).toBe('rgb(1, 2, 3)')
+  })
+
+  it('ignores the background without an expanded view', () => {
+    render({ expandedBackground: 'rgb(1, 2, 3)' })
+    openFullscreen()
+    expect(layer().style.background).toBe('')
+  })
+})
