@@ -80,6 +80,7 @@ ios/Pods
 .idea
 .claude/settings.local.json
 .claude/hooks/
+.claude/skills/
 CLAUDE.md
 graphify-out/
 .claude/settings.json
