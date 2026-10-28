@@ -181,7 +181,7 @@ export default function PersonForm({
 
   return (
     <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <div style={{ display: 'grid', gap: '1rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '1rem' }}>
         {/* Name + Real name grouped */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -336,7 +336,7 @@ export default function PersonForm({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <Label>{t.zodiacSign} *</Label>
           <Select value={form.zodiacSign} onValueChange={(value) => update('zodiacSign', value)}>
-            <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
+            <SelectTrigger className="w-full rounded-2xl" style={{ ...inputStyle }}>
               <SelectValue placeholder={t.select} />
             </SelectTrigger>
 

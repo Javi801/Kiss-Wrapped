@@ -66,7 +66,7 @@ function DialogContent({
         <div
           ref={scrollFadeRef}
           data-slot="dialog-body"
-          className="grid min-h-0 gap-6 overflow-y-auto p-6"
+          className="grid min-h-0 grid-cols-[minmax(0,1fr)] gap-6 overflow-y-auto p-6"
         >
           {children}
         </div>
