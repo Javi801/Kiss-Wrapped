@@ -387,11 +387,9 @@ export const es = {
   tagPeople: 'personas',
   tagEvent: 'evento',
   tagEvents: 'eventos',
-  deleteTagInUsePeopleDesc:
-    'Si la eliminas de todas formas, solo se quitará de esas personas: se mantienen, con este campo vacío.',
-  deleteTagInUseEventsDesc:
-    'Si la eliminas de todas formas, solo se quitará de esos eventos: se mantienen, con este campo vacío.',
-  deleteTagInUseRequired: 'Como el campo es obligatorio, quedarán marcados como incompletos.',
+  deleteTagInUsePeopleDesc: 'Si la eliminas se quitará de esas personas, y el campo quedará vacío.',
+  deleteTagInUseEventsDesc: 'Si la eliminas se quitará de esos eventos, y el campo quedará vacío.',
+  deleteTagInUseRequired: 'Al ser obligatorio, se marcará como incompleto.',
   deleteTagAnywayAction: 'Eliminar de todas formas',
   ...esGuide,
   entryGuideTitle: 'Entrada real de la app',

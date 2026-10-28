@@ -387,10 +387,10 @@ export const en = {
   tagEvent: 'event',
   tagEvents: 'events',
   deleteTagInUsePeopleDesc:
-    'If you delete it anyway, it is only removed from those people: they are kept, with this field empty.',
+    'If you delete it, it will be removed from those people and the field will be empty.',
   deleteTagInUseEventsDesc:
-    'If you delete it anyway, it is only removed from those events: they are kept, with this field empty.',
-  deleteTagInUseRequired: 'Since the field is required, they will be marked as incomplete.',
+    'If you delete it, it will be removed from those events and the field will be empty.',
+  deleteTagInUseRequired: 'As it is required, it will be marked as incomplete.',
   deleteTagAnywayAction: 'Delete anyway',
   ...enGuide,
   entryGuideTitle: "The app's real entrance",
