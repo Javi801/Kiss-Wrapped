@@ -9,6 +9,7 @@ export function emptyFilters() {
     maxAge: '',
     activity: [],
     howWeMet: [],
+    nationality: [],
     zodiacSign: [],
     eventDateFrom: '',
     eventDateTo: '',
@@ -36,6 +37,7 @@ export function filterPeople(people, query, filters) {
       .toLowerCase()
 
     const selectedHowWeMet = filters.howWeMet ?? []
+    const selectedNationality = filters.nationality ?? []
     const matchesQuery = !q || searchable.includes(q)
     const age = effectiveAge(person)
     const matchesMinAge = !filters.minAge || age >= Number(filters.minAge)
@@ -45,6 +47,9 @@ export function filterPeople(people, query, filters) {
     const matchesHowWeMet =
       selectedHowWeMet.length === 0 ||
       selectedHowWeMet.some((tag) => normalizeTag(person.howWeMet) === normalizeTag(tag))
+    const matchesNationality =
+      selectedNationality.length === 0 ||
+      selectedNationality.some((tag) => normalizeTag(person.nationality) === normalizeTag(tag))
     const matchesZodiac =
       filters.zodiacSign.length === 0 ||
       filters.zodiacSign.some((z) => z[0] === person.zodiacSign?.[0])
@@ -64,6 +69,7 @@ export function filterPeople(people, query, filters) {
       matchesMaxAge &&
       matchesActivity &&
       matchesHowWeMet &&
+      matchesNationality &&
       matchesZodiac &&
       matchesEventDate
     )

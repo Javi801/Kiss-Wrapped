@@ -1,4 +1,4 @@
-import { Briefcase, Calendar, RotateCcw, SlidersHorizontal, Star } from 'lucide-react'
+import { Briefcase, Calendar, Globe, RotateCcw, SlidersHorizontal, Star } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -68,6 +68,7 @@ const EMPTY_FILTERS = {
   maxAge: '',
   activity: [],
   howWeMet: [],
+  nationality: [],
   zodiacSign: [],
   eventDateFrom: '',
   eventDateTo: '',
@@ -140,6 +141,7 @@ export default function FiltersPanel({
   t,
   language,
   howWeMetTags = [],
+  nationalityTags = [],
 }) {
   const PALETTE = usePalette()
   const inputStyle = {
@@ -162,6 +164,18 @@ export default function FiltersPanel({
       return {
         ...prev,
         howWeMet: selected.includes(value)
+          ? selected.filter((tag) => tag !== value)
+          : [...selected, value],
+      }
+    })
+  }
+
+  function toggleNationality(value) {
+    setFilters((prev) => {
+      const selected = prev.nationality ?? []
+      return {
+        ...prev,
+        nationality: selected.includes(value)
           ? selected.filter((tag) => tag !== value)
           : [...selected, value],
       }
@@ -302,6 +316,27 @@ export default function FiltersPanel({
                   label={value}
                   selected={filters.howWeMet.includes(value)}
                   onClick={() => toggleHowWeMet(value)}
+                />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {nationalityTags.length > 0 && (
+        <>
+          <Divider />
+
+          {/* Nationality */}
+          <div>
+            <SectionLabel icon={Globe} label={t.nationality} />
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+              {nationalityTags.map((value) => (
+                <Chip
+                  key={value}
+                  label={value}
+                  selected={(filters.nationality ?? []).includes(value)}
+                  onClick={() => toggleNationality(value)}
                 />
               ))}
             </div>

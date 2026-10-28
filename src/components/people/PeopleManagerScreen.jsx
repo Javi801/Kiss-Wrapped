@@ -58,6 +58,7 @@ export default function PeopleManagerScreen({
         language={language}
         modalBackRef={modalBackRef}
         howWeMetTags={howWeMetTags}
+        nationalityTags={nationalityTags}
       />
 
       {list.filteredPeople.length ? (

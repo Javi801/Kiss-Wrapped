@@ -39,6 +39,7 @@ const EMPTY = {
   maxAge: '',
   activity: [],
   howWeMet: [],
+  nationality: [],
   zodiacSign: [],
   eventDateFrom: '',
   eventDateTo: '',
@@ -72,7 +73,12 @@ function Harness({ initial, setGroupBy, setSortBy, ...props }) {
   )
 }
 
-function render({ filters = {}, howWeMetTags = ['School', 'Work'], ...props } = {}) {
+function render({
+  filters = {},
+  howWeMetTags = ['School', 'Work'],
+  nationalityTags = ['Chilean', 'Peruvian'],
+  ...props
+} = {}) {
   const handlers = { setGroupBy: vi.fn(), setSortBy: vi.fn() }
   fields.selects = []
   fields.dates = []
@@ -84,6 +90,7 @@ function render({ filters = {}, howWeMetTags = ['School', 'Work'], ...props } = 
       <Harness
         initial={{ ...EMPTY, ...filters }}
         howWeMetTags={howWeMetTags}
+        nationalityTags={nationalityTags}
         {...handlers}
         {...props}
       />
@@ -183,6 +190,40 @@ describe('FiltersPanel — how we met', () => {
   })
 })
 
+describe('FiltersPanel — nationality', () => {
+  it('offers a chip per stored nationality tag', () => {
+    render()
+    expect(container.textContent).toContain(t.nationality)
+    expect(
+      buttons().filter((item) => ['Chilean', 'Peruvian'].includes(item.textContent))
+    ).toHaveLength(2)
+  })
+
+  it('hides the section when there are no nationality tags', () => {
+    render({ nationalityTags: [] })
+    expect(container.textContent).not.toContain(t.nationality)
+  })
+
+  it('adds a tapped nationality to the filter state', () => {
+    render({ filters: { nationality: ['Chilean'] } })
+    click('Peruvian')
+    expect(current.nationality).toEqual(['Chilean', 'Peruvian'])
+  })
+
+  it('removes a nationality that is tapped again', () => {
+    render({ filters: { nationality: ['Chilean'] } })
+    click('Chilean')
+    expect(current.nationality).toEqual([])
+  })
+
+  it('tolerates filters saved before the nationality filter existed', () => {
+    const { nationality: _, ...legacy } = EMPTY
+    render({ filters: legacy })
+    click('Chilean')
+    expect(current.nationality).toEqual(['Chilean'])
+  })
+})
+
 describe('FiltersPanel — zodiac', () => {
   const zodiacChips = () => buttons().filter((item) => /\(.*\)$/.test(item.textContent))
 
@@ -278,6 +319,7 @@ describe('FiltersPanel — reset', () => {
         minAge: '20',
         maxAge: '30',
         activity: ['works'],
+        nationality: ['Chilean'],
         zodiacSign: [ZODIAC_OPTIONS.en[3]],
         eventDateFrom: '2024.01.01',
         eventDateTo: '2024.12.31',

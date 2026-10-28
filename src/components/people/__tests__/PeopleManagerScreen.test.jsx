@@ -156,6 +156,11 @@ describe('PeopleManagerScreen — list', () => {
     render([person('Ana')], props)
     expect(seen.cards.ana).toMatchObject({ ...props, language: 'en', t, modalBackRef })
   })
+
+  it('offers the nationality tags to the filters', () => {
+    render([person('Ana')], { nationalityTags: ['Chilean'] })
+    expect(seen.filters.nationalityTags).toEqual(['Chilean'])
+  })
 })
 
 describe('PeopleManagerScreen — search', () => {
@@ -207,6 +212,7 @@ describe('PeopleManagerScreen — search', () => {
       maxAge: '',
       activity: [],
       howWeMet: [],
+      nationality: [],
       zodiacSign: [],
       eventDateFrom: '',
       eventDateTo: '',
@@ -275,6 +281,35 @@ describe('PeopleManagerScreen — filters', () => {
     render(taggedPeople)
     setFilters({ howWeMet: ['School'] })
     expect(shown()).toEqual(['ana', 'cy'])
+  })
+
+  it('keeps people whose nationality matches a selected tag, ignoring case and spaces', () => {
+    const taggedPeople = [
+      person('Ana', { nationality: 'Chilean' }),
+      person('Bob', { nationality: 'Peruvian' }),
+      person('Cy', { nationality: ' chilean ' }),
+      person('Dee'),
+    ]
+    render(taggedPeople)
+    setFilters({ nationality: ['Chilean'] })
+    expect(shown()).toEqual(['ana', 'cy'])
+  })
+
+  it('combines several selected nationalities', () => {
+    const taggedPeople = [
+      person('Ana', { nationality: 'Chilean' }),
+      person('Bob', { nationality: 'Peruvian' }),
+      person('Cy', { nationality: 'Argentinian' }),
+    ]
+    render(taggedPeople)
+    setFilters({ nationality: ['Chilean', 'Peruvian'] })
+    expect(shown()).toEqual(['ana', 'bob'])
+  })
+
+  it('keeps everyone when the filters predate the nationality filter', () => {
+    render([person('Ana', { nationality: 'Chilean' }), person('Bob')])
+    setFilters({ nationality: undefined })
+    expect(shown()).toEqual(['ana', 'bob'])
   })
 
   it('keeps people with an event on or after the start date', () => {
