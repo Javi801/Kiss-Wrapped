@@ -15,11 +15,13 @@ import java.util.List;
 public class AppIconPlugin extends Plugin {
 
     private static final List<String> COLORS = Arrays.asList(
-            "lightPurple", "golden", "darkPurple", "darkPink", "darkGreen", "lightGreen", "lightPink");
+            "notebookPink", "notebookLavender", "notebookGreen",
+            "chartPink", "chartLavender", "chartGreen",
+            "orbitPink", "orbitLavender", "orbitGreen");
 
     @PluginMethod
     public void setColor(PluginCall call) {
-        String color = call.getString("color", "lightPink");
+        String color = call.getString("color", "notebookPink");
         if (!COLORS.contains(color)) {
             call.reject("Unknown color: " + color);
             return;

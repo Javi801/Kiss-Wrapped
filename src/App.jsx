@@ -257,6 +257,9 @@ export default function KissWrappedApp() {
     screen === SCREENS.intro ||
     screen === SCREENS.onboarding
 
+  // Render nothing until the saved settings are read, so the default palette never flashes.
+  if (screen === SCREENS.boot) return null
+
   const palette = PALETTES[theme] ?? PALETTES.pink
 
   return (

@@ -16,7 +16,9 @@ export function emptyFilters() {
 }
 
 function normalizeTag(value) {
-  return String(value ?? '').trim().toLowerCase()
+  return String(value ?? '')
+    .trim()
+    .toLowerCase()
 }
 
 export function filterPeople(people, query, filters) {

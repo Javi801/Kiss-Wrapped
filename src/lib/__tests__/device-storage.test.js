@@ -318,8 +318,8 @@ describe('loadSettings (web path)', () => {
   })
 
   it('returns the saved iconColor', async () => {
-    localStorage.setItem(ICON_COLOR_KEY, 'darkPink')
-    expect((await loadSettings()).iconColor).toBe('darkPink')
+    localStorage.setItem(ICON_COLOR_KEY, 'chartPink')
+    expect((await loadSettings()).iconColor).toBe('chartPink')
   })
 
   it('returns the saved language', async () => {
@@ -341,9 +341,9 @@ describe('loadSettings (web path)', () => {
   })
 
   it('falls back to default language when only iconColor is saved', async () => {
-    localStorage.setItem(ICON_COLOR_KEY, 'darkPink')
+    localStorage.setItem(ICON_COLOR_KEY, 'chartPink')
     const settings = await loadSettings()
-    expect(settings.iconColor).toBe('darkPink')
+    expect(settings.iconColor).toBe('chartPink')
     expect(settings.language).toBe(DEFAULT_SETTINGS.language)
     expect(settings.theme).toBe(DEFAULT_SETTINGS.theme)
   })
@@ -385,35 +385,35 @@ describe('saveSettings (web path)', () => {
   })
 
   it('saves iconColor to localStorage', async () => {
-    await saveSettings({ iconColor: 'darkPink', language: 'es' })
-    expect(localStorage.getItem(ICON_COLOR_KEY)).toBe('darkPink')
+    await saveSettings({ iconColor: 'chartPink', language: 'es' })
+    expect(localStorage.getItem(ICON_COLOR_KEY)).toBe('chartPink')
   })
 
   it('saves language to localStorage', async () => {
-    await saveSettings({ iconColor: 'darkPink', language: 'es' })
+    await saveSettings({ iconColor: 'chartPink', language: 'es' })
     expect(localStorage.getItem(LANGUAGE_KEY)).toBe('es')
   })
 
   it('saves theme to localStorage', async () => {
-    await saveSettings({ iconColor: 'darkPink', language: 'es', theme: 'dark' })
+    await saveSettings({ iconColor: 'chartPink', language: 'es', theme: 'dark' })
     expect(localStorage.getItem(THEME_KEY)).toBe('dark')
   })
 
   it('does not overwrite iconColor when it is undefined', async () => {
-    localStorage.setItem(ICON_COLOR_KEY, 'lightPink')
+    localStorage.setItem(ICON_COLOR_KEY, 'notebookPink')
     await saveSettings({ language: 'es' })
-    expect(localStorage.getItem(ICON_COLOR_KEY)).toBe('lightPink')
+    expect(localStorage.getItem(ICON_COLOR_KEY)).toBe('notebookPink')
   })
 
   it('does not overwrite language when it is undefined', async () => {
     localStorage.setItem(LANGUAGE_KEY, 'en')
-    await saveSettings({ iconColor: 'darkPink' })
+    await saveSettings({ iconColor: 'chartPink' })
     expect(localStorage.getItem(LANGUAGE_KEY)).toBe('en')
   })
 
   it('does not overwrite theme when it is undefined', async () => {
     localStorage.setItem(THEME_KEY, 'green')
-    await saveSettings({ iconColor: 'darkPink' })
+    await saveSettings({ iconColor: 'chartPink' })
     expect(localStorage.getItem(THEME_KEY)).toBe('green')
   })
 
@@ -424,7 +424,7 @@ describe('saveSettings (web path)', () => {
 
   it('does not overwrite situationTags when it is undefined', async () => {
     localStorage.setItem(SITUATION_TAGS_KEY, JSON.stringify(['Existing']))
-    await saveSettings({ iconColor: 'darkPink' })
+    await saveSettings({ iconColor: 'chartPink' })
     expect(JSON.parse(localStorage.getItem(SITUATION_TAGS_KEY))).toEqual(['Existing'])
   })
 
@@ -435,7 +435,7 @@ describe('saveSettings (web path)', () => {
 
   it('does not overwrite placeTags when it is undefined', async () => {
     localStorage.setItem(PLACE_TAGS_KEY, JSON.stringify(['Existing']))
-    await saveSettings({ iconColor: 'darkPink' })
+    await saveSettings({ iconColor: 'chartPink' })
     expect(JSON.parse(localStorage.getItem(PLACE_TAGS_KEY))).toEqual(['Existing'])
   })
 
@@ -446,13 +446,13 @@ describe('saveSettings (web path)', () => {
 
   it('does not overwrite howWeMetTags when it is undefined', async () => {
     localStorage.setItem(HOW_WE_MET_TAGS_KEY, JSON.stringify(['Existing']))
-    await saveSettings({ iconColor: 'darkPink' })
+    await saveSettings({ iconColor: 'chartPink' })
     expect(JSON.parse(localStorage.getItem(HOW_WE_MET_TAGS_KEY))).toEqual(['Existing'])
   })
 
   it('round-trips correctly through save and load', async () => {
     await saveSettings({
-      iconColor: 'darkGreen',
+      iconColor: 'chartGreen',
       language: 'es',
       theme: 'dark',
       statsVisible: true,
@@ -463,7 +463,7 @@ describe('saveSettings (web path)', () => {
       onboardingDone: true,
     })
     expect(await loadSettings()).toEqual({
-      iconColor: 'darkGreen',
+      iconColor: 'chartGreen',
       language: 'es',
       theme: 'dark',
       statsVisible: true,
@@ -564,7 +564,7 @@ describe('loadSettings (native path — reads existing file)', () => {
 
   it('returns settings from native file when it exists', async () => {
     const stored = {
-      iconColor: 'darkPink',
+      iconColor: 'chartPink',
       language: 'es',
       theme: 'dark',
       statsVisible: true,
@@ -753,7 +753,7 @@ describe('saveSettings (native path)', () => {
 
   it('writes to Filesystem with Directory.Data', async () => {
     await saveSettings({
-      iconColor: 'darkPink',
+      iconColor: 'chartPink',
       language: 'es',
       theme: 'dark',
       statsVisible: false,
@@ -768,7 +768,7 @@ describe('saveSettings (native path)', () => {
 
   it('serializes all settings fields correctly', async () => {
     const settings = {
-      iconColor: 'darkPink',
+      iconColor: 'chartPink',
       language: 'es',
       theme: 'dark',
       statsVisible: false,
@@ -785,7 +785,7 @@ describe('saveSettings (native path)', () => {
 
   it('does not write to localStorage on native', async () => {
     localStorage.clear()
-    await saveSettings({ iconColor: 'darkGreen' })
+    await saveSettings({ iconColor: 'chartGreen' })
     expect(localStorage.getItem(ICON_COLOR_KEY)).toBeNull()
   })
 })

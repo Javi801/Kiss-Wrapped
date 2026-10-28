@@ -81,7 +81,12 @@ function render({ filters = {}, howWeMetTags = ['School', 'Work'], ...props } = 
   root = createRoot(container)
   act(() => {
     root.render(
-      <Harness initial={{ ...EMPTY, ...filters }} howWeMetTags={howWeMetTags} {...handlers} {...props} />
+      <Harness
+        initial={{ ...EMPTY, ...filters }}
+        howWeMetTags={howWeMetTags}
+        {...handlers}
+        {...props}
+      />
     )
   })
   return handlers

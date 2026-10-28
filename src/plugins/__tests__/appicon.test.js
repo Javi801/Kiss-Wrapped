@@ -18,20 +18,20 @@ describe('setAppIconColor', () => {
   })
 
   it('asks the plugin to switch to the given color', async () => {
-    await setAppIconColor('darkPink')
+    await setAppIconColor('chartPink')
     expect(mockPlugin.setColor).toHaveBeenCalledOnce()
-    expect(mockPlugin.setColor).toHaveBeenCalledWith({ color: 'darkPink' })
+    expect(mockPlugin.setColor).toHaveBeenCalledWith({ color: 'chartPink' })
   })
 
   it('resolves when the plugin is unavailable', async () => {
     mockPlugin.setColor.mockRejectedValue(new Error('AppIcon plugin is not implemented on web'))
-    await expect(setAppIconColor('darkGreen')).resolves.toBeUndefined()
+    await expect(setAppIconColor('chartGreen')).resolves.toBeUndefined()
   })
 
   it('resolves when the plugin throws synchronously', async () => {
     mockPlugin.setColor.mockImplementation(() => {
       throw new Error('not implemented')
     })
-    await expect(setAppIconColor('darkGreen')).resolves.toBeUndefined()
+    await expect(setAppIconColor('chartGreen')).resolves.toBeUndefined()
   })
 })

@@ -16,7 +16,7 @@ import { SPEECH_BUBBLE_SELECTOR } from '@/lib/onboarding'
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
 const t = COPY.en
-const settings = { theme: 'pink', iconColor: 'lightPink', statsVisible: true }
+const settings = { theme: 'pink', iconColor: 'notebookPink', statsVisible: true }
 const person = createPerson({
   name: 'Mia',
   birthYear: 1995,

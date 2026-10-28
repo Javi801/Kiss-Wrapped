@@ -25,14 +25,17 @@ export const APP_GITHUB_REPO = 'https://github.com/Javi801/Kiss-Wrapped'
 // Supported values for user settings. Persisted values outside these lists are ignored.
 export const LANGUAGES = ['en', 'es']
 export const THEMES = ['pink', 'green', 'dark']
+// App icon variants: design (notebook, chart, orbit) plus color (pink, lavender, green).
 export const ICON_COLORS = [
-  'lightPurple',
-  'golden',
-  'darkPurple',
-  'darkPink',
-  'darkGreen',
-  'lightGreen',
-  'lightPink',
+  'notebookPink',
+  'notebookLavender',
+  'notebookGreen',
+  'chartPink',
+  'chartLavender',
+  'chartGreen',
+  'orbitPink',
+  'orbitLavender',
+  'orbitGreen',
 ]
 
 // Initial values for user settings. They apply only until the user's own
@@ -40,7 +43,7 @@ export const ICON_COLORS = [
 export const DEFAULT_SETTINGS = {
   language: 'en',
   theme: 'pink',
-  iconColor: 'lightPink',
+  iconColor: 'notebookPink',
   statsVisible: true,
   includePartnerEvents: false,
 }

@@ -19,12 +19,12 @@
             android:exported="true">
         </activity>
 
-        <!-- Light pink (default) -->
+        <!-- Notebook pink (default) -->
         <activity-alias
-            android:name=".AliasLightPink"
+            android:name=".AliasNotebookPink"
             android:targetActivity=".MainActivity"
-            android:icon="@mipmap/ic_launcher_light_pink"
-            android:roundIcon="@mipmap/ic_launcher_light_pink"
+            android:icon="@mipmap/ic_launcher_notebook_pink"
+            android:roundIcon="@mipmap/ic_launcher_notebook_pink"
             android:label="@string/app_name"
             android:enabled="true"
             android:exported="true">
@@ -34,12 +34,12 @@
             </intent-filter>
         </activity-alias>
 
-        <!-- Light purple -->
+        <!-- Notebook lavender -->
         <activity-alias
-            android:name=".AliasLightPurple"
+            android:name=".AliasNotebookLavender"
             android:targetActivity=".MainActivity"
-            android:icon="@mipmap/ic_launcher_light_purple"
-            android:roundIcon="@mipmap/ic_launcher_light_purple"
+            android:icon="@mipmap/ic_launcher_notebook_lavender"
+            android:roundIcon="@mipmap/ic_launcher_notebook_lavender"
             android:label="@string/app_name"
             android:enabled="false"
             android:exported="true">
@@ -49,12 +49,12 @@
             </intent-filter>
         </activity-alias>
 
-        <!-- Golden -->
+        <!-- Notebook green -->
         <activity-alias
-            android:name=".AliasGolden"
+            android:name=".AliasNotebookGreen"
             android:targetActivity=".MainActivity"
-            android:icon="@mipmap/ic_launcher_golden"
-            android:roundIcon="@mipmap/ic_launcher_golden"
+            android:icon="@mipmap/ic_launcher_notebook_green"
+            android:roundIcon="@mipmap/ic_launcher_notebook_green"
             android:label="@string/app_name"
             android:enabled="false"
             android:exported="true">
@@ -64,12 +64,12 @@
             </intent-filter>
         </activity-alias>
 
-        <!-- Dark purple -->
+        <!-- Chart pink -->
         <activity-alias
-            android:name=".AliasDarkPurple"
+            android:name=".AliasChartPink"
             android:targetActivity=".MainActivity"
-            android:icon="@mipmap/ic_launcher_dark_purple"
-            android:roundIcon="@mipmap/ic_launcher_dark_purple"
+            android:icon="@mipmap/ic_launcher_chart_pink"
+            android:roundIcon="@mipmap/ic_launcher_chart_pink"
             android:label="@string/app_name"
             android:enabled="false"
             android:exported="true">
@@ -79,12 +79,12 @@
             </intent-filter>
         </activity-alias>
 
-        <!-- Dark pink -->
+        <!-- Chart lavender -->
         <activity-alias
-            android:name=".AliasDarkPink"
+            android:name=".AliasChartLavender"
             android:targetActivity=".MainActivity"
-            android:icon="@mipmap/ic_launcher_dark_pink"
-            android:roundIcon="@mipmap/ic_launcher_dark_pink"
+            android:icon="@mipmap/ic_launcher_chart_lavender"
+            android:roundIcon="@mipmap/ic_launcher_chart_lavender"
             android:label="@string/app_name"
             android:enabled="false"
             android:exported="true">
@@ -94,12 +94,12 @@
             </intent-filter>
         </activity-alias>
 
-        <!-- Dark green -->
+        <!-- Chart green -->
         <activity-alias
-            android:name=".AliasDarkGreen"
+            android:name=".AliasChartGreen"
             android:targetActivity=".MainActivity"
-            android:icon="@mipmap/ic_launcher_dark_green"
-            android:roundIcon="@mipmap/ic_launcher_dark_green"
+            android:icon="@mipmap/ic_launcher_chart_green"
+            android:roundIcon="@mipmap/ic_launcher_chart_green"
             android:label="@string/app_name"
             android:enabled="false"
             android:exported="true">
@@ -109,12 +109,42 @@
             </intent-filter>
         </activity-alias>
 
-        <!-- Light green -->
+        <!-- Orbit pink -->
         <activity-alias
-            android:name=".AliasLightGreen"
+            android:name=".AliasOrbitPink"
             android:targetActivity=".MainActivity"
-            android:icon="@mipmap/ic_launcher_light_green"
-            android:roundIcon="@mipmap/ic_launcher_light_green"
+            android:icon="@mipmap/ic_launcher_orbit_pink"
+            android:roundIcon="@mipmap/ic_launcher_orbit_pink"
+            android:label="@string/app_name"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- Orbit lavender -->
+        <activity-alias
+            android:name=".AliasOrbitLavender"
+            android:targetActivity=".MainActivity"
+            android:icon="@mipmap/ic_launcher_orbit_lavender"
+            android:roundIcon="@mipmap/ic_launcher_orbit_lavender"
+            android:label="@string/app_name"
+            android:enabled="false"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- Orbit green -->
+        <activity-alias
+            android:name=".AliasOrbitGreen"
+            android:targetActivity=".MainActivity"
+            android:icon="@mipmap/ic_launcher_orbit_green"
+            android:roundIcon="@mipmap/ic_launcher_orbit_green"
             android:label="@string/app_name"
             android:enabled="false"
             android:exported="true">

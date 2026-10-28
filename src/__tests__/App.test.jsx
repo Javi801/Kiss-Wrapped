@@ -182,13 +182,13 @@ describe('App — boot', () => {
 
   it('restores the saved language, theme, icon color and stats visibility', async () => {
     await boot({
-      settings: { language: 'es', theme: 'green', iconColor: 'darkGreen', statsVisible: false },
+      settings: { language: 'es', theme: 'green', iconColor: 'chartGreen', statsVisible: false },
     })
     openMain()
     expect(screens.main).toMatchObject({
       language: 'es',
       theme: 'green',
-      iconColor: 'darkGreen',
+      iconColor: 'chartGreen',
       statsVisible: false,
       t: COPY.es,
     })
@@ -789,13 +789,13 @@ describe('App — settings', () => {
   it('saves a changed icon color and switches the launcher icon', async () => {
     await boot()
     openMain()
-    await act(async () => screens.main.setIconColor('darkPurple'))
-    expect(savedSettings().iconColor).toBe('darkPurple')
-    expect(mockSetAppIconColor).toHaveBeenCalledWith('darkPurple')
+    await act(async () => screens.main.setIconColor('orbitLavender'))
+    expect(savedSettings().iconColor).toBe('orbitLavender')
+    expect(mockSetAppIconColor).toHaveBeenCalledWith('orbitLavender')
   })
 
   it('does not touch the launcher icon while booting', async () => {
-    await boot({ settings: { iconColor: 'darkGreen' } })
+    await boot({ settings: { iconColor: 'chartGreen' } })
     expect(mockSetAppIconColor).not.toHaveBeenCalled()
   })
 

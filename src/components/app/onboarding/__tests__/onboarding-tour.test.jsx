@@ -60,7 +60,7 @@ const t = COPY.en
 const person = { id: 'mia', name: 'Mia', events: [] }
 const settings = {
   theme: 'dark',
-  iconColor: 'darkPink',
+  iconColor: 'chartPink',
   statsVisible: false,
   includePartnerEvents: true,
 }
