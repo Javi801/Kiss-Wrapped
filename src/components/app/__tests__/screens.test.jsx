@@ -471,7 +471,7 @@ describe('OnboardingWizard — tour steps', () => {
 })
 
 describe('OnboardingPersonStep', () => {
-  const settings = { theme: 'dark', iconColor: 'darkPink', statsVisible: false }
+  const settings = { theme: 'dark', iconColor: 'chartPink', statsVisible: false }
 
   function renderStep() {
     const onPracticePerson = vi.fn()

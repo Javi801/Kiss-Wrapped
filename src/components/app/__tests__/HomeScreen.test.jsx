@@ -81,7 +81,7 @@ function render(props = {}) {
         people={[ana, bob]}
         t={t}
         language="en"
-        iconColor="lightPink"
+        iconColor="notebookPink"
         theme="pink"
         statsVisible
         modalBackRef={modalBackRef}
@@ -197,7 +197,7 @@ describe('HomeScreen — settings and about', () => {
     render()
     await click(t.settings)
     expect(seen.colors).toMatchObject({
-      iconColor: 'lightPink',
+      iconColor: 'notebookPink',
       setIconColor: handlers.setIconColor,
       theme: 'pink',
       setTheme: handlers.setTheme,

@@ -276,7 +276,7 @@ Event {
 Settings {
   language:             string    // en or es
   theme:                string    // pink, green, or dark
-  iconColor:            string
+  iconColor:            string    // icon design + color, e.g. notebookPink
   statsVisible:         boolean
   includePartnerEvents: boolean   // count events inside a partner period in the stats
   situationTags:        string[]
