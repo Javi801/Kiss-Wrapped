@@ -65,6 +65,13 @@ describe('DialogContent', () => {
     expect(body.contains(slot('dialog-close'))).toBe(false)
   })
 
+  it('lets the caller change the layout of the body', () => {
+    renderDialog({ bodyClassName: 'flex flex-1 flex-col' })
+    const body = slot('dialog-body').className.split(' ')
+    expect(body).toEqual(expect.arrayContaining(['flex', 'flex-1', 'flex-col', 'overflow-y-auto']))
+    expect(body).not.toContain('grid')
+  })
+
   it('omits the close button when asked to', () => {
     renderDialog({ showCloseButton: false })
     expect(slot('dialog-close')).toBeNull()
