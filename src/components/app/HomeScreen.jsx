@@ -21,14 +21,19 @@ import JsonExportDialogs from '@/components/app/JsonExportDialogs'
 import ImportDialogs from '@/components/app/ImportDialogs'
 import AboutDialog from '@/components/app/AboutDialog'
 import AppGuideDialog from '@/components/app/AppGuideDialog'
+import TagsDialog from '@/components/app/TagsDialog'
 import OnboardingDoneDialog from '@/components/app/OnboardingDoneDialog'
 import { TOUR_TARGETS } from '@/lib/onboarding'
+
+// Used when the screen is rendered without tag lists, as the onboarding tour does.
+const NO_TAGS = { howWeMet: [], nationality: [], situation: [], place: [] }
 
 /**
  * Renders the main dashboard screen.
  * It shows summary metrics, primary actions, and app-level settings.
  * `onRestartOnboarding` adds the restart-onboarding action to the settings.
  * `onboardingDoneOpen` shows the notice that follows the onboarding; `onCloseOnboardingDone` closes it.
+ * `tags` holds the tag lists by field name for the tags dialog; `onRemoveTag(field, tag)` deletes one.
  * For the onboarding tour, `tourTarget` names what it points at (`SCREENS.add`, `SCREENS.people`,
  * `TOUR_TARGETS.data` or `TOUR_TARGETS.settings`) and `tourHint` (`{ title, body }`) is the
  * text for the last two.
@@ -48,6 +53,8 @@ export default function MainScreen({
   statsVisible,
   setStatsVisible,
   includePartnerEvents,
+  tags = NO_TAGS,
+  onRemoveTag,
   modalBackRef,
   onRestartOnboarding,
   onboardingDoneOpen = false,
@@ -61,6 +68,9 @@ export default function MainScreen({
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
+  const [tagsOpen, setTagsOpen] = useState(false)
+  // null = idle | { field, tag } = waiting for the delete confirmation
+  const [pendingTagDelete, setPendingTagDelete] = useState(null)
   // null = idle | { fileName, isNative, hadMissingFields } = success | Error = failed
   const [jsonExportStatus, setJsonExportStatus] = useState(null)
   // null = idle | { type: "confirm", count, data } | { type: "success", count } | { type: "error_type" | "error_format" }
@@ -75,6 +85,7 @@ export default function MainScreen({
       onboardingDoneOpen ||
       aboutOpen ||
       guideOpen ||
+      tagsOpen ||
       languageOpen ||
       settingsOpen ||
       confirmOpen ||
@@ -85,6 +96,8 @@ export default function MainScreen({
           if (onboardingDoneOpen) onCloseOnboardingDone()
           else if (aboutOpen) setAboutOpen(false)
           else if (guideOpen) setGuideOpen(false)
+          else if (pendingTagDelete !== null) setPendingTagDelete(null)
+          else if (tagsOpen) setTagsOpen(false)
           else if (languageOpen) setLanguageOpen(false)
           else if (settingsOpen) setSettingsOpen(false)
           else if (confirmOpen) setConfirmOpen(false)
@@ -99,6 +112,8 @@ export default function MainScreen({
     onCloseOnboardingDone,
     aboutOpen,
     guideOpen,
+    tagsOpen,
+    pendingTagDelete,
     languageOpen,
     settingsOpen,
     confirmOpen,
@@ -199,6 +214,7 @@ export default function MainScreen({
         settingsOpen={settingsOpen}
         setSettingsOpen={setSettingsOpen}
         onOpenAbout={() => setAboutOpen(true)}
+        onOpenTags={() => setTagsOpen(true)}
         onOpenGuide={() => setGuideOpen(true)}
         onRestartOnboarding={onRestartOnboarding}
       />
@@ -235,6 +251,21 @@ export default function MainScreen({
       <AboutDialog open={aboutOpen} onOpenChange={setAboutOpen} t={t} />
 
       <AppGuideDialog open={guideOpen} onOpenChange={setGuideOpen} t={t} />
+
+      <TagsDialog
+        open={tagsOpen}
+        onOpenChange={setTagsOpen}
+        t={t}
+        people={people}
+        tags={tags}
+        pendingDelete={pendingTagDelete}
+        onRequestDelete={(field, tag) => setPendingTagDelete({ field, tag })}
+        onCancelDelete={() => setPendingTagDelete(null)}
+        onConfirmDelete={() => {
+          onRemoveTag(pendingTagDelete.field, pendingTagDelete.tag)
+          setPendingTagDelete(null)
+        }}
+      />
 
       <OnboardingDoneDialog open={onboardingDoneOpen} onClose={onCloseOnboardingDone} t={t} />
 

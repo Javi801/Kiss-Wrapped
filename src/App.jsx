@@ -124,6 +124,17 @@ export default function KissWrappedApp() {
     setNationalityTags((prev) => (prev.includes(tag) ? prev : [...prev, tag]))
   }
 
+  // Removes a tag from the list of the given field (howWeMet, nationality, situation or place).
+  function removeTag(field, tag) {
+    const setters = {
+      howWeMet: setHowWeMetTags,
+      nationality: setNationalityTags,
+      situation: setSituationTags,
+      place: setPlaceTags,
+    }
+    setters[field]((prev) => prev.filter((existing) => existing !== tag))
+  }
+
   // Clears all app data and resets the app to its initial state.
   async function clearAllAppData() {
     try {
@@ -341,6 +352,13 @@ export default function KissWrappedApp() {
                   statsVisible={statsVisible}
                   setStatsVisible={setStatsVisible}
                   includePartnerEvents={includePartnerEvents}
+                  tags={{
+                    howWeMet: howWeMetTags,
+                    nationality: nationalityTags,
+                    situation: situationTags,
+                    place: placeTags,
+                  }}
+                  onRemoveTag={removeTag}
                   modalBackRef={modalBackRef}
                   onRestartOnboarding={
                     FEATURES.onboarding ? () => navigateTo(SCREENS.onboarding) : undefined

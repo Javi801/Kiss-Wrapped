@@ -78,6 +78,17 @@ export function mergePeopleFieldTags(people, existingTags, field) {
   return merged
 }
 
+// Counts how many of `values` match each tag, ignoring case and surrounding spaces
+// like the merge functions above. Returns one count per tag, in `tags` order.
+export function countTagUses(tags, values) {
+  const counts = new Map()
+  for (const value of values) {
+    const key = value?.trim().toLowerCase()
+    if (key) counts.set(key, (counts.get(key) || 0) + 1)
+  }
+  return tags.map((tag) => counts.get(tag.trim().toLowerCase()) || 0)
+}
+
 // Converts hex color to RGB object
 export function hexToRgb(hex) {
   const normalized = hex.replace('#', '')

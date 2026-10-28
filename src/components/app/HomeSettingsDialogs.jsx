@@ -1,4 +1,4 @@
-import { BookOpen, Check, Info, Languages, RotateCcw, Settings } from 'lucide-react'
+import { BookOpen, Check, Info, Languages, RotateCcw, Settings, Tag } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -48,8 +48,8 @@ function SettingsAction({ icon: Icon, label, onClick }) {
 
 /**
  * Dialogs opened from the hero card of the main screen: the language picker and
- * the settings, which also lead to the app guide, the about dialog and, when
- * `onRestartOnboarding` is given, the onboarding.
+ * the settings, which also lead to the tags, the app guide, the about dialog and,
+ * when `onRestartOnboarding` is given, the onboarding.
  */
 export default function HomeSettingsDialogs({
   t,
@@ -64,6 +64,7 @@ export default function HomeSettingsDialogs({
   settingsOpen,
   setSettingsOpen,
   onOpenAbout,
+  onOpenTags,
   onOpenGuide,
   onRestartOnboarding,
 }) {
@@ -170,6 +171,14 @@ export default function HomeSettingsDialogs({
               setTheme={setTheme}
               t={t}
               accent={false}
+            />
+            <SettingsAction
+              icon={Tag}
+              label={t.tags}
+              onClick={() => {
+                setSettingsOpen(false)
+                onOpenTags()
+              }}
             />
             <SettingsAction
               icon={BookOpen}
