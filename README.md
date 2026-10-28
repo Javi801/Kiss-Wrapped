@@ -250,6 +250,7 @@ Person {
   id:         string
   name:       string
   realName:   string          // optional
+  nationality: string         // optional, tag-based
   birthYear:  number
   birthdayAlreadyHappened: boolean
   zodiacSign: string          // full localized option, e.g. "♍ Virgo (August 24 - September 22)"
@@ -282,6 +283,7 @@ Settings {
   situationTags:        string[]
   placeTags:            string[]
   howWeMetTags:         string[]
+  nationalityTags:      string[]
   onboardingDone:       boolean   // the onboarding was completed or does not apply
 }
 ```
