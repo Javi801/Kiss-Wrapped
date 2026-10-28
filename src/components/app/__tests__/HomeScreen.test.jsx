@@ -540,7 +540,7 @@ describe('HomeScreen — tags', () => {
   async function openTags(props = {}) {
     render({ tags, onRemoveTag: vi.fn(), ...props })
     await click(t.settings)
-    await click(t.tags, dialog())
+    await click(t.manageTags, dialog())
   }
 
   // The confirmation is the real Radix alert dialog, portaled to the body.
@@ -553,14 +553,14 @@ describe('HomeScreen — tags', () => {
   it('moves from settings to the tags dialog', async () => {
     await openTags()
     expect(container.querySelectorAll('[data-dialog]')).toHaveLength(1)
-    expect(dialog().textContent).toContain(t.tagsIntro)
+    expect(dialog().textContent).toContain(t.manageTags)
   })
 
   it('opens without tag lists, as in the onboarding tour', async () => {
     render()
     await click(t.settings)
-    await click(t.tags, dialog())
-    expect(dialog().textContent).toContain(t.tagsIntro)
+    await click(t.manageTags, dialog())
+    expect(dialog().textContent).toContain(t.manageTags)
   })
 
   it('deletes a tag once the delete is confirmed', async () => {

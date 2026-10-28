@@ -174,7 +174,7 @@ export default function HomeSettingsDialogs({
             />
             <SettingsAction
               icon={Tag}
-              label={t.tags}
+              label={t.manageTags}
               onClick={() => {
                 setSettingsOpen(false)
                 onOpenTags()

@@ -371,9 +371,7 @@ export const es = {
   onboardingDoneTitle: 'Tutorial terminado',
   onboardingDoneBody: 'Hay más información de uso en Configuración, en «Guía de la app».',
   onboardingDoneAction: 'Entendido',
-  tags: 'Etiquetas',
-  tagsIntro:
-    'Al eliminar una etiqueta en uso, también se quita de las personas o eventos que la tienen.',
+  manageTags: 'Gestionar etiquetas',
   tagsPeopleSection: 'Personas',
   tagsEventsSection: 'Eventos',
   noTags: 'Sin etiquetas',

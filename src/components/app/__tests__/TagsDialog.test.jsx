@@ -4,7 +4,7 @@ import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { COPY } from '@/lib/constants'
 
-const seen = vi.hoisted(() => ({ alertOpenChange: null }))
+const seen = vi.hoisted(() => ({ alertOpenChange: null, contentProps: null }))
 
 vi.mock('@/lib/theme', () => ({ usePalette: () => ({}) }))
 vi.mock('@/components/ui/dialog', async () => {
@@ -13,7 +13,10 @@ vi.mock('@/components/ui/dialog', async () => {
   return {
     Dialog: ({ open, children }) =>
       open ? createElement('div', { 'data-dialog': true }, children) : null,
-    DialogContent: passthrough,
+    DialogContent: ({ children, ...props }) => {
+      seen.contentProps = props
+      return children
+    },
     DialogHeader: passthrough,
     DialogTitle: passthrough,
     DialogDescription: passthrough,
@@ -99,6 +102,7 @@ afterEach(() => {
   container?.remove()
   root = null
   seen.alertOpenChange = null
+  seen.contentProps = null
 })
 
 const buttons = () => [...container.querySelectorAll('button')]
@@ -123,7 +127,7 @@ describe('TagsDialog', () => {
   it('groups the four lists under people and events, with their tag counts', () => {
     render()
     const text = container.textContent
-    expect(text).toContain(t.tagsIntro)
+    expect(text).toContain(t.manageTags)
     expect(text.indexOf(t.tagsPeopleSection)).toBeLessThan(text.indexOf(t.howWeMet))
     expect(text.indexOf(t.nationality)).toBeLessThan(text.indexOf(t.tagsEventsSection))
     expect(text.indexOf(t.tagsEventsSection)).toBeLessThan(text.indexOf(t.eventSituation))
@@ -152,6 +156,89 @@ describe('TagsDialog', () => {
 
     await toggle(t.eventPlace)
     expect(container.querySelectorAll('li')).toHaveLength(0)
+  })
+
+  it('keeps the dialog at a fixed height with a column body', () => {
+    render()
+    expect(seen.contentProps).toHaveProperty('aria-describedby', undefined)
+    expect(seen.contentProps.className).toBe('h-[calc(100svh-2rem)]')
+    expect(seen.contentProps.bodyClassName.split(' ')).toEqual(
+      expect.arrayContaining(['flex', 'flex-col'])
+    )
+  })
+
+  // Lays out the lists area from y=100 to y=600 and the given header 48px tall ending at `bottom`.
+  function mockLayout(label, bottom) {
+    return vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function () {
+      if (this.style.position === 'relative') return { top: 100, bottom: 600, height: 500 }
+      if (this.style.height === '100%') return { top: 100, bottom: 600, height: 500 }
+      if (this.hasAttribute('aria-expanded') && this.textContent.includes(label)) {
+        return { top: bottom - 48, bottom, height: 48 }
+      }
+      return { top: 0, bottom: 0, height: 0 }
+    })
+  }
+
+  const headersArea = () => listToggle(t.howWeMet).parentElement
+
+  it('lays the open list over the headers, from its header to the end of the area', async () => {
+    const layout = mockLayout(t.eventSituation, 300)
+    render()
+    await toggle(t.eventSituation)
+    const list = container.querySelector('ul')
+    expect(list.parentElement).toBe(headersArea().parentElement)
+    expect(headersArea().contains(list)).toBe(false)
+    expect(list.style.position).toBe('absolute')
+    expect(list.style.zIndex).toBe('1')
+    expect(list.style.top).toBe('200px')
+    expect(list.style.bottom).toBe('0px')
+    layout.mockRestore()
+  })
+
+  it('scrolls a header near the bottom to the top before opening its list', async () => {
+    const layout = mockLayout(t.eventPlace, 580)
+    render()
+    await toggle(t.eventPlace)
+    expect(headersArea().scrollTop).toBe(432)
+    layout.mockRestore()
+  })
+
+  it('leaves the headers in place when the list has room', async () => {
+    const layout = mockLayout(t.howWeMet, 200)
+    render()
+    await toggle(t.howWeMet)
+    expect(headersArea().scrollTop).toBe(0)
+    layout.mockRestore()
+  })
+
+  it('scrolls a long list inside itself, keeping the gesture inside', async () => {
+    render({ tags: { ...tags, place: Array.from({ length: 40 }, (_, i) => `Tag ${i}`) } })
+    await toggle(t.eventPlace)
+    const list = container.querySelector('ul')
+    expect(list.style.overflowY).toBe('auto')
+    expect(list.style.overscrollBehavior).toBe('contain')
+    expect(list.querySelectorAll('li')).toHaveLength(40)
+  })
+
+  it('holds the headers still only while a list is open', async () => {
+    render()
+    expect(headersArea().style.overflowY).toBe('auto')
+    await toggle(t.howWeMet)
+    expect(headersArea().style.overflowY).toBe('hidden')
+    await toggle(t.howWeMet)
+    expect(headersArea().style.overflowY).toBe('auto')
+  })
+
+  it('places the open list again when the window is resized', async () => {
+    const layout = mockLayout(t.howWeMet, 200)
+    render()
+    await toggle(t.howWeMet)
+    expect(container.querySelector('ul').style.top).toBe('100px')
+    layout.mockRestore()
+    const moved = mockLayout(t.howWeMet, 250)
+    act(() => window.dispatchEvent(new Event('resize')))
+    expect(container.querySelector('ul').style.top).toBe('150px')
+    moved.mockRestore()
   })
 
   it('counts the uses of person fields, ignoring case and spaces', async () => {
