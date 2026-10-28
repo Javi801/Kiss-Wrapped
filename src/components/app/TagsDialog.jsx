@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/alert-dialog'
 
 import { TEXT } from '@/lib/constants'
-import { countTagUses } from '@/lib/helpers'
+import { TAG_FIELDS, countTagUses, tagFieldValues } from '@/lib/helpers'
 import { usePalette } from '@/lib/theme'
 
 // Tag lists grouped by where their values are stored: on the person or on its events.
@@ -29,27 +29,36 @@ const TAG_GROUPS = [
   {
     titleKey: 'tagsPeopleSection',
     lists: [
-      { field: 'howWeMet', labelKey: 'howWeMet', onEvents: false },
-      { field: 'nationality', labelKey: 'nationality', onEvents: false },
+      { field: 'howWeMet', labelKey: 'howWeMet' },
+      { field: 'nationality', labelKey: 'nationality' },
     ],
   },
   {
     titleKey: 'tagsEventsSection',
     lists: [
-      { field: 'situation', labelKey: 'eventSituation', onEvents: true },
-      { field: 'place', labelKey: 'eventPlace', onEvents: true },
+      { field: 'situation', labelKey: 'eventSituation' },
+      { field: 'place', labelKey: 'eventPlace' },
     ],
   },
 ]
 
-function fieldValues(people, field, onEvents) {
-  return onEvents
-    ? people.flatMap((person) => (person.events || []).map((event) => event[field]))
-    : people.map((person) => person[field])
+// Confirmation text: a plain notice for an unused tag; for a tag in use, how many
+// records use it and what deleting it does to them.
+function deleteDescription(pending, t) {
+  if (!pending?.count) return t.deleteTagConfirmDesc
+  const { onEvents, required } = TAG_FIELDS[pending.field]
+  const one = pending.count === 1
+  const noun = onEvents ? (one ? t.tagEvent : t.tagEvents) : one ? t.tagPerson : t.tagPeople
+  return [
+    `${t.deleteTagInUse} ${pending.count} ${noun}.`,
+    onEvents ? t.deleteTagInUseEventsDesc : t.deleteTagInUsePeopleDesc,
+    required ? t.deleteTagInUseRequired : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
 }
 
-// One collapsible tag list. Only unused tags get a delete button, because the boot
-// merges the values found in the data back into the lists.
+// One collapsible tag list; every tag has a delete button.
 function TagList({ label, tags, counts, expanded, onToggle, onRequestDelete, t }) {
   const PALETTE = usePalette()
 
@@ -126,25 +135,20 @@ function TagList({ label, tags, counts, expanded, onToggle, onRequestDelete, t }
                   ? t.tagUnused
                   : `${counts[i]} ${counts[i] === 1 ? t.tagUse : t.tagUses}`}
               </span>
-              {counts[i] === 0 ? (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  aria-label={`${t.deleteTag}: ${tag}`}
-                  style={{
-                    width: '2.75rem',
-                    height: '2.75rem',
-                    flexShrink: 0,
-                    color: PALETTE.dangerEmphasis,
-                  }}
-                  onClick={() => onRequestDelete(tag)}
-                >
-                  <Trash2 style={{ height: '1rem', width: '1rem' }} />
-                </Button>
-              ) : (
-                // Keeps the counts aligned with the rows that have a button.
-                <span aria-hidden="true" style={{ width: '2.75rem', flexShrink: 0 }} />
-              )}
+              <Button
+                type="button"
+                variant="ghost"
+                aria-label={`${t.deleteTag}: ${tag}`}
+                style={{
+                  width: '2.75rem',
+                  height: '2.75rem',
+                  flexShrink: 0,
+                  color: PALETTE.dangerEmphasis,
+                }}
+                onClick={() => onRequestDelete(tag, counts[i])}
+              >
+                <Trash2 style={{ height: '1rem', width: '1rem' }} />
+              </Button>
             </li>
           ))}
         </ul>
@@ -156,8 +160,9 @@ function TagList({ label, tags, counts, expanded, onToggle, onRequestDelete, t }
 /**
  * Tags dialog opened from the settings: the how-we-met, nationality, situation and
  * place tag lists with how many people or events use each tag. `tags` holds the
- * lists by field name. `pendingDelete` (`{ field, tag }` or null) is the tag waiting
- * for confirmation; it lives in the parent so the back button can close it.
+ * lists by field name. `pendingDelete` (`{ field, tag, count }` or null) is the tag
+ * waiting for confirmation, with how many records use it; it lives in the parent so
+ * the back button can close it.
  */
 export default function TagsDialog({
   open,
@@ -216,17 +221,17 @@ export default function TagsDialog({
                 <span style={{ ...TEXT.label, color: PALETTE.textSoft, paddingLeft: '0.25rem' }}>
                   {t[group.titleKey]}
                 </span>
-                {group.lists.map(({ field, labelKey, onEvents }) => {
+                {group.lists.map(({ field, labelKey }) => {
                   const list = tags[field]
                   return (
                     <TagList
                       key={field}
                       label={t[labelKey]}
                       tags={list}
-                      counts={countTagUses(list, fieldValues(people, field, onEvents))}
+                      counts={countTagUses(list, tagFieldValues(people, field))}
                       expanded={expandedField === field}
                       onToggle={() => setExpandedField((prev) => (prev === field ? null : field))}
-                      onRequestDelete={(tag) => onRequestDelete(field, tag)}
+                      onRequestDelete={(tag, count) => onRequestDelete(field, tag, count)}
                       t={t}
                     />
                   )
@@ -248,7 +253,7 @@ export default function TagsDialog({
             <AlertDialogTitle>{t.deleteTagConfirmTitle}</AlertDialogTitle>
             <AlertDialogDescription>
               <strong style={{ overflowWrap: 'anywhere' }}>{pendingDelete?.tag}</strong>{' '}
-              {t.deleteTagConfirmDesc}
+              {deleteDescription(pendingDelete, t)}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -257,7 +262,7 @@ export default function TagsDialog({
               style={{ background: PALETTE.danger, color: PALETTE.textOnAccent }}
               onClick={onConfirmDelete}
             >
-              {t.deleteTagConfirmAction}
+              {pendingDelete?.count ? t.deleteTagAnywayAction : t.deleteTagConfirmAction}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

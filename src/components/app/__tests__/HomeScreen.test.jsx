@@ -534,6 +534,73 @@ describe('HomeScreen — onboarding tour', () => {
   )
 })
 
+describe('HomeScreen — tags', () => {
+  const tags = { howWeMet: ['App'], nationality: [], situation: [], place: ['Park'] }
+
+  async function openTags(props = {}) {
+    render({ tags, onRemoveTag: vi.fn(), ...props })
+    await click(t.settings)
+    await click(t.tags, dialog())
+  }
+
+  // The confirmation is the real Radix alert dialog, portaled to the body.
+  const alert = () => document.querySelector('[role="alertdialog"]')
+  const requestParkDelete = async () => {
+    await click(t.eventPlace, dialog())
+    await click(`${t.deleteTag}: Park`, dialog())
+  }
+
+  it('moves from settings to the tags dialog', async () => {
+    await openTags()
+    expect(container.querySelectorAll('[data-dialog]')).toHaveLength(1)
+    expect(dialog().textContent).toContain(t.tagsIntro)
+  })
+
+  it('opens without tag lists, as in the onboarding tour', async () => {
+    render()
+    await click(t.settings)
+    await click(t.tags, dialog())
+    expect(dialog().textContent).toContain(t.tagsIntro)
+  })
+
+  it('deletes a tag once the delete is confirmed', async () => {
+    const onRemoveTag = vi.fn()
+    await openTags({ onRemoveTag })
+    await requestParkDelete()
+    expect(onRemoveTag).not.toHaveBeenCalled()
+    await click(t.deleteTagConfirmAction, alert())
+    expect(onRemoveTag).toHaveBeenCalledWith('place', 'Park')
+    expect(alert()).toBeNull()
+    expect(dialog()).not.toBeNull()
+  })
+
+  it('asks to delete a tag in use anyway, with how many events use it', async () => {
+    const onRemoveTag = vi.fn()
+    const carla = { id: 'carla', name: 'Carla', events: [{ id: 'c1', place: 'park' }] }
+    await openTags({ onRemoveTag, people: [ana, carla] })
+    await requestParkDelete()
+    expect(alert().textContent).toContain(`${t.deleteTagInUse} 1 ${t.tagEvent}.`)
+    await click(t.deleteTagAnywayAction, alert())
+    expect(onRemoveTag).toHaveBeenCalledWith('place', 'Park')
+  })
+
+  it('closes the confirmation first and then the dialog from the back button', async () => {
+    const onRemoveTag = vi.fn()
+    await openTags({ onRemoveTag })
+    await requestParkDelete()
+    expect(alert()).not.toBeNull()
+
+    act(() => modalBackRef.current())
+    expect(alert()).toBeNull()
+    expect(dialog()).not.toBeNull()
+
+    act(() => modalBackRef.current())
+    expect(dialog()).toBeNull()
+    expect(modalBackRef.current).toBeNull()
+    expect(onRemoveTag).not.toHaveBeenCalled()
+  })
+})
+
 describe('HomeScreen — app guide and onboarding restart', () => {
   it('moves from settings to the app guide', async () => {
     render()

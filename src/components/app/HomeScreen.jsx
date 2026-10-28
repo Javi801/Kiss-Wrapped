@@ -69,7 +69,7 @@ export default function MainScreen({
   const [aboutOpen, setAboutOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
   const [tagsOpen, setTagsOpen] = useState(false)
-  // null = idle | { field, tag } = waiting for the delete confirmation
+  // null = idle | { field, tag, count } = waiting for the delete confirmation
   const [pendingTagDelete, setPendingTagDelete] = useState(null)
   // null = idle | { fileName, isNative, hadMissingFields } = success | Error = failed
   const [jsonExportStatus, setJsonExportStatus] = useState(null)
@@ -259,7 +259,7 @@ export default function MainScreen({
         people={people}
         tags={tags}
         pendingDelete={pendingTagDelete}
-        onRequestDelete={(field, tag) => setPendingTagDelete({ field, tag })}
+        onRequestDelete={(field, tag, count) => setPendingTagDelete({ field, tag, count })}
         onCancelDelete={() => setPendingTagDelete(null)}
         onConfirmDelete={() => {
           onRemoveTag(pendingTagDelete.field, pendingTagDelete.tag)

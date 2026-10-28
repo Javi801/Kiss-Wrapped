@@ -35,7 +35,7 @@ src/
     app/                Top-level screens and app-level widgets (Home, AddPerson, Intro,
                         Onboarding, Privacy, ErrorBoundary, Color selector), FormCard,
                         plus the sections and dialogs of the Home screen (HomeHeroCard,
-                        HomeActions, HomeSettingsDialogs, AboutDialog, AppGuideDialog, OnboardingDoneDialog,
+                        HomeActions, HomeSettingsDialogs, TagsDialog, AboutDialog, AppGuideDialog, OnboardingDoneDialog,
                         BottomNav, JsonExportDialogs, ImportDialogs, ImportPartnerDialogs)
       onboarding/       The onboarding wizard (OnboardingWizard), its steps (Onboarding*Step,
                         OnboardingFormStep), the tour player (OnboardingTour), the scene
@@ -132,7 +132,7 @@ There is no state library. All global state is `useState` inside three hooks in 
 
 `screen` lives in `useAppNavigation`, `isPrivate` in `usePrivacyOverlay`, and everything else in `usePersistedAppState`. `isLoaded` and `onboardingDone` are internal to `usePersistedAppState`, which exposes the derived `onboardingPending` and `completeOnboarding()` instead of their setters.
 
-All mutations (`addPerson`, `updatePerson`, `deletePerson`, `addEvent`, `updateEvent`, `deleteEvent`, `deleteAllEvents`, `importAppData`, `clearAllAppData`) are defined in `App.jsx` and passed down as callback props. Children never mutate `people` directly, and updates are always immutable.
+All mutations (`addPerson`, `updatePerson`, `deletePerson`, `addEvent`, `updateEvent`, `deleteEvent`, `deleteAllEvents`, `importAppData`, `clearAllAppData`, `removeTag`) are defined in `App.jsx` and passed down as callback props. Children never mutate `people` directly, and updates are always immutable.
 
 Two React contexts exist, both provided by `App.jsx`:
 
@@ -234,7 +234,7 @@ Invariants:
 
 Lifecycle:
 
-1. **Boot** (`hooks/usePersistedAppState.js`): `loadPeopleFromDevice()` → `normalizePeople()` → `setPeople`; then `loadSettings()` → validate each value against the supported lists in `lib/config.js` → set state. Values that were never saved fall back to `DEFAULT_SETTINGS`. Tag lists are merged with values already present in the data (`mergeEventTagsFromPeople`, `mergePeopleFieldTags`), and `App.jsx` registers the how-we-met and nationality values of added, edited and imported people the same way. The hook receives `setScreen` and always opens `intro`. It also decides whether the onboarding is pending: only when `FEATURES.onboarding` is on, `onboardingDone` was never saved as `true`, and there are no saved people, so updating users never see it. While it is pending the language is the device language (`detectDeviceLanguage`) instead of the saved one or the default. Otherwise `onboardingDone` is saved as `true`. When loading throws, the boot falls back to an empty dataset in the device language and the onboarding is not pending: a failed load is not treated as a new install. Then `isLoaded = true`.
+1. **Boot** (`hooks/usePersistedAppState.js`): `loadPeopleFromDevice()` → `normalizePeople()` → `setPeople`; then `loadSettings()` → validate each value against the supported lists in `lib/config.js` → set state. Values that were never saved fall back to `DEFAULT_SETTINGS`. Tag lists are merged with values already present in the data (`mergeEventTagsFromPeople`, `mergePeopleFieldTags`), and `App.jsx` registers the how-we-met and nationality values of added, edited and imported people the same way. Because of this merge, a tag still used by a person or event would come back on the next boot, so deleting one from `TagsDialog` (opened from the settings) also clears it from the data: `removeTag` in `App.jsx` drops it from its list and calls `clearTagFromPeople` (`lib/helpers.js`), which empties that field, ignoring case and surrounding spaces, in the people or events that use it and keeps the records. The confirmation shows how many use it (`countTagUses`) and, for the required fields in `TAG_FIELDS`, warns that those records become incomplete. The hook receives `setScreen` and always opens `intro`. It also decides whether the onboarding is pending: only when `FEATURES.onboarding` is on, `onboardingDone` was never saved as `true`, and there are no saved people, so updating users never see it. While it is pending the language is the device language (`detectDeviceLanguage`) instead of the saved one or the default. Otherwise `onboardingDone` is saved as `true`. When loading throws, the boot falls back to an empty dataset in the device language and the onboarding is not pending: a failed load is not treated as a new install. Then `isLoaded = true`.
 2. **Save**: two effects in the same hook write the full people array and the full settings object whenever they change, only after `isLoaded` is true. This guard prevents overwriting stored data with the initial empty state; keep it for any new persisted state.
 3. **Partner data is sanitized on load** without asking the user. `normalizePeople` calls `sanitizePartnerFields` (`lib/partner.js`): a date that is not a valid `yyyy.MM.dd` string becomes `''`, an inverted range drops `partnerFrom`, `past` without a valid `partnerTo` becomes `never`, and an unknown status becomes `current` when the record has `isPartner: true` and `never` otherwise. Future dates are kept, so the result does not depend on the day it runs.
 4. **Migrations run on load**, not as a separate step: legacy `age` → `birthYear` (`migrateLegacyAge`), legacy `isPartner` → `partnerStatus` (`resolvePartnerStatus`, called from `normalizePeople`), and `localStorage` settings → native settings file (first native run).
@@ -317,6 +317,7 @@ Privacy mechanisms, in addition to the above:
 | Add an onboarding step | A step component in `components/app/onboarding/`, added to `ONBOARDING_STEPS` in `OnboardingWizard.jsx`; a tour step is a scene list in `onboardingScenes.js`, added as a `{ scenes }` entry |
 | Let the onboarding tour point at a new control | `tourTargetProps` and `TapGuide` on the control, a name in `TOUR_TARGETS` when it is not a screen, and a scene in `onboardingScenes.js` |
 | Add a section to the app guide | An entry in `APP_GUIDE_SECTIONS` and its texts in every `*-guide.js` file of `lib/translations/` |
+| Add a tag list | Its state and persistence like any persisted setting, the merge at boot, a setter in `removeTag` and the `tags` prop in `App.jsx`, an entry in `TAG_FIELDS` (`lib/helpers.js`), and one in `TAG_GROUPS` (`TagsDialog.jsx`) |
 | Add a dialog or sheet | Register a close callback on `modalBackRef` while open |
 | Add date or age logic | `lib/date.js` with unit tests; never inline date parsing in components |
 

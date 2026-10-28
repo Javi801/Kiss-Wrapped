@@ -693,6 +693,81 @@ describe('App — people mutations', () => {
     expect(savedSettings().nationalityTags).toEqual(['Chilean'])
   })
 
+  it('passes the four tag lists to the main screen', async () => {
+    await boot({
+      settings: {
+        howWeMetTags: ['App'],
+        nationalityTags: ['Chilean'],
+        situationTags: ['Date'],
+        placeTags: ['Bar'],
+      },
+    })
+    openMain()
+    expect(screens.main.tags).toEqual({
+      howWeMet: ['App'],
+      nationality: ['Chilean'],
+      situation: ['Date'],
+      place: ['Bar'],
+    })
+  })
+
+  it.each([
+    ['howWeMet', 'howWeMetTags'],
+    ['nationality', 'nationalityTags'],
+    ['situation', 'situationTags'],
+    ['place', 'placeTags'],
+  ])('removes a %s tag and saves the list', async (field, key) => {
+    await boot({ settings: { [key]: ['Keep', 'Drop'] } })
+    openMain()
+    await act(async () => screens.main.onRemoveTag(field, 'Drop'))
+    expect(savedSettings()[key]).toEqual(['Keep'])
+    expect(screens.main.tags[field]).toEqual(['Keep'])
+  })
+
+  it('clears a removed person tag from the people that use it', async () => {
+    await boot({
+      people: [
+        { id: 'a', name: 'A', howWeMet: 'app', events: [] },
+        { id: 'b', name: 'B', howWeMet: 'School', events: [] },
+      ],
+      settings: { howWeMetTags: ['App', 'School'] },
+    })
+    openMain()
+    await act(async () => screens.main.onRemoveTag('howWeMet', 'App'))
+    expect(savedPeople().map((person) => person.howWeMet)).toEqual(['', 'School'])
+    expect(savedSettings().howWeMetTags).toEqual(['School'])
+  })
+
+  it('clears a removed event tag from the events that use it, keeping the events', async () => {
+    await boot({
+      people: [
+        {
+          id: 'a',
+          name: 'A',
+          events: [
+            { id: 'e1', date: '2024.01.01', place: 'Bar' },
+            { id: 'e2', date: '2024.01.02', place: 'Park' },
+          ],
+        },
+      ],
+      settings: { placeTags: ['Bar', 'Park'] },
+    })
+    openMain()
+    await act(async () => screens.main.onRemoveTag('place', 'Bar'))
+    expect(savedPeople()[0].events.map((event) => [event.id, event.place])).toEqual([
+      ['e1', ''],
+      ['e2', 'Park'],
+    ])
+    expect(savedSettings().placeTags).toEqual(['Park'])
+  })
+
+  it('leaves the other tag lists untouched when removing a tag', async () => {
+    await boot({ settings: { placeTags: ['Drop'], situationTags: ['Drop'] } })
+    openMain()
+    await act(async () => screens.main.onRemoveTag('place', 'Drop'))
+    expect(savedSettings()).toMatchObject({ placeTags: [], situationTags: ['Drop'] })
+  })
+
   it('clears everything and returns to the intro', async () => {
     await boot({ people: [ana, bob] })
     openMain()

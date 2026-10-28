@@ -372,7 +372,8 @@ export const es = {
   onboardingDoneBody: 'Hay más información de uso en Configuración, en «Guía de la app».',
   onboardingDoneAction: 'Entendido',
   tags: 'Etiquetas',
-  tagsIntro: 'Solo se pueden eliminar las etiquetas que no usa ninguna persona ni evento.',
+  tagsIntro:
+    'Al eliminar una etiqueta en uso, también se quita de las personas o eventos que la tienen.',
   tagsPeopleSection: 'Personas',
   tagsEventsSection: 'Eventos',
   noTags: 'Sin etiquetas',
@@ -383,6 +384,17 @@ export const es = {
   deleteTagConfirmTitle: '¿Eliminar esta etiqueta?',
   deleteTagConfirmDesc: 'Dejará de aparecer como sugerencia en los formularios.',
   deleteTagConfirmAction: 'Sí, eliminar',
+  deleteTagInUse: 'En uso en',
+  tagPerson: 'persona',
+  tagPeople: 'personas',
+  tagEvent: 'evento',
+  tagEvents: 'eventos',
+  deleteTagInUsePeopleDesc:
+    'Si la eliminas de todas formas, solo se quitará de esas personas: se mantienen, con este campo vacío.',
+  deleteTagInUseEventsDesc:
+    'Si la eliminas de todas formas, solo se quitará de esos eventos: se mantienen, con este campo vacío.',
+  deleteTagInUseRequired: 'Como el campo es obligatorio, quedarán marcados como incompletos.',
+  deleteTagAnywayAction: 'Eliminar de todas formas',
   ...esGuide,
   entryGuideTitle: 'Entrada real de la app',
   entryGuideBody: 'Toca el corazón sutil de la esquina para abrir tu espacio.',

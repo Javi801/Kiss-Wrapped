@@ -13,6 +13,7 @@ import {
   normalizePeople,
   mergeEventTagsFromPeople,
   mergePeopleFieldTags,
+  clearTagFromPeople,
 } from '@/lib/helpers'
 import { hasScore } from '@/lib/format'
 import { clearPeopleFromDevice } from '@/lib/device-storage'
@@ -124,7 +125,8 @@ export default function KissWrappedApp() {
     setNationalityTags((prev) => (prev.includes(tag) ? prev : [...prev, tag]))
   }
 
-  // Removes a tag from the list of the given field (howWeMet, nationality, situation or place).
+  // Removes a tag from the list of the given field (howWeMet, nationality, situation or place)
+  // and clears it from the people or events that use it, which stay otherwise unchanged.
   function removeTag(field, tag) {
     const setters = {
       howWeMet: setHowWeMetTags,
@@ -133,6 +135,7 @@ export default function KissWrappedApp() {
       place: setPlaceTags,
     }
     setters[field]((prev) => prev.filter((existing) => existing !== tag))
+    setPeople((prev) => clearTagFromPeople(prev, field, tag))
   }
 
   // Clears all app data and resets the app to its initial state.
