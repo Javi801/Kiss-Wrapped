@@ -52,6 +52,8 @@ export const DEFAULT_SETTINGS = {
 export const LIMITS = {
   // Person name and real name.
   nameLength: 100,
+  // Person nationality.
+  nationalityLength: 60,
   // Tag-style fields: event place, event situation, how we met.
   tagLength: 200,
   // Person activity detail.

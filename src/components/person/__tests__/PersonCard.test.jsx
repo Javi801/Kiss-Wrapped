@@ -238,11 +238,24 @@ describe('PersonCard — details', () => {
     expect(container.textContent).toContain('likes tea')
   })
 
+  it('shows the nationality', () => {
+    renderCard({ nationality: 'Chilean' })
+    toggle()
+    expect(container.textContent).toContain(`${t.nationality}: Chilean`)
+  })
+
+  it('shows the details block when the nationality is the only extra info', () => {
+    renderCard({ howWeMet: '', detail: '', nationality: 'Chilean' })
+    toggle()
+    expect(container.textContent).toContain(`${t.nationality}: Chilean`)
+  })
+
   it('omits the fields that are empty', () => {
     renderCard({ howWeMet: '' })
     toggle()
     expect(container.textContent).not.toContain(`${t.realName}:`)
     expect(container.textContent).not.toContain(`${t.met}:`)
+    expect(container.textContent).not.toContain(`${t.nationality}:`)
   })
 
   it('says there are no events yet', () => {
@@ -316,6 +329,16 @@ describe('PersonCard — editing the person', () => {
     expect(forms.person.includeRealName).toBe(true)
     expect(forms.person.includePartner).toBe(true)
     expect(forms.person.howWeMetTags).toEqual(['School'])
+  })
+
+  it('opens the form with the nationality field and its tags', () => {
+    const onAddNationalityTag = vi.fn()
+    renderCard({}, { nationalityTags: ['Chilean'], onAddNationalityTag })
+    toggle()
+    click(t.editPerson)
+    expect(forms.person.includeNationality).toBe(true)
+    expect(forms.person.nationalityTags).toEqual(['Chilean'])
+    expect(forms.person.onAddNationalityTag).toBe(onAddNationalityTag)
   })
 
   it('saves the changes for this person and closes', () => {

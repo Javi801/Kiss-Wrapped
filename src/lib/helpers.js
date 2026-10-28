@@ -35,6 +35,7 @@ export function normalizePeople(rawPeople) {
     return {
       ...person,
       realName: person.realName || '',
+      nationality: person.nationality || '',
       ...sanitizePartnerFields(rawPerson),
       events: Array.isArray(person.events)
         ? person.events.map((event) => ({

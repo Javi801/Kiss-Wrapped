@@ -61,6 +61,8 @@ function PeopleScene({ scene, people, t, language, onTap }) {
       onAddPlaceTag={noop}
       howWeMetTags={[]}
       onAddHowWeMetTag={noop}
+      nationalityTags={[]}
+      onAddNationalityTag={noop}
       cardTour={
         scene.card && {
           expanded: scene.card.expanded,

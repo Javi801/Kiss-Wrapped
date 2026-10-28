@@ -42,6 +42,7 @@ import {
   SITUATION_TAGS_KEY,
   PLACE_TAGS_KEY,
   HOW_WE_MET_TAGS_KEY,
+  NATIONALITY_TAGS_KEY,
   PEOPLE_FILE_NAME,
   SETTINGS_FILE_NAME,
 } from '@/lib/constants'
@@ -280,6 +281,12 @@ describe('exportPeopleJson — normalizeForExport output content', () => {
     expect(exportedJson()[0].realName).toBe('')
   })
 
+  it('fills absent optional nationality with empty string without flagging hadMissingFields', async () => {
+    const { nationality: _, ...personWithoutNationality } = COMPLETE_PERSON
+    await exportPeopleJson([personWithoutNationality])
+    expect(exportedJson()[0].nationality).toBe('')
+  })
+
   it('leaves birthYear as null when missing', async () => {
     await exportPeopleJson([{ ...COMPLETE_PERSON, birthYear: null }])
     expect(exportedJson()[0].birthYear).toBeNull()
@@ -313,6 +320,7 @@ describe('loadSettings (web path)', () => {
       situationTags: [],
       placeTags: [],
       howWeMetTags: [],
+      nationalityTags: [],
       onboardingDone: false,
     })
   })
@@ -373,6 +381,15 @@ describe('loadSettings (web path)', () => {
 
   it('returns empty howWeMetTags when none are saved', async () => {
     expect((await loadSettings()).howWeMetTags).toEqual([])
+  })
+
+  it('returns saved nationalityTags', async () => {
+    localStorage.setItem(NATIONALITY_TAGS_KEY, JSON.stringify(['Chilean', 'Peruvian']))
+    expect((await loadSettings()).nationalityTags).toEqual(['Chilean', 'Peruvian'])
+  })
+
+  it('returns empty nationalityTags when none are saved', async () => {
+    expect((await loadSettings()).nationalityTags).toEqual([])
   })
 })
 
@@ -450,6 +467,17 @@ describe('saveSettings (web path)', () => {
     expect(JSON.parse(localStorage.getItem(HOW_WE_MET_TAGS_KEY))).toEqual(['Existing'])
   })
 
+  it('saves nationalityTags to localStorage', async () => {
+    await saveSettings({ nationalityTags: ['Chilean', 'Peruvian'] })
+    expect(JSON.parse(localStorage.getItem(NATIONALITY_TAGS_KEY))).toEqual(['Chilean', 'Peruvian'])
+  })
+
+  it('does not overwrite nationalityTags when it is undefined', async () => {
+    localStorage.setItem(NATIONALITY_TAGS_KEY, JSON.stringify(['Existing']))
+    await saveSettings({ iconColor: 'chartPink' })
+    expect(JSON.parse(localStorage.getItem(NATIONALITY_TAGS_KEY))).toEqual(['Existing'])
+  })
+
   it('round-trips correctly through save and load', async () => {
     await saveSettings({
       iconColor: 'chartGreen',
@@ -460,6 +488,7 @@ describe('saveSettings (web path)', () => {
       situationTags: ['Date', 'Party'],
       placeTags: ['Café', 'Home'],
       howWeMetTags: ['School', 'Work'],
+      nationalityTags: ['Chilean'],
       onboardingDone: true,
     })
     expect(await loadSettings()).toEqual({
@@ -471,6 +500,7 @@ describe('saveSettings (web path)', () => {
       situationTags: ['Date', 'Party'],
       placeTags: ['Café', 'Home'],
       howWeMetTags: ['School', 'Work'],
+      nationalityTags: ['Chilean'],
       onboardingDone: true,
     })
   })
@@ -529,23 +559,31 @@ describe('loadSettings (native path — migration from localStorage)', () => {
     expect((await loadSettings()).howWeMetTags).toEqual(['School', 'Work'])
   })
 
+  it('migrates nationalityTags from localStorage', async () => {
+    localStorage.setItem(NATIONALITY_TAGS_KEY, JSON.stringify(['Chilean', 'Peruvian']))
+    expect((await loadSettings()).nationalityTags).toEqual(['Chilean', 'Peruvian'])
+  })
+
   it('returns empty tag arrays when localStorage has none', async () => {
     const settings = await loadSettings()
     expect(settings.situationTags).toEqual([])
     expect(settings.placeTags).toEqual([])
     expect(settings.howWeMetTags).toEqual([])
+    expect(settings.nationalityTags).toEqual([])
   })
 
   it('persists migrated tags to the native settings file', async () => {
     localStorage.setItem(SITUATION_TAGS_KEY, JSON.stringify(['Date']))
     localStorage.setItem(PLACE_TAGS_KEY, JSON.stringify(['Home']))
     localStorage.setItem(HOW_WE_MET_TAGS_KEY, JSON.stringify(['School']))
+    localStorage.setItem(NATIONALITY_TAGS_KEY, JSON.stringify(['Chilean']))
     await loadSettings()
     expect(mockFilesystem.writeFile).toHaveBeenCalledOnce()
     const written = JSON.parse(mockFilesystem.writeFile.mock.calls[0][0].data)
     expect(written.situationTags).toEqual(['Date'])
     expect(written.placeTags).toEqual(['Home'])
     expect(written.howWeMetTags).toEqual(['School'])
+    expect(written.nationalityTags).toEqual(['Chilean'])
   })
 })
 
@@ -572,6 +610,7 @@ describe('loadSettings (native path — reads existing file)', () => {
       situationTags: [],
       placeTags: [],
       howWeMetTags: ['School'],
+      nationalityTags: ['Chilean'],
       onboardingDone: true,
     }
     mockFilesystem.readFile.mockResolvedValueOnce({ data: JSON.stringify(stored) })
@@ -637,6 +676,15 @@ describe('loadSettings (native path — reads existing file)', () => {
     expect(settings.howWeMetTags).toEqual([])
     expect(settings.situationTags).toEqual(['Date'])
     expect(settings.placeTags).toEqual(['Home'])
+  })
+
+  it('returns empty nationalityTags when the settings file predates the field', async () => {
+    mockFilesystem.readFile.mockResolvedValueOnce({
+      data: JSON.stringify({ howWeMetTags: ['School'] }),
+    })
+    const settings = await loadSettings()
+    expect(settings.nationalityTags).toEqual([])
+    expect(settings.howWeMetTags).toEqual(['School'])
   })
 })
 
@@ -776,6 +824,7 @@ describe('saveSettings (native path)', () => {
       situationTags: ['Date'],
       placeTags: ['Café'],
       howWeMetTags: ['School'],
+      nationalityTags: ['Chilean'],
       onboardingDone: true,
     }
     await saveSettings(settings)
@@ -878,6 +927,7 @@ describe('persisted settings override config defaults (native path)', () => {
       situationTags: ['Date', 'Party'],
       placeTags: ['Café', 'Home'],
       howWeMetTags: ['School', 'Work'],
+      nationalityTags: ['Chilean', 'Peruvian'],
     }
     await saveSettings({ ...USER_CHOICES, ...tags, onboardingDone: true })
     const written = mockFilesystem.writeFile.mock.calls[0][0].data

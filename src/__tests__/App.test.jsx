@@ -76,6 +76,7 @@ const SAVED_SETTINGS = {
   situationTags: [],
   placeTags: [],
   howWeMetTags: [],
+  nationalityTags: [],
   onboardingDone: true,
 }
 
@@ -236,11 +237,25 @@ describe('App — boot', () => {
     expect([...screens.people.howWeMetTags].sort()).toEqual(['App', 'School'])
   })
 
+  it('offers the saved nationality tags together with the ones already used in the data', async () => {
+    await bootOnPeople({
+      people: [
+        { ...ana, nationality: 'Peruvian' },
+        { ...bob, nationality: 'chilean' },
+      ],
+      settings: { nationalityTags: ['Chilean'] },
+    })
+    expect(screens.people.nationalityTags).toEqual(['Chilean', 'Peruvian'])
+  })
+
   it('tolerates saved tag lists that are not arrays', async () => {
-    await bootOnPeople({ settings: { placeTags: null, situationTags: 'x', howWeMetTags: 3 } })
+    await bootOnPeople({
+      settings: { placeTags: null, situationTags: 'x', howWeMetTags: 3, nationalityTags: {} },
+    })
     expect(screens.people.placeTags).toEqual([])
     expect(screens.people.situationTags).toEqual([])
     expect(screens.people.howWeMetTags).toEqual([])
+    expect(screens.people.nationalityTags).toEqual([])
   })
 
   it('starts empty on the intro screen when loading fails', async () => {
@@ -619,6 +634,17 @@ describe('App — people mutations', () => {
     })
   })
 
+  it('registers the nationalities of imported people', async () => {
+    await boot({ settings: { nationalityTags: ['Chilean'] } })
+    openMain()
+    const imported = [
+      { id: 'n1', name: 'New', nationality: 'Peruvian', events: [] },
+      { id: 'n2', name: 'Other', nationality: 'CHILEAN', events: [] },
+    ]
+    await act(async () => screens.main.onImportData(imported))
+    expect(savedSettings().nationalityTags).toEqual(['Chilean', 'Peruvian'])
+  })
+
   it('registers the how-we-met of a new person as a tag', async () => {
     await boot({ settings: { howWeMetTags: ['App'] } })
     openMain()
@@ -646,6 +672,25 @@ describe('App — people mutations', () => {
     await bootOnPeople({ people: [ana], settings: { howWeMetTags: ['App'] } })
     await act(async () => screens.people.onUpdatePerson('ana', { howWeMet: 'app' }))
     expect(savedSettings().howWeMetTags).toEqual(['App'])
+  })
+
+  it('registers the nationality of an edited person as a tag', async () => {
+    await bootOnPeople({ people: [ana], settings: { nationalityTags: ['Chilean'] } })
+    await act(async () => screens.people.onUpdatePerson('ana', { nationality: ' Peruvian ' }))
+    expect(savedSettings().nationalityTags).toEqual(['Chilean', 'Peruvian'])
+    expect(screens.people.nationalityTags).toEqual(['Chilean', 'Peruvian'])
+  })
+
+  it('does not duplicate a nationality tag that differs only in case', async () => {
+    await bootOnPeople({ people: [ana], settings: { nationalityTags: ['Chilean'] } })
+    await act(async () => screens.people.onUpdatePerson('ana', { nationality: 'chilean' }))
+    expect(savedSettings().nationalityTags).toEqual(['Chilean'])
+  })
+
+  it('registers no nationality tag for an edited person without one', async () => {
+    await bootOnPeople({ people: [ana], settings: { nationalityTags: ['Chilean'] } })
+    await act(async () => screens.people.onUpdatePerson('ana', { nationality: '' }))
+    expect(savedSettings().nationalityTags).toEqual(['Chilean'])
   })
 
   it('clears everything and returns to the intro', async () => {
@@ -828,6 +873,7 @@ describe('App — settings', () => {
     ['onAddPlaceTag', 'placeTags'],
     ['onAddSituationTag', 'situationTags'],
     ['onAddHowWeMetTag', 'howWeMetTags'],
+    ['onAddNationalityTag', 'nationalityTags'],
   ])('saves a new tag once through %s', async (handler, key) => {
     await bootOnPeople({ settings: { [key]: ['Old'] } })
     await act(async () => screens.people[handler]('New'))

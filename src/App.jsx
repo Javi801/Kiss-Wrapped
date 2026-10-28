@@ -76,6 +76,8 @@ export default function KissWrappedApp() {
     setPlaceTags,
     howWeMetTags,
     setHowWeMetTags,
+    nationalityTags,
+    setNationalityTags,
     onboardingPending,
     completeOnboarding,
   } = usePersistedAppState(setScreen)
@@ -117,6 +119,11 @@ export default function KissWrappedApp() {
     setHowWeMetTags((prev) => (prev.includes(tag) ? prev : [...prev, tag]))
   }
 
+  // Adds a new nationality tag if it doesn't already exist.
+  function addNationalityTag(tag) {
+    setNationalityTags((prev) => (prev.includes(tag) ? prev : [...prev, tag]))
+  }
+
   // Clears all app data and resets the app to its initial state.
   async function clearAllAppData() {
     try {
@@ -140,12 +147,18 @@ export default function KissWrappedApp() {
     setHowWeMetTags((prev) => mergePeopleFieldTags(sourcePeople, prev, 'howWeMet'))
   }
 
+  // Registers the nationality values of the given people as tags.
+  function registerNationalityTags(sourcePeople) {
+    setNationalityTags((prev) => mergePeopleFieldTags(sourcePeople, prev, 'nationality'))
+  }
+
   // Appends imported people (already deduplicated by the caller) to the existing dataset.
   function importAppData(rawPeople) {
     const importedPeople = normalizePeople(rawPeople)
     setPeople((prev) => [...prev, ...importedPeople])
     registerEventTags(importedPeople)
     registerHowWeMetTags(importedPeople)
+    registerNationalityTags(importedPeople)
   }
 
   // Creates a new person and inserts an initial empty event.
@@ -165,6 +178,7 @@ export default function KissWrappedApp() {
       prev.map((person) => (person.id === personId ? { ...person, ...values } : person))
     )
     registerHowWeMetTags([values])
+    registerNationalityTags([values])
   }
 
   // Deletes a person completely from the dataset.
@@ -365,6 +379,8 @@ export default function KissWrappedApp() {
                   onAddPlaceTag={addPlaceTag}
                   howWeMetTags={howWeMetTags}
                   onAddHowWeMetTag={addHowWeMetTag}
+                  nationalityTags={nationalityTags}
+                  onAddNationalityTag={addNationalityTag}
                 />
               ) : null}
 

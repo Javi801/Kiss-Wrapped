@@ -28,6 +28,8 @@ export default function PeopleManagerScreen({
   onAddPlaceTag,
   howWeMetTags,
   onAddHowWeMetTag,
+  nationalityTags,
+  onAddNationalityTag,
   cardTour,
 }) {
   const PALETTE = usePalette()
@@ -83,6 +85,8 @@ export default function PeopleManagerScreen({
               onAddPlaceTag,
               howWeMetTags,
               onAddHowWeMetTag,
+              nationalityTags,
+              onAddNationalityTag,
               tour: cardTour,
             }}
           />

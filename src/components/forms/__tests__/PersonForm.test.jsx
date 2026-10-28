@@ -5,13 +5,15 @@ import { createRoot } from 'react-dom/client'
 import { COPY, GENDERS, ZODIAC_OPTIONS } from '@/lib/constants'
 import { LIMITS } from '@/lib/config'
 
-// Selects in render order (gender, zodiac, activity) and the how-we-met tag input.
-const fields = vi.hoisted(() => ({ selects: [], tagInput: null }))
+// Selects in render order (gender, zodiac, activity), the how-we-met tag input and the
+// nationality tag input (the only one with a placeholder).
+const fields = vi.hoisted(() => ({ selects: [], tagInput: null, nationalityInput: null }))
 
 vi.mock('@/lib/theme', () => ({ usePalette: () => ({}) }))
 vi.mock('@/components/forms/TagInput', () => ({
   default: (props) => {
-    fields.tagInput = props
+    if (props.placeholder) fields.nationalityInput = props
+    else fields.tagInput = props
     return null
   },
 }))
@@ -50,6 +52,7 @@ function render(props = {}) {
   const onSave = vi.fn()
   fields.selects = []
   fields.tagInput = null
+  fields.nationalityInput = null
   container = document.createElement('div')
   document.body.appendChild(container)
   root = createRoot(container)
@@ -278,6 +281,7 @@ describe('PersonForm — saving a new person', () => {
     expect(saved(onSave)).toEqual({
       name: 'Mia',
       realName: '',
+      nationality: '',
       gender: 'female',
       howWeMet: 'School',
       zodiacSign: AQUARIUS,
@@ -303,6 +307,36 @@ describe('PersonForm — saving a new person', () => {
   it('has no real name field by default', () => {
     render()
     expect(container.querySelectorAll('input:not([type="number"])')).toHaveLength(1)
+  })
+
+  it('saves the trimmed nationality only when that field is shown', () => {
+    const onSave = render({ includeNationality: true })
+    fill()
+    act(() => fields.nationalityInput.onChange('  Chilean '))
+    submit()
+    expect(saved(onSave).nationality).toBe('Chilean')
+  })
+
+  it('has no nationality field by default', () => {
+    render()
+    expect(fields.nationalityInput).toBeNull()
+  })
+
+  it('offers the nationality tags and lets the user add one', () => {
+    const onAddNationalityTag = vi.fn()
+    render({ includeNationality: true, nationalityTags: ['Chilean'], onAddNationalityTag })
+    expect(fields.nationalityInput).toMatchObject({
+      tags: ['Chilean'],
+      onAddTag: onAddNationalityTag,
+      maxLength: LIMITS.nationalityLength,
+      placeholder: t.nationalityPlaceholder,
+      addTagLabel: t.addTag,
+    })
+  })
+
+  it('offers no nationality tags when none are passed', () => {
+    render({ includeNationality: true })
+    expect(fields.nationalityInput.tags).toEqual([])
   })
 })
 
@@ -364,6 +398,23 @@ describe('PersonForm — editing a person', () => {
     const onSave = render({ initialValues: bare, includeHowWeMet: false })
     submit()
     expect(saved(onSave)).toMatchObject({ realName: '', howWeMet: '', detail: '' })
+  })
+
+  it('shows the current nationality', () => {
+    render({ initialValues: { ...existing, nationality: 'Chilean' }, includeNationality: true })
+    expect(fields.nationalityInput.value).toBe('Chilean')
+  })
+
+  it('keeps the hidden nationality untouched', () => {
+    const onSave = render({ initialValues: { ...existing, nationality: 'Chilean' } })
+    submit()
+    expect(saved(onSave).nationality).toBe('Chilean')
+  })
+
+  it('saves an empty nationality for a record without one', () => {
+    const onSave = render({ initialValues: existing, includeNationality: true })
+    submit()
+    expect(saved(onSave).nationality).toBe('')
   })
 })
 

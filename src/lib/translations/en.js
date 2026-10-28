@@ -58,6 +58,8 @@ export const en = {
   name: 'Name',
   realName: 'Real name',
   realNamePlaceholder: 'Optional real name',
+  nationality: 'Nationality',
+  nationalityPlaceholder: 'Optional nationality',
   age: 'Age',
   gender: 'Gender',
   howWeMet: 'How we met',

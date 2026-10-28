@@ -45,6 +45,9 @@ export function usePersistedAppState(setScreen) {
   // User-defined how-we-met tags shared across all person forms.
   const [howWeMetTags, setHowWeMetTags] = useState([])
 
+  // User-defined nationality tags shared across all person forms.
+  const [nationalityTags, setNationalityTags] = useState([])
+
   // Whether the onboarding flow has been completed (true = skip, show app normally).
   // Initialized to true to avoid flashing the onboarding on re-renders; boot corrects it.
   const [onboardingDone, setOnboardingDone] = useState(true)
@@ -97,6 +100,13 @@ export function usePersistedAppState(setScreen) {
             ? settings.howWeMetTags
             : []
           setHowWeMetTags(mergePeopleFieldTags(loadedPeople, savedHowWeMetTags, 'howWeMet'))
+
+          const savedNationalityTags = Array.isArray(settings.nationalityTags)
+            ? settings.nationalityTags
+            : []
+          setNationalityTags(
+            mergePeopleFieldTags(loadedPeople, savedNationalityTags, 'nationality')
+          )
         }
       } catch (error) {
         if (import.meta.env.DEV) console.error('Failed to load app data', error)
@@ -147,6 +157,7 @@ export function usePersistedAppState(setScreen) {
       situationTags,
       placeTags,
       howWeMetTags,
+      nationalityTags,
       onboardingDone,
     }).catch((error) => {
       if (import.meta.env.DEV) console.error('Failed to save settings', error)
@@ -160,6 +171,7 @@ export function usePersistedAppState(setScreen) {
     situationTags,
     placeTags,
     howWeMetTags,
+    nationalityTags,
     onboardingDone,
     isLoaded,
   ])
@@ -188,6 +200,8 @@ export function usePersistedAppState(setScreen) {
     setPlaceTags,
     howWeMetTags,
     setHowWeMetTags,
+    nationalityTags,
+    setNationalityTags,
     onboardingPending: FEATURES.onboarding && !onboardingDone,
     completeOnboarding,
   }

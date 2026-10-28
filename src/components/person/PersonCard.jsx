@@ -38,6 +38,8 @@ export default function PersonCard({
   onAddPlaceTag,
   howWeMetTags,
   onAddHowWeMetTag,
+  nationalityTags,
+  onAddNationalityTag,
   tour,
 }) {
   const PALETTE = usePalette()
@@ -149,6 +151,8 @@ export default function PersonCard({
         onAddPlaceTag={onAddPlaceTag}
         howWeMetTags={howWeMetTags}
         onAddHowWeMetTag={onAddHowWeMetTag}
+        nationalityTags={nationalityTags}
+        onAddNationalityTag={onAddNationalityTag}
       />
     </>
   )

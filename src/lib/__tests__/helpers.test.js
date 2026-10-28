@@ -155,6 +155,18 @@ describe('normalizePeople', () => {
     const people = [{ name: 'Ana', realName: 'Ana García', events: [] }]
     expect(normalizePeople(people)[0].realName).toBe('Ana García')
   })
+  it('normalizes missing nationality to empty string', () => {
+    const people = [{ name: 'Ana', events: [] }]
+    expect(normalizePeople(people)[0].nationality).toBe('')
+  })
+  it('normalizes null nationality to empty string', () => {
+    const people = [{ name: 'Ana', nationality: null, events: [] }]
+    expect(normalizePeople(people)[0].nationality).toBe('')
+  })
+  it('preserves a truthy nationality unchanged', () => {
+    const people = [{ name: 'Ana', nationality: 'Chilean', events: [] }]
+    expect(normalizePeople(people)[0].nationality).toBe('Chilean')
+  })
   it('defaults missing partner fields to never', () => {
     const result = normalizePeople([{ name: 'Ana', events: [] }])[0]
     expect(result.partnerStatus).toBe('never')

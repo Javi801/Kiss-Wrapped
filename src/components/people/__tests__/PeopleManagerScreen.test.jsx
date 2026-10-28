@@ -147,9 +147,11 @@ describe('PeopleManagerScreen — list', () => {
       onAddSituationTag: vi.fn(),
       onAddPlaceTag: vi.fn(),
       onAddHowWeMetTag: vi.fn(),
+      onAddNationalityTag: vi.fn(),
       situationTags: ['Date'],
       placeTags: ['Park'],
       howWeMetTags: ['School'],
+      nationalityTags: ['Chilean'],
     }
     render([person('Ana')], props)
     expect(seen.cards.ana).toMatchObject({ ...props, language: 'en', t, modalBackRef })

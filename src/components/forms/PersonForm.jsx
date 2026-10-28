@@ -45,11 +45,14 @@ export default function PersonForm({
   language,
   includeHowWeMet = true,
   includeRealName = false,
+  includeNationality = false,
   includePartner = false,
   saveLabel,
   mode,
   howWeMetTags = [],
   onAddHowWeMetTag,
+  nationalityTags = [],
+  onAddNationalityTag,
   isParentOpen,
 }) {
   const PALETTE = usePalette()
@@ -61,6 +64,7 @@ export default function PersonForm({
       return {
         name: '',
         realName: '',
+        nationality: '',
         age: '',
         gender: '',
         howWeMet: '',
@@ -87,6 +91,7 @@ export default function PersonForm({
       zodiacSign,
       age: displayAge,
       realName: initialValues.realName ?? '',
+      nationality: initialValues.nationality ?? '',
       howWeMet: initialValues.howWeMet ?? '',
       detail: initialValues.detail ?? '',
       partnerStatus: PARTNER_STATUSES.includes(initialValues.partnerStatus)
@@ -170,6 +175,7 @@ export default function PersonForm({
       howWeMet: includeHowWeMet ? form.howWeMet.trim() : initialValues?.howWeMet || '',
       name: form.name.trim(),
       realName: includeRealName ? form.realName.trim() : initialValues?.realName || '',
+      nationality: includeNationality ? form.nationality.trim() : initialValues?.nationality || '',
     })
   }
 
@@ -295,6 +301,28 @@ export default function PersonForm({
             )}
           </div>
         </div>
+
+        {/* Nationality */}
+        {includeNationality && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <Label>{t.nationality}</Label>
+            <TagInput
+              value={form.nationality}
+              onChange={(val) => update('nationality', val)}
+              tags={nationalityTags}
+              onAddTag={onAddNationalityTag}
+              maxLength={LIMITS.nationalityLength}
+              placeholder={t.nationalityPlaceholder}
+              className="rounded-2xl"
+              style={{ ...inputStyle }}
+              addTagLabel={t.addTag}
+              isParentOpen={isParentOpen}
+            />
+            <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
+              {form.nationality.length}/{LIMITS.nationalityLength}
+            </p>
+          </div>
+        )}
 
         {/* Partner marker + period */}
         {includePartner && (
