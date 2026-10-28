@@ -58,7 +58,8 @@ src/
     */__tests__/        Unit tests next to the components they cover
   lib/                  Framework-light logic: dates, stats, formatting, storage, constants
     config.js           Central configuration: feature flags, metadata, defaults, limits
-    translations/       UI strings, one file per language (grouped as COPY in constants.js)
+    translations/       UI strings, one file per language (grouped as COPY in constants.js),
+                        with the app guide texts in a separate file per language (*-guide.js)
     __tests__/          Unit tests for lib/
   plugins/              JS wrappers for custom Capacitor plugins
     __tests__/          Unit tests for plugins/
@@ -268,7 +269,7 @@ All of these follow the same sequence: write to `Directory.Cache` → `Filesyste
 
 ## Localization
 
-- All UI strings live in one file per language, `lib/translations/en.js` and `lib/translations/es.js`. `COPY` in `lib/constants.js` groups them under `en` and `es`. Every key must exist in both languages; `constants.test.js` enforces it.
+- All UI strings live in one file per language, `lib/translations/en.js` and `lib/translations/es.js`. The app guide texts (`appGuide*`, `guide*`) are kept apart in `en-guide.js` and `es-guide.js` and spread into those dictionaries, so the files stay under the ESLint `max-lines` limit. `COPY` in `lib/constants.js` groups them under `en` and `es`. Every key must exist in both languages; `constants.test.js` enforces it.
 - No user-facing string is hardcoded in components.
 - `detectDeviceLanguage()` maps the device locale to `en` or `es` and is used as a fallback (for example in `ErrorBoundary`, which renders outside the providers) and as the language of a new install while the onboarding is pending.
 
@@ -304,7 +305,7 @@ Privacy mechanisms, in addition to the above:
 |---|---|
 | Enable, disable, or add a feature flag | `FEATURES` in `lib/config.js`, plus its pinned value in `config.test.js` |
 | Change a default setting, a length limit, an onboarding timing, or app metadata | `lib/config.js` |
-| Add or change a UI string | `lib/translations/en.js` and `lib/translations/es.js` |
+| Add or change a UI string | `lib/translations/en.js` and `lib/translations/es.js` (app guide texts: `en-guide.js` and `es-guide.js`) |
 | Add a palette color token | Every palette in `PALETTES` |
 | Add a theme or a language | `PALETTES` in `lib/constants.js`, or a new file in `lib/translations/` added to `COPY` plus `ZODIAC_OPTIONS` in `lib/constants.js`, and the matching list in `lib/config.js` |
 | Add a field to Person or Event | The form (`PersonForm` / `EventForm`), `normalizePeople` for defaults and migration, `normalizeForExport` if it is required, display in `PersonCardHeader` / `PersonCardDetails` (person) or `PersonEventList` (event), tests in `lib/__tests__/` |
@@ -315,7 +316,7 @@ Privacy mechanisms, in addition to the above:
 | Add a screen | New name in `SCREENS` (`lib/constants.js`), its branch in the `screen` conditional in `App.jsx`, `navItems` and `hideBottomBar` if relevant |
 | Add an onboarding step | A step component in `components/app/onboarding/`, added to `ONBOARDING_STEPS` in `OnboardingWizard.jsx`; a tour step is a scene list in `onboardingScenes.js`, added as a `{ scenes }` entry |
 | Let the onboarding tour point at a new control | `tourTargetProps` and `TapGuide` on the control, a name in `TOUR_TARGETS` when it is not a screen, and a scene in `onboardingScenes.js` |
-| Add a section to the app guide | An entry in `APP_GUIDE_SECTIONS` and its texts in every file of `lib/translations/` |
+| Add a section to the app guide | An entry in `APP_GUIDE_SECTIONS` and its texts in every `*-guide.js` file of `lib/translations/` |
 | Add a dialog or sheet | Register a close callback on `modalBackRef` while open |
 | Add date or age logic | `lib/date.js` with unit tests; never inline date parsing in components |
 
