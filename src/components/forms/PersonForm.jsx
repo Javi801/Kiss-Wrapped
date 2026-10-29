@@ -9,6 +9,11 @@ import TagInput from '@/components/forms/TagInput'
 import PartnerFields from '@/components/forms/PartnerFields'
 import SpeechBubble from '@/components/forms/SpeechBubble'
 import SubmitButton from '@/components/forms/SubmitButton'
+import {
+  toPersonFormState,
+  toPersonPayload,
+  validatePersonForm,
+} from '@/components/forms/personFormValues'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
@@ -21,14 +26,8 @@ import {
 import { ACTIVITY, GENDERS, ZODIAC_OPTIONS, TEXT } from '@/lib/constants'
 import { LIMITS } from '@/lib/config'
 import { usePalette } from '@/lib/theme'
-import {
-  activityDetailPlaceholder,
-  translateGender,
-  translatePartnerError,
-  getZodiacForLanguage,
-} from '@/lib/format'
-import { calculateDisplayAge, deriveBirthYear, isWithinZodiacPeriod } from '@/lib/date'
-import { PARTNER_STATUSES, validatePartnerFields } from '@/lib/partner'
+import { activityDetailPlaceholder, translateGender } from '@/lib/format'
+import { isWithinZodiacPeriod } from '@/lib/date'
 
 /**
  * Form used for creating or editing a person.
@@ -60,49 +59,7 @@ export default function PersonForm({
   const PALETTE = usePalette()
   // The add form addresses the user; any other mode speaks about the person.
   const isAdd = mode === 'add'
-  // Local form state initialization.
-  const [form, setForm] = useState(() => {
-    if (!initialValues) {
-      return {
-        name: '',
-        realName: '',
-        nationality: '',
-        age: '',
-        gender: '',
-        howWeMet: '',
-        zodiacSign: '',
-        activity: '',
-        detail: '',
-        partnerStatus: 'never',
-        partnerFrom: '',
-        partnerTo: '',
-      }
-    }
-    const zodiacSign = getZodiacForLanguage(initialValues.zodiacSign, language)
-    const displayAge = initialValues.birthYear
-      ? String(
-          calculateDisplayAge(
-            initialValues.birthYear,
-            zodiacSign,
-            initialValues.birthdayAlreadyHappened
-          ) ?? ''
-        )
-      : String(initialValues.age ?? '')
-    return {
-      ...initialValues,
-      zodiacSign,
-      age: displayAge,
-      realName: initialValues.realName ?? '',
-      nationality: initialValues.nationality ?? '',
-      howWeMet: initialValues.howWeMet ?? '',
-      detail: initialValues.detail ?? '',
-      partnerStatus: PARTNER_STATUSES.includes(initialValues.partnerStatus)
-        ? initialValues.partnerStatus
-        : 'never',
-      partnerFrom: initialValues.partnerFrom ?? '',
-      partnerTo: initialValues.partnerTo ?? '',
-    }
-  })
+  const [form, setForm] = useState(() => toPersonFormState(initialValues, language))
 
   const [errors, setErrors] = useState({})
   const [birthdayAlreadyHappened, setBirthdayAlreadyHappened] = useState(
@@ -116,69 +73,23 @@ export default function PersonForm({
     if (key === 'zodiacSign') setBirthdayAlreadyHappened(false)
   }
 
-  // Validate required fields and data types.
-  function validate() {
-    const next = {}
-
-    if (!form.name.trim()) next.name = t.requiredName
-
-    if (!String(form.age).trim()) next.age = t.requiredAge
-    else if (
-      !Number.isInteger(Number(form.age)) ||
-      Number(form.age) <= 0 ||
-      Number(form.age) > LIMITS.maxAge
-    )
-      next.age = t.validAge
-
-    if (!form.gender) next.gender = t.requiredGender
-
-    if (includeHowWeMet && !form.howWeMet.trim()) next.howWeMet = t.requiredHowWeMet
-
-    if (!form.zodiacSign) next.zodiacSign = t.requiredZodiac
-
-    if (!form.activity) next.activity = t.requiredActivity
-
-    // Partner period: optional start; a past partner needs a valid end after the start.
-    const partnerErrors = validatePartnerFields({
-      partnerStatus: form.partnerStatus,
-      partnerFrom: form.partnerFrom.trim(),
-      partnerTo: form.partnerTo.trim(),
-    })
-    for (const [field, code] of Object.entries(partnerErrors)) {
-      next[field] = translatePartnerError(code, t)
-    }
-
-    setErrors(next)
-
-    return Object.keys(next).length === 0
-  }
-
-  // Submit handler that normalizes values before sending.
+  // Validates, then sends the normalized values.
   function submit(e) {
     e.preventDefault()
 
-    if (!validate()) return
+    const nextErrors = validatePersonForm(form, { includeHowWeMet }, t)
+    setErrors(nextErrors)
+    if (Object.keys(nextErrors).length) return
 
-    const { age, ...rest } = form
-    onSave({
-      ...rest,
-      partnerStatus: form.partnerStatus,
-      partnerFrom: form.partnerStatus !== 'never' ? form.partnerFrom.trim() : '',
-      partnerTo: form.partnerStatus === 'past' ? form.partnerTo.trim() : '',
-      birthYear: deriveBirthYear(
-        Number(age),
-        form.zodiacSign,
-        showBirthdayCheckbox && birthdayAlreadyHappened
-      ),
-      birthdayAlreadyHappened: showBirthdayCheckbox
-        ? birthdayAlreadyHappened
-        : (initialValues?.birthdayAlreadyHappened ?? false),
-      detail: form.detail.trim(),
-      howWeMet: includeHowWeMet ? form.howWeMet.trim() : initialValues?.howWeMet || '',
-      name: form.name.trim(),
-      realName: includeRealName ? form.realName.trim() : initialValues?.realName || '',
-      nationality: includeNationality ? form.nationality.trim() : initialValues?.nationality || '',
-    })
+    onSave(
+      toPersonPayload(form, {
+        initialValues,
+        birthdayAlreadyHappened,
+        includeHowWeMet,
+        includeRealName,
+        includeNationality,
+      })
+    )
   }
 
   // Shared input styling.
