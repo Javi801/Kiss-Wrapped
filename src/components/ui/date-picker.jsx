@@ -21,6 +21,8 @@ const DAY_HEADERS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
 
 const YEAR_PAGE_SIZE = 12
 
+const CALENDAR_WIDTH = 268
+
 // Text input paired with a calendar dropdown; value format is yyyy.MM.dd.
 export function DatePicker({ value, onChange, placeholder, className, style }) {
   const PALETTE = usePalette()
@@ -38,6 +40,8 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
     transition: 'background-color 0.1s',
   }
   const [open, setOpen] = useState(false)
+  // The calendar opens toward the left when it would overflow the right edge of the screen.
+  const [alignEnd, setAlignEnd] = useState(false)
   const containerRef = useRef(null)
 
   const today = new Date()
@@ -82,7 +86,11 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
   }
 
   function toggleOpen() {
-    if (!open) setCalView('days')
+    if (!open) {
+      setCalView('days')
+      const left = containerRef.current?.getBoundingClientRect().left ?? 0
+      setAlignEnd(left + CALENDAR_WIDTH > document.documentElement.clientWidth)
+    }
     setOpen((o) => !o)
   }
 
@@ -242,14 +250,14 @@ export function DatePicker({ value, onChange, placeholder, className, style }) {
           style={{
             position: 'absolute',
             top: 'calc(100% + 6px)',
-            left: 0,
+            ...(alignEnd ? { right: 0 } : { left: 0 }),
             zIndex: 200,
             backgroundColor: PALETTE.card,
             border: `1px solid ${PALETTE.cardBorder}`,
             borderRadius: '1rem',
             padding: '1rem',
             boxShadow: '0 8px 32px rgba(226,115,150,0.18)',
-            minWidth: '268px',
+            minWidth: `${CALENDAR_WIDTH}px`,
             userSelect: 'none',
           }}
         >
