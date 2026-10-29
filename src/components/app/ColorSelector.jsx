@@ -28,6 +28,32 @@ const iconSwatch = ({ glyph, background }) =>
 
 const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1)
 
+// Grid option shared by the theme and icon pickers.
+function OptionTile({ selected, children, ...props }) {
+  const PALETTE = usePalette()
+  return (
+    <button
+      type="button"
+      className="rounded-2xl"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '0.375rem',
+        padding: '0.5rem',
+        border: selected ? `2px solid ${PALETTE.accent}` : `1.5px solid ${PALETTE.inputBorder}`,
+        // Border only: a tinted fill would match the icon background on some themes.
+        backgroundColor: PALETTE.controlBg,
+        cursor: 'pointer',
+        transition: 'all 150ms ease',
+      }}
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}
+
 export default function ColorSelector({
   iconColor,
   setIconColor,
@@ -63,25 +89,7 @@ export default function ColorSelector({
             {THEMES.map(({ key, gradient }) => {
               const selected = theme === key
               return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setTheme(key)}
-                  className="rounded-2xl"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '0.375rem',
-                    padding: '0.5rem',
-                    border: selected
-                      ? `2px solid ${PALETTE.accent}`
-                      : `1.5px solid ${PALETTE.inputBorder}`,
-                    backgroundColor: selected ? PALETTE.accentMuted : PALETTE.controlBg,
-                    cursor: 'pointer',
-                    transition: 'all 150ms ease',
-                  }}
-                >
+                <OptionTile key={key} selected={selected} onClick={() => setTheme(key)}>
                   <span
                     className="rounded-full"
                     style={{
@@ -103,7 +111,7 @@ export default function ColorSelector({
                   >
                     {t[`theme${capitalize(key)}`]}
                   </span>
-                </button>
+                </OptionTile>
               )
             })}
           </div>
@@ -126,28 +134,16 @@ export default function ColorSelector({
             const selected = iconShape === shape
             const label = t[`icon${capitalize(shape)}`] ?? shape
             return (
-              <button
+              <OptionTile
                 key={shape}
-                type="button"
+                selected={selected}
                 aria-label={label}
                 aria-pressed={selected}
                 // Re-tapping the current icon must not touch the launcher aliases again.
                 onClick={() => !selected && setIconColor(iconVariantKey(shape, iconTone))}
-                className="rounded-2xl"
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  padding: '0.5rem',
-                  border: selected
-                    ? `2px solid ${PALETTE.accent}`
-                    : `1.5px solid ${PALETTE.inputBorder}`,
-                  backgroundColor: selected ? PALETTE.accentMuted : PALETTE.controlBg,
-                  cursor: 'pointer',
-                  transition: 'all 150ms ease',
-                }}
               >
                 <SparkleIcon palette={iconVariantKey(shape, iconTone)} size={48} />
-              </button>
+              </OptionTile>
             )
           })}
         </div>
