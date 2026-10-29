@@ -3,10 +3,12 @@ import { Save } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import ChoiceToggle from '@/components/forms/ChoiceToggle'
+import FormField from '@/components/forms/FormField'
 import TagInput from '@/components/forms/TagInput'
 import PartnerFields from '@/components/forms/PartnerFields'
 import SpeechBubble from '@/components/forms/SpeechBubble'
-import { Label } from '@/components/ui/label'
+import SubmitButton from '@/components/forms/SubmitButton'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
@@ -190,8 +192,13 @@ export default function PersonForm({
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '1rem' }}>
         {/* Name + Real name grouped */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <Label>{t.name} *</Label>
+          <FormField
+            label={t.name}
+            required
+            length={form.name.length}
+            maxLength={LIMITS.nameLength}
+            error={errors.name}
+          >
             <Input
               value={form.name}
               onChange={(e) => update('name', e.target.value)}
@@ -199,15 +206,14 @@ export default function PersonForm({
               className="rounded-2xl"
               style={{ ...inputStyle }}
             />
-            <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-              {form.name.length}/{LIMITS.nameLength}
-            </p>
-            {errors.name && <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.name}</p>}
-          </div>
+          </FormField>
 
           {includeRealName && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <Label>{t.realName}</Label>
+            <FormField
+              label={t.realName}
+              length={form.realName.length}
+              maxLength={LIMITS.nameLength}
+            >
               <Input
                 value={form.realName}
                 onChange={(e) => update('realName', e.target.value)}
@@ -216,10 +222,7 @@ export default function PersonForm({
                 placeholder={t.realNamePlaceholder}
                 style={{ ...inputStyle }}
               />
-              <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-                {form.realName.length}/{LIMITS.nameLength}
-              </p>
-            </div>
+            </FormField>
           )}
         </div>
 
@@ -227,8 +230,7 @@ export default function PersonForm({
         <div
           style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '1rem' }}
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <Label>{t.age} *</Label>
+          <FormField label={t.age} required error={errors.age}>
             <Input
               type="number"
               value={form.age}
@@ -238,11 +240,9 @@ export default function PersonForm({
               className="rounded-2xl"
               style={{ ...inputStyle }}
             />
-            {errors.age && <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.age}</p>}
-          </div>
+          </FormField>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <Label>{t.gender} *</Label>
+          <FormField label={t.gender} required error={errors.gender}>
             <Select value={form.gender} onValueChange={(value) => update('gender', value)}>
               <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
                 <SelectValue placeholder={t.select} />
@@ -256,11 +256,7 @@ export default function PersonForm({
                 ))}
               </SelectContent>
             </Select>
-
-            {errors.gender && (
-              <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.gender}</p>
-            )}
-          </div>
+          </FormField>
 
           {/* Spans both columns so the prompt and options are not squeezed into the age column */}
           {showBirthdayCheckbox && (
@@ -275,46 +271,25 @@ export default function PersonForm({
               <p style={{ ...TEXT.caption, color: PALETTE.text }}>
                 {isAdd ? t.birthdayAlreadyHappened : t.birthdayAlreadyHappenedThird}
               </p>
-              <div
-                style={{
-                  display: 'flex',
-                  borderRadius: '0.75rem',
-                  overflow: 'hidden',
-                  border: `1px solid ${PALETTE.inputBorder}`,
-                  width: 'fit-content',
-                  backgroundColor: PALETTE.inputBg,
-                }}
-              >
-                {[true, false].map((val) => (
-                  <button
-                    key={String(val)}
-                    type="button"
-                    onClick={() => setBirthdayAlreadyHappened(val)}
-                    style={{
-                      padding: '0.25rem 1rem',
-                      ...TEXT.caption,
-                      fontWeight: 500,
-                      whiteSpace: 'nowrap',
-                      cursor: 'pointer',
-                      border: 'none',
-                      backgroundColor:
-                        birthdayAlreadyHappened === val ? PALETTE.accent : 'transparent',
-                      color: birthdayAlreadyHappened === val ? PALETTE.textOnAccent : PALETTE.text,
-                      transition: 'background-color 0.15s, color 0.15s',
-                    }}
-                  >
-                    {val ? t.birthdayYes : t.birthdayNo}
-                  </button>
-                ))}
-              </div>
+              <ChoiceToggle
+                options={[
+                  { value: true, label: t.birthdayYes },
+                  { value: false, label: t.birthdayNo },
+                ]}
+                value={birthdayAlreadyHappened}
+                onChange={setBirthdayAlreadyHappened}
+              />
             </div>
           )}
         </div>
 
         {/* Nationality */}
         {includeNationality && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <Label>{t.nationality}</Label>
+          <FormField
+            label={t.nationality}
+            length={form.nationality.length}
+            maxLength={LIMITS.nationalityLength}
+          >
             <TagInput
               value={form.nationality}
               onChange={(val) => update('nationality', val)}
@@ -327,10 +302,7 @@ export default function PersonForm({
               addTagLabel={t.addTag}
               isParentOpen={isParentOpen}
             />
-            <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-              {form.nationality.length}/{LIMITS.nationalityLength}
-            </p>
-          </div>
+          </FormField>
         )}
 
         {/* Partner marker + period */}
@@ -347,8 +319,13 @@ export default function PersonForm({
 
         {/* How we met */}
         {includeHowWeMet && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <Label>{t.howWeMet} *</Label>
+          <FormField
+            label={t.howWeMet}
+            required
+            length={form.howWeMet.length}
+            maxLength={LIMITS.tagLength}
+            error={errors.howWeMet}
+          >
             <TagInput
               value={form.howWeMet}
               onChange={(val) => update('howWeMet', val)}
@@ -360,18 +337,11 @@ export default function PersonForm({
               addTagLabel={t.addTag}
               isParentOpen={isParentOpen}
             />
-            <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-              {form.howWeMet.length}/{LIMITS.tagLength}
-            </p>
-            {errors.howWeMet && (
-              <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.howWeMet}</p>
-            )}
-          </div>
+          </FormField>
         )}
 
         {/* Zodiac */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <Label>{t.zodiacSign} *</Label>
+        <FormField label={t.zodiacSign} required error={errors.zodiacSign}>
           <Select value={form.zodiacSign} onValueChange={(value) => update('zodiacSign', value)}>
             <SelectTrigger className="w-full rounded-2xl" style={{ ...inputStyle }}>
               <SelectValue placeholder={t.select} />
@@ -387,15 +357,10 @@ export default function PersonForm({
           </Select>
 
           {zodiacHint && <SpeechBubble>{zodiacHint}</SpeechBubble>}
-
-          {errors.zodiacSign && (
-            <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.zodiacSign}</p>
-          )}
-        </div>
+        </FormField>
 
         {/* Activity */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <Label>{t.activity} *</Label>
+        <FormField label={t.activity} required error={errors.activity}>
           <Select value={form.activity} onValueChange={(value) => update('activity', value)}>
             <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
               <SelectValue placeholder={t.select} />
@@ -410,16 +375,15 @@ export default function PersonForm({
               <SelectItem value={ACTIVITY.other}>{t.other}</SelectItem>
             </SelectContent>
           </Select>
-
-          {errors.activity && (
-            <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.activity}</p>
-          )}
-        </div>
+        </FormField>
 
         {/* Specific — only visible after an activity is chosen */}
         {form.activity && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <Label>{t.detail}</Label>
+          <FormField
+            label={t.detail}
+            length={form.detail.length}
+            maxLength={LIMITS.personDetailLength}
+          >
             <Textarea
               value={form.detail}
               onChange={(e) => update('detail', e.target.value)}
@@ -428,30 +392,16 @@ export default function PersonForm({
               className="rounded-2xl"
               style={{ ...inputStyle }}
             />
-            <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-              {form.detail.length}/{LIMITS.personDetailLength}
-            </p>
-          </div>
+          </FormField>
         )}
       </div>
 
       {/* Actions */}
       <div style={{ display: 'flex', gap: '0.5rem', paddingTop: '0.5rem' }}>
-        <Button
-          type="submit"
-          className="rounded-2xl"
-          style={{
-            flex: '1 1 0%',
-            color: PALETTE.textOnAccent,
-            boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-            background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
-            // The gradient would repeat under the default transparent border.
-            border: 'none',
-          }}
-        >
+        <SubmitButton>
           <Save style={{ marginRight: '0.5rem', height: '1rem', width: '1rem' }} />
           {saveLabel || t.savePerson}
-        </Button>
+        </SubmitButton>
 
         {onCancel && (
           <Button

@@ -219,6 +219,15 @@ describe('PersonForm — birthday during the current sign', () => {
     expect(container.textContent).toContain(t.birthdayAlreadyHappenedThird)
   })
 
+  it('marks the chosen birthday answer as pressed', () => {
+    render()
+    act(() => zodiac().onValueChange(GEMINI))
+    const pressed = () => container.querySelector('button[aria-pressed="true"]').textContent
+    expect(pressed()).toBe(t.birthdayNo)
+    press(t.birthdayYes)
+    expect(pressed()).toBe(t.birthdayYes)
+  })
+
   it('assumes the birthday is still ahead', () => {
     const onSave = render()
     fill({ zodiacSign: GEMINI })
