@@ -48,6 +48,8 @@ export const PALETTES = {
   pink: {
     bg: '#fff8fb',
     bgSoft: '#fff3f8',
+    dialogBg: '#fff3f8',
+    dialogBorder: '#ead7e2',
     bgGradientFrom: '#ffddea',
     bgGradientVia: '#f8abc7',
     bgGradientTo: '#bde0fe',
@@ -108,6 +110,8 @@ export const PALETTES = {
   green: {
     bg: '#f6fbf8',
     bgSoft: '#eef8f2',
+    dialogBg: '#eef8f2',
+    dialogBorder: '#c8e6d0',
     bgGradientFrom: '#d4edda',
     bgGradientVia: '#a8d5b5',
     bgGradientTo: '#bde0fe',
@@ -170,6 +174,8 @@ export const PALETTES = {
   dark: {
     bg: '#0f0d1a',
     bgSoft: '#14112a',
+    dialogBg: '#241f48',
+    dialogBorder: '#6a60c0',
     bgGradientFrom: '#1a1535',
     bgGradientVia: '#1e2d5a',
     bgGradientTo: '#0f1e3d',

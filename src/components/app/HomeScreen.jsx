@@ -38,6 +38,13 @@ const NO_TAGS = { howWeMet: [], nationality: [], situation: [], place: [] }
  * `TOUR_TARGETS.data` or `TOUR_TARGETS.settings`) and `tourHint` (`{ title, body }`) is the
  * text for the last two.
  */
+// Closes a dialog opened from the settings and opens the settings again. The setters are
+// passed in, so the back-button effect can call it without depending on it.
+function closeDialogToSettings(setOpen, setSettingsOpen) {
+  setOpen(false)
+  setSettingsOpen(true)
+}
+
 export default function MainScreen({
   onNavigate,
   onClearData,
@@ -94,10 +101,10 @@ export default function MainScreen({
     modalBackRef.current = anyOpen
       ? () => {
           if (onboardingDoneOpen) onCloseOnboardingDone()
-          else if (aboutOpen) setAboutOpen(false)
-          else if (guideOpen) setGuideOpen(false)
+          else if (aboutOpen) closeDialogToSettings(setAboutOpen, setSettingsOpen)
+          else if (guideOpen) closeDialogToSettings(setGuideOpen, setSettingsOpen)
           else if (pendingTagDelete !== null) setPendingTagDelete(null)
-          else if (tagsOpen) setTagsOpen(false)
+          else if (tagsOpen) closeDialogToSettings(setTagsOpen, setSettingsOpen)
           else if (languageOpen) setLanguageOpen(false)
           else if (settingsOpen) setSettingsOpen(false)
           else if (confirmOpen) setConfirmOpen(false)
@@ -121,6 +128,11 @@ export default function MainScreen({
     importStatus,
     modalBackRef,
   ])
+
+  // onOpenChange of a dialog opened from the settings: closing it returns to the settings.
+  function returnToSettings(setOpen) {
+    return (open) => (open ? setOpen(true) : closeDialogToSettings(setOpen, setSettingsOpen))
+  }
 
   async function handleExportJson() {
     try {
@@ -248,13 +260,13 @@ export default function MainScreen({
         onImport={importResolvedPartnerIssues}
       />
 
-      <AboutDialog open={aboutOpen} onOpenChange={setAboutOpen} t={t} />
+      <AboutDialog open={aboutOpen} onOpenChange={returnToSettings(setAboutOpen)} t={t} />
 
-      <AppGuideDialog open={guideOpen} onOpenChange={setGuideOpen} t={t} />
+      <AppGuideDialog open={guideOpen} onOpenChange={returnToSettings(setGuideOpen)} t={t} />
 
       <TagsDialog
         open={tagsOpen}
-        onOpenChange={setTagsOpen}
+        onOpenChange={returnToSettings(setTagsOpen)}
         t={t}
         people={people}
         tags={tags}

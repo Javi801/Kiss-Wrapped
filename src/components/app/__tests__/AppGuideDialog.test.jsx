@@ -4,6 +4,8 @@ import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { COPY } from '@/lib/constants'
 
+const seen = vi.hoisted(() => ({ contentProps: null }))
+
 vi.mock('@/lib/theme', () => ({ usePalette: () => ({}) }))
 vi.mock('@/components/ui/dialog', async () => {
   const { createElement } = await import('react')
@@ -11,7 +13,10 @@ vi.mock('@/components/ui/dialog', async () => {
   return {
     Dialog: ({ open, children }) =>
       open ? createElement('div', { 'data-dialog': true }, children) : null,
-    DialogContent: passthrough,
+    DialogContent: ({ children, ...props }) => {
+      seen.contentProps = props
+      return children
+    },
     DialogHeader: passthrough,
     DialogTitle: passthrough,
     DialogDescription: passthrough,
@@ -20,6 +25,10 @@ vi.mock('@/components/ui/dialog', async () => {
 })
 
 import AppGuideDialog from '@/components/app/AppGuideDialog'
+import {
+  SETTINGS_DIALOG_CLASS,
+  SETTINGS_OVERLAY_CLASS,
+} from '@/components/app/settingsDialogTransition'
 import AppGuideSection from '@/components/app/AppGuideSection'
 import { APP_GUIDE_SECTIONS } from '@/components/app/appGuideSections'
 
@@ -83,11 +92,17 @@ describe('AppGuideDialog', () => {
     }
   })
 
-  it('closes from its button', () => {
-    const onOpenChange = vi.fn()
-    render(<AppGuideDialog open onOpenChange={onOpenChange} t={t} />)
-    act(() => container.querySelector('button').click())
-    expect(onOpenChange).toHaveBeenCalledWith(false)
+  it('closes from the corner button, with no button of its own', () => {
+    render(<AppGuideDialog open onOpenChange={vi.fn()} t={t} />)
+    expect(seen.contentProps.showCloseButton).toBeUndefined()
+    expect(container.querySelector('button')).toBeNull()
+  })
+
+  it('uses the shared settings dialog background', () => {
+    render(<AppGuideDialog open onOpenChange={vi.fn()} t={t} />)
+    expect(seen.contentProps.className).toBe(`rounded-2xl ${SETTINGS_DIALOG_CLASS}`)
+    expect(seen.contentProps.overlayClassName).toBe(SETTINGS_OVERLAY_CLASS)
+    expect(Object.keys(seen.contentProps.style)).toEqual(['background', 'borderColor'])
   })
 })
 

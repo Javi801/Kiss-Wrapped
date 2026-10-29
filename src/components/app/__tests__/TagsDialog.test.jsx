@@ -43,6 +43,10 @@ vi.mock('@/components/ui/alert-dialog', async () => {
 })
 
 import TagsDialog from '@/components/app/TagsDialog'
+import {
+  SETTINGS_DIALOG_CLASS,
+  SETTINGS_OVERLAY_CLASS,
+} from '@/components/app/settingsDialogTransition'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
@@ -161,7 +165,14 @@ describe('TagsDialog', () => {
   it('keeps the dialog at a fixed height with a column body', () => {
     render()
     expect(seen.contentProps).toHaveProperty('aria-describedby', undefined)
-    expect(seen.contentProps.className).toBe('h-[calc(100svh-2rem)]')
+    expect(seen.contentProps.className.split(' ')).toEqual([
+      'h-[calc(100svh-2rem)]',
+      'rounded-2xl',
+      SETTINGS_DIALOG_CLASS,
+    ])
+    expect(seen.contentProps.overlayClassName).toBe(SETTINGS_OVERLAY_CLASS)
+    expect(Object.keys(seen.contentProps.style)).toEqual(['background', 'borderColor'])
+    expect(seen.contentProps.showCloseButton).toBeUndefined()
     expect(seen.contentProps.bodyClassName.split(' ')).toEqual(
       expect.arrayContaining(['flex', 'flex-col'])
     )

@@ -47,6 +47,10 @@ vi.mock('@/components/ui/dialog', async () => {
 })
 
 import MainScreen from '@/components/app/HomeScreen'
+import {
+  SETTINGS_DIALOG_CLASS,
+  SETTINGS_OVERLAY_CLASS,
+} from '@/components/app/settingsDialogTransition'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
@@ -101,6 +105,9 @@ const click = (label, scope = container) =>
   act(async () => {
     find(label, scope).click()
   })
+// The settings dialog is the one listing both the tags row and the about row.
+const settingsShown = () =>
+  Boolean(dialog() && find(t.manageTags, dialog()) && find(t.about, dialog()))
 const tile = (label) => seen.tiles.findLast((item) => item.label === label)
 const fileInput = () => container.querySelector('input[type="file"]')
 
@@ -224,12 +231,14 @@ describe('HomeScreen — settings and about', () => {
     expect(open).toHaveBeenCalledWith(APP_GITHUB_REPO, '_blank')
   })
 
-  it('closes the about dialog', async () => {
+  it('closes the about dialog from the corner button, with no button of its own', async () => {
     render()
     await click(t.settings)
     await click(t.about, dialog())
-    await click(t.close, dialog())
-    expect(dialog()).toBeNull()
+    expect(seen.dialogContent.showCloseButton).toBeUndefined()
+    expect(find(t.close, dialog())).toBeUndefined()
+    act(() => seen.openDialogs.at(-1)(false))
+    expect(settingsShown()).toBe(true)
   })
 })
 
@@ -456,7 +465,6 @@ describe('HomeScreen — hardware back button and dismissal', () => {
   const openers = [
     ['language', () => click(t.language)],
     ['settings', () => click(t.settings)],
-    ['about', async () => (await click(t.settings), click(t.about, dialog()))],
     ['clear-data confirmation', () => click(t.clearLocalDataLabel)],
     ['export result', () => click(t.exportJsonLabel)],
     ['import', () => pickFile('backup.txt', '')],
@@ -483,6 +491,48 @@ describe('HomeScreen — hardware back button and dismissal', () => {
     act(() => onOpenChange(false))
     expect(dialog()).toBeNull()
   })
+
+  const fromSettings = [
+    ['about', t.about],
+    ['app guide', t.appGuide],
+    ['tags', t.manageTags],
+  ]
+  const openFromSettings = async (label) => {
+    await click(t.settings)
+    await click(label, dialog())
+    expect(settingsShown()).toBe(false)
+  }
+
+  it.each(fromSettings)('returns from the %s dialog to the settings', async (_name, label) => {
+    render()
+    await openFromSettings(label)
+    act(() => modalBackRef.current())
+    expect(settingsShown()).toBe(true)
+    act(() => modalBackRef.current())
+    expect(dialog()).toBeNull()
+    expect(modalBackRef.current).toBeNull()
+  })
+
+  it.each(fromSettings)(
+    'returns to the settings when the %s dialog is dismissed',
+    async (_name, label) => {
+      render()
+      await openFromSettings(label)
+      act(() => seen.openDialogs.at(-1)(false))
+      expect(settingsShown()).toBe(true)
+    }
+  )
+
+  it.each([['settings', null], ...fromSettings])(
+    'swaps the %s dialog without fading its overlay or animating it out',
+    async (_name, label) => {
+      render()
+      if (label) await openFromSettings(label)
+      else await click(t.settings)
+      expect(seen.dialogContent.className).toContain(SETTINGS_DIALOG_CLASS)
+      expect(seen.dialogContent.overlayClassName).toBe(SETTINGS_OVERLAY_CLASS)
+    }
+  )
 
   it('works without a back-button registry', async () => {
     render({ modalBackRef: undefined })
@@ -595,8 +645,7 @@ describe('HomeScreen — tags', () => {
     expect(dialog()).not.toBeNull()
 
     act(() => modalBackRef.current())
-    expect(dialog()).toBeNull()
-    expect(modalBackRef.current).toBeNull()
+    expect(settingsShown()).toBe(true)
     expect(onRemoveTag).not.toHaveBeenCalled()
   })
 })
@@ -611,18 +660,18 @@ describe('HomeScreen — app guide and onboarding restart', () => {
     expect(dialog().textContent).toContain(t.guideDataExport)
   })
 
-  it('closes the app guide from its button and from the back button', async () => {
+  it('closes the app guide from the corner button and from the back button', async () => {
     render()
     await click(t.settings)
     await click(t.appGuide, dialog())
-    await click(t.close, dialog())
-    expect(dialog()).toBeNull()
+    expect(seen.dialogContent.showCloseButton).toBeUndefined()
+    expect(find(t.close, dialog())).toBeUndefined()
+    act(() => seen.openDialogs.at(-1)(false))
+    expect(settingsShown()).toBe(true)
 
-    await click(t.settings)
     await click(t.appGuide, dialog())
     act(() => modalBackRef.current())
-    expect(dialog()).toBeNull()
-    expect(modalBackRef.current).toBeNull()
+    expect(settingsShown()).toBe(true)
   })
 
   it('offers no onboarding restart unless it can be restarted', async () => {

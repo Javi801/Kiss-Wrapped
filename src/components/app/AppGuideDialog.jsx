@@ -1,17 +1,19 @@
 import { BookOpen } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
 
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
+import {
+  SETTINGS_DIALOG_CLASS,
+  SETTINGS_OVERLAY_CLASS,
+} from '@/components/app/settingsDialogTransition'
 import AppGuideSection from '@/components/app/AppGuideSection'
 import { APP_GUIDE_SECTIONS } from '@/components/app/appGuideSections'
 
@@ -25,9 +27,9 @@ export default function AppGuideDialog({ open, onOpenChange, t }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        showCloseButton={false}
-        className="rounded-2xl"
-        style={{ background: PALETTE.bgSoft, borderColor: PALETTE.line }}
+        className={`rounded-2xl ${SETTINGS_DIALOG_CLASS}`}
+        overlayClassName={SETTINGS_OVERLAY_CLASS}
+        style={{ background: PALETTE.dialogBg, borderColor: PALETTE.dialogBorder }}
       >
         <DialogHeader>
           <div
@@ -50,7 +52,9 @@ export default function AppGuideDialog({ open, onOpenChange, t }) {
                 boxShadow: `0 4px 14px ${PALETTE.accentGlow}`,
               }}
             >
-              <BookOpen style={{ height: '1.5rem', width: '1.5rem', color: 'white' }} />
+              <BookOpen
+                style={{ height: '1.5rem', width: '1.5rem', color: PALETTE.textOnAccent }}
+              />
             </div>
             <DialogTitle style={{ ...TEXT.subheading, color: PALETTE.accentEmphasis2 }}>
               {t.appGuide}
@@ -73,20 +77,6 @@ export default function AppGuideDialog({ open, onOpenChange, t }) {
             ))}
           </div>
         </DialogDescription>
-
-        <DialogFooter>
-          <Button
-            className="rounded-xl"
-            style={{
-              background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
-              color: 'white',
-              border: 'none',
-            }}
-            onClick={() => onOpenChange(false)}
-          >
-            {t.close}
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

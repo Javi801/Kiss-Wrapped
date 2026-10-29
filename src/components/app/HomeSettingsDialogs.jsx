@@ -6,6 +6,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
 import ColorSelector from '@/components/app/ColorSelector'
+import {
+  SETTINGS_DIALOG_CLASS,
+  SETTINGS_OVERLAY_CLASS,
+} from '@/components/app/settingsDialogTransition'
 
 const headerStyle = {
   display: 'flex',
@@ -139,7 +143,7 @@ export default function HomeSettingsDialogs({
       </Dialog>
 
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-        <DialogContent>
+        <DialogContent className={SETTINGS_DIALOG_CLASS} overlayClassName={SETTINGS_OVERLAY_CLASS}>
           <DialogHeader>
             <div style={headerStyle}>
               <div

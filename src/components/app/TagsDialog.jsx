@@ -18,6 +18,10 @@ import { useScrollFade } from '@/hooks/useScrollFade'
 import { TEXT } from '@/lib/constants'
 import { TAG_FIELDS, countTagUses, tagFieldValues } from '@/lib/helpers'
 import { usePalette } from '@/lib/theme'
+import {
+  SETTINGS_DIALOG_CLASS,
+  SETTINGS_OVERLAY_CLASS,
+} from '@/components/app/settingsDialogTransition'
 
 // Tag lists grouped by where their values are stored: on the person or on its events.
 const TAG_GROUPS = [
@@ -237,7 +241,9 @@ export default function TagsDialog({
         {/* Fixed height, so opening or closing a list never resizes it or shifts its scroll.
             No subtitle, to leave the open list as much room as possible. */}
         <DialogContent
-          className="h-[calc(100svh-2rem)]"
+          className={`h-[calc(100svh-2rem)] rounded-2xl ${SETTINGS_DIALOG_CLASS}`}
+          overlayClassName={SETTINGS_OVERLAY_CLASS}
+          style={{ background: PALETTE.dialogBg, borderColor: PALETTE.dialogBorder }}
           bodyClassName="flex flex-1 flex-col gap-0"
           aria-describedby={undefined}
         >
