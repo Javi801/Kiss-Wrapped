@@ -299,8 +299,7 @@ export default function PersonForm({
                       border: 'none',
                       backgroundColor:
                         birthdayAlreadyHappened === val ? PALETTE.accent : 'transparent',
-                      color:
-                        birthdayAlreadyHappened === val ? PALETTE.textOnAccent : PALETTE.text,
+                      color: birthdayAlreadyHappened === val ? PALETTE.textOnAccent : PALETTE.text,
                       transition: 'background-color 0.15s, color 0.15s',
                     }}
                   >
