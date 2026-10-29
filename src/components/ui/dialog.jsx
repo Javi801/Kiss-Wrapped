@@ -41,8 +41,10 @@ function focusContent(event) {
   event.currentTarget.focus()
 }
 
+// `bodyClassName` changes the layout of the scrollable body around the children.
 function DialogContent({
   className,
+  bodyClassName,
   overlayClassName,
   overlayStyle,
   children,
@@ -66,7 +68,10 @@ function DialogContent({
         <div
           ref={scrollFadeRef}
           data-slot="dialog-body"
-          className="grid min-h-0 grid-cols-[minmax(0,1fr)] gap-6 overflow-y-auto p-6"
+          className={cn(
+            'grid min-h-0 grid-cols-[minmax(0,1fr)] gap-6 overflow-y-auto p-6',
+            bodyClassName
+          )}
         >
           {children}
         </div>

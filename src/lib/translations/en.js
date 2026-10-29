@@ -1,3 +1,5 @@
+import { enGuide } from '@/lib/translations/en-guide'
+
 // English UI texts.
 export const en = {
   appTitle: 'Kiss Wrapped',
@@ -368,8 +370,7 @@ export const en = {
   onboardingDoneTitle: 'Tutorial finished',
   onboardingDoneBody: 'There is more on how to use the app in Settings, under "App guide".',
   onboardingDoneAction: 'Got it',
-  tags: 'Tags',
-  tagsIntro: 'Only tags that no person or event uses can be deleted.',
+  manageTags: 'Manage tags',
   tagsPeopleSection: 'People',
   tagsEventsSection: 'Events',
   noTags: 'No tags',
@@ -380,30 +381,18 @@ export const en = {
   deleteTagConfirmTitle: 'Delete this tag?',
   deleteTagConfirmDesc: 'It will no longer be suggested in the forms.',
   deleteTagConfirmAction: 'Yes, delete',
-  appGuide: 'App guide',
-  appGuideIntro: 'What the tutorial does not get to show.',
-  guideEntryTitle: 'Hidden entrance',
-  guideEntryDecoy: 'The first screen shows none of your data.',
-  guideEntryHeart: 'To get in, tap the heart in the corner.',
-  guideEntryReturn: 'After you save a new person, the app goes back to that screen.',
-  guideStatsTitle: 'Statistics',
-  guideStatsSource:
-    'They are computed from your people and events: the more you log, the more they show.',
-  guideStatsScores: 'Scores only consider the events that have one.',
-  guideStatsCharts: 'Any chart can be expanded to full screen and saved as an image.',
-  guidePartnerTitle: 'Partner events',
-  guidePartnerMark:
-    'When you edit a person you can mark them as a current or past partner, with the dates.',
-  guidePartnerEvents:
-    'Events inside that period do not count in the event statistics, unless you turn on "Include partner events" on the statistics screen.',
-  guideDataTitle: 'Data',
-  guideDataExport: 'Export creates a file with all your people and events.',
-  guideDataImport:
-    'Import adds the people from an exported file and skips the ones you already have.',
-  guideDataClear: 'Clear permanently removes everything that is saved.',
-  guidePrivacyTitle: 'Privacy screen',
-  guidePrivacyCover:
-    'When you leave the app or switch to another one, a neutral screen covers the content.',
+  deleteTagInUse: 'In use by',
+  tagPerson: 'person',
+  tagPeople: 'people',
+  tagEvent: 'event',
+  tagEvents: 'events',
+  deleteTagInUsePeopleDesc:
+    'If you delete it, it will be removed from those people and the field will be empty.',
+  deleteTagInUseEventsDesc:
+    'If you delete it, it will be removed from those events and the field will be empty.',
+  deleteTagInUseRequired: 'As it is required, it will be marked as incomplete.',
+  deleteTagAnywayAction: 'Delete anyway',
+  ...enGuide,
   entryGuideTitle: "The app's real entrance",
   entryGuideBody: 'Tap the subtle heart in the corner to open your space.',
 }
