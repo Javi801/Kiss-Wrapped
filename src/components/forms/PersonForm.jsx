@@ -239,45 +239,6 @@ export default function PersonForm({
               style={{ ...inputStyle }}
             />
             {errors.age && <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.age}</p>}
-            {showBirthdayCheckbox && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <p style={{ ...TEXT.caption, color: PALETTE.text }}>
-                  {isAdd ? t.birthdayAlreadyHappened : t.birthdayAlreadyHappenedThird}
-                </p>
-                <div
-                  style={{
-                    display: 'flex',
-                    borderRadius: '0.75rem',
-                    overflow: 'hidden',
-                    border: `1px solid ${PALETTE.inputBorder}`,
-                    width: 'fit-content',
-                    backgroundColor: PALETTE.inputBg,
-                  }}
-                >
-                  {[true, false].map((val) => (
-                    <button
-                      key={String(val)}
-                      type="button"
-                      onClick={() => setBirthdayAlreadyHappened(val)}
-                      style={{
-                        padding: '0.25rem 1rem',
-                        ...TEXT.caption,
-                        fontWeight: 500,
-                        cursor: 'pointer',
-                        border: 'none',
-                        backgroundColor:
-                          birthdayAlreadyHappened === val ? PALETTE.accent : 'transparent',
-                        color:
-                          birthdayAlreadyHappened === val ? PALETTE.textOnAccent : PALETTE.text,
-                        transition: 'background-color 0.15s, color 0.15s',
-                      }}
-                    >
-                      {val ? t.birthdayYes : t.birthdayNo}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -300,6 +261,55 @@ export default function PersonForm({
               <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.gender}</p>
             )}
           </div>
+
+          {/* Spans both columns so the prompt and options are not squeezed into the age column */}
+          {showBirthdayCheckbox && (
+            <div
+              style={{
+                gridColumn: '1 / -1',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.35rem',
+              }}
+            >
+              <p style={{ ...TEXT.caption, color: PALETTE.text }}>
+                {isAdd ? t.birthdayAlreadyHappened : t.birthdayAlreadyHappenedThird}
+              </p>
+              <div
+                style={{
+                  display: 'flex',
+                  borderRadius: '0.75rem',
+                  overflow: 'hidden',
+                  border: `1px solid ${PALETTE.inputBorder}`,
+                  width: 'fit-content',
+                  backgroundColor: PALETTE.inputBg,
+                }}
+              >
+                {[true, false].map((val) => (
+                  <button
+                    key={String(val)}
+                    type="button"
+                    onClick={() => setBirthdayAlreadyHappened(val)}
+                    style={{
+                      padding: '0.25rem 1rem',
+                      ...TEXT.caption,
+                      fontWeight: 500,
+                      whiteSpace: 'nowrap',
+                      cursor: 'pointer',
+                      border: 'none',
+                      backgroundColor:
+                        birthdayAlreadyHappened === val ? PALETTE.accent : 'transparent',
+                      color:
+                        birthdayAlreadyHappened === val ? PALETTE.textOnAccent : PALETTE.text,
+                      transition: 'background-color 0.15s, color 0.15s',
+                    }}
+                  >
+                    {val ? t.birthdayYes : t.birthdayNo}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Nationality */}
