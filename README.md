@@ -139,7 +139,7 @@ At a glance:
   </tr>
   <tr>
     <td><code>components/forms/</code></td>
-    <td>PersonForm, PartnerFields, EventForm, FiltersPanel, TagInput, and SpeechBubble</td>
+    <td>PersonForm, PartnerFields, EventForm, FiltersPanel, TagInput, SpeechBubble, and the shared form parts (FormField, ChoiceToggle, SubmitButton)</td>
   </tr>
   <tr>
     <td><code>components/people/</code></td>
