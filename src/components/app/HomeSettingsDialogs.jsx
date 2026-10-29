@@ -176,40 +176,47 @@ export default function HomeSettingsDialogs({
               t={t}
               accent={false}
             />
-            <SettingsAction
-              icon={Tag}
-              label={t.manageTags}
-              onClick={() => {
-                setSettingsOpen(false)
-                onOpenTags()
-              }}
-            />
-            <SettingsAction
-              icon={BookOpen}
-              label={t.appGuide}
-              onClick={() => {
-                setSettingsOpen(false)
-                onOpenGuide()
-              }}
-            />
-            {onRestartOnboarding && (
-              <SettingsAction
-                icon={RotateCcw}
-                label={t.restartOnboarding}
-                onClick={() => {
-                  setSettingsOpen(false)
-                  onRestartOnboarding()
-                }}
-              />
-            )}
-            <SettingsAction
-              icon={Info}
-              label={t.about}
-              onClick={() => {
-                setSettingsOpen(false)
-                onOpenAbout()
-              }}
-            />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <p style={{ ...TEXT.body, textTransform: 'uppercase', color: PALETTE.textSoft }}>
+                {t.otherSettings}
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <SettingsAction
+                  icon={Tag}
+                  label={t.manageTags}
+                  onClick={() => {
+                    setSettingsOpen(false)
+                    onOpenTags()
+                  }}
+                />
+                <SettingsAction
+                  icon={BookOpen}
+                  label={t.appGuide}
+                  onClick={() => {
+                    setSettingsOpen(false)
+                    onOpenGuide()
+                  }}
+                />
+                {onRestartOnboarding && (
+                  <SettingsAction
+                    icon={RotateCcw}
+                    label={t.restartOnboarding}
+                    onClick={() => {
+                      setSettingsOpen(false)
+                      onRestartOnboarding()
+                    }}
+                  />
+                )}
+                <SettingsAction
+                  icon={Info}
+                  label={t.about}
+                  onClick={() => {
+                    setSettingsOpen(false)
+                    onOpenAbout()
+                  }}
+                />
+              </div>
+            </div>
           </section>
         </DialogContent>
       </Dialog>

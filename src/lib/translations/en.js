@@ -221,6 +221,7 @@ export const en = {
   iconNotebook: 'Notebook',
   iconChart: 'Chart',
   iconOrbit: 'Orbit',
+  otherSettings: 'Other',
   colorPink: 'Pink',
   colorLavender: 'Lavender',
   colorGreen: 'Green',

@@ -221,6 +221,7 @@ export const es = {
   iconNotebook: 'Libreta',
   iconChart: 'Gráfico',
   iconOrbit: 'Órbita',
+  otherSettings: 'Otros',
   colorPink: 'Rosado',
   colorLavender: 'Lavanda',
   colorGreen: 'Verde',
