@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { App as CapacitorApp } from '@capacitor/app'
 
+import { SCREENS } from '@/lib/constants'
 import { closeTopSelect } from '@/lib/open-selects'
 
 /**
@@ -8,7 +9,7 @@ import { closeTopSelect } from '@/lib/open-selects'
  */
 export function useAppNavigation() {
   // Current visible screen. Boot starts blank until persisted settings are read.
-  const [screen, setScreen] = useState('boot')
+  const [screen, setScreen] = useState(SCREENS.boot)
 
   // Navigation history stack for hardware back button support.
   const screenHistoryRef = useRef([])
@@ -17,7 +18,7 @@ export function useAppNavigation() {
   // The back button handler checks this before doing screen navigation.
   const modalBackRef = useRef(null)
   // Ref keeps the latest screen value accessible inside the Capacitor listener.
-  const screenRef = useRef('boot')
+  const screenRef = useRef(SCREENS.boot)
 
   // Keep screenRef in sync so the Capacitor listener always sees the latest value.
   useEffect(() => {
@@ -56,10 +57,10 @@ export function useAppNavigation() {
 
       const current = screenRef.current
 
-      if (current === 'add') {
+      if (current === SCREENS.add) {
         screenHistoryRef.current = []
-        setScreen('intro')
-      } else if (current === 'intro') {
+        setScreen(SCREENS.intro)
+      } else if (current === SCREENS.intro) {
         CapacitorApp.exitApp()
       } else {
         const history = screenHistoryRef.current
@@ -67,10 +68,10 @@ export function useAppNavigation() {
           const prev = history[history.length - 1]
           screenHistoryRef.current = history.slice(0, -1)
           setScreen(prev)
-        } else if (current === 'main') {
+        } else if (current === SCREENS.main) {
           CapacitorApp.exitApp()
         } else {
-          setScreen('main')
+          setScreen(SCREENS.main)
         }
       }
     })

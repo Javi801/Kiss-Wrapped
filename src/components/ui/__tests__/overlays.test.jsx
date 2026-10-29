@@ -65,6 +65,13 @@ describe('DialogContent', () => {
     expect(body.contains(slot('dialog-close'))).toBe(false)
   })
 
+  it('lets the caller change the layout of the body', () => {
+    renderDialog({ bodyClassName: 'flex flex-1 flex-col' })
+    const body = slot('dialog-body').className.split(' ')
+    expect(body).toEqual(expect.arrayContaining(['flex', 'flex-1', 'flex-col', 'overflow-y-auto']))
+    expect(body).not.toContain('grid')
+  })
+
   it('omits the close button when asked to', () => {
     renderDialog({ showCloseButton: false })
     expect(slot('dialog-close')).toBeNull()
@@ -79,6 +86,23 @@ describe('DialogContent', () => {
     expect(overlay).toContain('z-[10002]')
     expect(overlay).not.toContain('z-50')
     expect(overlay).not.toContain('z-[10003]')
+  })
+
+  it('passes the overlay style to the overlay only', () => {
+    renderDialog({ overlayStyle: { backgroundColor: 'rgb(1, 2, 3)' } })
+    expect(slot('dialog-overlay').style.backgroundColor).toBe('rgb(1, 2, 3)')
+    expect(slot('dialog-content').style.backgroundColor).toBe('')
+  })
+
+  it('combines the overlay style with the overlay class name', () => {
+    renderDialog({ overlayClassName: 'z-[10002]', overlayStyle: { opacity: 0.5 } })
+    expect(slot('dialog-overlay').className.split(' ')).toContain('z-[10002]')
+    expect(slot('dialog-overlay').style.opacity).toBe('0.5')
+  })
+
+  it('leaves the overlay color to its class names by default', () => {
+    renderDialog()
+    expect(slot('dialog-overlay').style.backgroundColor).toBe('')
   })
 
   it('keeps the default layer when no class names are given', () => {

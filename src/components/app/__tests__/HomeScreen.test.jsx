@@ -2,14 +2,15 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
-import { COPY } from '@/lib/constants'
+import { COPY, SCREENS } from '@/lib/constants'
 import { APP_GITHUB_REPO, APP_VERSION } from '@/lib/config'
+import { TOUR_LAYERS, TOUR_TARGETS } from '@/lib/onboarding'
 
 const mockStorage = vi.hoisted(() => ({ exportPeopleJson: vi.fn() }))
 const mockPdf = vi.hoisted(() => ({ saveErrorLog: vi.fn() }))
-const seen = vi.hoisted(() => ({ tiles: [], colors: null, openDialogs: [] }))
+const seen = vi.hoisted(() => ({ tiles: [], colors: null, openDialogs: [], dialogContent: null }))
 
-vi.mock('@/lib/theme', () => ({ usePalette: () => ({}) }))
+vi.mock('@/lib/theme', () => ({ usePalette: () => ({ backdrop: 'rgb(1, 2, 3)' }) }))
 vi.mock('@/lib/device-storage', () => mockStorage)
 vi.mock('@/lib/pdf-export', () => mockPdf)
 vi.mock('@/components/app/ColorSelector', () => ({
@@ -24,7 +25,7 @@ vi.mock('@/components/shared/StatTile', () => ({
     return null
   },
 }))
-// Only open dialogs render, each exposing its onOpenChange handler.
+// Only open dialogs render, each exposing its onOpenChange handler and the props of its content.
 vi.mock('@/components/ui/dialog', async () => {
   const { createElement } = await import('react')
   const passthrough = ({ children }) => children
@@ -34,7 +35,10 @@ vi.mock('@/components/ui/dialog', async () => {
       seen.openDialogs.push(onOpenChange)
       return createElement('div', { 'data-dialog': true }, children)
     },
-    DialogContent: passthrough,
+    DialogContent: ({ children, ...props }) => {
+      seen.dialogContent = props
+      return children
+    },
     DialogHeader: passthrough,
     DialogTitle: passthrough,
     DialogDescription: passthrough,
@@ -43,6 +47,10 @@ vi.mock('@/components/ui/dialog', async () => {
 })
 
 import MainScreen from '@/components/app/HomeScreen'
+import {
+  SETTINGS_DIALOG_CLASS,
+  SETTINGS_OVERLAY_CLASS,
+} from '@/components/app/settingsDialogTransition'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
@@ -77,7 +85,7 @@ function render(props = {}) {
         people={[ana, bob]}
         t={t}
         language="en"
-        iconColor="lightPink"
+        iconColor="notebookPink"
         theme="pink"
         statsVisible
         modalBackRef={modalBackRef}
@@ -97,6 +105,9 @@ const click = (label, scope = container) =>
   act(async () => {
     find(label, scope).click()
   })
+// The settings dialog is the one listing both the tags row and the about row.
+const settingsShown = () =>
+  Boolean(dialog() && find(t.manageTags, dialog()) && find(t.about, dialog()))
 const tile = (label) => seen.tiles.findLast((item) => item.label === label)
 const fileInput = () => container.querySelector('input[type="file"]')
 
@@ -116,6 +127,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   seen.colors = null
   seen.openDialogs = []
+  seen.dialogContent = null
   mockStorage.exportPeopleJson.mockResolvedValue({
     fileName: 'kiss-wrapped-data-2024-01-01.json',
     isNative: true,
@@ -166,9 +178,9 @@ describe('HomeScreen — summary', () => {
 
 describe('HomeScreen — navigation', () => {
   it.each([
-    ['add', t.addNewPerson],
-    ['people', t.viewEditPeople],
-    ['stats', t.viewStatistics],
+    [SCREENS.add, t.addNewPerson],
+    [SCREENS.people, t.viewEditPeople],
+    [SCREENS.stats, t.viewStatistics],
   ])('opens the %s screen', async (screen, label) => {
     render()
     await click(label)
@@ -192,7 +204,7 @@ describe('HomeScreen — settings and about', () => {
     render()
     await click(t.settings)
     expect(seen.colors).toMatchObject({
-      iconColor: 'lightPink',
+      iconColor: 'notebookPink',
       setIconColor: handlers.setIconColor,
       theme: 'pink',
       setTheme: handlers.setTheme,
@@ -219,12 +231,14 @@ describe('HomeScreen — settings and about', () => {
     expect(open).toHaveBeenCalledWith(APP_GITHUB_REPO, '_blank')
   })
 
-  it('closes the about dialog', async () => {
+  it('closes the about dialog from the corner button, with no button of its own', async () => {
     render()
     await click(t.settings)
     await click(t.about, dialog())
-    await click(t.close, dialog())
-    expect(dialog()).toBeNull()
+    expect(seen.dialogContent.showCloseButton).toBeUndefined()
+    expect(find(t.close, dialog())).toBeUndefined()
+    act(() => seen.openDialogs.at(-1)(false))
+    expect(settingsShown()).toBe(true)
   })
 })
 
@@ -451,7 +465,6 @@ describe('HomeScreen — hardware back button and dismissal', () => {
   const openers = [
     ['language', () => click(t.language)],
     ['settings', () => click(t.settings)],
-    ['about', async () => (await click(t.settings), click(t.about, dialog()))],
     ['clear-data confirmation', () => click(t.clearLocalDataLabel)],
     ['export result', () => click(t.exportJsonLabel)],
     ['import', () => pickFile('backup.txt', '')],
@@ -479,6 +492,48 @@ describe('HomeScreen — hardware back button and dismissal', () => {
     expect(dialog()).toBeNull()
   })
 
+  const fromSettings = [
+    ['about', t.about],
+    ['app guide', t.appGuide],
+    ['tags', t.manageTags],
+  ]
+  const openFromSettings = async (label) => {
+    await click(t.settings)
+    await click(label, dialog())
+    expect(settingsShown()).toBe(false)
+  }
+
+  it.each(fromSettings)('returns from the %s dialog to the settings', async (_name, label) => {
+    render()
+    await openFromSettings(label)
+    act(() => modalBackRef.current())
+    expect(settingsShown()).toBe(true)
+    act(() => modalBackRef.current())
+    expect(dialog()).toBeNull()
+    expect(modalBackRef.current).toBeNull()
+  })
+
+  it.each(fromSettings)(
+    'returns to the settings when the %s dialog is dismissed',
+    async (_name, label) => {
+      render()
+      await openFromSettings(label)
+      act(() => seen.openDialogs.at(-1)(false))
+      expect(settingsShown()).toBe(true)
+    }
+  )
+
+  it.each([['settings', null], ...fromSettings])(
+    'swaps the %s dialog without fading its overlay or animating it out',
+    async (_name, label) => {
+      render()
+      if (label) await openFromSettings(label)
+      else await click(t.settings)
+      expect(seen.dialogContent.className).toContain(SETTINGS_DIALOG_CLASS)
+      expect(seen.dialogContent.overlayClassName).toBe(SETTINGS_OVERLAY_CLASS)
+    }
+  )
+
   it('works without a back-button registry', async () => {
     render({ modalBackRef: undefined })
     await click(t.language)
@@ -486,21 +541,116 @@ describe('HomeScreen — hardware back button and dismissal', () => {
   })
 })
 
-describe('HomeScreen — onboarding guide', () => {
+describe('HomeScreen — onboarding tour', () => {
   it('shows no tap guide by default', () => {
     render()
     expect(container.textContent).not.toContain('👆')
   })
 
   it('puts the tap guide on the people button', () => {
-    render({ guideTarget: 'people' })
+    render({ tourTarget: SCREENS.people })
     expect(find(t.viewEditPeople).textContent).toContain('👆')
     expect(find(t.viewEditPeople).style.position).toBe('relative')
     expect(find(t.addNewPerson).textContent).not.toContain('👆')
   })
+
+  it('puts the tap guide on the add-person button', () => {
+    render({ tourTarget: SCREENS.add })
+    expect(find(t.addNewPerson).textContent).toContain('👆')
+    expect(find(t.addNewPerson).style.position).toBe('relative')
+    expect(find(t.viewEditPeople).textContent).not.toContain('👆')
+  })
+
+  it('marks no button as a tour target by default', () => {
+    render()
+    expect(container.querySelector('[data-tour-target]')).toBeNull()
+    expect(find(t.addNewPerson).style.pointerEvents).toBe('')
+    expect(find(t.viewEditPeople).style.pointerEvents).toBe('')
+  })
+
+  it.each([
+    [SCREENS.add, t.addNewPerson, t.viewEditPeople],
+    [SCREENS.people, t.viewEditPeople, t.addNewPerson],
+  ])(
+    'leaves only the guided %s button reachable for the tour, and still tappable',
+    async (tourTarget, guided, other) => {
+      render({ tourTarget })
+      expect([...container.querySelectorAll('[data-tour-target]')]).toEqual([find(guided)])
+      expect(find(guided).style.pointerEvents).toBe('auto')
+      expect(find(other).style.pointerEvents).toBe('')
+      await click(guided)
+      expect(handlers.onNavigate).toHaveBeenCalledWith(tourTarget)
+    }
+  )
 })
 
-describe('HomeScreen — app guide and tutorial', () => {
+describe('HomeScreen — tags', () => {
+  const tags = { howWeMet: ['App'], nationality: [], situation: [], place: ['Park'] }
+
+  async function openTags(props = {}) {
+    render({ tags, onRemoveTag: vi.fn(), ...props })
+    await click(t.settings)
+    await click(t.manageTags, dialog())
+  }
+
+  // The confirmation is the real Radix alert dialog, portaled to the body.
+  const alert = () => document.querySelector('[role="alertdialog"]')
+  const requestParkDelete = async () => {
+    await click(t.eventPlace, dialog())
+    await click(`${t.deleteTag}: Park`, dialog())
+  }
+
+  it('moves from settings to the tags dialog', async () => {
+    await openTags()
+    expect(container.querySelectorAll('[data-dialog]')).toHaveLength(1)
+    expect(dialog().textContent).toContain(t.manageTags)
+  })
+
+  it('opens without tag lists, as in the onboarding tour', async () => {
+    render()
+    await click(t.settings)
+    await click(t.manageTags, dialog())
+    expect(dialog().textContent).toContain(t.manageTags)
+  })
+
+  it('deletes a tag once the delete is confirmed', async () => {
+    const onRemoveTag = vi.fn()
+    await openTags({ onRemoveTag })
+    await requestParkDelete()
+    expect(onRemoveTag).not.toHaveBeenCalled()
+    await click(t.deleteTagConfirmAction, alert())
+    expect(onRemoveTag).toHaveBeenCalledWith('place', 'Park')
+    expect(alert()).toBeNull()
+    expect(dialog()).not.toBeNull()
+  })
+
+  it('asks to delete a tag in use anyway, with how many events use it', async () => {
+    const onRemoveTag = vi.fn()
+    const carla = { id: 'carla', name: 'Carla', events: [{ id: 'c1', place: 'park' }] }
+    await openTags({ onRemoveTag, people: [ana, carla] })
+    await requestParkDelete()
+    expect(alert().textContent).toContain(`${t.deleteTagInUse} 1 ${t.tagEvent}.`)
+    await click(t.deleteTagAnywayAction, alert())
+    expect(onRemoveTag).toHaveBeenCalledWith('place', 'Park')
+  })
+
+  it('closes the confirmation first and then the dialog from the back button', async () => {
+    const onRemoveTag = vi.fn()
+    await openTags({ onRemoveTag })
+    await requestParkDelete()
+    expect(alert()).not.toBeNull()
+
+    act(() => modalBackRef.current())
+    expect(alert()).toBeNull()
+    expect(dialog()).not.toBeNull()
+
+    act(() => modalBackRef.current())
+    expect(settingsShown()).toBe(true)
+    expect(onRemoveTag).not.toHaveBeenCalled()
+  })
+})
+
+describe('HomeScreen — app guide and onboarding restart', () => {
   it('moves from settings to the app guide', async () => {
     render()
     await click(t.settings)
@@ -510,31 +660,31 @@ describe('HomeScreen — app guide and tutorial', () => {
     expect(dialog().textContent).toContain(t.guideDataExport)
   })
 
-  it('closes the app guide from its button and from the back button', async () => {
+  it('closes the app guide from the corner button and from the back button', async () => {
     render()
     await click(t.settings)
     await click(t.appGuide, dialog())
-    await click(t.close, dialog())
-    expect(dialog()).toBeNull()
+    expect(seen.dialogContent.showCloseButton).toBeUndefined()
+    expect(find(t.close, dialog())).toBeUndefined()
+    act(() => seen.openDialogs.at(-1)(false))
+    expect(settingsShown()).toBe(true)
 
-    await click(t.settings)
     await click(t.appGuide, dialog())
     act(() => modalBackRef.current())
-    expect(dialog()).toBeNull()
-    expect(modalBackRef.current).toBeNull()
+    expect(settingsShown()).toBe(true)
   })
 
-  it('offers no tutorial restart unless it can be restarted', async () => {
+  it('offers no onboarding restart unless it can be restarted', async () => {
     render()
     await click(t.settings)
-    expect(find(t.restartTutorial, dialog())).toBeUndefined()
+    expect(find(t.restartOnboarding, dialog())).toBeUndefined()
   })
 
-  it('restarts the tutorial from settings and closes them', async () => {
+  it('restarts the onboarding from settings and closes them', async () => {
     const onRestartOnboarding = vi.fn()
     render({ onRestartOnboarding })
     await click(t.settings)
-    await click(t.restartTutorial, dialog())
+    await click(t.restartOnboarding, dialog())
     expect(onRestartOnboarding).toHaveBeenCalledOnce()
     expect(dialog()).toBeNull()
   })
@@ -545,19 +695,19 @@ describe('HomeScreen — onboarding hints', () => {
   const notes = () => [...container.querySelectorAll('[role="note"]')]
 
   it('shows no hint by default, even with a hint text', () => {
-    render({ guideHint: hint })
+    render({ tourHint: hint })
     expect(notes()).toHaveLength(0)
   })
 
   it('shows the data hint right above the data buttons', () => {
-    render({ guideTarget: 'data', guideHint: hint })
+    render({ tourTarget: TOUR_TARGETS.data, tourHint: hint })
     expect(notes()).toHaveLength(1)
     expect(notes()[0].textContent).toBe('Hint titleHint body')
     expect(notes()[0].nextElementSibling.contains(find(t.exportJsonLabel))).toBe(true)
   })
 
   it('shows the settings hint inside the hero card, pointing at its right side', () => {
-    render({ guideTarget: 'settings', guideHint: hint })
+    render({ tourTarget: TOUR_TARGETS.settings, tourHint: hint })
     expect(notes()).toHaveLength(1)
     expect(notes()[0].textContent).toBe('Hint titleHint body')
     expect(notes()[0].querySelector('[aria-hidden="true"]').style.right).not.toBe('')
@@ -569,7 +719,7 @@ describe('HomeScreen — onboarding hints', () => {
 
 describe('HomeScreen — onboarding spotlight', () => {
   const hint = { title: 'Hint title', body: 'Hint body' }
-  const lifted = (node) => node.style.zIndex === '2'
+  const lifted = (node) => node.style.zIndex === String(TOUR_LAYERS.raised)
 
   it('lifts nothing by default', () => {
     render()
@@ -577,7 +727,7 @@ describe('HomeScreen — onboarding spotlight', () => {
   })
 
   it('lifts the data hint with export and import, but not clear', () => {
-    render({ guideTarget: 'data', guideHint: hint })
+    render({ tourTarget: TOUR_TARGETS.data, tourHint: hint })
     expect(lifted(container.querySelector('[role="note"]'))).toBe(true)
     expect(lifted(find(t.exportJsonLabel))).toBe(true)
     expect(lifted(find(t.importJsonLabel))).toBe(true)
@@ -586,7 +736,7 @@ describe('HomeScreen — onboarding spotlight', () => {
   })
 
   it('lifts the settings hint with the settings button only', () => {
-    render({ guideTarget: 'settings', guideHint: hint })
+    render({ tourTarget: TOUR_TARGETS.settings, tourHint: hint })
     expect(lifted(container.querySelector('[role="note"]'))).toBe(true)
     expect(lifted(find(t.settings))).toBe(true)
     expect(lifted(find(t.language))).toBe(false)
@@ -594,28 +744,34 @@ describe('HomeScreen — onboarding spotlight', () => {
   })
 })
 
-describe('HomeScreen — tutorial done notice', () => {
+describe('HomeScreen — onboarding done notice', () => {
   it('stays hidden by default', () => {
     render()
     expect(dialog()).toBeNull()
   })
 
   it('shows the notice and closes it from its button', async () => {
-    const onCloseTutorialDone = vi.fn()
-    render({ tutorialDoneOpen: true, onCloseTutorialDone })
-    expect(dialog().textContent).toContain(t.tutorialDoneTitle)
-    expect(dialog().textContent).toContain(t.tutorialDoneBody)
-    await click(t.tutorialDoneAction, dialog())
-    expect(onCloseTutorialDone).toHaveBeenCalledOnce()
+    const onCloseOnboardingDone = vi.fn()
+    render({ onboardingDoneOpen: true, onCloseOnboardingDone })
+    expect(dialog().textContent).toContain(t.onboardingDoneTitle)
+    expect(dialog().textContent).toContain(t.onboardingDoneBody)
+    await click(t.onboardingDoneAction, dialog())
+    expect(onCloseOnboardingDone).toHaveBeenCalledOnce()
+  })
+
+  it('dims the screen behind the notice with the tour backdrop and offers no close button', () => {
+    render({ onboardingDoneOpen: true, onCloseOnboardingDone: vi.fn() })
+    expect(seen.dialogContent.overlayStyle).toEqual({ backgroundColor: 'rgb(1, 2, 3)' })
+    expect(seen.dialogContent.showCloseButton).toBe(false)
   })
 
   it('closes the notice when it is dismissed or from the back button', () => {
-    const onCloseTutorialDone = vi.fn()
-    render({ tutorialDoneOpen: true, onCloseTutorialDone })
+    const onCloseOnboardingDone = vi.fn()
+    render({ onboardingDoneOpen: true, onCloseOnboardingDone })
     act(() => seen.openDialogs.at(-1)(true))
-    expect(onCloseTutorialDone).not.toHaveBeenCalled()
+    expect(onCloseOnboardingDone).not.toHaveBeenCalled()
     act(() => seen.openDialogs.at(-1)(false))
     act(() => modalBackRef.current())
-    expect(onCloseTutorialDone).toHaveBeenCalledTimes(2)
+    expect(onCloseOnboardingDone).toHaveBeenCalledTimes(2)
   })
 })

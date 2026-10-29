@@ -1,4 +1,4 @@
-// App icon image for the chosen icon color: the heart over its background.
+// App icon image for the chosen icon variant: the glyph over its background.
 
 import { ICON_VARIANTS, DEFAULT_ICON_VARIANT } from './SparkleIcon.constants'
 

@@ -124,8 +124,16 @@ describe('PeopleManagerScreen — list', () => {
 
   it('shows the empty state when there is nobody', () => {
     render([])
-    expect(container.textContent).toContain(t.noPeopleFound)
+    expect(container.textContent).toContain(t.noPeopleYet)
+    expect(container.textContent).toContain(t.noPeopleYetDesc)
     expect(shown()).toEqual([])
+  })
+
+  it('offers no search reset when there is nobody', () => {
+    render([])
+    expect(container.textContent).not.toContain(t.noPeopleFound)
+    expect(container.textContent).not.toContain(t.tryDifferent)
+    expect(container.textContent).not.toContain(t.clearSearch)
   })
 
   it('wires every card to the screen handlers and tags', () => {
@@ -139,12 +147,19 @@ describe('PeopleManagerScreen — list', () => {
       onAddSituationTag: vi.fn(),
       onAddPlaceTag: vi.fn(),
       onAddHowWeMetTag: vi.fn(),
+      onAddNationalityTag: vi.fn(),
       situationTags: ['Date'],
       placeTags: ['Park'],
       howWeMetTags: ['School'],
+      nationalityTags: ['Chilean'],
     }
     render([person('Ana')], props)
     expect(seen.cards.ana).toMatchObject({ ...props, language: 'en', t, modalBackRef })
+  })
+
+  it('offers the nationality tags to the filters', () => {
+    render([person('Ana')], { nationalityTags: ['Chilean'] })
+    expect(seen.filters.nationalityTags).toEqual(['Chilean'])
   })
 })
 
@@ -196,6 +211,8 @@ describe('PeopleManagerScreen — search', () => {
       minAge: '',
       maxAge: '',
       activity: [],
+      howWeMet: [],
+      nationality: [],
       zodiacSign: [],
       eventDateFrom: '',
       eventDateTo: '',
@@ -253,6 +270,46 @@ describe('PeopleManagerScreen — filters', () => {
     render(people)
     setFilters({ zodiacSign: [ZODIAC_OPTIONS.en[1]] })
     expect(shown()).toEqual(['cy'])
+  })
+
+  it('keeps people whose how-we-met tag matches the selected tag', () => {
+    const taggedPeople = [
+      person('Ana', { howWeMet: 'School' }),
+      person('Bob', { howWeMet: 'Work' }),
+      person('Cy', { howWeMet: 'school' }),
+    ]
+    render(taggedPeople)
+    setFilters({ howWeMet: ['School'] })
+    expect(shown()).toEqual(['ana', 'cy'])
+  })
+
+  it('keeps people whose nationality matches a selected tag, ignoring case and spaces', () => {
+    const taggedPeople = [
+      person('Ana', { nationality: 'Chilean' }),
+      person('Bob', { nationality: 'Peruvian' }),
+      person('Cy', { nationality: ' chilean ' }),
+      person('Dee'),
+    ]
+    render(taggedPeople)
+    setFilters({ nationality: ['Chilean'] })
+    expect(shown()).toEqual(['ana', 'cy'])
+  })
+
+  it('combines several selected nationalities', () => {
+    const taggedPeople = [
+      person('Ana', { nationality: 'Chilean' }),
+      person('Bob', { nationality: 'Peruvian' }),
+      person('Cy', { nationality: 'Argentinian' }),
+    ]
+    render(taggedPeople)
+    setFilters({ nationality: ['Chilean', 'Peruvian'] })
+    expect(shown()).toEqual(['ana', 'bob'])
+  })
+
+  it('keeps everyone when the filters predate the nationality filter', () => {
+    render([person('Ana', { nationality: 'Chilean' }), person('Bob')])
+    setFilters({ nationality: undefined })
+    expect(shown()).toEqual(['ana', 'bob'])
   })
 
   it('keeps people with an event on or after the start date', () => {
@@ -465,15 +522,15 @@ describe('PeopleManagerScreen — filter sheet', () => {
   })
 })
 
-describe('PeopleManagerScreen — onboarding guide', () => {
-  it('passes no guide to the cards by default', () => {
+describe('PeopleManagerScreen — onboarding tour', () => {
+  it('passes no tour to the cards by default', () => {
     render([person('Ana')])
-    expect(Object.values(seen.cards)[0].guide).toBeUndefined()
+    expect(Object.values(seen.cards)[0].tour).toBeUndefined()
   })
 
-  it('passes the card guide to the cards', () => {
-    const cardGuide = { expanded: true }
-    render([person('Ana')], { cardGuide })
-    expect(Object.values(seen.cards)[0].guide).toBe(cardGuide)
+  it('passes the card tour to the cards', () => {
+    const cardTour = { expanded: true }
+    render([person('Ana')], { cardTour })
+    expect(Object.values(seen.cards)[0].tour).toBe(cardTour)
   })
 })

@@ -42,6 +42,7 @@ import {
   SITUATION_TAGS_KEY,
   PLACE_TAGS_KEY,
   HOW_WE_MET_TAGS_KEY,
+  NATIONALITY_TAGS_KEY,
   PEOPLE_FILE_NAME,
   SETTINGS_FILE_NAME,
 } from '@/lib/constants'
@@ -280,6 +281,12 @@ describe('exportPeopleJson — normalizeForExport output content', () => {
     expect(exportedJson()[0].realName).toBe('')
   })
 
+  it('fills absent optional nationality with empty string without flagging hadMissingFields', async () => {
+    const { nationality: _, ...personWithoutNationality } = COMPLETE_PERSON
+    await exportPeopleJson([personWithoutNationality])
+    expect(exportedJson()[0].nationality).toBe('')
+  })
+
   it('leaves birthYear as null when missing', async () => {
     await exportPeopleJson([{ ...COMPLETE_PERSON, birthYear: null }])
     expect(exportedJson()[0].birthYear).toBeNull()
@@ -313,13 +320,14 @@ describe('loadSettings (web path)', () => {
       situationTags: [],
       placeTags: [],
       howWeMetTags: [],
+      nationalityTags: [],
       onboardingDone: false,
     })
   })
 
   it('returns the saved iconColor', async () => {
-    localStorage.setItem(ICON_COLOR_KEY, 'darkPink')
-    expect((await loadSettings()).iconColor).toBe('darkPink')
+    localStorage.setItem(ICON_COLOR_KEY, 'chartPink')
+    expect((await loadSettings()).iconColor).toBe('chartPink')
   })
 
   it('returns the saved language', async () => {
@@ -341,9 +349,9 @@ describe('loadSettings (web path)', () => {
   })
 
   it('falls back to default language when only iconColor is saved', async () => {
-    localStorage.setItem(ICON_COLOR_KEY, 'darkPink')
+    localStorage.setItem(ICON_COLOR_KEY, 'chartPink')
     const settings = await loadSettings()
-    expect(settings.iconColor).toBe('darkPink')
+    expect(settings.iconColor).toBe('chartPink')
     expect(settings.language).toBe(DEFAULT_SETTINGS.language)
     expect(settings.theme).toBe(DEFAULT_SETTINGS.theme)
   })
@@ -374,6 +382,15 @@ describe('loadSettings (web path)', () => {
   it('returns empty howWeMetTags when none are saved', async () => {
     expect((await loadSettings()).howWeMetTags).toEqual([])
   })
+
+  it('returns saved nationalityTags', async () => {
+    localStorage.setItem(NATIONALITY_TAGS_KEY, JSON.stringify(['Chilean', 'Peruvian']))
+    expect((await loadSettings()).nationalityTags).toEqual(['Chilean', 'Peruvian'])
+  })
+
+  it('returns empty nationalityTags when none are saved', async () => {
+    expect((await loadSettings()).nationalityTags).toEqual([])
+  })
 })
 
 // ---------------------------------------------------------------------------
@@ -385,35 +402,35 @@ describe('saveSettings (web path)', () => {
   })
 
   it('saves iconColor to localStorage', async () => {
-    await saveSettings({ iconColor: 'darkPink', language: 'es' })
-    expect(localStorage.getItem(ICON_COLOR_KEY)).toBe('darkPink')
+    await saveSettings({ iconColor: 'chartPink', language: 'es' })
+    expect(localStorage.getItem(ICON_COLOR_KEY)).toBe('chartPink')
   })
 
   it('saves language to localStorage', async () => {
-    await saveSettings({ iconColor: 'darkPink', language: 'es' })
+    await saveSettings({ iconColor: 'chartPink', language: 'es' })
     expect(localStorage.getItem(LANGUAGE_KEY)).toBe('es')
   })
 
   it('saves theme to localStorage', async () => {
-    await saveSettings({ iconColor: 'darkPink', language: 'es', theme: 'dark' })
+    await saveSettings({ iconColor: 'chartPink', language: 'es', theme: 'dark' })
     expect(localStorage.getItem(THEME_KEY)).toBe('dark')
   })
 
   it('does not overwrite iconColor when it is undefined', async () => {
-    localStorage.setItem(ICON_COLOR_KEY, 'lightPink')
+    localStorage.setItem(ICON_COLOR_KEY, 'notebookPink')
     await saveSettings({ language: 'es' })
-    expect(localStorage.getItem(ICON_COLOR_KEY)).toBe('lightPink')
+    expect(localStorage.getItem(ICON_COLOR_KEY)).toBe('notebookPink')
   })
 
   it('does not overwrite language when it is undefined', async () => {
     localStorage.setItem(LANGUAGE_KEY, 'en')
-    await saveSettings({ iconColor: 'darkPink' })
+    await saveSettings({ iconColor: 'chartPink' })
     expect(localStorage.getItem(LANGUAGE_KEY)).toBe('en')
   })
 
   it('does not overwrite theme when it is undefined', async () => {
     localStorage.setItem(THEME_KEY, 'green')
-    await saveSettings({ iconColor: 'darkPink' })
+    await saveSettings({ iconColor: 'chartPink' })
     expect(localStorage.getItem(THEME_KEY)).toBe('green')
   })
 
@@ -424,7 +441,7 @@ describe('saveSettings (web path)', () => {
 
   it('does not overwrite situationTags when it is undefined', async () => {
     localStorage.setItem(SITUATION_TAGS_KEY, JSON.stringify(['Existing']))
-    await saveSettings({ iconColor: 'darkPink' })
+    await saveSettings({ iconColor: 'chartPink' })
     expect(JSON.parse(localStorage.getItem(SITUATION_TAGS_KEY))).toEqual(['Existing'])
   })
 
@@ -435,7 +452,7 @@ describe('saveSettings (web path)', () => {
 
   it('does not overwrite placeTags when it is undefined', async () => {
     localStorage.setItem(PLACE_TAGS_KEY, JSON.stringify(['Existing']))
-    await saveSettings({ iconColor: 'darkPink' })
+    await saveSettings({ iconColor: 'chartPink' })
     expect(JSON.parse(localStorage.getItem(PLACE_TAGS_KEY))).toEqual(['Existing'])
   })
 
@@ -446,13 +463,24 @@ describe('saveSettings (web path)', () => {
 
   it('does not overwrite howWeMetTags when it is undefined', async () => {
     localStorage.setItem(HOW_WE_MET_TAGS_KEY, JSON.stringify(['Existing']))
-    await saveSettings({ iconColor: 'darkPink' })
+    await saveSettings({ iconColor: 'chartPink' })
     expect(JSON.parse(localStorage.getItem(HOW_WE_MET_TAGS_KEY))).toEqual(['Existing'])
+  })
+
+  it('saves nationalityTags to localStorage', async () => {
+    await saveSettings({ nationalityTags: ['Chilean', 'Peruvian'] })
+    expect(JSON.parse(localStorage.getItem(NATIONALITY_TAGS_KEY))).toEqual(['Chilean', 'Peruvian'])
+  })
+
+  it('does not overwrite nationalityTags when it is undefined', async () => {
+    localStorage.setItem(NATIONALITY_TAGS_KEY, JSON.stringify(['Existing']))
+    await saveSettings({ iconColor: 'chartPink' })
+    expect(JSON.parse(localStorage.getItem(NATIONALITY_TAGS_KEY))).toEqual(['Existing'])
   })
 
   it('round-trips correctly through save and load', async () => {
     await saveSettings({
-      iconColor: 'darkGreen',
+      iconColor: 'chartGreen',
       language: 'es',
       theme: 'dark',
       statsVisible: true,
@@ -460,10 +488,11 @@ describe('saveSettings (web path)', () => {
       situationTags: ['Date', 'Party'],
       placeTags: ['Café', 'Home'],
       howWeMetTags: ['School', 'Work'],
+      nationalityTags: ['Chilean'],
       onboardingDone: true,
     })
     expect(await loadSettings()).toEqual({
-      iconColor: 'darkGreen',
+      iconColor: 'chartGreen',
       language: 'es',
       theme: 'dark',
       statsVisible: true,
@@ -471,6 +500,7 @@ describe('saveSettings (web path)', () => {
       situationTags: ['Date', 'Party'],
       placeTags: ['Café', 'Home'],
       howWeMetTags: ['School', 'Work'],
+      nationalityTags: ['Chilean'],
       onboardingDone: true,
     })
   })
@@ -529,23 +559,31 @@ describe('loadSettings (native path — migration from localStorage)', () => {
     expect((await loadSettings()).howWeMetTags).toEqual(['School', 'Work'])
   })
 
+  it('migrates nationalityTags from localStorage', async () => {
+    localStorage.setItem(NATIONALITY_TAGS_KEY, JSON.stringify(['Chilean', 'Peruvian']))
+    expect((await loadSettings()).nationalityTags).toEqual(['Chilean', 'Peruvian'])
+  })
+
   it('returns empty tag arrays when localStorage has none', async () => {
     const settings = await loadSettings()
     expect(settings.situationTags).toEqual([])
     expect(settings.placeTags).toEqual([])
     expect(settings.howWeMetTags).toEqual([])
+    expect(settings.nationalityTags).toEqual([])
   })
 
   it('persists migrated tags to the native settings file', async () => {
     localStorage.setItem(SITUATION_TAGS_KEY, JSON.stringify(['Date']))
     localStorage.setItem(PLACE_TAGS_KEY, JSON.stringify(['Home']))
     localStorage.setItem(HOW_WE_MET_TAGS_KEY, JSON.stringify(['School']))
+    localStorage.setItem(NATIONALITY_TAGS_KEY, JSON.stringify(['Chilean']))
     await loadSettings()
     expect(mockFilesystem.writeFile).toHaveBeenCalledOnce()
     const written = JSON.parse(mockFilesystem.writeFile.mock.calls[0][0].data)
     expect(written.situationTags).toEqual(['Date'])
     expect(written.placeTags).toEqual(['Home'])
     expect(written.howWeMetTags).toEqual(['School'])
+    expect(written.nationalityTags).toEqual(['Chilean'])
   })
 })
 
@@ -564,7 +602,7 @@ describe('loadSettings (native path — reads existing file)', () => {
 
   it('returns settings from native file when it exists', async () => {
     const stored = {
-      iconColor: 'darkPink',
+      iconColor: 'chartPink',
       language: 'es',
       theme: 'dark',
       statsVisible: true,
@@ -572,6 +610,7 @@ describe('loadSettings (native path — reads existing file)', () => {
       situationTags: [],
       placeTags: [],
       howWeMetTags: ['School'],
+      nationalityTags: ['Chilean'],
       onboardingDone: true,
     }
     mockFilesystem.readFile.mockResolvedValueOnce({ data: JSON.stringify(stored) })
@@ -637,6 +676,15 @@ describe('loadSettings (native path — reads existing file)', () => {
     expect(settings.howWeMetTags).toEqual([])
     expect(settings.situationTags).toEqual(['Date'])
     expect(settings.placeTags).toEqual(['Home'])
+  })
+
+  it('returns empty nationalityTags when the settings file predates the field', async () => {
+    mockFilesystem.readFile.mockResolvedValueOnce({
+      data: JSON.stringify({ howWeMetTags: ['School'] }),
+    })
+    const settings = await loadSettings()
+    expect(settings.nationalityTags).toEqual([])
+    expect(settings.howWeMetTags).toEqual(['School'])
   })
 })
 
@@ -753,7 +801,7 @@ describe('saveSettings (native path)', () => {
 
   it('writes to Filesystem with Directory.Data', async () => {
     await saveSettings({
-      iconColor: 'darkPink',
+      iconColor: 'chartPink',
       language: 'es',
       theme: 'dark',
       statsVisible: false,
@@ -768,7 +816,7 @@ describe('saveSettings (native path)', () => {
 
   it('serializes all settings fields correctly', async () => {
     const settings = {
-      iconColor: 'darkPink',
+      iconColor: 'chartPink',
       language: 'es',
       theme: 'dark',
       statsVisible: false,
@@ -776,6 +824,7 @@ describe('saveSettings (native path)', () => {
       situationTags: ['Date'],
       placeTags: ['Café'],
       howWeMetTags: ['School'],
+      nationalityTags: ['Chilean'],
       onboardingDone: true,
     }
     await saveSettings(settings)
@@ -785,7 +834,7 @@ describe('saveSettings (native path)', () => {
 
   it('does not write to localStorage on native', async () => {
     localStorage.clear()
-    await saveSettings({ iconColor: 'darkGreen' })
+    await saveSettings({ iconColor: 'chartGreen' })
     expect(localStorage.getItem(ICON_COLOR_KEY)).toBeNull()
   })
 })
@@ -878,6 +927,7 @@ describe('persisted settings override config defaults (native path)', () => {
       situationTags: ['Date', 'Party'],
       placeTags: ['Café', 'Home'],
       howWeMetTags: ['School', 'Work'],
+      nationalityTags: ['Chilean', 'Peruvian'],
     }
     await saveSettings({ ...USER_CHOICES, ...tags, onboardingDone: true })
     const written = mockFilesystem.writeFile.mock.calls[0][0].data

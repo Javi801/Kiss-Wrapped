@@ -5,25 +5,49 @@ import { Input } from '@/components/ui/input'
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
 
-function getViewportMetrics() {
-  const visualViewport = window.visualViewport
-  return {
-    offsetTop: visualViewport?.offsetTop ?? 0,
-    offsetLeft: visualViewport?.offsetLeft ?? 0,
-    height: visualViewport?.height ?? window.innerHeight,
-  }
-}
-
+const GAP = 4
+const MARGIN = 8
+const MAX_H = 240
 // Room a side needs to keep the dropdown; below it the other side is considered.
 const MIN_ROOM = 160
+// Differences below this (in px) are ignored so the per-frame loop doesn't re-render.
+const EPSILON = 0.5
+
+const nudge = (current, delta) => (Math.abs(delta) < EPSILON ? current : current + delta)
+
+const stopPropagation = (e) => e.stopPropagation()
 
 function isSamePosition(a, b) {
+  if (!a || !b) return a === b
   return (
-    a?.placement === b.placement &&
+    a.placement === b.placement &&
     a.top === b.top &&
     a.left === b.left &&
     a.width === b.width &&
-    a.maxHeight === b.maxHeight
+    a.maxHeight === b.maxHeight &&
+    a.ready === b.ready
+  )
+}
+
+function Option({ onSelect, style, children }) {
+  return (
+    <button
+      type="button"
+      // Keeps focus on the input, so onBlur doesn't close the list before the click lands.
+      onMouseDown={(e) => e.preventDefault()}
+      onClick={onSelect}
+      style={{
+        display: 'block',
+        width: '100%',
+        textAlign: 'left',
+        padding: '0.5rem 0.75rem',
+        ...TEXT.body,
+        cursor: 'pointer',
+        ...style,
+      }}
+    >
+      {children}
+    </button>
   )
 }
 
@@ -44,6 +68,9 @@ export default function TagInput({
   const containerRef = useRef(null)
   const dropdownRef = useRef(null)
   const placementRef = useRef(null)
+  // Mirror of `pos` so the per-frame loop can read the last applied position
+  // without depending on render timing.
+  const posRef = useRef(null)
 
   const trimmed = value.trim()
   const filtered = tags.filter(
@@ -54,50 +81,73 @@ export default function TagInput({
   const effectiveOpen = isParentOpen === false ? false : open
   const showDropdown = effectiveOpen && pos && (filtered.length > 0 || showAddOption)
 
-  // Anchor rect and viewport metrics must be read in the same synchronous pass:
-  // mixing a stale rect with fresh visualViewport offsets (or vice versa) is what
-  // makes the dropdown jump while the keyboard hides and the scroll rebounds.
+  const commit = useCallback((next) => {
+    posRef.current = next
+    setPos(next)
+  }, [])
+
+  const closeDropdown = useCallback(() => {
+    placementRef.current = null
+    commit(null)
+    setOpen(false)
+  }, [commit])
+
+  // Where the dropdown SHOULD be (from the input's rect), corrected by how far the
+  // rendered dropdown actually is from that. The dialog (transforms, scroll lock)
+  // can shift `position: fixed` coordinates, so we trust measurements, not math.
   const computePosition = useCallback(() => {
     if (!containerRef.current) return null
-    const anchorRect = containerRef.current.getBoundingClientRect()
-    const { offsetTop, offsetLeft, height: vph } = getViewportMetrics()
-    const anchorTop = anchorRect.top - offsetTop
-    const anchorBottom = anchorRect.bottom - offsetTop
-    if (anchorBottom < 0 || anchorTop > vph) return null
-    const spaceBelow = vph - anchorBottom - 4
-    const spaceAbove = anchorTop - 4
-    // The side is kept while it has room, so scrolling does not make the dropdown
-    // flip, and picked again once it runs out (e.g. the keyboard covers it).
+
+    const anchor = containerRef.current.getBoundingClientRect()
+    const vv = window.visualViewport
+    const offsetTop = vv?.offsetTop ?? 0
+    const viewportHeight = vv?.height ?? window.innerHeight
+
+    // Visible-area coordinates (keyboard excluded). Only used to measure free space.
+    const visibleTop = anchor.top - offsetTop
+    const visibleBottom = anchor.bottom - offsetTop
+    if (visibleBottom < 0 || visibleTop > viewportHeight) return null
+
+    const spaceBelow = viewportHeight - visibleBottom - GAP - MARGIN
+    const spaceAbove = visibleTop - GAP - MARGIN
+
+    // The side is kept while it has room, so the dropdown doesn't flip while
+    // scrolling, and picked again once it runs out (e.g. the keyboard covers it).
     const room = placementRef.current === 'up' ? spaceAbove : spaceBelow
     if (!placementRef.current || room < MIN_ROOM) {
       placementRef.current = spaceBelow < MIN_ROOM && spaceAbove > spaceBelow ? 'up' : 'down'
     }
     const placement = placementRef.current
+    const maxHeight = Math.max(0, Math.min(placement === 'up' ? spaceAbove : spaceBelow, MAX_H))
+
+    const el = dropdownRef.current
+    const applied = posRef.current
+    const rendered = el?.getBoundingClientRect()
+
+    const desiredTop =
+      placement === 'up'
+        ? anchor.top - GAP - Math.min(rendered?.height ?? 0, maxHeight)
+        : anchor.bottom + GAP
+    const desiredLeft = anchor.left
+
+    // Until the dropdown has rendered once there is nothing to measure, so it
+    // stays hidden for a frame and is then shown already corrected.
+    const ready = !!rendered && !!applied
+
     return {
       placement,
-      top: placement === 'up' ? anchorTop - 4 : anchorBottom + 4,
-      left: anchorRect.left - offsetLeft,
-      width: anchorRect.width,
-      maxHeight: Math.max(Math.min(placement === 'up' ? spaceAbove : spaceBelow, 240), 0),
+      top: ready ? nudge(applied.top, desiredTop - rendered.top) : desiredTop,
+      left: ready ? nudge(applied.left, desiredLeft - rendered.left) : desiredLeft,
+      width: anchor.width,
+      maxHeight,
+      ready,
     }
   }, [])
 
-  const closeDropdown = useCallback(() => {
+  function openDropdown() {
     placementRef.current = null
-    setPos(null)
-    setOpen(false)
-  }, [])
-
-  function handleFocus() {
-    placementRef.current = null
-    setPos(computePosition())
-    setOpen(true)
-  }
-
-  function handleChange(e) {
-    onChange(e.target.value)
-    placementRef.current = null
-    setPos(computePosition())
+    posRef.current = null
+    commit(computePosition())
     setOpen(true)
   }
 
@@ -110,38 +160,33 @@ export default function TagInput({
       }
     }
 
-    // Synchronous on purpose: deferring to requestAnimationFrame leaves the
-    // dropdown a frame behind the input during the keyboard-hide scroll rebound.
+    // A null position means the input is momentarily out of the visible area
+    // (e.g. the keyboard is moving): hide the dropdown but keep it open, so it
+    // shows up again by itself.
     function reposition() {
       const next = computePosition()
-      if (!next) {
-        closeDropdown()
-      } else {
-        setPos((prev) => (isSamePosition(prev, next) ? prev : next))
-      }
+      if (!isSamePosition(posRef.current, next)) commit(next)
     }
 
-    // The input can also move with no scroll or resize event at all (a transition
-    // or a layout change in the parent dialog), so it is checked on every frame too.
+    // The input can move with no scroll or resize event at all (a transition or a
+    // layout change in the parent dialog), so it is also checked on every frame.
     let frame = requestAnimationFrame(function follow() {
       reposition()
       frame = requestAnimationFrame(follow)
     })
 
-    document.addEventListener('mousedown', closeIfOutside)
-    window.addEventListener('scroll', reposition, true)
+    document.addEventListener('pointerdown', closeIfOutside)
     window.addEventListener('resize', reposition)
     window.visualViewport?.addEventListener('resize', reposition)
     window.visualViewport?.addEventListener('scroll', reposition)
     return () => {
       cancelAnimationFrame(frame)
-      document.removeEventListener('mousedown', closeIfOutside)
-      window.removeEventListener('scroll', reposition, true)
+      document.removeEventListener('pointerdown', closeIfOutside)
       window.removeEventListener('resize', reposition)
       window.visualViewport?.removeEventListener('resize', reposition)
       window.visualViewport?.removeEventListener('scroll', reposition)
     }
-  }, [effectiveOpen, computePosition, closeDropdown])
+  }, [effectiveOpen, computePosition, closeDropdown, commit])
 
   function selectTag(tag) {
     onChange(tag)
@@ -159,13 +204,14 @@ export default function TagInput({
     <div ref={containerRef}>
       <Input
         value={value}
-        onChange={handleChange}
-        onFocus={handleFocus}
+        onChange={(e) => {
+          onChange(e.target.value)
+          setOpen(true)
+        }}
+        onFocus={openDropdown}
         onBlur={closeDropdown}
         onKeyDown={(e) => {
-          if (e.key === 'Escape') {
-            closeDropdown()
-          }
+          if (e.key === 'Escape') closeDropdown()
         }}
         placeholder={placeholder}
         maxLength={maxLength}
@@ -177,71 +223,58 @@ export default function TagInput({
         createPortal(
           <div
             ref={dropdownRef}
+            // The dropdown lives outside the Radix dialog, so its scroll lock and
+            // outside-press handling would otherwise swallow these gestures.
+            onWheel={stopPropagation}
+            onTouchMove={stopPropagation}
+            onPointerDown={stopPropagation}
             style={{
               position: 'fixed',
               top: pos.top,
               left: pos.left,
               width: pos.width,
+              maxHeight: pos.maxHeight,
+              visibility: pos.ready ? 'visible' : 'hidden',
               zIndex: 9999,
-              transform: pos.placement === 'up' ? 'translateY(-100%)' : 'none',
               borderRadius: '0.75rem',
               border: `1px solid ${PALETTE.inputBorder}`,
               backgroundColor: PALETTE.card,
               boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
-              overflow: 'hidden',
               overflowY: 'auto',
-              maxHeight: pos.maxHeight,
+              overscrollBehavior: 'contain',
+              WebkitOverflowScrolling: 'touch',
+              touchAction: 'pan-y',
               pointerEvents: 'auto',
             }}
           >
             {filtered.map((tag, i) => {
               const selected = value.toLowerCase() === tag.toLowerCase()
               return (
-                <button
+                <Option
                   key={tag}
-                  type="button"
-                  onPointerDown={(e) => {
-                    e.preventDefault()
-                    selectTag(tag)
-                  }}
+                  onSelect={() => selectTag(tag)}
                   style={{
-                    display: 'block',
-                    width: '100%',
-                    textAlign: 'left',
-                    padding: '0.5rem 0.75rem',
-                    ...TEXT.body,
                     color: selected ? PALETTE.accent : PALETTE.text,
                     backgroundColor: selected ? PALETTE.accentMuted : 'transparent',
                     fontWeight: selected ? '600' : '400',
-                    cursor: 'pointer',
                     borderTop: i > 0 ? `1px solid ${PALETTE.inputBorder}` : 'none',
                   }}
                 >
                   {tag}
-                </button>
+                </Option>
               )
             })}
             {showAddOption && (
-              <button
-                type="button"
-                onPointerDown={(e) => {
-                  e.preventDefault()
-                  handleAddTag()
-                }}
+              <Option
+                onSelect={handleAddTag}
                 style={{
-                  display: 'block',
-                  width: '100%',
-                  textAlign: 'left',
-                  padding: '0.5rem 0.75rem',
-                  ...TEXT.body,
                   color: PALETTE.accent,
                   fontWeight: '500',
-                  cursor: 'pointer',
                   borderTop: filtered.length > 0 ? `1px solid ${PALETTE.inputBorder}` : 'none',
                 }}
               >
                 {`+ ${addTagLabel} "${trimmed}"`}
-              </button>
+              </Option>
             )}
           </div>,
           document.body

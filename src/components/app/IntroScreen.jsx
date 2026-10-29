@@ -6,9 +6,15 @@ import IntroEntryGuide from '@/components/app/IntroEntryGuide'
 /**
  * Initial splash-like screen with hidden entry.
  * Acts as a playful gate before entering the main app.
- * `showEntryGuide` points out the hidden entry while onboarding is pending.
+ * `showEntryGuide` points out the hidden entry while onboarding is pending;
+ * `entryGuideCallout={false}` leaves only its tap guide, without the text.
  */
-export default function IntroScreen({ onOpenMain, showEntryGuide = false, t }) {
+export default function IntroScreen({
+  onOpenMain,
+  showEntryGuide = false,
+  entryGuideCallout = true,
+  t,
+}) {
   const PALETTE = usePalette()
   return (
     <div
@@ -35,12 +41,19 @@ export default function IntroScreen({ onOpenMain, showEntryGuide = false, t }) {
           right: 0,
           bottom: 0,
           left: 0,
-          background: 'radial-gradient(circle at top, rgba(255,255,255,0.95), transparent 45%)',
+          background: `radial-gradient(circle at top, ${PALETTE.topGlow}, transparent 45%)`,
         }}
       />
 
       {/* Hidden entry in the top-left heart. */}
-      <div style={{ position: 'absolute', top: '1rem', left: '1rem', zIndex: 10 }}>
+      <div
+        style={{
+          position: 'absolute',
+          top: 'calc(env(safe-area-inset-top, 0px) + 1rem)',
+          left: '1rem',
+          zIndex: 10,
+        }}
+      >
         <button
           type="button"
           onClick={onOpenMain}
@@ -59,7 +72,7 @@ export default function IntroScreen({ onOpenMain, showEntryGuide = false, t }) {
         >
           ♡
         </button>
-        {showEntryGuide ? <IntroEntryGuide t={t} /> : null}
+        {showEntryGuide ? <IntroEntryGuide t={t} showCallout={entryGuideCallout} /> : null}
       </div>
 
       {/* Center visual */}
@@ -83,7 +96,7 @@ export default function IntroScreen({ onOpenMain, showEntryGuide = false, t }) {
             position: 'absolute',
             inset: 0,
             zIndex: 5,
-            backgroundColor: 'rgba(24,14,34,0.6)',
+            backgroundColor: PALETTE.backdrop,
           }}
         />
       ) : null}

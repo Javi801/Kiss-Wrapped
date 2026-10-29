@@ -1,4 +1,4 @@
-import { Briefcase, Calendar, RotateCcw, SlidersHorizontal, Star } from 'lucide-react'
+import { Briefcase, Calendar, Globe, RotateCcw, SlidersHorizontal, Star } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,8 +12,9 @@ import {
 } from '@/components/ui/select'
 import { DatePicker } from '@/components/ui/date-picker'
 
-import { ZODIAC_OPTIONS, TEXT } from '@/lib/constants'
+import { ACTIVITIES, ZODIAC_OPTIONS, TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
+import { translateActivity } from '@/lib/format'
 
 const MONTH_NUM = {
   january: '01',
@@ -66,6 +67,8 @@ const EMPTY_FILTERS = {
   minAge: '',
   maxAge: '',
   activity: [],
+  howWeMet: [],
+  nationality: [],
   zodiacSign: [],
   eventDateFrom: '',
   eventDateTo: '',
@@ -137,6 +140,8 @@ export default function FiltersPanel({
   peopleCount,
   t,
   language,
+  howWeMetTags = [],
+  nationalityTags = [],
 }) {
   const PALETTE = usePalette()
   const inputStyle = {
@@ -151,6 +156,30 @@ export default function FiltersPanel({
         ? prev.activity.filter((a) => a !== value)
         : [...prev.activity, value],
     }))
+  }
+
+  function toggleHowWeMet(value) {
+    setFilters((prev) => {
+      const selected = prev.howWeMet ?? []
+      return {
+        ...prev,
+        howWeMet: selected.includes(value)
+          ? selected.filter((tag) => tag !== value)
+          : [...selected, value],
+      }
+    })
+  }
+
+  function toggleNationality(value) {
+    setFilters((prev) => {
+      const selected = prev.nationality ?? []
+      return {
+        ...prev,
+        nationality: selected.includes(value)
+          ? selected.filter((tag) => tag !== value)
+          : [...selected, value],
+      }
+    })
   }
 
   function toggleZodiac(value) {
@@ -258,28 +287,6 @@ export default function FiltersPanel({
 
       <Divider />
 
-      {/* Activity */}
-      <div>
-        <SectionLabel icon={Briefcase} label={t.activity} />
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-          {[
-            { value: 'studies', label: t.studies },
-            { value: 'works', label: t.works },
-            { value: 'studies and works', label: t.studiesWorks },
-            { value: 'other', label: t.other },
-          ].map(({ value, label }) => (
-            <Chip
-              key={value}
-              label={label}
-              selected={filters.activity.includes(value)}
-              onClick={() => toggleActivity(value)}
-            />
-          ))}
-        </div>
-      </div>
-
-      <Divider />
-
       {/* Event date range */}
       <div>
         <SectionLabel icon={Calendar} label={t.eventDateRange} />
@@ -317,6 +324,65 @@ export default function FiltersPanel({
           ))}
         </div>
       </div>
+
+      <Divider />
+
+      {/* Activity */}
+      <div>
+        <SectionLabel icon={Briefcase} label={t.activity} />
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+          {ACTIVITIES.map((value) => (
+            <Chip
+              key={value}
+              label={translateActivity(value, t)}
+              selected={filters.activity.includes(value)}
+              onClick={() => toggleActivity(value)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {howWeMetTags.length > 0 && (
+        <>
+          <Divider />
+
+          {/* How we met */}
+          <div>
+            <SectionLabel icon={Star} label={t.howWeMet} />
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+              {howWeMetTags.map((value) => (
+                <Chip
+                  key={value}
+                  label={value}
+                  selected={filters.howWeMet.includes(value)}
+                  onClick={() => toggleHowWeMet(value)}
+                />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {nationalityTags.length > 0 && (
+        <>
+          <Divider />
+
+          {/* Nationality */}
+          <div>
+            <SectionLabel icon={Globe} label={t.nationality} />
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+              {nationalityTags.map((value) => (
+                <Chip
+                  key={value}
+                  label={value}
+                  selected={(filters.nationality ?? []).includes(value)}
+                  onClick={() => toggleNationality(value)}
+                />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }

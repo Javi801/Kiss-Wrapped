@@ -1,10 +1,10 @@
 import { ArrowLeft } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 
 import { usePalette } from '@/lib/theme'
 import PersonForm from '@/components/forms/PersonForm'
+import FormCard from '@/components/app/FormCard'
 
 /**
  * Renders the screen used to add a new person.
@@ -30,27 +30,17 @@ export default function AddPersonScreen({ onSave, onBack, t, language }) {
       </div>
 
       {/* Form container */}
-      <Card
-        className="rounded-3xl"
-        style={{
-          boxShadow: `0 4px 24px rgba(0,0,0,0.12), 0 0 0 1px ${PALETTE.cardBorder}`,
-          backdropFilter: 'blur(12px)',
-          border: 'none',
-          background: `linear-gradient(160deg, ${PALETTE.card} 0%, ${PALETTE.cardSoft} 100%)`,
-        }}
-      >
-        <CardContent style={{ padding: '1.25rem' }}>
-          <PersonForm
-            onSave={onSave}
-            onCancel={onBack}
-            t={t}
-            language={language}
-            includeHowWeMet={false}
-            mode="add"
-            saveLabel={t.saveAndBack}
-          />
-        </CardContent>
-      </Card>
+      <FormCard>
+        <PersonForm
+          onSave={onSave}
+          onCancel={onBack}
+          t={t}
+          language={language}
+          includeHowWeMet={false}
+          mode="add"
+          saveLabel={t.saveAndBack}
+        />
+      </FormCard>
     </div>
   )
 }

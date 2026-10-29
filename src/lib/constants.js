@@ -15,19 +15,41 @@ export const INCLUDE_PARTNER_EVENTS_KEY = 'kiss-wrapped-include-partner-events-v
 export const SITUATION_TAGS_KEY = 'kiss-wrapped-situation-tags-v1'
 export const PLACE_TAGS_KEY = 'kiss-wrapped-place-tags-v1'
 export const HOW_WE_MET_TAGS_KEY = 'kiss-wrapped-how-we-met-tags-v1'
+export const NATIONALITY_TAGS_KEY = 'kiss-wrapped-nationality-tags-v1'
 export const ONBOARDING_DONE_KEY = 'kiss-wrapped-onboarding-done-v1'
 export const PEOPLE_FILE_NAME = 'kiss-wrapped-people.json'
 export const SETTINGS_FILE_NAME = 'kiss-wrapped-settings.json'
 
+// Screen names the app navigates between.
+export const SCREENS = {
+  boot: 'boot',
+  intro: 'intro',
+  main: 'main',
+  add: 'add',
+  people: 'people',
+  stats: 'stats',
+  onboarding: 'onboarding',
+}
+
 // Reusable option lists used across forms and analytics.
 export const GENDERS = ['male', 'female', 'other']
 export const SCORE_OPTIONS = [0, 1, 2, 3, 4, 5]
+// Activity values as stored in the data, and their list in display order.
+export const ACTIVITY = {
+  studies: 'studies',
+  works: 'works',
+  studiesAndWorks: 'studies and works',
+  other: 'other',
+}
+export const ACTIVITIES = Object.values(ACTIVITY)
 
 // All available UI themes.
 export const PALETTES = {
   pink: {
     bg: '#fff8fb',
     bgSoft: '#fff3f8',
+    dialogBg: '#fff3f8',
+    dialogBorder: '#ead7e2',
     bgGradientFrom: '#ffddea',
     bgGradientVia: '#f8abc7',
     bgGradientTo: '#bde0fe',
@@ -61,6 +83,12 @@ export const PALETTES = {
     navBarBg: 'rgba(255,255,255,0.8)',
     accentShadow: 'rgba(226,115,150,0.2)',
     accentGlow: 'rgba(226,115,150,0.35)',
+    backdrop: 'rgba(24,14,34,0.6)',
+    topGlow: 'rgba(255,255,255,0.95)',
+    calloutBg: 'rgba(255,255,255,0.92)',
+    calloutShadow: 'rgba(55,36,61,0.16)',
+    shadow: 'rgba(0,0,0,0.12)',
+    shadowStrong: 'rgba(0,0,0,0.16)',
     danger: '#ef4444',
     dangerEmphasis: '#dc2626',
     warningBorder: '#f9d58a',
@@ -82,6 +110,8 @@ export const PALETTES = {
   green: {
     bg: '#f6fbf8',
     bgSoft: '#eef8f2',
+    dialogBg: '#eef8f2',
+    dialogBorder: '#c8e6d0',
     bgGradientFrom: '#d4edda',
     bgGradientVia: '#a8d5b5',
     bgGradientTo: '#bde0fe',
@@ -115,6 +145,12 @@ export const PALETTES = {
     navBarBg: 'rgba(255,255,255,0.8)',
     accentShadow: 'rgba(90,158,114,0.2)',
     accentGlow: 'rgba(90,158,114,0.35)',
+    backdrop: 'rgba(24,14,34,0.6)',
+    topGlow: 'rgba(255,255,255,0.95)',
+    calloutBg: 'rgba(255,255,255,0.92)',
+    calloutShadow: 'rgba(55,36,61,0.16)',
+    shadow: 'rgba(0,0,0,0.12)',
+    shadowStrong: 'rgba(0,0,0,0.16)',
     danger: '#ef4444',
     dangerEmphasis: '#dc2626',
     warningBorder: '#f9d58a',
@@ -138,6 +174,8 @@ export const PALETTES = {
   dark: {
     bg: '#0f0d1a',
     bgSoft: '#14112a',
+    dialogBg: '#241f48',
+    dialogBorder: '#6a60c0',
     bgGradientFrom: '#1a1535',
     bgGradientVia: '#1e2d5a',
     bgGradientTo: '#0f1e3d',
@@ -171,6 +209,12 @@ export const PALETTES = {
     navBarBg: 'rgba(15,13,26,0.85)',
     accentShadow: 'rgba(139,124,248,0.2)',
     accentGlow: 'rgba(139,124,248,0.35)',
+    backdrop: 'rgba(24,14,34,0.6)',
+    topGlow: 'rgba(255,255,255,0.95)',
+    calloutBg: '#1a1535',
+    calloutShadow: 'rgba(55,36,61,0.16)',
+    shadow: 'rgba(0,0,0,0.12)',
+    shadowStrong: 'rgba(0,0,0,0.16)',
     danger: '#f87171',
     dangerEmphasis: '#ef4444',
     warningBorder: '#f9d58a',
@@ -196,6 +240,9 @@ export const PALETTES = {
 // Default palette alias kept for non-React modules (e.g. pdf-export.js).
 export const PALETTE = PALETTES.pink
 
+// Width of the app's content column.
+export const CONTENT_MAX_WIDTH = '28rem'
+
 // Semantic text scale. Spread into style objects or use directly as style prop.
 export const TEXT = {
   caption: { fontSize: '0.75rem', lineHeight: '1rem' },
@@ -206,7 +253,12 @@ export const TEXT = {
   base: { fontSize: '1rem', lineHeight: '1.5rem' },
   title: { fontSize: '1rem', lineHeight: '1.5rem', fontWeight: '600' },
   subheading: { fontSize: '1.125rem', lineHeight: '1.75rem', fontWeight: '700' },
-  heading: { fontSize: '1.5rem', lineHeight: '2rem', fontWeight: '700' },
+  heading: {
+    fontSize: '1.5rem',
+    lineHeight: '2rem',
+    fontWeight: '700',
+    letterSpacing: '-0.025em',
+  },
 }
 
 // Generic colors for graphics.

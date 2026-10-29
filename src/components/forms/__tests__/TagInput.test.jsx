@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 
@@ -44,6 +44,13 @@ const input = () => container.querySelector('input')
 const options = () => [...document.body.querySelectorAll('button')]
 const labels = () => options().map((option) => option.textContent)
 const focus = () => act(() => input().focus())
+const pointerDown = (target) =>
+  act(() => {
+    target.dispatchEvent(new Event('pointerdown', { bubbles: true }))
+  })
+const nextFrame = () => act(() => vi.advanceTimersToNextFrame())
+const useFakeFrames = () =>
+  vi.useFakeTimers({ toFake: ['requestAnimationFrame', 'cancelAnimationFrame'] })
 
 function type(text) {
   const setValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set
@@ -55,9 +62,7 @@ function type(text) {
 
 function pick(label) {
   const option = options().find((item) => item.textContent === label)
-  act(() => {
-    option.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, cancelable: true }))
-  })
+  act(() => option.click())
 }
 
 // Places the input at the given vertical position of a 768px-high viewport.
@@ -70,11 +75,31 @@ function placeInputAt(top, bottom) {
   })
 }
 
+// jsdom has no layout: lays the fixed dropdown out where its style puts it,
+// shifted by `offset` like a transformed dialog would.
+function layoutDropdown({ offset = 0, height = 100 } = {}) {
+  const native = Element.prototype.getBoundingClientRect
+  vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function () {
+    if (this.style?.position !== 'fixed') return native.call(this)
+    const top = parseFloat(this.style.top) + offset
+    const left = parseFloat(this.style.left) + offset
+    return { top, left, height, bottom: top + height, width: parseFloat(this.style.width) }
+  })
+}
+
+// jsdom has no visualViewport, which the component listens to for scrolls.
+function stubVisualViewport() {
+  const viewport = Object.assign(new EventTarget(), { height: 768, offsetTop: 0 })
+  Object.defineProperty(window, 'visualViewport', { configurable: true, value: viewport })
+  return viewport
+}
+
 afterEach(() => {
   act(() => root.unmount())
   container.remove()
   vi.restoreAllMocks()
   vi.useRealTimers()
+  delete window.visualViewport
 })
 
 describe('TagInput — suggestions', () => {
@@ -95,11 +120,24 @@ describe('TagInput — suggestions', () => {
     expect(labels()).toEqual(['Park', 'Party'])
   })
 
-  it('opens the suggestions while typing and reports the typed text', () => {
+  it('reports the typed text and filters the suggestions with it', () => {
     const onChange = vi.fn()
     render({ onChange })
+    focus()
     type('ho')
     expect(onChange).toHaveBeenCalledWith('ho')
+    expect(labels()).toEqual(['Home'])
+  })
+
+  it('opens the suggestions again when typing after they were closed', () => {
+    useFakeFrames()
+    render()
+    focus()
+    act(() => {
+      input().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    })
+    type('ho')
+    nextFrame()
     expect(labels()).toEqual(['Home'])
   })
 
@@ -192,18 +230,14 @@ describe('TagInput — closing', () => {
   it('closes when pressing outside the input and the suggestions', () => {
     render()
     focus()
-    act(() => {
-      document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
-    })
+    pointerDown(document.body)
     expect(options()).toHaveLength(0)
   })
 
   it('stays open when pressing inside the suggestions', () => {
     render()
     focus()
-    act(() => {
-      options()[0].dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
-    })
+    pointerDown(options()[0])
     expect(labels()).toEqual(TAGS)
   })
 
@@ -226,95 +260,102 @@ describe('TagInput — closing', () => {
 
 describe('TagInput — placement', () => {
   const dropdown = () => options()[0].parentElement
+  let viewport
 
-  it('opens below the input when there is room', () => {
+  beforeEach(() => {
+    useFakeFrames()
+    viewport = stubVisualViewport()
+  })
+
+  // The input is spied first so its own mock doesn't fall through to the prototype's.
+  function openAt(top, bottom, layout) {
+    render()
+    placeInputAt(top, bottom)
+    layoutDropdown(layout)
+    focus()
+    nextFrame()
+  }
+
+  it('stays hidden until the dropdown has been measured', () => {
     render()
     placeInputAt(100, 140)
+    layoutDropdown()
     focus()
+    expect(dropdown().style.visibility).toBe('hidden')
+    nextFrame()
+    expect(dropdown().style.visibility).toBe('visible')
+  })
+
+  it('opens below the input when there is room', () => {
+    openAt(100, 140)
     expect(dropdown().style.top).toBe('144px')
-    expect(dropdown().style.transform).toBe('none')
     expect(dropdown().style.left).toBe('10px')
     expect(dropdown().style.width).toBe('200px')
   })
 
   it('opens above the input when there is little room below', () => {
-    render()
-    placeInputAt(700, 740)
-    focus()
-    expect(dropdown().style.top).toBe('696px')
-    expect(dropdown().style.transform).toBe('translateY(-100%)')
+    openAt(700, 740)
+    // 700 - 4px gap - 100px rendered height.
+    expect(dropdown().style.top).toBe('596px')
   })
 
   it('never grows taller than 240px', () => {
-    render()
-    placeInputAt(100, 140)
-    focus()
+    openAt(100, 140)
     expect(dropdown().style.maxHeight).toBe('240px')
   })
 
   it('shrinks to the space left below the input', () => {
-    render()
-    placeInputAt(10, 564)
-    focus()
-    expect(dropdown().style.maxHeight).toBe('200px')
+    openAt(10, 564)
+    // 768 - 564 - 4px gap - 8px margin.
+    expect(dropdown().style.maxHeight).toBe('192px')
+  })
+
+  it('corrects for the dialog shifting the dropdown', () => {
+    openAt(100, 140, { offset: 20 })
+    expect(dropdown().style.top).toBe('124px')
+    expect(dropdown().style.left).toBe('-10px')
+    nextFrame()
+    expect(dropdown().style.top).toBe('124px')
   })
 
   it('follows the input when the page scrolls', () => {
-    render()
-    placeInputAt(100, 140)
-    focus()
+    openAt(100, 140)
     placeInputAt(60, 100)
     act(() => {
-      window.dispatchEvent(new Event('scroll'))
+      viewport.dispatchEvent(new Event('scroll'))
     })
     expect(dropdown().style.top).toBe('104px')
   })
 
   it('follows the input when it moves without a scroll or resize event', () => {
-    vi.useFakeTimers({ toFake: ['requestAnimationFrame', 'cancelAnimationFrame'] })
-    render()
-    placeInputAt(100, 140)
-    focus()
+    openAt(100, 140)
     placeInputAt(60, 100)
-    act(() => {
-      vi.advanceTimersToNextFrame()
-    })
+    nextFrame()
     expect(dropdown().style.top).toBe('104px')
   })
 
   it('closes when the input moves out of view without a scroll or resize event', () => {
-    vi.useFakeTimers({ toFake: ['requestAnimationFrame', 'cancelAnimationFrame'] })
-    render()
-    placeInputAt(100, 140)
-    focus()
+    openAt(100, 140)
     placeInputAt(-80, -40)
-    act(() => {
-      vi.advanceTimersToNextFrame()
-    })
+    nextFrame()
     expect(options()).toHaveLength(0)
   })
 
   it('moves above the input once the room below runs out', () => {
-    render()
-    placeInputAt(100, 140)
-    focus()
+    openAt(100, 140)
     placeInputAt(600, 640)
     act(() => {
       window.dispatchEvent(new Event('resize'))
     })
-    expect(dropdown().style.top).toBe('596px')
-    expect(dropdown().style.transform).toBe('translateY(-100%)')
+    expect(dropdown().style.top).toBe('496px')
   })
 
   it('stays above the input while there is still room there', () => {
-    render()
-    placeInputAt(700, 740)
-    focus()
+    openAt(700, 740)
     placeInputAt(400, 440)
     act(() => {
-      window.dispatchEvent(new Event('scroll'))
+      viewport.dispatchEvent(new Event('scroll'))
     })
-    expect(dropdown().style.top).toBe('396px')
-    expect(dropdown().style.transform).toBe('translateY(-100%)')
+    expect(dropdown().style.top).toBe('296px')
   })
 })

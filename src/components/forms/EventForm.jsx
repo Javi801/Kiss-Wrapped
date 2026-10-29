@@ -2,7 +2,6 @@ import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
@@ -28,8 +27,10 @@ import { LIMITS } from '@/lib/config'
 import { usePalette } from '@/lib/theme'
 import { todayString, isValidDateString, isFutureDate } from '@/lib/date'
 import { hasScore, renderKisses } from '@/lib/format'
+import FormField from '@/components/forms/FormField'
 import TagInput from '@/components/forms/TagInput'
 import SpeechBubble from '@/components/forms/SpeechBubble'
+import SubmitButton from '@/components/forms/SubmitButton'
 
 /**
  * Form used for creating or editing an event.
@@ -97,8 +98,7 @@ export default function EventForm({
   return (
     <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       {/* Date */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <Label>{t.eventDate} *</Label>
+      <FormField label={t.eventDate} required error={errors.date}>
         <DatePicker
           value={date}
           onChange={setDate}
@@ -107,12 +107,10 @@ export default function EventForm({
           style={{ ...inputStyle }}
         />
         <p style={{ ...TEXT.caption, color: PALETTE.textSoft }}>{t.dateFormatHelper}</p>
-        {errors.date && <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.date}</p>}
-      </div>
+      </FormField>
 
       {/* Score */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <Label>{t.eventScore}</Label>
+      <FormField label={t.eventScore}>
         <Select value={score} onValueChange={setScore}>
           <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
             <SelectValue placeholder={t.none} />
@@ -126,11 +124,16 @@ export default function EventForm({
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </FormField>
 
       {/* Place */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <Label>{t.eventPlace} *</Label>
+      <FormField
+        label={t.eventPlace}
+        required
+        length={place.length}
+        maxLength={LIMITS.tagLength}
+        error={errors.place}
+      >
         <TagInput
           value={place}
           onChange={setPlace}
@@ -143,15 +146,16 @@ export default function EventForm({
           isParentOpen={isParentOpen}
         />
         {tagsHint && <SpeechBubble>{tagsHint}</SpeechBubble>}
-        <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-          {place.length}/{LIMITS.tagLength}
-        </p>
-        {errors.place && <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.place}</p>}
-      </div>
+      </FormField>
 
       {/* Situation */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <Label>{t.eventSituation} *</Label>
+      <FormField
+        label={t.eventSituation}
+        required
+        length={situation.length}
+        maxLength={LIMITS.tagLength}
+        error={errors.situation}
+      >
         <TagInput
           value={situation}
           onChange={setSituation}
@@ -163,17 +167,10 @@ export default function EventForm({
           addTagLabel={t.addTag}
           isParentOpen={isParentOpen}
         />
-        <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-          {situation.length}/{LIMITS.tagLength}
-        </p>
-        {errors.situation && (
-          <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.situation}</p>
-        )}
-      </div>
+      </FormField>
 
       {/* Details */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <Label>{t.eventDetails}</Label>
+      <FormField label={t.eventDetails} length={details.length} maxLength={LIMITS.eventNotesLength}>
         <Textarea
           value={details}
           onChange={(e) => setDetails(e.target.value)}
@@ -182,14 +179,14 @@ export default function EventForm({
           className="rounded-2xl"
           style={{ ...inputStyle }}
         />
-        <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-          {details.length}/{LIMITS.eventNotesLength}
-        </p>
-      </div>
+      </FormField>
 
       {/* Observations */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <Label>{t.eventObservations}</Label>
+      <FormField
+        label={t.eventObservations}
+        length={observations.length}
+        maxLength={LIMITS.eventNotesLength}
+      >
         <Textarea
           value={observations}
           onChange={(e) => setObservations(e.target.value)}
@@ -198,28 +195,12 @@ export default function EventForm({
           className="rounded-2xl"
           style={{ ...inputStyle }}
         />
-        <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-          {observations.length}/{LIMITS.eventNotesLength}
-        </p>
-      </div>
+      </FormField>
 
       {/* Actions */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <Button
-            type="submit"
-            className="rounded-2xl"
-            style={{
-              flex: '1 1 0%',
-              color: PALETTE.textOnAccent,
-              boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-              background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
-              // The gradient would repeat under the default transparent border.
-              border: 'none',
-            }}
-          >
-            {t.saveEvent}
-          </Button>
+          <SubmitButton>{t.saveEvent}</SubmitButton>
           {onCancel && (
             <Button
               type="button"

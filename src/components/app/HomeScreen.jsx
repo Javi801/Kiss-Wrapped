@@ -21,16 +21,30 @@ import JsonExportDialogs from '@/components/app/JsonExportDialogs'
 import ImportDialogs from '@/components/app/ImportDialogs'
 import AboutDialog from '@/components/app/AboutDialog'
 import AppGuideDialog from '@/components/app/AppGuideDialog'
-import TutorialDoneDialog from '@/components/app/TutorialDoneDialog'
+import TagsDialog from '@/components/app/TagsDialog'
+import OnboardingDoneDialog from '@/components/app/OnboardingDoneDialog'
+import { TOUR_TARGETS } from '@/lib/onboarding'
+
+// Used when the screen is rendered without tag lists, as the onboarding tour does.
+const NO_TAGS = { howWeMet: [], nationality: [], situation: [], place: [] }
 
 /**
  * Renders the main dashboard screen.
  * It shows summary metrics, primary actions, and app-level settings.
- * `onRestartOnboarding` adds the restart-tutorial action to the settings.
- * `tutorialDoneOpen` shows the notice that follows the tutorial; `onCloseTutorialDone` closes it.
- * For the onboarding tour, `guideTarget` names what it points at (`'people'`, `'data'`
- * or `'settings'`) and `guideHint` (`{ title, body }`) is the text for the last two.
+ * `onRestartOnboarding` adds the restart-onboarding action to the settings.
+ * `onboardingDoneOpen` shows the notice that follows the onboarding; `onCloseOnboardingDone` closes it.
+ * `tags` holds the tag lists by field name for the tags dialog; `onRemoveTag(field, tag)` deletes one.
+ * For the onboarding tour, `tourTarget` names what it points at (`SCREENS.add`, `SCREENS.people`,
+ * `TOUR_TARGETS.data` or `TOUR_TARGETS.settings`) and `tourHint` (`{ title, body }`) is the
+ * text for the last two.
  */
+// Closes a dialog opened from the settings and opens the settings again. The setters are
+// passed in, so the back-button effect can call it without depending on it.
+function closeDialogToSettings(setOpen, setSettingsOpen) {
+  setOpen(false)
+  setSettingsOpen(true)
+}
+
 export default function MainScreen({
   onNavigate,
   onClearData,
@@ -46,12 +60,14 @@ export default function MainScreen({
   statsVisible,
   setStatsVisible,
   includePartnerEvents,
+  tags = NO_TAGS,
+  onRemoveTag,
   modalBackRef,
   onRestartOnboarding,
-  tutorialDoneOpen = false,
-  onCloseTutorialDone,
-  guideTarget,
-  guideHint,
+  onboardingDoneOpen = false,
+  onCloseOnboardingDone,
+  tourTarget,
+  tourHint,
 }) {
   const PALETTE = usePalette()
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -59,6 +75,9 @@ export default function MainScreen({
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
+  const [tagsOpen, setTagsOpen] = useState(false)
+  // null = idle | { field, tag, count } = waiting for the delete confirmation
+  const [pendingTagDelete, setPendingTagDelete] = useState(null)
   // null = idle | { fileName, isNative, hadMissingFields } = success | Error = failed
   const [jsonExportStatus, setJsonExportStatus] = useState(null)
   // null = idle | { type: "confirm", count, data } | { type: "success", count } | { type: "error_type" | "error_format" }
@@ -70,9 +89,10 @@ export default function MainScreen({
   useEffect(() => {
     if (!modalBackRef) return
     const anyOpen =
-      tutorialDoneOpen ||
+      onboardingDoneOpen ||
       aboutOpen ||
       guideOpen ||
+      tagsOpen ||
       languageOpen ||
       settingsOpen ||
       confirmOpen ||
@@ -80,9 +100,11 @@ export default function MainScreen({
       importStatus !== null
     modalBackRef.current = anyOpen
       ? () => {
-          if (tutorialDoneOpen) onCloseTutorialDone()
-          else if (aboutOpen) setAboutOpen(false)
-          else if (guideOpen) setGuideOpen(false)
+          if (onboardingDoneOpen) onCloseOnboardingDone()
+          else if (aboutOpen) closeDialogToSettings(setAboutOpen, setSettingsOpen)
+          else if (guideOpen) closeDialogToSettings(setGuideOpen, setSettingsOpen)
+          else if (pendingTagDelete !== null) setPendingTagDelete(null)
+          else if (tagsOpen) closeDialogToSettings(setTagsOpen, setSettingsOpen)
           else if (languageOpen) setLanguageOpen(false)
           else if (settingsOpen) setSettingsOpen(false)
           else if (confirmOpen) setConfirmOpen(false)
@@ -93,10 +115,12 @@ export default function MainScreen({
         }
       : null
   }, [
-    tutorialDoneOpen,
-    onCloseTutorialDone,
+    onboardingDoneOpen,
+    onCloseOnboardingDone,
     aboutOpen,
     guideOpen,
+    tagsOpen,
+    pendingTagDelete,
     languageOpen,
     settingsOpen,
     confirmOpen,
@@ -104,6 +128,11 @@ export default function MainScreen({
     importStatus,
     modalBackRef,
   ])
+
+  // onOpenChange of a dialog opened from the settings: closing it returns to the settings.
+  function returnToSettings(setOpen) {
+    return (open) => (open ? setOpen(true) : closeDialogToSettings(setOpen, setSettingsOpen))
+  }
 
   async function handleExportJson() {
     try {
@@ -181,7 +210,7 @@ export default function MainScreen({
         includePartnerEvents={includePartnerEvents}
         onOpenLanguage={() => setLanguageOpen(true)}
         onOpenSettings={() => setSettingsOpen(true)}
-        settingsHint={guideTarget === 'settings' ? guideHint : undefined}
+        settingsHint={tourTarget === TOUR_TARGETS.settings ? tourHint : undefined}
       />
 
       <HomeSettingsDialogs
@@ -197,6 +226,7 @@ export default function MainScreen({
         settingsOpen={settingsOpen}
         setSettingsOpen={setSettingsOpen}
         onOpenAbout={() => setAboutOpen(true)}
+        onOpenTags={() => setTagsOpen(true)}
         onOpenGuide={() => setGuideOpen(true)}
         onRestartOnboarding={onRestartOnboarding}
       />
@@ -208,8 +238,8 @@ export default function MainScreen({
         onExportJson={handleExportJson}
         onImportJson={() => fileInputRef.current?.click()}
         onClearData={() => setConfirmOpen(true)}
-        guideTarget={guideTarget}
-        dataHint={guideTarget === 'data' ? guideHint : undefined}
+        tourTarget={tourTarget}
+        dataHint={tourTarget === TOUR_TARGETS.data ? tourHint : undefined}
       />
 
       <JsonExportDialogs
@@ -230,11 +260,26 @@ export default function MainScreen({
         onImport={importResolvedPartnerIssues}
       />
 
-      <AboutDialog open={aboutOpen} onOpenChange={setAboutOpen} t={t} />
+      <AboutDialog open={aboutOpen} onOpenChange={returnToSettings(setAboutOpen)} t={t} />
 
-      <AppGuideDialog open={guideOpen} onOpenChange={setGuideOpen} t={t} />
+      <AppGuideDialog open={guideOpen} onOpenChange={returnToSettings(setGuideOpen)} t={t} />
 
-      <TutorialDoneDialog open={tutorialDoneOpen} onClose={onCloseTutorialDone} t={t} />
+      <TagsDialog
+        open={tagsOpen}
+        onOpenChange={returnToSettings(setTagsOpen)}
+        t={t}
+        people={people}
+        tags={tags}
+        pendingDelete={pendingTagDelete}
+        onRequestDelete={(field, tag, count) => setPendingTagDelete({ field, tag, count })}
+        onCancelDelete={() => setPendingTagDelete(null)}
+        onConfirmDelete={() => {
+          onRemoveTag(pendingTagDelete.field, pendingTagDelete.tag)
+          setPendingTagDelete(null)
+        }}
+      />
+
+      <OnboardingDoneDialog open={onboardingDoneOpen} onClose={onCloseOnboardingDone} t={t} />
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent showCloseButton={false}>

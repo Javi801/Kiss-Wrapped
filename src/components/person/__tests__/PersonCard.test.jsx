@@ -4,6 +4,7 @@ import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { COPY, ZODIAC_OPTIONS } from '@/lib/constants'
 import { formatShortDate } from '@/lib/date'
+import { TOUR_TARGETS } from '@/lib/onboarding'
 
 // Props of the forms currently mounted inside an open dialog.
 const forms = vi.hoisted(() => ({ person: null, event: null }))
@@ -237,11 +238,24 @@ describe('PersonCard — details', () => {
     expect(container.textContent).toContain('likes tea')
   })
 
+  it('shows the nationality', () => {
+    renderCard({ nationality: 'Chilean' })
+    toggle()
+    expect(container.textContent).toContain(`${t.nationality}: Chilean`)
+  })
+
+  it('shows the details block when the nationality is the only extra info', () => {
+    renderCard({ howWeMet: '', detail: '', nationality: 'Chilean' })
+    toggle()
+    expect(container.textContent).toContain(`${t.nationality}: Chilean`)
+  })
+
   it('omits the fields that are empty', () => {
     renderCard({ howWeMet: '' })
     toggle()
     expect(container.textContent).not.toContain(`${t.realName}:`)
     expect(container.textContent).not.toContain(`${t.met}:`)
+    expect(container.textContent).not.toContain(`${t.nationality}:`)
   })
 
   it('says there are no events yet', () => {
@@ -315,6 +329,16 @@ describe('PersonCard — editing the person', () => {
     expect(forms.person.includeRealName).toBe(true)
     expect(forms.person.includePartner).toBe(true)
     expect(forms.person.howWeMetTags).toEqual(['School'])
+  })
+
+  it('opens the form with the nationality field and its tags', () => {
+    const onAddNationalityTag = vi.fn()
+    renderCard({}, { nationalityTags: ['Chilean'], onAddNationalityTag })
+    toggle()
+    click(t.editPerson)
+    expect(forms.person.includeNationality).toBe(true)
+    expect(forms.person.nationalityTags).toEqual(['Chilean'])
+    expect(forms.person.onAddNationalityTag).toBe(onAddNationalityTag)
   })
 
   it('saves the changes for this person and closes', () => {
@@ -473,7 +497,7 @@ describe('PersonCard — hardware back button', () => {
   })
 })
 
-describe('PersonCard — onboarding guide', () => {
+describe('PersonCard — onboarding tour', () => {
   const tapGuide = () => container.querySelector('[data-tap-guide]')
   const notes = () =>
     [...container.querySelectorAll('[role="note"]')].map((item) => item.textContent)
@@ -486,7 +510,7 @@ describe('PersonCard — onboarding guide', () => {
   })
 
   it('stays collapsed and points at the card', () => {
-    renderCard({}, { guide: { expanded: false, tapTarget: 'card' } })
+    renderCard({}, { tour: { expanded: false, tapTarget: TOUR_TARGETS.card } })
     expect(tapGuide().closest('button')).toBe(container.querySelector('button'))
     toggle()
     expect(actions.props).toBeNull()
@@ -496,9 +520,9 @@ describe('PersonCard — onboarding guide', () => {
     renderCard(
       { events: [complete(), complete({ id: 'e2', date: '2023.05.01' })] },
       {
-        guide: {
+        tour: {
           expanded: true,
-          tapTarget: 'addEvent',
+          tapTarget: TOUR_TARGETS.addEvent,
           editHint: 'About editing',
           eventHint: 'About events',
         },
@@ -510,11 +534,39 @@ describe('PersonCard — onboarding guide', () => {
     expect(eventRows()[0].previousElementSibling.textContent).toBe('About events')
   })
 
-  it('hands the add-event tap to the guide instead of opening the form', () => {
+  it('hands the add-event tap to the tour instead of opening the form', () => {
     const onAddEvent = vi.fn()
-    renderCard({}, { guide: { expanded: true, tapTarget: 'addEvent', onAddEvent } })
+    renderCard({}, { tour: { expanded: true, tapTarget: TOUR_TARGETS.addEvent, onAddEvent } })
     click(t.addEvent)
     expect(onAddEvent).toHaveBeenCalledOnce()
     expect(dialog()).toBeNull()
+  })
+
+  it('hands the card tap to the tour', () => {
+    const onToggle = vi.fn()
+    renderCard({}, { tour: { expanded: false, tapTarget: TOUR_TARGETS.card, onToggle } })
+    toggle()
+    expect(onToggle).toHaveBeenCalledOnce()
+    expect(actions.props).toBeNull()
+  })
+
+  it('leaves the card header reachable for the tour only while it points at it', () => {
+    const header = () => container.querySelector('button')
+    renderCard()
+    expect(header().hasAttribute('data-tour-target')).toBe(false)
+    expect(header().style.pointerEvents).toBe('')
+    act(() => root.unmount())
+    container.remove()
+
+    renderCard({}, { tour: { expanded: false, tapTarget: TOUR_TARGETS.card } })
+    expect(header().hasAttribute('data-tour-target')).toBe(true)
+    expect(header().style.pointerEvents).toBe('auto')
+    expect(header().style.position).toBe('relative')
+    act(() => root.unmount())
+    container.remove()
+
+    renderCard({}, { tour: { expanded: true, tapTarget: TOUR_TARGETS.addEvent } })
+    expect(header().hasAttribute('data-tour-target')).toBe(false)
+    expect(header().style.pointerEvents).toBe('')
   })
 })

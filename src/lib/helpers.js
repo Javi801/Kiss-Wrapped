@@ -35,6 +35,7 @@ export function normalizePeople(rawPeople) {
     return {
       ...person,
       realName: person.realName || '',
+      nationality: person.nationality || '',
       ...sanitizePartnerFields(rawPerson),
       events: Array.isArray(person.events)
         ? person.events.map((event) => ({
@@ -75,6 +76,57 @@ export function mergePeopleFieldTags(people, existingTags, field) {
     }
   }
   return merged
+}
+
+// Fields whose values are kept as tag lists: where they are stored (on the person or
+// on its events) and whether a record without them is incomplete.
+export const TAG_FIELDS = {
+  howWeMet: { onEvents: false, required: true },
+  nationality: { onEvents: false, required: false },
+  situation: { onEvents: true, required: true },
+  place: { onEvents: true, required: true },
+}
+
+const tagKey = (value) => value?.trim().toLowerCase() || ''
+
+// Returns every stored value of a tag field, one per person or one per event.
+export function tagFieldValues(people, field) {
+  return TAG_FIELDS[field].onEvents
+    ? people.flatMap((person) => (person.events || []).map((event) => event[field]))
+    : people.map((person) => person[field])
+}
+
+// Counts how many of `values` match each tag, ignoring case and surrounding spaces
+// like the merge functions above. Returns one count per tag, in `tags` order.
+export function countTagUses(tags, values) {
+  const counts = new Map()
+  for (const value of values) {
+    const key = tagKey(value)
+    if (key) counts.set(key, (counts.get(key) || 0) + 1)
+  }
+  return tags.map((tag) => counts.get(tagKey(tag)) || 0)
+}
+
+// Empties the values of a tag field that match `tag` (ignoring case and surrounding
+// spaces), so the merge at boot does not bring the tag back. Records stay; only
+// that field is cleared. Unchanged people keep their identity.
+export function clearTagFromPeople(people, field, tag) {
+  const key = tagKey(tag)
+  const matches = (record) => key !== '' && tagKey(record[field]) === key
+
+  if (!TAG_FIELDS[field].onEvents) {
+    return people.map((person) => (matches(person) ? { ...person, [field]: '' } : person))
+  }
+  return people.map((person) =>
+    (person.events || []).some(matches)
+      ? {
+          ...person,
+          events: person.events.map((event) =>
+            matches(event) ? { ...event, [field]: '' } : event
+          ),
+        }
+      : person
+  )
 }
 
 // Converts hex color to RGB object

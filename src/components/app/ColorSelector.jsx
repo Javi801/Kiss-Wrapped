@@ -8,17 +8,51 @@ import {
 
 import { TEXT, PALETTES } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
-import { ICON_COLORS } from '@/lib/config'
-import { ICON_VARIANTS } from '@/components/shared/SparkleIcon.constants'
+import {
+  ICON_SHAPES,
+  ICON_TONES,
+  ICON_VARIANTS,
+  DEFAULT_ICON_VARIANT,
+  iconVariantKey,
+} from '@/components/shared/SparkleIcon.constants'
+import { SparkleIcon } from '@/components/shared/SparkleIcon'
 
 const THEMES = Object.keys(PALETTES).map((key) => ({
   key,
   gradient: `linear-gradient(135deg, ${PALETTES[key].bgGradientFrom}, ${PALETTES[key].bgGradientVia}, ${PALETTES[key].bgGradientTo})`,
 }))
 
-// Two-tone swatch: the heart color in the center over the icon background.
-const iconSwatch = ({ heart, background }) =>
-  `radial-gradient(circle, ${heart} 0 40%, ${background} 46%)`
+// Two-tone swatch: the glyph color in the center over the icon background.
+const iconSwatch = ({ glyph, background }) =>
+  `radial-gradient(circle, ${glyph} 0 40%, ${background} 46%)`
+
+const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1)
+
+// Grid option shared by the theme and icon pickers.
+function OptionTile({ selected, children, ...props }) {
+  const PALETTE = usePalette()
+  return (
+    <button
+      type="button"
+      className="rounded-2xl"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '0.375rem',
+        padding: '0.5rem',
+        border: selected ? `2px solid ${PALETTE.accent}` : `1.5px solid ${PALETTE.inputBorder}`,
+        // Border only: a tinted fill would match the icon background on some themes.
+        backgroundColor: PALETTE.controlBg,
+        cursor: 'pointer',
+        transition: 'all 150ms ease',
+      }}
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}
 
 export default function ColorSelector({
   iconColor,
@@ -33,7 +67,10 @@ export default function ColorSelector({
     borderColor: PALETTE.inputBorder,
     backgroundColor: PALETTE.controlBg,
   }
-  const colorLabel = (p) => t[`color${p.charAt(0).toUpperCase() + p.slice(1)}`] ?? p
+  const colorLabel = (c) => t[`color${capitalize(c)}`] ?? c
+  // The picker edits the design and the color of one icon variant independently.
+  const { shape: iconShape, color: iconTone } =
+    ICON_VARIANTS[iconColor] ?? ICON_VARIANTS[DEFAULT_ICON_VARIANT]
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -52,25 +89,7 @@ export default function ColorSelector({
             {THEMES.map(({ key, gradient }) => {
               const selected = theme === key
               return (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setTheme(key)}
-                  className="rounded-2xl"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '0.375rem',
-                    padding: '0.5rem',
-                    border: selected
-                      ? `2px solid ${PALETTE.accent}`
-                      : `1.5px solid ${PALETTE.inputBorder}`,
-                    backgroundColor: selected ? PALETTE.accentMuted : PALETTE.controlBg,
-                    cursor: 'pointer',
-                    transition: 'all 150ms ease',
-                  }}
-                >
+                <OptionTile key={key} selected={selected} onClick={() => setTheme(key)}>
                   <span
                     className="rounded-full"
                     style={{
@@ -90,9 +109,9 @@ export default function ColorSelector({
                       color: selected ? PALETTE.accent : PALETTE.textSoft,
                     }}
                   >
-                    {t[`theme${key.charAt(0).toUpperCase() + key.slice(1)}`]}
+                    {t[`theme${capitalize(key)}`]}
                   </span>
-                </button>
+                </OptionTile>
               )
             })}
           </div>
@@ -107,10 +126,33 @@ export default function ColorSelector({
             color: accent ? 'rgba(255,255,255,0.88)' : PALETTE.textSoft,
           }}
         >
-          {t.iconColor}
+          {t.appIcon}
         </p>
 
-        <Select modal={false} value={iconColor} onValueChange={setIconColor}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+          {ICON_SHAPES.map((shape) => {
+            const selected = iconShape === shape
+            const label = t[`icon${capitalize(shape)}`] ?? shape
+            return (
+              <OptionTile
+                key={shape}
+                selected={selected}
+                aria-label={label}
+                aria-pressed={selected}
+                // Re-tapping the current icon must not touch the launcher aliases again.
+                onClick={() => !selected && setIconColor(iconVariantKey(shape, iconTone))}
+              >
+                <SparkleIcon palette={iconVariantKey(shape, iconTone)} size={48} />
+              </OptionTile>
+            )
+          })}
+        </div>
+
+        <Select
+          modal={false}
+          value={iconTone}
+          onValueChange={(color) => setIconColor(iconVariantKey(iconShape, color))}
+        >
           <SelectTrigger
             aria-label={t.iconColor}
             className="rounded-3xl"
@@ -122,8 +164,8 @@ export default function ColorSelector({
           </SelectTrigger>
 
           <SelectContent>
-            {ICON_COLORS.map((p) => (
-              <SelectItem key={p} value={p}>
+            {Object.keys(ICON_TONES).map((c) => (
+              <SelectItem key={c} value={c}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <span
                     className="rounded-full"
@@ -131,12 +173,12 @@ export default function ColorSelector({
                       height: '1rem',
                       width: '1rem',
                       flexShrink: 0,
-                      background: iconSwatch(ICON_VARIANTS[p]),
-                      // Keeps the near-black backgrounds visible on the dark theme.
+                      background: iconSwatch(ICON_TONES[c]),
+                      // Keeps the light backgrounds visible on the light themes.
                       border: '1px solid rgba(128, 128, 128, 0.55)',
                     }}
                   />
-                  {colorLabel(p)}
+                  {colorLabel(c)}
                 </div>
               </SelectItem>
             ))}

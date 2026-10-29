@@ -24,6 +24,8 @@ export default function PeopleToolbar({
   t,
   language,
   modalBackRef,
+  howWeMetTags = [],
+  nationalityTags = [],
 }) {
   const PALETTE = usePalette()
   const [filterOpen, setFilterOpen] = useState(false)
@@ -139,6 +141,8 @@ export default function PeopleToolbar({
               peopleCount={peopleCount}
               t={t}
               language={language}
+              howWeMetTags={howWeMetTags}
+              nationalityTags={nationalityTags}
             />
           </div>
         </SheetContent>

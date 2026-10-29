@@ -2,8 +2,9 @@ import { BarChart3, Download, Trash2, Upload, UserPlus, Users } from 'lucide-rea
 
 import { Button } from '@/components/ui/button'
 
-import { TEXT } from '@/lib/constants'
+import { TEXT, SCREENS } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
+import { TOUR_LAYERS, tourTargetProps } from '@/lib/onboarding'
 import TapGuide from '@/components/visuals/TapGuide'
 import SpeechBubble from '@/components/forms/SpeechBubble'
 
@@ -17,7 +18,8 @@ const dataButtonLabelStyle = {
 /**
  * Action buttons of the main screen: navigation to the other screens and the
  * data section (export, import and clear). For the onboarding tour,
- * `guideTarget="people"` shows the tap guide on the people button and
+ * `tourTarget` (`SCREENS.add` or `SCREENS.people`) shows the tap guide on that button, the
+ * only one the tour then leaves reachable (`data-tour-target`), and
  * `dataHint` (`{ title, body }`) a speech bubble over export and import, which
  * are then lifted above the tour backdrop.
  */
@@ -27,7 +29,7 @@ export default function HomeActions({
   onExportJson,
   onImportJson,
   onClearData,
-  guideTarget,
+  tourTarget,
   dataHint,
 }) {
   const PALETTE = usePalette()
@@ -53,23 +55,30 @@ export default function HomeActions({
 
   // Solid and above the tour backdrop while the data hint points at them.
   const hintedButtonStyle = dataHint
-    ? { ...dataButtonStyle, position: 'relative', zIndex: 2, backgroundColor: PALETTE.card }
+    ? {
+        ...dataButtonStyle,
+        position: 'relative',
+        zIndex: TOUR_LAYERS.raised,
+        backgroundColor: PALETTE.card,
+      }
     : dataButtonStyle
 
   return (
     <div style={{ display: 'grid', gap: '0.75rem' }}>
       <Button
         className="rounded-3xl"
-        style={{
+        {...tourTargetProps(tourTarget === SCREENS.add, {
           height: '3.5rem',
           justifyContent: 'flex-start',
           ...TEXT.body,
           color: PALETTE.textOnAccent,
           boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
           background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
-        }}
-        onClick={() => onNavigate('add')}
+          backgroundOrigin: 'border-box',
+        })}
+        onClick={() => onNavigate(SCREENS.add)}
       >
+        {tourTarget === SCREENS.add && <TapGuide />}
         <UserPlus style={{ marginRight: '0.75rem', height: '1.25rem', width: '1.25rem' }} />
         {t.addNewPerson}
       </Button>
@@ -77,14 +86,10 @@ export default function HomeActions({
       <Button
         variant="outline"
         className="rounded-3xl"
-        style={
-          guideTarget === 'people'
-            ? { ...outlineActionStyle, position: 'relative' }
-            : outlineActionStyle
-        }
-        onClick={() => onNavigate('people')}
+        {...tourTargetProps(tourTarget === SCREENS.people, outlineActionStyle)}
+        onClick={() => onNavigate(SCREENS.people)}
       >
-        {guideTarget === 'people' && <TapGuide />}
+        {tourTarget === SCREENS.people && <TapGuide />}
         <Users
           style={{
             marginRight: '0.75rem',
@@ -100,7 +105,7 @@ export default function HomeActions({
         variant="outline"
         className="rounded-3xl"
         style={outlineActionStyle}
-        onClick={() => onNavigate('stats')}
+        onClick={() => onNavigate(SCREENS.stats)}
       >
         <BarChart3
           style={{

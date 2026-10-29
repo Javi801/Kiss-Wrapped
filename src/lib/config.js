@@ -13,7 +13,7 @@ import { version } from '../../package.json'
 export const FEATURES = {
   // Kiss Wrapped PDF deck export on the stats screen. Off until the export bug is fixed.
   pdfExport: false,
-  // Onboarding tutorial: shown to new installs and restartable from the settings.
+  // Onboarding: shown to new installs and restartable from the settings.
   onboarding: true,
 }
 
@@ -25,14 +25,17 @@ export const APP_GITHUB_REPO = 'https://github.com/Javi801/Kiss-Wrapped'
 // Supported values for user settings. Persisted values outside these lists are ignored.
 export const LANGUAGES = ['en', 'es']
 export const THEMES = ['pink', 'green', 'dark']
+// App icon variants: design (notebook, chart, orbit) plus color (pink, lavender, green).
 export const ICON_COLORS = [
-  'lightPurple',
-  'golden',
-  'darkPurple',
-  'darkPink',
-  'darkGreen',
-  'lightGreen',
-  'lightPink',
+  'notebookPink',
+  'notebookLavender',
+  'notebookGreen',
+  'chartPink',
+  'chartLavender',
+  'chartGreen',
+  'orbitPink',
+  'orbitLavender',
+  'orbitGreen',
 ]
 
 // Initial values for user settings. They apply only until the user's own
@@ -40,7 +43,7 @@ export const ICON_COLORS = [
 export const DEFAULT_SETTINGS = {
   language: 'en',
   theme: 'pink',
-  iconColor: 'lightPink',
+  iconColor: 'notebookPink',
   statsVisible: true,
   includePartnerEvents: false,
 }
@@ -49,6 +52,8 @@ export const DEFAULT_SETTINGS = {
 export const LIMITS = {
   // Person name and real name.
   nameLength: 100,
+  // Person nationality.
+  nationalityLength: 60,
   // Tag-style fields: event place, event situation, how we met.
   tagLength: 200,
   // Person activity detail.
@@ -58,4 +63,16 @@ export const LIMITS = {
   maxAge: 120,
   // Entries in the "people with most events" ranking.
   topPeopleCount: 8,
+}
+
+// Onboarding timings, in milliseconds, and practice values.
+export const ONBOARDING = {
+  // Time an automatic tour scene stays on screen unless it sets its own `duration`.
+  sceneMs: 1800,
+  // Time a tour scene waits for its tap before it moves on by itself.
+  tapTimeoutMs: 8000,
+  // Time the intro stays on screen after the practice person is saved.
+  introSceneMs: 2000,
+  // Age of the practice person when the form has no valid one.
+  practiceAge: 25,
 }

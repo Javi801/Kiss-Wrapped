@@ -1,8 +1,8 @@
 import UIKit
 
 /// Blanks the app while inactive so the iOS app-switcher snapshot shows a
-/// black cover instead of sensitive UI. Counterpart of FLAG_SECURE on Android
-/// (MainActivity.java), except iOS cannot block screenshots, only the snapshot.
+/// black cover instead of sensitive UI. Counterpart of the recents-thumbnail
+/// hiding in MainActivity.java on Android; screenshots stay allowed on both.
 ///
 /// Integration (two steps, done on the branch that owns the Xcode project):
 ///   1. Add this file to the "App" target in Xcode.

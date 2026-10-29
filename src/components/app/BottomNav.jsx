@@ -1,7 +1,8 @@
 import { BarChart3, Search, UserPlus, Users } from 'lucide-react'
 
-import { TEXT } from '@/lib/constants'
+import { TEXT, SCREENS, CONTENT_MAX_WIDTH } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
+import { tourTargetProps } from '@/lib/onboarding'
 import TapGuide from '@/components/visuals/TapGuide'
 
 /**
@@ -10,16 +11,17 @@ import TapGuide from '@/components/visuals/TapGuide'
  * Props:
  *  - screen       Active screen key
  *  - onNavigate   Called with the key of the tapped item
- *  - guideTarget  Key of the item the onboarding tour points at
+ *  - tourTarget   Key of the item the onboarding tour points at, the only one it
+ *                 leaves reachable (`data-tour-target`)
  */
-export default function BottomNav({ screen, onNavigate, guideTarget, t }) {
+export default function BottomNav({ screen, onNavigate, tourTarget, t }) {
   const PALETTE = usePalette()
 
   const navItems = [
-    { key: 'main', label: t.home, icon: Users },
-    { key: 'add', label: t.add, icon: UserPlus },
-    { key: 'people', label: t.people, icon: Search },
-    { key: 'stats', label: t.stats, icon: BarChart3 },
+    { key: SCREENS.main, label: t.home, icon: Users },
+    { key: SCREENS.add, label: t.add, icon: UserPlus },
+    { key: SCREENS.people, label: t.people, icon: Search },
+    { key: SCREENS.stats, label: t.stats, icon: BarChart3 },
   ]
 
   return (
@@ -39,7 +41,7 @@ export default function BottomNav({ screen, onNavigate, guideTarget, t }) {
         style={{
           margin: '0 auto',
           display: 'grid',
-          maxWidth: '28rem',
+          maxWidth: CONTENT_MAX_WIDTH,
           gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
           gap: '0.25rem',
           paddingLeft: '0.75rem',
@@ -51,14 +53,14 @@ export default function BottomNav({ screen, onNavigate, guideTarget, t }) {
         {navItems.map((item) => {
           const Icon = item.icon
           const active = screen === item.key
-          const guided = guideTarget === item.key
+          const guided = tourTarget === item.key
 
           return (
             <button
               key={item.key}
               onClick={() => onNavigate(item.key)}
               className="rounded-2xl"
-              style={{
+              {...tourTargetProps(guided, {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -74,9 +76,8 @@ export default function BottomNav({ screen, onNavigate, guideTarget, t }) {
                 background: active
                   ? `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`
                   : 'transparent',
-                color: active ? '#ffffff' : PALETTE.textSoft,
-                position: guided ? 'relative' : undefined,
-              }}
+                color: active ? PALETTE.textOnAccent : PALETTE.textSoft,
+              })}
             >
               {guided && <TapGuide />}
               <Icon style={{ height: '1rem', width: '1rem' }} />

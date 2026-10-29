@@ -4,13 +4,14 @@ import { formatShortDate } from '@/lib/date'
 
 /**
  * Extra info shown when a person card is expanded: partner period, real name,
- * how we met and free-text detail. Renders nothing when none of them is set.
+ * nationality, how we met and free-text detail. Renders nothing when none of them is set.
  */
 export default function PersonCardDetails({ person, t, language }) {
   const PALETTE = usePalette()
 
   const hasExtraInfo =
     person.realName ||
+    person.nationality ||
     person.howWeMet ||
     person.detail ||
     person.partnerStatus === 'current' ||
@@ -35,6 +36,11 @@ export default function PersonCardDetails({ person, t, language }) {
       {person.realName && (
         <p style={{ ...TEXT.body, color: PALETTE.text }}>
           {t.realName}: {person.realName}
+        </p>
+      )}
+      {person.nationality && (
+        <p style={{ ...TEXT.body, color: PALETTE.text }}>
+          {t.nationality}: {person.nationality}
         </p>
       )}
       {person.howWeMet && (

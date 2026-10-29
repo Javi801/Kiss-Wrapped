@@ -38,6 +38,8 @@ const EMPTY = {
   minAge: '',
   maxAge: '',
   activity: [],
+  howWeMet: [],
+  nationality: [],
   zodiacSign: [],
   eventDateFrom: '',
   eventDateTo: '',
@@ -71,7 +73,12 @@ function Harness({ initial, setGroupBy, setSortBy, ...props }) {
   )
 }
 
-function render({ filters = {}, ...props } = {}) {
+function render({
+  filters = {},
+  howWeMetTags = ['School', 'Work'],
+  nationalityTags = ['Chilean', 'Peruvian'],
+  ...props
+} = {}) {
   const handlers = { setGroupBy: vi.fn(), setSortBy: vi.fn() }
   fields.selects = []
   fields.dates = []
@@ -79,7 +86,15 @@ function render({ filters = {}, ...props } = {}) {
   document.body.appendChild(container)
   root = createRoot(container)
   act(() => {
-    root.render(<Harness initial={{ ...EMPTY, ...filters }} {...handlers} {...props} />)
+    root.render(
+      <Harness
+        initial={{ ...EMPTY, ...filters }}
+        howWeMetTags={howWeMetTags}
+        nationalityTags={nationalityTags}
+        {...handlers}
+        {...props}
+      />
+    )
   })
   return handlers
 }
@@ -158,6 +173,54 @@ describe('FiltersPanel — activity', () => {
     render({ filters: { minAge: '20', zodiacSign: [ZODIAC_OPTIONS.en[0]] } })
     click(t.other)
     expect(current).toMatchObject({ minAge: '20', zodiacSign: [ZODIAC_OPTIONS.en[0]] })
+  })
+})
+
+describe('FiltersPanel — how we met', () => {
+  it('filters by a stored how-we-met tag', () => {
+    render({ filters: { howWeMet: ['School'] }, language: 'en' })
+    click('School')
+    expect(current.howWeMet).toEqual([])
+  })
+
+  it('keeps the selected how-we-met tags in the filter state', () => {
+    render({ filters: { howWeMet: ['School'] }, language: 'en' })
+    click('Work')
+    expect(current.howWeMet).toEqual(['School', 'Work'])
+  })
+})
+
+describe('FiltersPanel — nationality', () => {
+  it('offers a chip per stored nationality tag', () => {
+    render()
+    expect(container.textContent).toContain(t.nationality)
+    expect(
+      buttons().filter((item) => ['Chilean', 'Peruvian'].includes(item.textContent))
+    ).toHaveLength(2)
+  })
+
+  it('hides the section when there are no nationality tags', () => {
+    render({ nationalityTags: [] })
+    expect(container.textContent).not.toContain(t.nationality)
+  })
+
+  it('adds a tapped nationality to the filter state', () => {
+    render({ filters: { nationality: ['Chilean'] } })
+    click('Peruvian')
+    expect(current.nationality).toEqual(['Chilean', 'Peruvian'])
+  })
+
+  it('removes a nationality that is tapped again', () => {
+    render({ filters: { nationality: ['Chilean'] } })
+    click('Chilean')
+    expect(current.nationality).toEqual([])
+  })
+
+  it('tolerates filters saved before the nationality filter existed', () => {
+    const { nationality: _, ...legacy } = EMPTY
+    render({ filters: legacy })
+    click('Chilean')
+    expect(current.nationality).toEqual(['Chilean'])
   })
 })
 
@@ -256,6 +319,7 @@ describe('FiltersPanel — reset', () => {
         minAge: '20',
         maxAge: '30',
         activity: ['works'],
+        nationality: ['Chilean'],
         zodiacSign: [ZODIAC_OPTIONS.en[3]],
         eventDateFrom: '2024.01.01',
         eventDateTo: '2024.12.31',

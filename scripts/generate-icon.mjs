@@ -1,5 +1,5 @@
 /**
- * Generates the Android launcher icons and the in-app icon images for every icon color.
+ * Generates the Android launcher icons, the iOS app icons and the in-app icon images for every icon color.
  * Run: npm run gen:icon
  *
  * Reads assets/icons/{resource}/foreground.png and background.png (adaptive icon layers,
@@ -11,11 +11,15 @@
  *   ic_launcher_{resource}.webp            — legacy icon for API < 26 (rounded square)
  *   ic_launcher*.webp                      — defaults, from the default color
  *
+ * Outputs to ios/App/App/Assets.xcassets/:
+ *   AppIcon.appiconset/                    — primary icon, from the default color
+ *   AppIcon-{color}.appiconset/            — alternate icon for every other color
+ *
  * Outputs to src/assets/icons/:
  *   {image}                                — composed square icon drawn inside the app
  */
 
-import { mkdirSync, readdirSync, rmSync } from 'node:fs'
+import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
@@ -30,6 +34,7 @@ const __dir = dirname(fileURLToPath(import.meta.url))
 const SOURCES = resolve(__dir, '../assets/icons')
 const RES = resolve(__dir, '../android/app/src/main/res')
 const WEB = resolve(__dir, '../src/assets/icons')
+const IOS = resolve(__dir, '../ios/App/App/Assets.xcassets')
 
 // ─── Sizes ───────────────────────────────────────────────────────────────────
 // Launchers show the central 72dp of the 108dp adaptive canvas.
@@ -44,6 +49,7 @@ const DENSITIES = {
 }
 
 const WEB_SIZE = 512
+const IOS_SIZE = 1024
 const LEGACY_CORNER_RATIO = 0.2
 const WEBP = { quality: 90 }
 
@@ -79,6 +85,19 @@ async function legacy(resource, size, radius) {
   return mask(sharp(await composed.png().toBuffer()), size, radius).webp(WEBP)
 }
 
+// iOS rejects app icons with an alpha channel, and applies its own corner mask.
+async function ios(color, resource) {
+  const name = color === DEFAULT_ICON_VARIANT ? 'AppIcon' : `AppIcon-${color}`
+  const dir = `${IOS}/${name}.appiconset`
+  mkdirSync(dir, { recursive: true })
+  await (await compose(resource, IOS_SIZE)).flatten().removeAlpha().png().toFile(`${dir}/icon.png`)
+  const contents = {
+    images: [{ filename: 'icon.png', idiom: 'universal', platform: 'ios', size: '1024x1024' }],
+    info: { author: 'xcode', version: 1 },
+  }
+  writeFileSync(`${dir}/Contents.json`, `${JSON.stringify(contents, null, 2)}\n`)
+}
+
 // ─── Generate ────────────────────────────────────────────────────────────────
 // Drop earlier launcher images so a renamed or removed color leaves nothing behind.
 for (const dir of Object.keys(DENSITIES)) {
@@ -87,6 +106,9 @@ for (const dir of Object.keys(DENSITIES)) {
   }
 }
 rmSync(WEB, { recursive: true, force: true })
+for (const set of readdirSync(IOS)) {
+  if (/^AppIcon.*\.appiconset$/.test(set)) rmSync(`${IOS}/${set}`, { recursive: true })
+}
 mkdirSync(WEB, { recursive: true })
 
 for (const [color, { resource, image }] of Object.entries(ICON_VARIANTS)) {
@@ -114,6 +136,7 @@ for (const [color, { resource, image }] of Object.entries(ICON_VARIANTS)) {
   }
 
   await (await compose(resource, WEB_SIZE)).webp(WEBP).toFile(`${WEB}/${image}`)
+  await ios(color, resource)
   process.stdout.write(`  ${color}\n`)
 }
 

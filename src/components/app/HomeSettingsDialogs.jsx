@@ -1,4 +1,4 @@
-import { BookOpen, Check, Info, Languages, RotateCcw, Settings } from 'lucide-react'
+import { BookOpen, Check, Info, Languages, RotateCcw, Settings, Tag } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -6,6 +6,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { TEXT } from '@/lib/constants'
 import { usePalette } from '@/lib/theme'
 import ColorSelector from '@/components/app/ColorSelector'
+import {
+  SETTINGS_DIALOG_CLASS,
+  SETTINGS_OVERLAY_CLASS,
+} from '@/components/app/settingsDialogTransition'
 
 const headerStyle = {
   display: 'flex',
@@ -48,8 +52,8 @@ function SettingsAction({ icon: Icon, label, onClick }) {
 
 /**
  * Dialogs opened from the hero card of the main screen: the language picker and
- * the settings, which also lead to the app guide, the about dialog and, when
- * `onRestartOnboarding` is given, the tutorial.
+ * the settings, which also lead to the tags, the app guide, the about dialog and,
+ * when `onRestartOnboarding` is given, the onboarding.
  */
 export default function HomeSettingsDialogs({
   t,
@@ -64,6 +68,7 @@ export default function HomeSettingsDialogs({
   settingsOpen,
   setSettingsOpen,
   onOpenAbout,
+  onOpenTags,
   onOpenGuide,
   onRestartOnboarding,
 }) {
@@ -138,7 +143,7 @@ export default function HomeSettingsDialogs({
       </Dialog>
 
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-        <DialogContent>
+        <DialogContent className={SETTINGS_DIALOG_CLASS} overlayClassName={SETTINGS_OVERLAY_CLASS}>
           <DialogHeader>
             <div style={headerStyle}>
               <div
@@ -171,32 +176,47 @@ export default function HomeSettingsDialogs({
               t={t}
               accent={false}
             />
-            <SettingsAction
-              icon={BookOpen}
-              label={t.appGuide}
-              onClick={() => {
-                setSettingsOpen(false)
-                onOpenGuide()
-              }}
-            />
-            {onRestartOnboarding && (
-              <SettingsAction
-                icon={RotateCcw}
-                label={t.restartTutorial}
-                onClick={() => {
-                  setSettingsOpen(false)
-                  onRestartOnboarding()
-                }}
-              />
-            )}
-            <SettingsAction
-              icon={Info}
-              label={t.about}
-              onClick={() => {
-                setSettingsOpen(false)
-                onOpenAbout()
-              }}
-            />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <p style={{ ...TEXT.body, textTransform: 'uppercase', color: PALETTE.textSoft }}>
+                {t.otherSettings}
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <SettingsAction
+                  icon={Tag}
+                  label={t.manageTags}
+                  onClick={() => {
+                    setSettingsOpen(false)
+                    onOpenTags()
+                  }}
+                />
+                <SettingsAction
+                  icon={BookOpen}
+                  label={t.appGuide}
+                  onClick={() => {
+                    setSettingsOpen(false)
+                    onOpenGuide()
+                  }}
+                />
+                {onRestartOnboarding && (
+                  <SettingsAction
+                    icon={RotateCcw}
+                    label={t.restartOnboarding}
+                    onClick={() => {
+                      setSettingsOpen(false)
+                      onRestartOnboarding()
+                    }}
+                  />
+                )}
+                <SettingsAction
+                  icon={Info}
+                  label={t.about}
+                  onClick={() => {
+                    setSettingsOpen(false)
+                    onOpenAbout()
+                  }}
+                />
+              </div>
+            </div>
           </section>
         </DialogContent>
       </Dialog>

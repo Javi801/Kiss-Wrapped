@@ -93,7 +93,7 @@ function render() {
         people={[ana]}
         t={t}
         language="en"
-        iconColor="lightPink"
+        iconColor="notebookPink"
         theme="pink"
         statsVisible
         modalBackRef={modalBackRef}

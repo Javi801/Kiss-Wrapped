@@ -6,6 +6,10 @@ import {
   hexToRgb,
   mergeEventTagsFromPeople,
   mergePeopleFieldTags,
+  countTagUses,
+  TAG_FIELDS,
+  tagFieldValues,
+  clearTagFromPeople,
 } from '@/lib/helpers'
 import { todayString } from '@/lib/date'
 
@@ -154,6 +158,18 @@ describe('normalizePeople', () => {
   it('preserves a truthy realName unchanged', () => {
     const people = [{ name: 'Ana', realName: 'Ana García', events: [] }]
     expect(normalizePeople(people)[0].realName).toBe('Ana García')
+  })
+  it('normalizes missing nationality to empty string', () => {
+    const people = [{ name: 'Ana', events: [] }]
+    expect(normalizePeople(people)[0].nationality).toBe('')
+  })
+  it('normalizes null nationality to empty string', () => {
+    const people = [{ name: 'Ana', nationality: null, events: [] }]
+    expect(normalizePeople(people)[0].nationality).toBe('')
+  })
+  it('preserves a truthy nationality unchanged', () => {
+    const people = [{ name: 'Ana', nationality: 'Chilean', events: [] }]
+    expect(normalizePeople(people)[0].nationality).toBe('Chilean')
   })
   it('defaults missing partner fields to never', () => {
     const result = normalizePeople([{ name: 'Ana', events: [] }])[0]
@@ -383,6 +399,110 @@ describe('mergePeopleFieldTags', () => {
     const existing = ['Friends']
     mergePeopleFieldTags([{ howWeMet: 'App' }], existing, 'howWeMet')
     expect(existing).toEqual(['Friends'])
+  })
+})
+
+describe('countTagUses', () => {
+  it('returns one count per tag, in tag order', () => {
+    expect(countTagUses(['Bar', 'Park'], ['Park', 'Bar', 'Park'])).toEqual([1, 2])
+  })
+
+  it('returns zero for tags no value uses', () => {
+    expect(countTagUses(['Bar', 'Park'], ['Bar'])).toEqual([1, 0])
+  })
+
+  it('ignores case and surrounding spaces on both sides', () => {
+    expect(countTagUses([' Chilean'], ['chilean ', 'CHILEAN'])).toEqual([2])
+  })
+
+  it('skips empty, whitespace-only and missing values', () => {
+    expect(countTagUses(['Bar'], ['', '  ', undefined, null])).toEqual([0])
+  })
+
+  it('returns an empty list when there are no tags', () => {
+    expect(countTagUses([], ['Bar'])).toEqual([])
+  })
+})
+
+describe('TAG_FIELDS', () => {
+  it('lists the four tag fields with where they are stored', () => {
+    expect(TAG_FIELDS).toEqual({
+      howWeMet: { onEvents: false, required: true },
+      nationality: { onEvents: false, required: false },
+      situation: { onEvents: true, required: true },
+      place: { onEvents: true, required: true },
+    })
+  })
+})
+
+describe('tagFieldValues', () => {
+  const people = [
+    { howWeMet: 'App', events: [{ place: 'Bar' }, { place: 'Park' }] },
+    { howWeMet: 'School' },
+  ]
+
+  it('returns one value per person for person fields', () => {
+    expect(tagFieldValues(people, 'howWeMet')).toEqual(['App', 'School'])
+  })
+
+  it('returns one value per event for event fields, skipping people without events', () => {
+    expect(tagFieldValues(people, 'place')).toEqual(['Bar', 'Park'])
+  })
+})
+
+describe('clearTagFromPeople', () => {
+  it('empties a person field that matches, ignoring case and spaces', () => {
+    const people = [
+      { id: 'a', howWeMet: ' app ' },
+      { id: 'b', howWeMet: 'School' },
+    ]
+    expect(clearTagFromPeople(people, 'howWeMet', 'App')).toEqual([
+      { id: 'a', howWeMet: '' },
+      { id: 'b', howWeMet: 'School' },
+    ])
+  })
+
+  it('empties only the matching events and keeps the rest of each record', () => {
+    const people = [
+      {
+        id: 'a',
+        name: 'Ana',
+        events: [
+          { id: 'e1', place: 'BAR', situation: 'Date' },
+          { id: 'e2', place: 'Park', situation: 'Date' },
+        ],
+      },
+    ]
+    expect(clearTagFromPeople(people, 'place', 'Bar')).toEqual([
+      {
+        id: 'a',
+        name: 'Ana',
+        events: [
+          { id: 'e1', place: '', situation: 'Date' },
+          { id: 'e2', place: 'Park', situation: 'Date' },
+        ],
+      },
+    ])
+  })
+
+  it('keeps unchanged people as the same objects', () => {
+    const untouched = { id: 'b', howWeMet: 'School', events: [{ place: 'Park' }] }
+    const noEvents = { id: 'c' }
+    const result = clearTagFromPeople([untouched, noEvents], 'place', 'Bar')
+    expect(result[0]).toBe(untouched)
+    expect(result[1]).toBe(noEvents)
+    expect(clearTagFromPeople([untouched], 'howWeMet', 'App')[0]).toBe(untouched)
+  })
+
+  it('never matches empty values with a blank tag', () => {
+    const person = { id: 'a', nationality: '' }
+    expect(clearTagFromPeople([person], 'nationality', '  ')[0]).toBe(person)
+  })
+
+  it('does not mutate the input', () => {
+    const people = [{ id: 'a', events: [{ place: 'Bar' }] }]
+    clearTagFromPeople(people, 'place', 'Bar')
+    expect(people[0].events[0].place).toBe('Bar')
   })
 })
 

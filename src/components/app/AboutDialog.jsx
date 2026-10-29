@@ -7,12 +7,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from '@/components/ui/dialog'
 
 import { TEXT } from '@/lib/constants'
 import { APP_VERSION, APP_GITHUB_USER, APP_GITHUB_REPO } from '@/lib/config'
 import { usePalette } from '@/lib/theme'
+import {
+  SETTINGS_DIALOG_CLASS,
+  SETTINGS_OVERLAY_CLASS,
+} from '@/components/app/settingsDialogTransition'
 
 /**
  * About dialog: app name, version, description and the link for feedback.
@@ -23,9 +26,9 @@ export default function AboutDialog({ open, onOpenChange, t }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        showCloseButton={false}
-        className="rounded-2xl"
-        style={{ background: PALETTE.bgSoft, borderColor: PALETTE.line }}
+        className={`rounded-2xl ${SETTINGS_DIALOG_CLASS}`}
+        overlayClassName={SETTINGS_OVERLAY_CLASS}
+        style={{ background: PALETTE.dialogBg, borderColor: PALETTE.dialogBorder }}
       >
         <DialogHeader>
           <div
@@ -48,7 +51,7 @@ export default function AboutDialog({ open, onOpenChange, t }) {
                 boxShadow: `0 4px 14px ${PALETTE.accentGlow}`,
               }}
             >
-              <Info style={{ height: '1.5rem', width: '1.5rem', color: 'white' }} />
+              <Info style={{ height: '1.5rem', width: '1.5rem', color: PALETTE.textOnAccent }} />
             </div>
             <div style={{ textAlign: 'center' }}>
               <DialogTitle style={{ ...TEXT.subheading, color: PALETTE.accentEmphasis2 }}>
@@ -117,20 +120,6 @@ export default function AboutDialog({ open, onOpenChange, t }) {
             </div>
           </div>
         </DialogDescription>
-
-        <DialogFooter>
-          <Button
-            className="rounded-xl"
-            style={{
-              background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
-              color: 'white',
-              border: 'none',
-            }}
-            onClick={() => onOpenChange(false)}
-          >
-            {t.close}
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

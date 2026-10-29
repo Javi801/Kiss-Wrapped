@@ -31,6 +31,8 @@ export default function PersonCardDialogs({
   onAddPlaceTag,
   howWeMetTags,
   onAddHowWeMetTag,
+  nationalityTags,
+  onAddNationalityTag,
 }) {
   return (
     <>
@@ -52,9 +54,12 @@ export default function PersonCardDialogs({
             t={t}
             language={language}
             includeRealName
+            includeNationality
             includePartner
             howWeMetTags={howWeMetTags}
             onAddHowWeMetTag={onAddHowWeMetTag}
+            nationalityTags={nationalityTags}
+            onAddNationalityTag={onAddNationalityTag}
             isParentOpen={editingPerson}
           />
         </DialogContent>

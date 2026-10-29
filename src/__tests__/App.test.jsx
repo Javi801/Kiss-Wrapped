@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
-import { COPY } from '@/lib/constants'
+import { COPY, SCREENS } from '@/lib/constants'
 import { todayString } from '@/lib/date'
 
 const mockFeatures = vi.hoisted(() => ({ onboarding: false, pdfExport: false }))
@@ -60,7 +60,7 @@ function mockScreen(name) {
 vi.mock('@/components/app/HomeScreen', mockScreen('main'))
 vi.mock('@/components/app/AddPersonScreen', mockScreen('add'))
 vi.mock('@/components/app/IntroScreen', mockScreen('intro'))
-vi.mock('@/components/app/OnboardingWizard', mockScreen('onboarding'))
+vi.mock('@/components/app/onboarding/OnboardingWizard', mockScreen('onboarding'))
 vi.mock('@/components/app/PrivacyScreen', mockScreen('privacy'))
 vi.mock('@/components/people/PeopleManagerScreen', mockScreen('people'))
 vi.mock('@/components/stats/StatsScreen', mockScreen('stats'))
@@ -76,6 +76,7 @@ const SAVED_SETTINGS = {
   situationTags: [],
   placeTags: [],
   howWeMetTags: [],
+  nationalityTags: [],
   onboardingDone: true,
 }
 
@@ -111,7 +112,7 @@ const settleLazyScreens = () => act(async () => vi.dynamicImportSettled())
 async function bootOnPeople(options) {
   await boot(options)
   openMain()
-  go('people')
+  go(SCREENS.people)
 }
 
 beforeEach(() => {
@@ -182,13 +183,13 @@ describe('App — boot', () => {
 
   it('restores the saved language, theme, icon color and stats visibility', async () => {
     await boot({
-      settings: { language: 'es', theme: 'green', iconColor: 'darkGreen', statsVisible: false },
+      settings: { language: 'es', theme: 'green', iconColor: 'chartGreen', statsVisible: false },
     })
     openMain()
     expect(screens.main).toMatchObject({
       language: 'es',
       theme: 'green',
-      iconColor: 'darkGreen',
+      iconColor: 'chartGreen',
       statsVisible: false,
       t: COPY.es,
     })
@@ -198,7 +199,7 @@ describe('App — boot', () => {
     await boot({ settings: { includePartnerEvents: true } })
     openMain()
     expect(screens.main.includePartnerEvents).toBe(true)
-    go('stats')
+    go(SCREENS.stats)
     await settleLazyScreens()
     expect(screens.stats.includePartnerEvents).toBe(true)
   })
@@ -236,11 +237,25 @@ describe('App — boot', () => {
     expect([...screens.people.howWeMetTags].sort()).toEqual(['App', 'School'])
   })
 
+  it('offers the saved nationality tags together with the ones already used in the data', async () => {
+    await bootOnPeople({
+      people: [
+        { ...ana, nationality: 'Peruvian' },
+        { ...bob, nationality: 'chilean' },
+      ],
+      settings: { nationalityTags: ['Chilean'] },
+    })
+    expect(screens.people.nationalityTags).toEqual(['Chilean', 'Peruvian'])
+  })
+
   it('tolerates saved tag lists that are not arrays', async () => {
-    await bootOnPeople({ settings: { placeTags: null, situationTags: 'x', howWeMetTags: 3 } })
+    await bootOnPeople({
+      settings: { placeTags: null, situationTags: 'x', howWeMetTags: 3, nationalityTags: {} },
+    })
     expect(screens.people.placeTags).toEqual([])
     expect(screens.people.situationTags).toEqual([])
     expect(screens.people.howWeMetTags).toEqual([])
+    expect(screens.people.nationalityTags).toEqual([])
   })
 
   it('starts empty on the intro screen when loading fails', async () => {
@@ -327,20 +342,20 @@ describe('App — onboarding', () => {
     expect(savedSettings()).toMatchObject({ onboardingDone: true })
   })
 
-  it('shows the tutorial notice on the dashboard only after finishing, until it is closed', async () => {
+  it('shows the onboarding notice on the dashboard only after finishing, until it is closed', async () => {
     mockFeatures.onboarding = true
     await boot({ settings: { onboardingDone: false } })
     openMain()
     await act(async () => screens.onboarding.onComplete())
-    expect(screens.main.tutorialDoneOpen).toBe(true)
-    act(() => screens.main.onCloseTutorialDone())
-    expect(screens.main.tutorialDoneOpen).toBe(false)
+    expect(screens.main.onboardingDoneOpen).toBe(true)
+    act(() => screens.main.onCloseOnboardingDone())
+    expect(screens.main.onboardingDoneOpen).toBe(false)
   })
 
-  it('shows no tutorial notice on a normal entry', async () => {
+  it('shows no onboarding notice on a normal entry', async () => {
     await boot()
     openMain()
-    expect(screens.main.tutorialDoneOpen).toBe(false)
+    expect(screens.main.onboardingDoneOpen).toBe(false)
   })
 
   it('skips the onboarding when people are already saved', async () => {
@@ -425,7 +440,7 @@ describe('App — navigation', () => {
   it('hides the bottom bar on the add screen', async () => {
     await boot()
     openMain()
-    go('add')
+    go(SCREENS.add)
     expect(visibleScreens()).toEqual(['add'])
     expect(navButtons()).toHaveLength(0)
   })
@@ -433,7 +448,7 @@ describe('App — navigation', () => {
   it('returns to the intro when leaving the add screen', async () => {
     await boot()
     openMain()
-    go('add')
+    go(SCREENS.add)
     act(() => screens.add.onBack())
     expect(visibleScreens()).toEqual(['intro'])
   })
@@ -443,7 +458,7 @@ describe('App — hardware back button', () => {
   it('walks back through the visited screens and then exits', async () => {
     await boot()
     openMain()
-    go('people')
+    go(SCREENS.people)
 
     pressBack()
     expect(visibleScreens()).toEqual(['main'])
@@ -464,7 +479,7 @@ describe('App — hardware back button', () => {
   it('always goes from the add screen to the intro and forgets the history', async () => {
     await boot()
     openMain()
-    go('add')
+    go(SCREENS.add)
     pressBack()
     expect(visibleScreens()).toEqual(['intro'])
     pressBack()
@@ -474,7 +489,7 @@ describe('App — hardware back button', () => {
   it('closes an open dialog instead of navigating', async () => {
     await boot()
     openMain()
-    go('stats')
+    go(SCREENS.stats)
     await settleLazyScreens()
     const closeDialog = vi.fn()
     screens.stats.modalBackRef.current = closeDialog
@@ -491,7 +506,7 @@ describe('App — hardware back button', () => {
   it('closes an open select before an open dialog and before navigating', async () => {
     await boot()
     openMain()
-    go('stats')
+    go(SCREENS.stats)
     await settleLazyScreens()
     const closeDialog = vi.fn()
     screens.stats.modalBackRef.current = closeDialog
@@ -523,7 +538,7 @@ describe('App — people mutations', () => {
   it('adds a person on top with a first event dated today and returns to the intro', async () => {
     await boot({ people: [ana] })
     openMain()
-    go('add')
+    go(SCREENS.add)
     await act(async () => screens.add.onSave({ name: 'Mia', gender: 'female' }))
 
     const [mia, ...rest] = savedPeople()
@@ -538,7 +553,7 @@ describe('App — people mutations', () => {
   it('keeps the real name and how-we-met given for a new person', async () => {
     await boot()
     openMain()
-    go('add')
+    go(SCREENS.add)
     await act(async () =>
       screens.add.onSave({ name: 'Mia', realName: 'Maria', howWeMet: 'School' })
     )
@@ -548,7 +563,7 @@ describe('App — people mutations', () => {
   it('forgets the navigation history after adding a person', async () => {
     await boot()
     openMain()
-    go('add')
+    go(SCREENS.add)
     await act(async () => screens.add.onSave({ name: 'Mia' }))
     pressBack()
     expect(mockCapacitorApp.exitApp).toHaveBeenCalledOnce()
@@ -558,7 +573,7 @@ describe('App — people mutations', () => {
     await boot()
     for (const name of ['Mia', 'Lia']) {
       openMain()
-      go('add')
+      go(SCREENS.add)
       await act(async () => screens.add.onSave({ name }))
     }
     const ids = savedPeople().flatMap((person) => [person.id, ...person.events.map((e) => e.id)])
@@ -619,10 +634,21 @@ describe('App — people mutations', () => {
     })
   })
 
+  it('registers the nationalities of imported people', async () => {
+    await boot({ settings: { nationalityTags: ['Chilean'] } })
+    openMain()
+    const imported = [
+      { id: 'n1', name: 'New', nationality: 'Peruvian', events: [] },
+      { id: 'n2', name: 'Other', nationality: 'CHILEAN', events: [] },
+    ]
+    await act(async () => screens.main.onImportData(imported))
+    expect(savedSettings().nationalityTags).toEqual(['Chilean', 'Peruvian'])
+  })
+
   it('registers the how-we-met of a new person as a tag', async () => {
     await boot({ settings: { howWeMetTags: ['App'] } })
     openMain()
-    go('add')
+    go(SCREENS.add)
     await act(async () => screens.add.onSave({ name: 'Mia', howWeMet: ' School ' }))
     expect(savedSettings().howWeMetTags).toEqual(['App', 'School'])
   })
@@ -630,7 +656,7 @@ describe('App — people mutations', () => {
   it('registers no how-we-met tag for a new person without one', async () => {
     await boot({ settings: { howWeMetTags: ['App'] } })
     openMain()
-    go('add')
+    go(SCREENS.add)
     await act(async () => screens.add.onSave({ name: 'Mia' }))
     expect(savedSettings().howWeMetTags).toEqual(['App'])
   })
@@ -646,6 +672,100 @@ describe('App — people mutations', () => {
     await bootOnPeople({ people: [ana], settings: { howWeMetTags: ['App'] } })
     await act(async () => screens.people.onUpdatePerson('ana', { howWeMet: 'app' }))
     expect(savedSettings().howWeMetTags).toEqual(['App'])
+  })
+
+  it('registers the nationality of an edited person as a tag', async () => {
+    await bootOnPeople({ people: [ana], settings: { nationalityTags: ['Chilean'] } })
+    await act(async () => screens.people.onUpdatePerson('ana', { nationality: ' Peruvian ' }))
+    expect(savedSettings().nationalityTags).toEqual(['Chilean', 'Peruvian'])
+    expect(screens.people.nationalityTags).toEqual(['Chilean', 'Peruvian'])
+  })
+
+  it('does not duplicate a nationality tag that differs only in case', async () => {
+    await bootOnPeople({ people: [ana], settings: { nationalityTags: ['Chilean'] } })
+    await act(async () => screens.people.onUpdatePerson('ana', { nationality: 'chilean' }))
+    expect(savedSettings().nationalityTags).toEqual(['Chilean'])
+  })
+
+  it('registers no nationality tag for an edited person without one', async () => {
+    await bootOnPeople({ people: [ana], settings: { nationalityTags: ['Chilean'] } })
+    await act(async () => screens.people.onUpdatePerson('ana', { nationality: '' }))
+    expect(savedSettings().nationalityTags).toEqual(['Chilean'])
+  })
+
+  it('passes the four tag lists to the main screen', async () => {
+    await boot({
+      settings: {
+        howWeMetTags: ['App'],
+        nationalityTags: ['Chilean'],
+        situationTags: ['Date'],
+        placeTags: ['Bar'],
+      },
+    })
+    openMain()
+    expect(screens.main.tags).toEqual({
+      howWeMet: ['App'],
+      nationality: ['Chilean'],
+      situation: ['Date'],
+      place: ['Bar'],
+    })
+  })
+
+  it.each([
+    ['howWeMet', 'howWeMetTags'],
+    ['nationality', 'nationalityTags'],
+    ['situation', 'situationTags'],
+    ['place', 'placeTags'],
+  ])('removes a %s tag and saves the list', async (field, key) => {
+    await boot({ settings: { [key]: ['Keep', 'Drop'] } })
+    openMain()
+    await act(async () => screens.main.onRemoveTag(field, 'Drop'))
+    expect(savedSettings()[key]).toEqual(['Keep'])
+    expect(screens.main.tags[field]).toEqual(['Keep'])
+  })
+
+  it('clears a removed person tag from the people that use it', async () => {
+    await boot({
+      people: [
+        { id: 'a', name: 'A', howWeMet: 'app', events: [] },
+        { id: 'b', name: 'B', howWeMet: 'School', events: [] },
+      ],
+      settings: { howWeMetTags: ['App', 'School'] },
+    })
+    openMain()
+    await act(async () => screens.main.onRemoveTag('howWeMet', 'App'))
+    expect(savedPeople().map((person) => person.howWeMet)).toEqual(['', 'School'])
+    expect(savedSettings().howWeMetTags).toEqual(['School'])
+  })
+
+  it('clears a removed event tag from the events that use it, keeping the events', async () => {
+    await boot({
+      people: [
+        {
+          id: 'a',
+          name: 'A',
+          events: [
+            { id: 'e1', date: '2024.01.01', place: 'Bar' },
+            { id: 'e2', date: '2024.01.02', place: 'Park' },
+          ],
+        },
+      ],
+      settings: { placeTags: ['Bar', 'Park'] },
+    })
+    openMain()
+    await act(async () => screens.main.onRemoveTag('place', 'Bar'))
+    expect(savedPeople()[0].events.map((event) => [event.id, event.place])).toEqual([
+      ['e1', ''],
+      ['e2', 'Park'],
+    ])
+    expect(savedSettings().placeTags).toEqual(['Park'])
+  })
+
+  it('leaves the other tag lists untouched when removing a tag', async () => {
+    await boot({ settings: { placeTags: ['Drop'], situationTags: ['Drop'] } })
+    openMain()
+    await act(async () => screens.main.onRemoveTag('place', 'Drop'))
+    expect(savedSettings()).toMatchObject({ placeTags: [], situationTags: ['Drop'] })
   })
 
   it('clears everything and returns to the intro', async () => {
@@ -789,13 +909,13 @@ describe('App — settings', () => {
   it('saves a changed icon color and switches the launcher icon', async () => {
     await boot()
     openMain()
-    await act(async () => screens.main.setIconColor('darkPurple'))
-    expect(savedSettings().iconColor).toBe('darkPurple')
-    expect(mockSetAppIconColor).toHaveBeenCalledWith('darkPurple')
+    await act(async () => screens.main.setIconColor('orbitLavender'))
+    expect(savedSettings().iconColor).toBe('orbitLavender')
+    expect(mockSetAppIconColor).toHaveBeenCalledWith('orbitLavender')
   })
 
   it('does not touch the launcher icon while booting', async () => {
-    await boot({ settings: { iconColor: 'darkGreen' } })
+    await boot({ settings: { iconColor: 'chartGreen' } })
     expect(mockSetAppIconColor).not.toHaveBeenCalled()
   })
 
@@ -812,7 +932,7 @@ describe('App — settings', () => {
   it('saves the partner events choice made on the stats screen and applies it to home', async () => {
     await boot()
     openMain()
-    go('stats')
+    go(SCREENS.stats)
     await settleLazyScreens()
     expect(screens.stats.includePartnerEvents).toBe(false)
 
@@ -828,6 +948,7 @@ describe('App — settings', () => {
     ['onAddPlaceTag', 'placeTags'],
     ['onAddSituationTag', 'situationTags'],
     ['onAddHowWeMetTag', 'howWeMetTags'],
+    ['onAddNationalityTag', 'nationalityTags'],
   ])('saves a new tag once through %s', async (handler, key) => {
     await bootOnPeople({ settings: { [key]: ['Old'] } })
     await act(async () => screens.people[handler]('New'))

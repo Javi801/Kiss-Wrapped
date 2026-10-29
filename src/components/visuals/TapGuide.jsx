@@ -63,7 +63,7 @@ export default function TapGuide() {
           fontSize: '1.55rem',
           lineHeight: 1,
           rotate: -45,
-          filter: 'drop-shadow(0 2px 5px rgba(0,0,0,0.18))',
+          filter: `drop-shadow(0 2px 5px ${PALETTE.shadowStrong})`,
         }}
         initial={{ x: HAND_OFFSET, y: HAND_OFFSET, scale: 1, opacity: 0 }}
         animate={{

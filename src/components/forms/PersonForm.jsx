@@ -3,10 +3,17 @@ import { Save } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import ChoiceToggle from '@/components/forms/ChoiceToggle'
+import FormField from '@/components/forms/FormField'
 import TagInput from '@/components/forms/TagInput'
 import PartnerFields from '@/components/forms/PartnerFields'
 import SpeechBubble from '@/components/forms/SpeechBubble'
-import { Label } from '@/components/ui/label'
+import SubmitButton from '@/components/forms/SubmitButton'
+import {
+  toPersonFormState,
+  toPersonPayload,
+  validatePersonForm,
+} from '@/components/forms/personFormValues'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
@@ -16,12 +23,11 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-import { GENDERS, ZODIAC_OPTIONS, TEXT } from '@/lib/constants'
+import { ACTIVITY, GENDERS, ZODIAC_OPTIONS, TEXT } from '@/lib/constants'
 import { LIMITS } from '@/lib/config'
 import { usePalette } from '@/lib/theme'
-import { translateGender, translatePartnerError, getZodiacForLanguage } from '@/lib/format'
-import { calculateDisplayAge, deriveBirthYear, isWithinZodiacPeriod } from '@/lib/date'
-import { PARTNER_STATUSES, validatePartnerFields } from '@/lib/partner'
+import { activityDetailPlaceholder, translateGender } from '@/lib/format'
+import { isWithinZodiacPeriod } from '@/lib/date'
 
 /**
  * Form used for creating or editing a person.
@@ -40,55 +46,20 @@ export default function PersonForm({
   language,
   includeHowWeMet = true,
   includeRealName = false,
+  includeNationality = false,
   includePartner = false,
   saveLabel,
   mode,
   howWeMetTags = [],
   onAddHowWeMetTag,
+  nationalityTags = [],
+  onAddNationalityTag,
   isParentOpen,
 }) {
   const PALETTE = usePalette()
-  // Local form state initialization.
-  const [form, setForm] = useState(() => {
-    if (!initialValues) {
-      return {
-        name: '',
-        realName: '',
-        age: '',
-        gender: '',
-        howWeMet: '',
-        zodiacSign: '',
-        activity: '',
-        detail: '',
-        partnerStatus: 'never',
-        partnerFrom: '',
-        partnerTo: '',
-      }
-    }
-    const zodiacSign = getZodiacForLanguage(initialValues.zodiacSign, language)
-    const displayAge = initialValues.birthYear
-      ? String(
-          calculateDisplayAge(
-            initialValues.birthYear,
-            zodiacSign,
-            initialValues.birthdayAlreadyHappened
-          ) ?? ''
-        )
-      : String(initialValues.age ?? '')
-    return {
-      ...initialValues,
-      zodiacSign,
-      age: displayAge,
-      realName: initialValues.realName ?? '',
-      howWeMet: initialValues.howWeMet ?? '',
-      detail: initialValues.detail ?? '',
-      partnerStatus: PARTNER_STATUSES.includes(initialValues.partnerStatus)
-        ? initialValues.partnerStatus
-        : 'never',
-      partnerFrom: initialValues.partnerFrom ?? '',
-      partnerTo: initialValues.partnerTo ?? '',
-    }
-  })
+  // The add form addresses the user; any other mode speaks about the person.
+  const isAdd = mode === 'add'
+  const [form, setForm] = useState(() => toPersonFormState(initialValues, language))
 
   const [errors, setErrors] = useState({})
   const [birthdayAlreadyHappened, setBirthdayAlreadyHappened] = useState(
@@ -102,68 +73,23 @@ export default function PersonForm({
     if (key === 'zodiacSign') setBirthdayAlreadyHappened(false)
   }
 
-  // Validate required fields and data types.
-  function validate() {
-    const next = {}
-
-    if (!form.name.trim()) next.name = t.requiredName
-
-    if (!String(form.age).trim()) next.age = t.requiredAge
-    else if (
-      !Number.isInteger(Number(form.age)) ||
-      Number(form.age) <= 0 ||
-      Number(form.age) > LIMITS.maxAge
-    )
-      next.age = t.validAge
-
-    if (!form.gender) next.gender = t.requiredGender
-
-    if (includeHowWeMet && !form.howWeMet.trim()) next.howWeMet = t.requiredHowWeMet
-
-    if (!form.zodiacSign) next.zodiacSign = t.requiredZodiac
-
-    if (!form.activity) next.activity = t.requiredActivity
-
-    // Partner period: optional start; a past partner needs a valid end after the start.
-    const partnerErrors = validatePartnerFields({
-      partnerStatus: form.partnerStatus,
-      partnerFrom: form.partnerFrom.trim(),
-      partnerTo: form.partnerTo.trim(),
-    })
-    for (const [field, code] of Object.entries(partnerErrors)) {
-      next[field] = translatePartnerError(code, t)
-    }
-
-    setErrors(next)
-
-    return Object.keys(next).length === 0
-  }
-
-  // Submit handler that normalizes values before sending.
+  // Validates, then sends the normalized values.
   function submit(e) {
     e.preventDefault()
 
-    if (!validate()) return
+    const nextErrors = validatePersonForm(form, { includeHowWeMet }, t)
+    setErrors(nextErrors)
+    if (Object.keys(nextErrors).length) return
 
-    const { age, ...rest } = form
-    onSave({
-      ...rest,
-      partnerStatus: form.partnerStatus,
-      partnerFrom: form.partnerStatus !== 'never' ? form.partnerFrom.trim() : '',
-      partnerTo: form.partnerStatus === 'past' ? form.partnerTo.trim() : '',
-      birthYear: deriveBirthYear(
-        Number(age),
-        form.zodiacSign,
-        showBirthdayCheckbox && birthdayAlreadyHappened
-      ),
-      birthdayAlreadyHappened: showBirthdayCheckbox
-        ? birthdayAlreadyHappened
-        : (initialValues?.birthdayAlreadyHappened ?? false),
-      detail: form.detail.trim(),
-      howWeMet: includeHowWeMet ? form.howWeMet.trim() : initialValues?.howWeMet || '',
-      name: form.name.trim(),
-      realName: includeRealName ? form.realName.trim() : initialValues?.realName || '',
-    })
+    onSave(
+      toPersonPayload(form, {
+        initialValues,
+        birthdayAlreadyHappened,
+        includeHowWeMet,
+        includeRealName,
+        includeNationality,
+      })
+    )
   }
 
   // Shared input styling.
@@ -174,11 +100,16 @@ export default function PersonForm({
 
   return (
     <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <div style={{ display: 'grid', gap: '1rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: '1rem' }}>
         {/* Name + Real name grouped */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <Label>{t.name} *</Label>
+          <FormField
+            label={t.name}
+            required
+            length={form.name.length}
+            maxLength={LIMITS.nameLength}
+            error={errors.name}
+          >
             <Input
               value={form.name}
               onChange={(e) => update('name', e.target.value)}
@@ -186,15 +117,14 @@ export default function PersonForm({
               className="rounded-2xl"
               style={{ ...inputStyle }}
             />
-            <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-              {form.name.length}/{LIMITS.nameLength}
-            </p>
-            {errors.name && <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.name}</p>}
-          </div>
+          </FormField>
 
           {includeRealName && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <Label>{t.realName}</Label>
+            <FormField
+              label={t.realName}
+              length={form.realName.length}
+              maxLength={LIMITS.nameLength}
+            >
               <Input
                 value={form.realName}
                 onChange={(e) => update('realName', e.target.value)}
@@ -203,10 +133,7 @@ export default function PersonForm({
                 placeholder={t.realNamePlaceholder}
                 style={{ ...inputStyle }}
               />
-              <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-                {form.realName.length}/{LIMITS.nameLength}
-              </p>
-            </div>
+            </FormField>
           )}
         </div>
 
@@ -214,8 +141,7 @@ export default function PersonForm({
         <div
           style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '1rem' }}
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <Label>{t.age} *</Label>
+          <FormField label={t.age} required error={errors.age}>
             <Input
               type="number"
               value={form.age}
@@ -225,50 +151,9 @@ export default function PersonForm({
               className="rounded-2xl"
               style={{ ...inputStyle }}
             />
-            {errors.age && <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.age}</p>}
-            {showBirthdayCheckbox && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <p style={{ ...TEXT.caption, color: PALETTE.text }}>
-                  {mode === 'add' ? t.birthdayAlreadyHappened : t.birthdayAlreadyHappenedThird}
-                </p>
-                <div
-                  style={{
-                    display: 'flex',
-                    borderRadius: '0.75rem',
-                    overflow: 'hidden',
-                    border: `1px solid ${PALETTE.inputBorder}`,
-                    width: 'fit-content',
-                    backgroundColor: PALETTE.inputBg,
-                  }}
-                >
-                  {[true, false].map((val) => (
-                    <button
-                      key={String(val)}
-                      type="button"
-                      onClick={() => setBirthdayAlreadyHappened(val)}
-                      style={{
-                        padding: '0.25rem 1rem',
-                        ...TEXT.caption,
-                        fontWeight: 500,
-                        cursor: 'pointer',
-                        border: 'none',
-                        backgroundColor:
-                          birthdayAlreadyHappened === val ? PALETTE.accent : 'transparent',
-                        color:
-                          birthdayAlreadyHappened === val ? PALETTE.textOnAccent : PALETTE.text,
-                        transition: 'background-color 0.15s, color 0.15s',
-                      }}
-                    >
-                      {val ? t.birthdayYes : t.birthdayNo}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          </FormField>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <Label>{t.gender} *</Label>
+          <FormField label={t.gender} required error={errors.gender}>
             <Select value={form.gender} onValueChange={(value) => update('gender', value)}>
               <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
                 <SelectValue placeholder={t.select} />
@@ -282,12 +167,54 @@ export default function PersonForm({
                 ))}
               </SelectContent>
             </Select>
+          </FormField>
 
-            {errors.gender && (
-              <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.gender}</p>
-            )}
-          </div>
+          {/* Spans both columns so the prompt and options are not squeezed into the age column */}
+          {showBirthdayCheckbox && (
+            <div
+              style={{
+                gridColumn: '1 / -1',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.35rem',
+              }}
+            >
+              <p style={{ ...TEXT.caption, color: PALETTE.text }}>
+                {isAdd ? t.birthdayAlreadyHappened : t.birthdayAlreadyHappenedThird}
+              </p>
+              <ChoiceToggle
+                options={[
+                  { value: true, label: t.birthdayYes },
+                  { value: false, label: t.birthdayNo },
+                ]}
+                value={birthdayAlreadyHappened}
+                onChange={setBirthdayAlreadyHappened}
+              />
+            </div>
+          )}
         </div>
+
+        {/* Nationality */}
+        {includeNationality && (
+          <FormField
+            label={t.nationality}
+            length={form.nationality.length}
+            maxLength={LIMITS.nationalityLength}
+          >
+            <TagInput
+              value={form.nationality}
+              onChange={(val) => update('nationality', val)}
+              tags={nationalityTags}
+              onAddTag={onAddNationalityTag}
+              maxLength={LIMITS.nationalityLength}
+              placeholder={t.nationalityPlaceholder}
+              className="rounded-2xl"
+              style={{ ...inputStyle }}
+              addTagLabel={t.addTag}
+              isParentOpen={isParentOpen}
+            />
+          </FormField>
+        )}
 
         {/* Partner marker + period */}
         {includePartner && (
@@ -303,8 +230,13 @@ export default function PersonForm({
 
         {/* How we met */}
         {includeHowWeMet && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <Label>{t.howWeMet} *</Label>
+          <FormField
+            label={t.howWeMet}
+            required
+            length={form.howWeMet.length}
+            maxLength={LIMITS.tagLength}
+            error={errors.howWeMet}
+          >
             <TagInput
               value={form.howWeMet}
               onChange={(val) => update('howWeMet', val)}
@@ -316,20 +248,13 @@ export default function PersonForm({
               addTagLabel={t.addTag}
               isParentOpen={isParentOpen}
             />
-            <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-              {form.howWeMet.length}/{LIMITS.tagLength}
-            </p>
-            {errors.howWeMet && (
-              <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.howWeMet}</p>
-            )}
-          </div>
+          </FormField>
         )}
 
         {/* Zodiac */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <Label>{t.zodiacSign} *</Label>
+        <FormField label={t.zodiacSign} required error={errors.zodiacSign}>
           <Select value={form.zodiacSign} onValueChange={(value) => update('zodiacSign', value)}>
-            <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
+            <SelectTrigger className="w-full rounded-2xl" style={{ ...inputStyle }}>
               <SelectValue placeholder={t.select} />
             </SelectTrigger>
 
@@ -343,79 +268,51 @@ export default function PersonForm({
           </Select>
 
           {zodiacHint && <SpeechBubble>{zodiacHint}</SpeechBubble>}
-
-          {errors.zodiacSign && (
-            <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.zodiacSign}</p>
-          )}
-        </div>
+        </FormField>
 
         {/* Activity */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <Label>{t.activity} *</Label>
+        <FormField label={t.activity} required error={errors.activity}>
           <Select value={form.activity} onValueChange={(value) => update('activity', value)}>
             <SelectTrigger className="rounded-2xl" style={{ ...inputStyle }}>
               <SelectValue placeholder={t.select} />
             </SelectTrigger>
 
             <SelectContent>
-              <SelectItem value="studies">{mode === 'add' ? t.studiesForm : t.studies}</SelectItem>
-              <SelectItem value="works">{mode === 'add' ? t.worksForm : t.works}</SelectItem>
-              <SelectItem value="studies and works">
-                {mode === 'add' ? t.studiesWorksForm : t.studiesWorks}
+              <SelectItem value={ACTIVITY.studies}>{isAdd ? t.studiesForm : t.studies}</SelectItem>
+              <SelectItem value={ACTIVITY.works}>{isAdd ? t.worksForm : t.works}</SelectItem>
+              <SelectItem value={ACTIVITY.studiesAndWorks}>
+                {isAdd ? t.studiesWorksForm : t.studiesWorks}
               </SelectItem>
-              <SelectItem value="other">{t.other}</SelectItem>
+              <SelectItem value={ACTIVITY.other}>{t.other}</SelectItem>
             </SelectContent>
           </Select>
-
-          {errors.activity && (
-            <p style={{ ...TEXT.caption, color: PALETTE.danger }}>{errors.activity}</p>
-          )}
-        </div>
+        </FormField>
 
         {/* Specific — only visible after an activity is chosen */}
         {form.activity && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <Label>{t.detail}</Label>
+          <FormField
+            label={t.detail}
+            length={form.detail.length}
+            maxLength={LIMITS.personDetailLength}
+          >
             <Textarea
               value={form.detail}
               onChange={(e) => update('detail', e.target.value)}
-              placeholder={
-                form.activity === 'studies'
-                  ? t.specificStudies
-                  : form.activity === 'works'
-                    ? t.specificWorks
-                    : form.activity === 'studies and works'
-                      ? t.specificStudiesWorks
-                      : ''
-              }
+              placeholder={activityDetailPlaceholder(form.activity, t)}
               maxLength={LIMITS.personDetailLength}
               className="rounded-2xl"
               style={{ ...inputStyle }}
             />
-            <p style={{ ...TEXT.caption, color: PALETTE.textSoft, textAlign: 'right' }}>
-              {form.detail.length}/{LIMITS.personDetailLength}
-            </p>
-          </div>
+          </FormField>
         )}
       </div>
 
       {/* Actions */}
       <div style={{ display: 'flex', gap: '0.5rem', paddingTop: '0.5rem' }}>
-        <Button
-          type="submit"
-          className="rounded-2xl"
-          style={{
-            flex: '1 1 0%',
-            color: PALETTE.textOnAccent,
-            boxShadow: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-            background: `linear-gradient(90deg, ${PALETTE.accent}, ${PALETTE.accentSoft})`,
-            // The gradient would repeat under the default transparent border.
-            border: 'none',
-          }}
-        >
+        <SubmitButton>
           <Save style={{ marginRight: '0.5rem', height: '1rem', width: '1rem' }} />
           {saveLabel || t.savePerson}
-        </Button>
+        </SubmitButton>
 
         {onCancel && (
           <Button

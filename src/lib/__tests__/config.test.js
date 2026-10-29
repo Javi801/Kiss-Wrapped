@@ -10,12 +10,15 @@ import {
   ICON_COLORS,
   DEFAULT_SETTINGS,
   LIMITS,
+  ONBOARDING,
 } from '@/lib/config'
 import { COPY, PALETTES, ZODIAC_OPTIONS } from '@/lib/constants'
 import { ICON_VARIANTS, DEFAULT_ICON_VARIANT } from '@/components/shared/SparkleIcon.constants'
 
 const ANDROID_MAIN = new URL('../../../android/app/src/main/', import.meta.url)
 const readAndroid = (path) => readFileSync(new URL(path, ANDROID_MAIN), 'utf8')
+const IOS_APP = new URL('../../../ios/App/App/', import.meta.url)
+const readIos = (path) => readFileSync(new URL(path, IOS_APP), 'utf8')
 
 describe('FEATURES', () => {
   it('defines every flag as a boolean', () => {
@@ -78,6 +81,25 @@ describe('supported setting values', () => {
     expect(colors.sort()).toEqual([...ICON_COLORS].sort())
   })
 
+  it('lists exactly the icon colors the iOS plugin accepts', () => {
+    const [, list] = readIos('AppIconPlugin.swift').match(/colors = \[([^\]]*)\]/)
+    const colors = [...list.matchAll(/"(\w+)"/g)].map(([, color]) => color)
+    expect(colors.sort()).toEqual([...ICON_COLORS].sort())
+  })
+
+  it('has an iOS app icon set for every icon color', () => {
+    for (const color of ICON_COLORS) {
+      const set = color === DEFAULT_ICON_VARIANT ? 'AppIcon' : `AppIcon-${color}`
+      const contents = JSON.parse(readIos(`Assets.xcassets/${set}.appiconset/Contents.json`))
+      for (const { filename } of contents.images) {
+        expect(
+          existsSync(new URL(`Assets.xcassets/${set}.appiconset/${filename}`, IOS_APP)),
+          `${set}/${filename}`
+        ).toBe(true)
+      }
+    }
+  })
+
   it('lists exactly the icon colors that have a launcher alias', () => {
     const aliases = [
       ...readAndroid('AndroidManifest.xml').matchAll(
@@ -127,6 +149,9 @@ describe('DEFAULT_SETTINGS', () => {
     expect(enabled.charAt(0).toLowerCase() + enabled.slice(1)).toBe(DEFAULT_SETTINGS.iconColor)
     const plugin = readAndroid('java/io/kisswrapped/AppIconPlugin.java')
     expect(plugin).toContain(`getString("color", "${DEFAULT_SETTINGS.iconColor}")`)
+    expect(readIos('AppIconPlugin.swift')).toContain(
+      `defaultColor = "${DEFAULT_SETTINGS.iconColor}"`
+    )
   })
 
   it('defines statsVisible as a boolean', () => {
@@ -144,5 +169,24 @@ describe('LIMITS', () => {
       expect(Number.isInteger(value), name).toBe(true)
       expect(value, name).toBeGreaterThan(0)
     }
+  })
+})
+
+describe('ONBOARDING', () => {
+  it('defines every value as a positive integer', () => {
+    for (const [name, value] of Object.entries(ONBOARDING)) {
+      expect(Number.isInteger(value), name).toBe(true)
+      expect(value, name).toBeGreaterThan(0)
+    }
+  })
+
+  it('defines every timing', () => {
+    for (const name of ['sceneMs', 'tapTimeoutMs', 'introSceneMs']) {
+      expect(ONBOARDING[name], name).toEqual(expect.any(Number))
+    }
+  })
+
+  it('uses a practice age within the age limit', () => {
+    expect(ONBOARDING.practiceAge).toBeLessThanOrEqual(LIMITS.maxAge)
   })
 })

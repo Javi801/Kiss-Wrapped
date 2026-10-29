@@ -13,6 +13,7 @@ import {
   SITUATION_TAGS_KEY,
   PLACE_TAGS_KEY,
   HOW_WE_MET_TAGS_KEY,
+  NATIONALITY_TAGS_KEY,
   ONBOARDING_DONE_KEY,
 } from '@/lib/constants'
 import { DEFAULT_SETTINGS } from '@/lib/config'
@@ -102,6 +103,7 @@ const SETTINGS_DEFAULTS = {
   situationTags: [],
   placeTags: [],
   howWeMetTags: [],
+  nationalityTags: [],
   onboardingDone: false,
 }
 
@@ -132,6 +134,7 @@ export async function loadSettings() {
       const rawSituationTags = storage?.getItem(SITUATION_TAGS_KEY)
       const rawPlaceTags = storage?.getItem(PLACE_TAGS_KEY)
       const rawHowWeMetTags = storage?.getItem(HOW_WE_MET_TAGS_KEY)
+      const rawNationalityTags = storage?.getItem(NATIONALITY_TAGS_KEY)
       const migrated = {
         iconColor: storage?.getItem(ICON_COLOR_KEY) || SETTINGS_DEFAULTS.iconColor,
         language: storage?.getItem(LANGUAGE_KEY) || SETTINGS_DEFAULTS.language,
@@ -144,6 +147,7 @@ export async function loadSettings() {
         situationTags: rawSituationTags ? JSON.parse(rawSituationTags) : [],
         placeTags: rawPlaceTags ? JSON.parse(rawPlaceTags) : [],
         howWeMetTags: rawHowWeMetTags ? JSON.parse(rawHowWeMetTags) : [],
+        nationalityTags: rawNationalityTags ? JSON.parse(rawNationalityTags) : [],
         onboardingDone: storage?.getItem(ONBOARDING_DONE_KEY) === 'true',
       }
       // Persist migrated values so future reads use the file
@@ -158,6 +162,7 @@ export async function loadSettings() {
   const rawSituationTags = storage.getItem(SITUATION_TAGS_KEY)
   const rawPlaceTags = storage.getItem(PLACE_TAGS_KEY)
   const rawHowWeMetTags = storage.getItem(HOW_WE_MET_TAGS_KEY)
+  const rawNationalityTags = storage.getItem(NATIONALITY_TAGS_KEY)
   const rawOnboardingDone = storage.getItem(ONBOARDING_DONE_KEY)
   return {
     iconColor: storage.getItem(ICON_COLOR_KEY) || SETTINGS_DEFAULTS.iconColor,
@@ -171,6 +176,7 @@ export async function loadSettings() {
     situationTags: rawSituationTags ? JSON.parse(rawSituationTags) : [],
     placeTags: rawPlaceTags ? JSON.parse(rawPlaceTags) : [],
     howWeMetTags: rawHowWeMetTags ? JSON.parse(rawHowWeMetTags) : [],
+    nationalityTags: rawNationalityTags ? JSON.parse(rawNationalityTags) : [],
     onboardingDone: rawOnboardingDone === 'true',
   }
 }
@@ -185,6 +191,7 @@ export async function saveSettings({
   situationTags,
   placeTags,
   howWeMetTags,
+  nationalityTags,
   onboardingDone,
 }) {
   if (isNativePlatform()) {
@@ -200,6 +207,7 @@ export async function saveSettings({
         situationTags,
         placeTags,
         howWeMetTags,
+        nationalityTags,
         onboardingDone,
       }),
       encoding: Encoding.UTF8,
@@ -219,11 +227,13 @@ export async function saveSettings({
     storage.setItem(SITUATION_TAGS_KEY, JSON.stringify(situationTags))
   if (placeTags !== undefined) storage.setItem(PLACE_TAGS_KEY, JSON.stringify(placeTags))
   if (howWeMetTags !== undefined) storage.setItem(HOW_WE_MET_TAGS_KEY, JSON.stringify(howWeMetTags))
+  if (nationalityTags !== undefined)
+    storage.setItem(NATIONALITY_TAGS_KEY, JSON.stringify(nationalityTags))
   if (onboardingDone !== undefined) storage.setItem(ONBOARDING_DONE_KEY, String(onboardingDone))
 }
 
 const PERSON_REQUIRED_STRINGS = ['name', 'gender', 'howWeMet', 'zodiacSign', 'activity']
-const PERSON_OPTIONAL_STRINGS = ['realName']
+const PERSON_OPTIONAL_STRINGS = ['realName', 'nationality']
 const EVENT_REQUIRED_STRINGS = ['date', 'place', 'situation']
 
 // Fills missing required fields with empty values before export.
