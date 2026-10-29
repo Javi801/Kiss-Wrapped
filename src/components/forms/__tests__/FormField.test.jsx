@@ -73,17 +73,27 @@ describe('FormField', () => {
     expect(withoutError).not.toContain('<p')
   })
 
-  it('places the counter between the control and the error', () => {
+  it('puts the error and the counter in one row under the control, error first', () => {
     const html = render(
       <FormField label="Name" length={3} maxLength={40} error="Too short">
         <input data-testid="control" />
       </FormField>
     )
     const control = html.indexOf('data-testid="control"')
-    const counter = html.indexOf('>3/40<')
     const error = html.indexOf('Too short')
-    expect(control).toBeLessThan(counter)
-    expect(counter).toBeLessThan(error)
+    const counter = html.indexOf('>3/40<')
+    expect(control).toBeLessThan(error)
+    expect(error).toBeLessThan(counter)
+    expect(html).toMatch(/<div[^>]*><p[^>]*>Too short<\/p><p[^>]*>3\/40<\/p><\/div>/)
+  })
+
+  it('keeps the counter on the right when there is no error', () => {
+    const html = render(
+      <FormField label="Name" length={3} maxLength={40}>
+        <input />
+      </FormField>
+    )
+    expect(html).toContain('margin-left:auto')
   })
 })
 
